@@ -149,7 +149,7 @@ IndentPPDirectives: None
 # 向后兼容缩进外部块
 IndentExternBlock: AfterExternBlock
 # 缩进模板中的requires子句
-IndentRequires:  false
+IndentRequires:  true
 # 缩进宽度
 IndentWidth:     4
 # 函数返回类型换行时，缩进函数声明或函数定义的函数名
