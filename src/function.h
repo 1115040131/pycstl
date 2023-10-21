@@ -13,11 +13,11 @@ struct Function {
 };
 
 template <typename Ret, typename... Args>
-struct Function<Ret(Args...)> {
+class Function<Ret(Args...)> {
 public:
     // 通过虚函数擦除类型, base_ 在调用时都只需要调用 call 函数
     struct FuncBase {
-        virtual Ret call(Args... args) = 0;
+        virtual Ret call(Args&&... args) = 0;
         virtual ~FuncBase() = default;
     };
 
@@ -27,7 +27,7 @@ public:
 
         FuncImpl(F _f) : f(std::move(_f)) {}
 
-        virtual Ret call(Args... args) override {
+        virtual Ret call(Args&&... args) override {
             return std::invoke(f, std::forward<Args>(args)...);
         }
     };
