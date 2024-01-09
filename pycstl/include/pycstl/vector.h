@@ -1,6 +1,6 @@
 #pragma once
 
-#include <format>
+#include <fmt/format.h>
 
 namespace pycstl {
 
@@ -219,27 +219,27 @@ public:
     }
 
     reverse_iterator rbegin() noexcept {
-        return std::make_reverse_iterator(data_);
+        return std::make_reverse_iterator(data_ + size_);
     }
 
     const_reverse_iterator rbegin() const noexcept {
-        return std::make_reverse_iterator(data_);
+        return std::make_reverse_iterator(data_ + size_);
     }
 
     const_reverse_iterator crbegin() const noexcept {
-        return std::make_reverse_iterator(data_);
+        return std::make_reverse_iterator(data_ + size_);
     }
 
     reverse_iterator rend() noexcept {
-        return std::make_reverse_iterator(data_ + size_);
+        return std::make_reverse_iterator(data_);
     }
 
     const_reverse_iterator rend() const noexcept {
-        return std::make_reverse_iterator(data_ + size_);
+        return std::make_reverse_iterator(data_);
     }
 
     const_reverse_iterator crend() const noexcept {
-        return std::make_reverse_iterator(data_ + size_);
+        return std::make_reverse_iterator(data_);
     }
 
     // 容量
@@ -255,7 +255,7 @@ public:
 #ifdef _MSC_VER
         count = std::max(count, static_cast<size_t>(capacity_ * 1.5));
 #else
-        count = std::max(count, capacity_ * 2);
+        count = std::max(count, size_ * 2);
 #endif
         auto old_data = data_;
         auto old_capacity = capacity_;
@@ -429,7 +429,7 @@ public:
 
 private:
     void _throw_out_of_range(size_t pos) {
-        throw std::out_of_range(std::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
+        throw std::out_of_range(fmt::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
     }
 
 private:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <format>
+#include <fmt/format.h>
 
 namespace pycstl {
 
@@ -96,7 +96,7 @@ public:
 
 private:
     void throwOutOfRange(size_t _Pos) {
-        throw std::out_of_range(std::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), _N, _Pos));
+        throw std::out_of_range(fmt::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), _N, _Pos));
     }
 };
 
@@ -187,7 +187,7 @@ public:
 
 private:
     void throwOutOfRange(size_t _Pos) {
-        throw std::out_of_range(std::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), 0, _Pos));
+        throw std::out_of_range(fmt::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), 0, _Pos));
     }
 };
 

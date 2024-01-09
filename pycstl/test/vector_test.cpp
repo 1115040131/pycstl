@@ -1,27 +1,27 @@
-#include <format>
-#include <iostream>
+
 #include <vector>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "vector.h"
+#include "pycstl/vector.h"
 
 /// @brief 比较数组元素, 大小, 容量
-#define COMPARE_VEC_WITH_STL(vec1, vec2)                         \
-    EXPECT_EQ(vec1.size(), vec2.size());                         \
-    EXPECT_EQ(vec1.capacity(), vec2.capacity());                 \
-    for (size_t i = 0; i < vec2.size(); i++) {                   \
-        EXPECT_EQ(vec1[i], vec2[i]) << std::format("pos={}", i); \
+#define COMPARE_VEC_WITH_STL(pyc_vec, stl_vec)                         \
+    EXPECT_EQ(pyc_vec.size(), stl_vec.size());                         \
+    EXPECT_EQ(pyc_vec.capacity(), stl_vec.capacity());                 \
+    for (size_t i = 0; i < stl_vec.size(); i++) {                      \
+        EXPECT_EQ(pyc_vec[i], stl_vec[i]) << fmt::format("pos={}", i); \
     }
 
 /// @brief 比较数组元素, 大小
-#define COMPARE_CONTENT_WITH_STL(vec1, vec2)                     \
-    EXPECT_EQ(vec1.size(), vec2.size());                         \
-    for (size_t i = 0; i < vec2.size(); i++) {                   \
-        EXPECT_EQ(vec1[i], vec2[i]) << std::format("pos={}", i); \
+#define COMPARE_CONTENT_WITH_STL(pyc_vec, stl_vec)                     \
+    EXPECT_EQ(pyc_vec.size(), stl_vec.size());                         \
+    for (size_t i = 0; i < stl_vec.size(); i++) {                      \
+        EXPECT_EQ(pyc_vec[i], stl_vec[i]) << fmt::format("pos={}", i); \
     }
 
-TEST(test_vector, test_construction) {
+TEST(VectorTest, test_construction) {
     pycstl::Vector<int> vec1;
     std::vector<int> stl_vec1;
     EXPECT_EQ(sizeof(vec1), sizeof(stl_vec1));
@@ -74,7 +74,7 @@ TEST(test_vector, test_construction) {
     EXPECT_EQ(vec1.size(), 0);
 }
 
-TEST(test_vector, test_initialization) {
+TEST(VectorTest, test_initialization) {
     pycstl::Vector<int> vec1{17, 24, 145, -12, 31};
     std::vector<int> vec2{17, 24, 145, -12, 31};
     COMPARE_VEC_WITH_STL(vec1, vec2);
@@ -88,7 +88,7 @@ TEST(test_vector, test_initialization) {
     COMPARE_VEC_WITH_STL(vec1, vec2);
 }
 
-TEST(test_vector, test_modify) {
+TEST(VectorTest, test_modify) {
     pycstl::Vector<int> vec1{1, 2, 3};
     std::vector<int> vec2{1, 2, 3};
     COMPARE_VEC_WITH_STL(vec1, vec2);
@@ -107,7 +107,7 @@ TEST(test_vector, test_modify) {
     COMPARE_VEC_WITH_STL(bar1, bar2);
 }
 
-TEST(test_vector, test_erase_insert) {
+TEST(VectorTest, test_erase_insert) {
     pycstl::Vector<int> vec1;
     std::vector<int> vec2;
     vec1.reserve(16);
@@ -125,6 +125,7 @@ TEST(test_vector, test_erase_insert) {
     vec1.erase(vec1.begin() + 4, vec1.begin() + 8);
     vec2.erase(vec2.begin() + 4, vec2.begin() + 8);
     COMPARE_VEC_WITH_STL(vec1, vec2);
+
 
     vec1.insert(vec1.begin(), 10, 100);
     vec2.insert(vec2.begin(), 10, 100);
@@ -155,7 +156,7 @@ TEST(test_vector, test_erase_insert) {
     COMPARE_VEC_WITH_STL(vec1, vec2);
 }
 
-TEST(test_vector, test_emplace) {
+TEST(VectorTest, test_emplace) {
     struct Test {
         int x;
         int y;

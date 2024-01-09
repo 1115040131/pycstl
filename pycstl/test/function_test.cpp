@@ -1,9 +1,7 @@
-#include <format>
-#include <iostream>
-
+#include <fmt/printf.h>
 #include <gtest/gtest.h>
 
-#include "function.h"
+#include "pycstl/function.h"
 
 void repeatTwice(pycstl::Function<void(int)> const& func) {
     func(1);
@@ -11,19 +9,19 @@ void repeatTwice(pycstl::Function<void(int)> const& func) {
 }
 
 void func_hello(int i) {
-    std::cout << std::format("#{} Hello\n", i);
+    fmt::println("#{} Hello", i);
 }
 
 struct FuncPrintnum {
     void operator()(int i) const {
-        std::cout << std::format("#{} Numbers are: {}, {}\n", i, x, y);
+        fmt::println("#{} Numbers are: {}, {}", i, x, y);
     }
     int x;
     int y;
 };
 
 /// @brief function 接收函数
-TEST(test_function, test_func) {
+TEST(FunctionTest, SetFunction) {
     testing::internal::CaptureStdout();
     repeatTwice(func_hello);
     std::string output = testing::internal::GetCapturedStdout();
@@ -32,7 +30,7 @@ TEST(test_function, test_func) {
 }
 
 /// @brief function 接收结构体 (lambda 展开)
-TEST(test_function, test_struct) {
+TEST(FunctionTest, SetStruct) {
     testing::internal::CaptureStdout();
     FuncPrintnum func_printnum{2, 4};
     repeatTwice(func_printnum);
@@ -42,12 +40,12 @@ TEST(test_function, test_struct) {
 }
 
 /// @brief function 接收 lambda
-TEST(test_function, test_lambda) {
+TEST(FunctionTest, SetLambda) {
     testing::internal::CaptureStdout();
     int x = 3;
     int y = 9;
     repeatTwice([=](int i) {
-        std::cout << std::format("#{} Numbers are: {}, {}\n", i, x, y);
+        fmt::println("#{} Numbers are: {}, {}", i, x, y);
     });
     std::string output = testing::internal::GetCapturedStdout();
 

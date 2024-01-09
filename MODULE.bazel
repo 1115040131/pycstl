@@ -1,0 +1,10 @@
+module(
+    name = "pycstl",
+    version = "0.0.1",
+)
+
+# 1. The metadata of glog is fetched from the BCR, including its dependencies (gflags).
+# 2. The `repo_name` attribute allows users to reference this dependency via the `gtest` repo name.
+bazel_dep(name = "fmt", version = "10.2.1")
+bazel_dep(name = "glog", version = "0.6.0")
+bazel_dep(name = "googletest", version = "1.14.0")

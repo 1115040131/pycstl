@@ -1,10 +1,8 @@
 #include <array>
-#include <format>
-#include <iostream>
 
 #include <gtest/gtest.h>
 
-#include "array.h"
+#include "pycstl/array.h"
 
 using namespace pycstl;
 
@@ -14,7 +12,7 @@ void modify_array(Array<int, 32>& arr) {
     }
 }
 
-TEST(test_array, test_modify) {
+TEST(ArrayTest, ModifyArray) {
     Array<int, 32> arr{1, 2, 3};
     EXPECT_THROW(modify_array(arr), std::out_of_range);
 
@@ -24,7 +22,7 @@ TEST(test_array, test_modify) {
     }
 }
 
-TEST(test_array, test_size) {
+TEST(ArrayTest, SizeCompare) {
     Array<int, 32> arr{1, 2, 3};
     EXPECT_EQ(decltype(arr)::Size(), 32);
     EXPECT_EQ(arr.size(), 32);
@@ -40,7 +38,7 @@ TEST(test_array, test_size) {
     EXPECT_EQ(arr4.size(), 4);
 }
 
-TEST(test_array, test_iterator) {
+TEST(ArrayTest, IteratorVisit) {
     Array<int, 32> arr{1, 2, 3};
     for (auto it = arr.begin(); it != arr.end(); it++) {
         *it = 13;

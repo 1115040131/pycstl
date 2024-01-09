@@ -2,7 +2,7 @@
 
 #include <concepts>
 
-#include "function.h"
+#include "pycstl/function.h"
 
 namespace pycstl {
 

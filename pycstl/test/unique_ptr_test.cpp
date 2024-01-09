@@ -1,11 +1,9 @@
 #include <stdio.h>
 
-#include <format>
-#include <iostream>
-
+#include <fmt/printf.h>
 #include <gtest/gtest.h>
 
-#include "unique_ptr.h"
+#include "pycstl/unique_ptr.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)
@@ -14,21 +12,21 @@
 using namespace pycstl;
 
 template <>
-struct DefaultDeleter<FILE> {
+struct pycstl::DefaultDeleter<FILE> {
     void operator()(FILE* ptr) const {
         fclose(ptr);
-        std::cout << "DefaultDeleter<FILE>\n";
+        fmt::println("DefaultDeleter<FILE>");
     }
 };
 
 struct FileDeleter {
     void operator()(FILE* ptr) const {
         fclose(ptr);
-        std::cout << "FileDeleter\n";
+        fmt::println("FileDeleter<FILE>");
     }
 };
 
-TEST(test_unique_ptr, test_deconstruction) {
+TEST(UniquePtrTest, Deconstruction) {
     testing::internal::CaptureStdout();
     {
         auto file1 = UniquePtr<FILE>(fopen("myfile.txt", "w"));
@@ -36,7 +34,7 @@ TEST(test_unique_ptr, test_deconstruction) {
     }
     std::string output = testing::internal::GetCapturedStdout();
 
-    EXPECT_EQ(output, "FileDeleter\nDefaultDeleter<FILE>\n");
+    EXPECT_EQ(output, "FileDeleter<FILE>\nDefaultDeleter<FILE>\n");
 
     auto p = UniquePtr<int>(new int(42));
 }
@@ -45,7 +43,7 @@ struct MyClass {
     int a, b, c;
 };
 
-TEST(test_unique_ptr, test_make_unique) {
+TEST(UniquePtrTest, MakeUnique) {
     auto int_val = makeUnique<int>();
     EXPECT_EQ(*int_val, 0);
 
@@ -74,7 +72,7 @@ struct Dog : Animal {
     Dog(int _age) : age(_age) {}
 
     virtual void speak() {
-        std::cout << std::format("Bark! I'm {} year old!\n", age);
+        fmt::println("Bark! I'm {} year old!", age);
     }
 };
 
@@ -84,11 +82,11 @@ struct Cat : Animal {
     Cat(int& _age) : age(_age) {}
 
     virtual void speak() {
-        std::cout << std::format("Meow! I'm {} year old!\n", age);
+        fmt::println("Meow! I'm {} year old!", age);
     }
 };
 
-TEST(test_unique_ptr, test_unique_ptr_vector) {
+TEST(UniquePtrTest, VectorUniquePtr) {
     std::vector<UniquePtr<Animal>> zoo;
     int age = 3;
     zoo.push_back(makeUnique<Cat>(age));
@@ -117,7 +115,7 @@ void public_fclose(FILE* fp /* take ownership */) {
     EXPECT_EQ(fclose(fp), 0);
 }
 
-TEST(test_unique_ptr, test_ownership) {
+TEST(UniquePtrTest, Ownership) {
     testing::internal::CaptureStdout();
     {
         UniquePtr<FILE> fp(fopen("myfile.txt", "r"));
