@@ -136,6 +136,9 @@ public:
     }
 
     ~Vector() noexcept {
+        for (size_t i = 0; i < size_; i++) {
+            std::destroy_at(&data_[i]);
+        }
         if (capacity_) {
             alloc_.deallocate(data_, capacity_);
         }
@@ -373,9 +376,15 @@ public:
     }
 
     void resize(size_t count, const T& value = T()) {
-        reserve(count);
-        for (size_t i = size_; i < count; i++) {
-            std::construct_at(&data_[i], value);
+        if (count < size_) {
+            for (size_t i = count; i < size_; i++) {
+                std::destroy_at(&data_[i]);
+            }
+        } else if (count > size_) {
+            reserve(count);
+            for (size_t i = size_; i < count; i++) {
+                std::construct_at(&data_[i], value);
+            }
         }
         size_ = count;
     }
