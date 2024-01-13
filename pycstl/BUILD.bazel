@@ -7,6 +7,9 @@ exports_files(["LICENSE"])
 cc_library(
     name = "pycstl",
     hdrs = glob(["include/pycstl/*.h"]),
-    includes = ["include"],
-    deps = ["@fmt//:fmt"],
+    includes = [
+        ".",
+        "include",
+    ],
+    deps = ["@fmt"],
 )

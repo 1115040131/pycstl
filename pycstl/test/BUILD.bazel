@@ -1,44 +1,11 @@
 cc_test(
     name = "pycstl_all_test",
-    srcs = glob(["*_test.cpp"]),
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
     deps = [
+        "//pycstl",
         "@googletest//:gtest_main",
-        "//pycstl:pycstl"
-    ],
-)
-
-cc_test(
-    name = "function_test",
-    srcs = ["function_test.cpp"],
-    deps = [
-        "@googletest//:gtest_main",
-        "//pycstl:pycstl"
-    ],
-)
-
-cc_test(
-    name = "unique_ptr_test",
-    srcs = ["unique_ptr_test.cpp"],
-    deps = [
-        "@googletest//:gtest_main",
-        "//pycstl:pycstl"
-    ],
-)
-
-cc_test(
-    name = "array_test",
-    srcs = ["array_test.cpp"],
-    deps = [
-        "@googletest//:gtest_main",
-        "//pycstl:pycstl"
-    ],
-)
-
-cc_test(
-    name = "vector_test",
-    srcs = ["vector_test.cpp"],
-    deps = [
-        "@googletest//:gtest_main",
-        "//pycstl:pycstl"
     ],
 )
