@@ -1,0 +1,20 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+_RULES_BOOST_COMMIT = "28a32b81d829e49979475d9c539b297f88712006"
+
+# Boost
+# Famous C++ library that has given rise to many new additions to the C++ Standard Library
+# Makes @boost available for use: For example, add `@boost//:algorithm` to your deps.
+# For more, see https://github.com/nelhage/rules_boost and https://www.boost.org
+http_archive(
+    name = "com_github_nelhage_rules_boost",
+    strip_prefix = "rules_boost-" + _RULES_BOOST_COMMIT,
+
+    # Replace the commit hash in both places (below) with the latest, rather than using the stale one here.
+    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
+    urls = ["https://github.com/nelhage/rules_boost/archive/" + _RULES_BOOST_COMMIT + ".tar.gz"],
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
+boost_deps()
