@@ -30,15 +30,11 @@ TEST(ListTest, Erase) {
     COMPARE_CONTENT(arr, stl_arr);
 
     ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) {
-            container.erase(container.cbegin());
-        },
-        COMPARE_CONTENT);
+        arr, stl_arr, [](auto& container) { container.erase(container.cbegin()); }, COMPARE_CONTENT);
 
     ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) {
-            container.erase(std::next(container.cbegin(), 2), std::next(container.cbegin(), 4));
-        },
+        arr, stl_arr,
+        [](auto& container) { container.erase(std::next(container.cbegin(), 2), std::next(container.cbegin(), 4)); },
         COMPARE_CONTENT);
 }
 
@@ -48,21 +44,12 @@ TEST(ListTest, Remove) {
     COMPARE_CONTENT(arr, stl_arr);
 
     ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) {
-            container.remove(5);
-        },
-        COMPARE_CONTENT);
+        arr, stl_arr, [](auto& container) { container.remove(5); }, COMPARE_CONTENT);
 
     ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) {
-            container.remove(-99);
-        },
-        COMPARE_CONTENT);
+        arr, stl_arr, [](auto& container) { container.remove(-99); }, COMPARE_CONTENT);
 
     auto remove_condition = [](int value) { return value > 100; };
     ACTION_AND_COMPARE(
-        arr, stl_arr, [&](auto& container) {
-            container.remove_if(remove_condition);
-        },
-        COMPARE_CONTENT);
+        arr, stl_arr, [&](auto& container) { container.remove_if(remove_condition); }, COMPARE_CONTENT);
 }

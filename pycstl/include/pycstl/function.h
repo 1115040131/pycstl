@@ -27,16 +27,13 @@ public:
 
         FuncImpl(F _f) : f(std::move(_f)) {}
 
-        virtual Ret call(Args&&... args) override {
-            return std::invoke(f, std::forward<Args>(args)...);
-        }
+        virtual Ret call(Args&&... args) override { return std::invoke(f, std::forward<Args>(args)...); }
     };
 
     Function() = default;
 
     template <typename F>
-        requires(std::is_invocable_r_v<Ret, F, Args...> &&
-                 !std::is_same_v<std::decay_t<F>, Function>)
+        requires(std::is_invocable_r_v<Ret, F, Args...> && !std::is_same_v<std::decay_t<F>, Function>)
     Function(F f) : base_(std::make_shared<FuncImpl<F>>(std::move(f))) {}
 
     Ret operator()(Args... args) const {

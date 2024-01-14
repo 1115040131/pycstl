@@ -71,9 +71,7 @@ struct Dog : Animal {
 
     Dog(int _age) : age(_age) {}
 
-    virtual void speak() {
-        fmt::println("Bark! I'm {} year old!", age);
-    }
+    virtual void speak() { fmt::println("Bark! I'm {} year old!", age); }
 };
 
 struct Cat : Animal {
@@ -81,9 +79,7 @@ struct Cat : Animal {
 
     Cat(int& _age) : age(_age) {}
 
-    virtual void speak() {
-        fmt::println("Meow! I'm {} year old!", age);
-    }
+    virtual void speak() { fmt::println("Meow! I'm {} year old!", age); }
 };
 
 TEST(UniquePtrTest, VectorUniquePtr) {
@@ -111,9 +107,7 @@ TEST(UniquePtrTest, VectorUniquePtr) {
     EXPECT_EQ(output, "Meow! I'm 4 year old!\nBark! I'm 3 year old!\n");
 }
 
-void public_fclose(FILE* fp /* take ownership */) {
-    EXPECT_EQ(fclose(fp), 0);
-}
+void public_fclose(FILE* fp /* take ownership */) { EXPECT_EQ(fclose(fp), 0); }
 
 TEST(UniquePtrTest, Ownership) {
     testing::internal::CaptureStdout();

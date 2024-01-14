@@ -155,13 +155,9 @@ public:
         insert(begin(), first, last);
     }
 
-    void assign(std::initializer_list<T> init) {
-        assign(init.begin(), init.end());
-    }
+    void assign(std::initializer_list<T> init) { assign(init.begin(), init.end()); }
 
-    allocator_type get_allocator() const noexcept {
-        return alloc_;
-    }
+    allocator_type get_allocator() const noexcept { return alloc_; }
 
     // 元素访问
 
@@ -197,53 +193,29 @@ public:
 
     // 迭代器
 
-    iterator begin() noexcept {
-        return data_;
-    }
+    iterator begin() noexcept { return data_; }
 
-    const_iterator begin() const noexcept {
-        return data_;
-    }
+    const_iterator begin() const noexcept { return data_; }
 
-    const_iterator cbegin() const noexcept {
-        return data_;
-    }
+    const_iterator cbegin() const noexcept { return data_; }
 
-    iterator end() noexcept {
-        return data_ + size_;
-    }
+    iterator end() noexcept { return data_ + size_; }
 
-    const_iterator end() const noexcept {
-        return data_ + size_;
-    }
+    const_iterator end() const noexcept { return data_ + size_; }
 
-    const_iterator cend() const noexcept {
-        return data_ + size_;
-    }
+    const_iterator cend() const noexcept { return data_ + size_; }
 
-    reverse_iterator rbegin() noexcept {
-        return std::make_reverse_iterator(data_ + size_);
-    }
+    reverse_iterator rbegin() noexcept { return std::make_reverse_iterator(data_ + size_); }
 
-    const_reverse_iterator rbegin() const noexcept {
-        return std::make_reverse_iterator(data_ + size_);
-    }
+    const_reverse_iterator rbegin() const noexcept { return std::make_reverse_iterator(data_ + size_); }
 
-    const_reverse_iterator crbegin() const noexcept {
-        return std::make_reverse_iterator(data_ + size_);
-    }
+    const_reverse_iterator crbegin() const noexcept { return std::make_reverse_iterator(data_ + size_); }
 
-    reverse_iterator rend() noexcept {
-        return std::make_reverse_iterator(data_);
-    }
+    reverse_iterator rend() noexcept { return std::make_reverse_iterator(data_); }
 
-    const_reverse_iterator rend() const noexcept {
-        return std::make_reverse_iterator(data_);
-    }
+    const_reverse_iterator rend() const noexcept { return std::make_reverse_iterator(data_); }
 
-    const_reverse_iterator crend() const noexcept {
-        return std::make_reverse_iterator(data_);
-    }
+    const_reverse_iterator crend() const noexcept { return std::make_reverse_iterator(data_); }
 
     // 容量
 
@@ -358,9 +330,7 @@ public:
         return data_ + insert_idx;
     }
 
-    iterator insert(const_iterator pos, std::initializer_list<T> init) {
-        return insert(pos, init.begin(), init.end());
-    }
+    iterator insert(const_iterator pos, std::initializer_list<T> init) { return insert(pos, init.begin(), init.end()); }
 
     template <typename... Args>
     T& emplace(const_iterator pos, Args&&... args) {

@@ -15,9 +15,7 @@ T exchange(T& val, U&& new_val) {
 
 template <typename T>
 struct DefaultDeleter {
-    void operator()(T* ptr) const {
-        delete ptr;
-    }
+    void operator()(T* ptr) const { delete ptr; }
 };
 
 template <typename T, typename Deleter = DefaultDeleter<T>>
@@ -88,14 +86,11 @@ private:
 /// @brief C 风格数组偏特化
 template <typename T>
 struct DefaultDeleter<T[]> {
-    void operator()(T* ptr) const {
-        delete[] ptr;
-    }
+    void operator()(T* ptr) const { delete[] ptr; }
 };
 
 template <typename T, typename Deleter>
-struct UniquePtr<T[], Deleter> : UniquePtr<T, Deleter> {
-};
+struct UniquePtr<T[], Deleter> : UniquePtr<T, Deleter> {};
 
 template <typename T, typename... Args>
 UniquePtr<T> makeUnique(Args&&... args) {

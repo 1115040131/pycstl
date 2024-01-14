@@ -131,13 +131,9 @@ public:
 
     // 元素访问
 
-    _Tp& at(size_t _Pos) {
-        throwOutOfRange(_Pos);
-    }
+    _Tp& at(size_t _Pos) { throwOutOfRange(_Pos); }
 
-    const _Tp& at(size_t _Pos) const {
-        throwOutOfRange(_Pos);
-    }
+    const _Tp& at(size_t _Pos) const { throwOutOfRange(_Pos); }
 
     _Tp& operator[](size_t _Pos) noexcept { _LIBPYCCXX_UNREACHABLE(); }
 

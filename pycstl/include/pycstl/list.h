@@ -11,12 +11,8 @@ private:
         ListBaseNode* prev_;
         ListBaseNode* next_;
 
-        inline T& value() {
-            return static_cast<ListValueNode&>(*this).value_;
-        }
-        inline const T& value() const {
-            return static_cast<const ListValueNode&>(*this).value_;
-        }
+        inline T& value() { return static_cast<ListValueNode&>(*this).value_; }
+        inline const T& value() const { return static_cast<const ListValueNode&>(*this).value_; }
     };
 
     struct ListValueNode : ListBaseNode {
@@ -37,13 +33,9 @@ private:
     [[no_unique_address]] Allocator alloc_;
 #endif
 
-    ListNode* newNode() {
-        return AllocNode{alloc_}.allocate(1);
-    }
+    ListNode* newNode() { return AllocNode{alloc_}.allocate(1); }
 
-    void deleteNode(ListNode* node) noexcept {
-        AllocNode{alloc_}.deallocate(static_cast<ListValueNode*>(node), 1);
-    }
+    void deleteNode(ListNode* node) noexcept { AllocNode{alloc_}.deallocate(static_cast<ListValueNode*>(node), 1); }
 
 public:
     using value_type = T;
@@ -89,17 +81,11 @@ public:
             return tmp;
         }
 
-        T& operator*() const noexcept {
-            return curr->value();
-        }
+        T& operator*() const noexcept { return curr->value(); }
 
-        bool operator!=(const iterator& that) const noexcept {
-            return curr != that.curr;
-        }
+        bool operator!=(const iterator& that) const noexcept { return curr != that.curr; }
 
-        bool operator==(const iterator& that) const noexcept {
-            return !(*this != that);
-        }
+        bool operator==(const iterator& that) const noexcept { return !(*this != that); }
     };
 
     struct const_iterator {
@@ -121,9 +107,7 @@ public:
 
         const_iterator(iterator that) noexcept : curr(that.curr) {}
 
-        explicit operator iterator() const noexcept {
-            return iterator{const_cast<ListNode*>(curr)};
-        }
+        explicit operator iterator() const noexcept { return iterator{const_cast<ListNode*>(curr)}; }
 
         const_iterator& operator++() noexcept {  //++iterator
             curr = curr->next_;
@@ -147,17 +131,11 @@ public:
             return tmp;
         }
 
-        const T& operator*() const noexcept {
-            return curr->value();
-        }
+        const T& operator*() const noexcept { return curr->value(); }
 
-        bool operator!=(const const_iterator& that) const noexcept {
-            return curr != that.curr;
-        }
+        bool operator!=(const const_iterator& that) const noexcept { return curr != that.curr; }
 
-        bool operator==(const const_iterator& that) const noexcept {
-            return !(*this != that);
-        }
+        bool operator==(const const_iterator& that) const noexcept { return !(*this != that); }
     };
 
     using reverse_iterator = std::reverse_iterator<iterator>;
@@ -209,9 +187,7 @@ private:
         prev->next_ = &dummy_;
     }
 
-    void _uninit_assign(std::initializer_list<T> init) {
-        _uninit_assign(init.begin(), init.end());
-    }
+    void _uninit_assign(std::initializer_list<T> init) { _uninit_assign(init.begin(), init.end()); }
 
     void _uninit_move_assign(List&& other) noexcept {
         auto prev = other.dummy_.prev_;
@@ -225,14 +201,10 @@ private:
 
 public:
     // 构造函数 (1)
-    List() noexcept {
-        _uninit_assign(0);
-    }
+    List() noexcept { _uninit_assign(0); }
 
     // 构造函数 (2)
-    explicit List(const Allocator& alloc) noexcept : alloc_(alloc) {
-        _uninit_assign(0);
-    }
+    explicit List(const Allocator& alloc) noexcept : alloc_(alloc) { _uninit_assign(0); }
 
     // 构造函数 (3)
     List(size_t count, const T& value, const Allocator& alloc = Allocator()) : alloc_(alloc) {
@@ -240,9 +212,7 @@ public:
     }
 
     // 构造函数 (4)
-    explicit List(size_t count, const Allocator& alloc = Allocator()) : alloc_(alloc) {
-        _uninit_assign(count);
-    }
+    explicit List(size_t count, const Allocator& alloc = Allocator()) : alloc_(alloc) { _uninit_assign(count); }
 
     // input_iterator 支持 *it it++ ++it it!=it it==it
     // output_iterator 支持 *it=val it++ ++it it!=it it==it
@@ -258,35 +228,24 @@ public:
     }
 
     // 构造函数 (6) 拷贝构造函数
-    List(const List& other) : alloc_(other.alloc_) {
-        _uninit_assign(other.begin(), other.end());
-    }
+    List(const List& other) : alloc_(other.alloc_) { _uninit_assign(other.begin(), other.end()); }
 
     // 构造函数 (7)
-    List(const List& other, const Allocator& alloc) : alloc_(alloc) {
-        _uninit_assign(other.begin(), other.end());
-    }
+    List(const List& other, const Allocator& alloc) : alloc_(alloc) { _uninit_assign(other.begin(), other.end()); }
 
     // 构造函数 (8) 移动构造函数
-    List(List&& other) noexcept : alloc_(std::move(other.alloc_)) {
-        _uninit_move_assign(std::move(other));
-    }
+    List(List&& other) noexcept : alloc_(std::move(other.alloc_)) { _uninit_move_assign(std::move(other)); }
 
     // 构造函数 (9)
-    List(List&& other, const Allocator& alloc) noexcept : alloc_(alloc) {
-        _uninit_move_assign(std::move(other));
-    }
+    List(List&& other, const Allocator& alloc) noexcept : alloc_(alloc) { _uninit_move_assign(std::move(other)); }
 
     // 构造函数(10)
-    List(std::initializer_list<T> init, const Allocator& alloc = Allocator())
-        : alloc_(alloc) {
+    List(std::initializer_list<T> init, const Allocator& alloc = Allocator()) : alloc_(alloc) {
         _uninit_assign(init.begin(), init.end());
     }
 
     // 析构函数
-    ~List() noexcept {
-        clear();
-    }
+    ~List() noexcept { clear(); }
 
     // 拷贝赋值运算符
     List& operator=(const List& other) {
@@ -334,88 +293,50 @@ public:
 
 #pragma region 元素访问
 
-    T& front() noexcept {
-        return dummy_.next_->value();
-    }
+    T& front() noexcept { return dummy_.next_->value(); }
 
-    const T& front() const noexcept {
-        return dummy_.next_->value();
-    }
+    const T& front() const noexcept { return dummy_.next_->value(); }
 
-    T& back() noexcept {
-        return dummy_.prev_->value();
-    }
-    const T& back() const noexcept {
-        return dummy_.prev_->value();
-    }
+    T& back() noexcept { return dummy_.prev_->value(); }
+    const T& back() const noexcept { return dummy_.prev_->value(); }
 
 #pragma endregion
 
 #pragma region 元素访问
 
-    iterator begin() noexcept {
-        return iterator{dummy_.next_};
-    }
+    iterator begin() noexcept { return iterator{dummy_.next_}; }
 
-    iterator end() noexcept {
-        return iterator{&dummy_};
-    }
+    iterator end() noexcept { return iterator{&dummy_}; }
 
-    const_iterator cbegin() const noexcept {
-        return const_iterator{dummy_.next_};
-    }
+    const_iterator cbegin() const noexcept { return const_iterator{dummy_.next_}; }
 
-    const_iterator cend() const noexcept {
-        return const_iterator{&dummy_};
-    }
+    const_iterator cend() const noexcept { return const_iterator{&dummy_}; }
 
-    const_iterator begin() const noexcept {
-        return cbegin();
-    }
+    const_iterator begin() const noexcept { return cbegin(); }
 
-    const_iterator end() const noexcept {
-        return cend();
-    }
+    const_iterator end() const noexcept { return cend(); }
 
-    reverse_iterator rbegin() noexcept {
-        return std::make_reverse_iterator(end());
-    }
+    reverse_iterator rbegin() noexcept { return std::make_reverse_iterator(end()); }
 
-    reverse_iterator rend() noexcept {
-        return std::make_reverse_iterator(begin());
-    }
+    reverse_iterator rend() noexcept { return std::make_reverse_iterator(begin()); }
 
-    const_reverse_iterator crbegin() const noexcept {
-        return std::make_reverse_iterator(cend());
-    }
+    const_reverse_iterator crbegin() const noexcept { return std::make_reverse_iterator(cend()); }
 
-    const_reverse_iterator crend() const noexcept {
-        return std::make_reverse_iterator(cbegin());
-    }
+    const_reverse_iterator crend() const noexcept { return std::make_reverse_iterator(cbegin()); }
 
-    const_reverse_iterator rbegin() const noexcept {
-        return crbegin();
-    }
+    const_reverse_iterator rbegin() const noexcept { return crbegin(); }
 
-    const_reverse_iterator rend() const noexcept {
-        return crend();
-    }
+    const_reverse_iterator rend() const noexcept { return crend(); }
 
 #pragma endregion
 
 #pragma region 容量
 
-    bool empty() const noexcept {
-        return dummy_.next_ != &dummy_;
-    }
+    bool empty() const noexcept { return dummy_.next_ != &dummy_; }
 
-    size_t size() const noexcept {
-        return size_;
-    }
+    size_t size() const noexcept { return size_; }
 
-    static constexpr size_t max_size() noexcept {
-        return std::numeric_limits<size_t>::max();
-    }
+    static constexpr size_t max_size() noexcept { return std::numeric_limits<size_t>::max(); }
 
 #pragma endregion
 
@@ -446,13 +367,9 @@ public:
         return iterator{curr};
     }
 
-    iterator insert(const_iterator pos, const T& value) {
-        return emplace(pos, value);
-    }
+    iterator insert(const_iterator pos, const T& value) { return emplace(pos, value); }
 
-    iterator insert(const_iterator pos, T&& value) {
-        return emplace(pos, std::move_if_noexcept(value));
-    }
+    iterator insert(const_iterator pos, T&& value) { return emplace(pos, std::move_if_noexcept(value)); }
 
     iterator insert(const_iterator pos, size_t count, const T& value) {
         if (count == 0) [[unlikely]] {
@@ -479,9 +396,7 @@ public:
         return ++orig_pos;
     }
 
-    iterator insert(const_iterator pos, std::initializer_list<T> ilist) {
-        insert(pos, ilist.begin(), ilist.end());
-    }
+    iterator insert(const_iterator pos, std::initializer_list<T> ilist) { insert(pos, ilist.begin(), ilist.end()); }
 
     iterator erase(const_iterator pos) noexcept {
         auto node = const_cast<ListNode*>(pos.curr);
@@ -502,48 +417,34 @@ public:
         return iterator{first};
     }
 
-    void push_back(const T& value) {
-        emplace_back(value);
-    }
+    void push_back(const T& value) { emplace_back(value); }
 
-    void push_back(T&& value) {
-        emplace_back(std::move_if_noexcept(value));
-    }
+    void push_back(T&& value) { emplace_back(std::move_if_noexcept(value)); }
 
     template <typename... Args>
     T& emplace_back(Args&&... args) {
         return *emplace(end(), std::forward<Args>(args)...);
     }
 
-    void pop_back() noexcept {
-        erase(--end());
-    }
+    void pop_back() noexcept { erase(--end()); }
 
-    void push_front(const T& value) {
-        emplace_front(value);
-    }
+    void push_front(const T& value) { emplace_front(value); }
 
-    void push_front(T&& value) {
-        emplace_front(std::move_if_noexcept(value));
-    }
+    void push_front(T&& value) { emplace_front(std::move_if_noexcept(value)); }
 
     template <typename... Args>
     T& emplace_front(Args&&... args) {
         return *emplace(begin(), std::forward<Args>(args)...);
     }
 
-    void pop_front() noexcept {
-        erase(begin());
-    }
+    void pop_front() noexcept { erase(begin()); }
 
 #pragma endregion
 
 #pragma region 操作
 
     // 从另一个 list 中移动元素
-    void splice(const_iterator pos, List& other) {
-        insert(pos, other.begin(), other.end());
-    }
+    void splice(const_iterator pos, List& other) { insert(pos, other.begin(), other.end()); }
 
     void splice(const_iterator pos, List&& other) {
         inset(pos, std::make_move_iterator(other.begin()), std::make_move_iterator(other.end()));

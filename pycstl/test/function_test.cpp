@@ -8,14 +8,10 @@ void repeatTwice(pycstl::Function<void(int)> const& func) {
     func(2);
 }
 
-void func_hello(int i) {
-    fmt::println("#{} Hello", i);
-}
+void func_hello(int i) { fmt::println("#{} Hello", i); }
 
 struct FuncPrintnum {
-    void operator()(int i) const {
-        fmt::println("#{} Numbers are: {}, {}", i, x, y);
-    }
+    void operator()(int i) const { fmt::println("#{} Numbers are: {}, {}", i, x, y); }
     int x;
     int y;
 };
@@ -44,9 +40,7 @@ TEST(FunctionTest, SetLambda) {
     testing::internal::CaptureStdout();
     int x = 3;
     int y = 9;
-    repeatTwice([=](int i) {
-        fmt::println("#{} Numbers are: {}, {}", i, x, y);
-    });
+    repeatTwice([=](int i) { fmt::println("#{} Numbers are: {}, {}", i, x, y); });
     std::string output = testing::internal::GetCapturedStdout();
 
     EXPECT_EQ(output, "#1 Numbers are: 3, 9\n#2 Numbers are: 3, 9\n");

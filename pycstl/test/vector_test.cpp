@@ -146,9 +146,7 @@ TEST(VectorTest, test_emplace) {
         int x;
         int y;
 
-        bool operator==(const Test& that) const {
-            return x == that.x && y == that.y;
-        }
+        bool operator==(const Test& that) const { return x == that.x && y == that.y; }
     };
 
     pycstl::Vector<Test> vec1;
