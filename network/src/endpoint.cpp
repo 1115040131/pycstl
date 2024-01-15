@@ -1,7 +1,9 @@
 #include "network/endpoint.h"
 
 #include <iostream>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <boost/asio.hpp>
 #include <fmt/printf.h>
@@ -205,6 +207,35 @@ int AcceptNewConnection() {
     }
 
     return 0;
+}
+
+void UseConstBuffer() {
+    std::string buf = "hello world";
+    asio::const_buffer asio_buf(buf.c_str(), buf.size());
+    std::vector<asio::const_buffer> buffer_sequence;
+    buffer_sequence.push_back(asio_buf);
+}
+
+void UseBufferStr() { [[maybe_unused]] asio::const_buffers_1 output_buf = asio::buffer("hello world"); }
+
+void UseBufferArray() {
+    constexpr size_t kBufSizeBytes = 20;
+    std::unique_ptr<char[]> buf(new char[kBufSizeBytes]);
+    asio::mutable_buffers_1 input_buf = asio::buffer(static_cast<void*>(buf.get()), kBufSizeBytes);
+}
+
+void UseStreamBuffer() {
+    asio::streambuf buf;
+    std::ostream output(&buf);
+
+    // Writing the message to the stream-based buffer.
+    output << "Message1\nMessage2";
+
+    std::istream input(&buf);
+
+    std::string message1;
+
+    input >> message1;
 }
 
 }  // namespace network

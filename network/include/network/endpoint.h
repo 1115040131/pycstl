@@ -29,4 +29,16 @@ int DnsConnectToEnd();
 /// @brief 服务器接收连接
 int AcceptNewConnection();
 
+/// @brief 手动构造 asio const buffer
+void UseConstBuffer();
+
+/// @brief const buffer 传入 str
+void UseBufferStr();
+
+/// @brief const buffer 传入 array
+void UseBufferArray();
+
+/// @brief 流式传入 buffer
+void UseStreamBuffer();
+
 }  // namespace network
