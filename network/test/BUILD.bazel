@@ -1,0 +1,11 @@
+cc_test(
+    name = "network_all_test",
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
+    deps = [
+        "//network",
+        "@googletest//:gtest_main",
+    ],
+)
