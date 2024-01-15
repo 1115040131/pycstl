@@ -12,6 +12,8 @@ namespace network {
 
 namespace asio = boost::asio;
 
+#pragma region socket 的监听和连接
+
 int ClientEndPoint() {
     // Step 1. Assume that the client application has already obtained the IP-address and the protocol port number.
     std::string raw_ip_address = "127.4.8.1";
@@ -209,6 +211,10 @@ int AcceptNewConnection() {
     return 0;
 }
 
+#pragma endregion
+
+#pragma region buffer
+
 void UseConstBuffer() {
     std::string buf = "hello world";
     asio::const_buffer asio_buf(buf.c_str(), buf.size());
@@ -221,7 +227,7 @@ void UseBufferStr() { [[maybe_unused]] asio::const_buffers_1 output_buf = asio::
 void UseBufferArray() {
     constexpr size_t kBufSizeBytes = 20;
     std::unique_ptr<char[]> buf(new char[kBufSizeBytes]);
-    asio::mutable_buffers_1 input_buf = asio::buffer(static_cast<void*>(buf.get()), kBufSizeBytes);
+    [[maybe_unused]] asio::mutable_buffers_1 input_buf = asio::buffer(static_cast<void*>(buf.get()), kBufSizeBytes);
 }
 
 void UseStreamBuffer() {
@@ -237,5 +243,204 @@ void UseStreamBuffer() {
 
     input >> message1;
 }
+
+#pragma endregion
+
+#pragma region 同步读写
+
+/// @brief 同步写 write_some
+void WriteToSocket(asio::ip::tcp::socket& sock) {
+    std::string buf = "Hello World";
+    size_t total_bytes_written = 0;
+
+    // 循环发送
+    while (total_bytes_written != buf.length()) {
+        total_bytes_written +=
+            sock.write_some(asio::buffer(buf.c_str() + total_bytes_written, buf.length() - total_bytes_written));
+    }
+}
+
+int SendDataByWriteSome() {
+    std::string raw_ip_address = "127.0.0.1";
+    unsigned short port_num = 3333;
+
+    try {
+        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::io_context io_context;
+        asio::ip::tcp::socket sock(io_context, endpoint.protocol());
+        sock.connect(endpoint);
+        WriteToSocket(sock);
+    } catch (const boost::system::system_error& e) {
+        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+
+        return e.code().value();
+    }
+
+    return 0;
+}
+
+/// @brief 同步写 send
+int SendDataBySend() {
+    std::string raw_ip_address = "127.0.0.1";
+    unsigned short port_num = 3333;
+
+    try {
+        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::io_context io_context;
+        asio::ip::tcp::socket sock(io_context, endpoint.protocol());
+        sock.connect(endpoint);
+
+        std::string buf = "Hello World";
+
+        // 一次性发送
+        // send_length = 0: 对端关闭
+        //             > 0: 一定等于 buf.length(), 否则阻塞
+        //             < 0: 错误
+        auto send_length = sock.send(asio::buffer(buf.c_str(), buf.length()));
+        if (send_length <= 0) {
+            fmt::println("Send failed!");
+            return 1;
+        }
+    } catch (const boost::system::system_error& e) {
+        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+
+        return e.code().value();
+    }
+
+    return 0;
+}
+
+/// @brief 同步写 write
+int SendDataByWrite() {
+    std::string raw_ip_address = "127.0.0.1";
+    unsigned short port_num = 3333;
+
+    try {
+        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::io_context io_context;
+        asio::ip::tcp::socket sock(io_context, endpoint.protocol());
+        sock.connect(endpoint);
+
+        std::string buf = "Hello World";
+
+        // 一次性发送
+        // send_length = 0: 对端关闭
+        //             > 0: 一定等于 buf.length(), 否则阻塞
+        //             < 0: 错误
+        auto send_length = asio::write(sock, asio::buffer(buf.c_str(), buf.length()));
+        if (send_length <= 0) {
+            fmt::println("Write failed!");
+            return 1;
+        }
+    } catch (const boost::system::system_error& e) {
+        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+
+        return e.code().value();
+    }
+
+    return 0;
+}
+
+/// @brief 同步读 read_some
+std::string ReadFromSocket(asio::ip::tcp::socket& sock) {
+    constexpr unsigned char kMessageSize = 7;
+    char buf[kMessageSize];
+    size_t total_bytes_read = 0;
+
+    // 循环读
+    while (total_bytes_read != kMessageSize) {
+        total_bytes_read += sock.read_some(asio::buffer(buf + total_bytes_read, kMessageSize - total_bytes_read));
+    }
+
+    return std::string(buf, total_bytes_read);
+}
+
+int ReadDataByReadSome() {
+    std::string raw_ip_address = "127.0.0.1";
+    unsigned short port_num = 3333;
+
+    try {
+        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::io_context io_context;
+        asio::ip::tcp::socket sock(io_context, endpoint.protocol());
+        sock.connect(endpoint);
+        ReadFromSocket(sock);
+    } catch (const boost::system::system_error& e) {
+        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+
+        return e.code().value();
+    }
+
+    return 0;
+}
+
+/// @brief 同步读 receive
+int ReadDataByReceive() {
+    std::string raw_ip_address = "127.0.0.1";
+    unsigned short port_num = 3333;
+
+    try {
+        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::io_context io_context;
+        asio::ip::tcp::socket sock(io_context, endpoint.protocol());
+        sock.connect(endpoint);
+
+        constexpr unsigned char kMessageSize = 7;
+        char buffer_receive[kMessageSize];
+        int receive_length = sock.receive(asio::buffer(buffer_receive, kMessageSize));
+        if (receive_length <= 0) {
+            fmt::println("Receive failed!");
+            return 1;
+        }
+    } catch (const boost::system::system_error& e) {
+        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+
+        return e.code().value();
+    }
+
+    return 0;
+}
+
+/// @brief 同步读 read
+int ReadDataByRead() {
+    std::string raw_ip_address = "127.0.0.1";
+    unsigned short port_num = 3333;
+
+    try {
+        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::io_context io_context;
+        asio::ip::tcp::socket sock(io_context, endpoint.protocol());
+        sock.connect(endpoint);
+
+        constexpr unsigned char kMessageSize = 7;
+        char buffer_receive[kMessageSize];
+        int receive_length = asio::read(sock, asio::buffer(buffer_receive, kMessageSize));
+        if (receive_length <= 0) {
+            fmt::println("Receive failed!");
+            return 1;
+        }
+    } catch (const boost::system::system_error& e) {
+        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+
+        return e.code().value();
+    }
+
+    return 0;
+}
+
+/// @brief 读取直到指定字符
+std::string ReadDataByUtil(asio::ip::tcp::socket& sock) {
+    asio::streambuf buf;
+
+    asio::read_until(sock, buf, '\n');
+
+    std::string message;
+
+    std::istream input(&buf);
+    std::getline(input, message);
+    return message;
+}
+
+#pragma endregion
 
 }  // namespace network
