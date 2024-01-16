@@ -17,3 +17,21 @@ cc_library(
         "@fmt",
     ],
 )
+
+cc_binary(
+    name = "sync_client",
+    srcs = ["example/sync_client.cpp"],
+    deps = [
+        "@boost//:asio",
+        "@fmt",
+    ],
+)
+
+cc_binary(
+    name = "sync_server",
+    srcs = ["example/sync_server.cpp"],
+    deps = [
+        "@boost//:asio",
+        "@fmt",
+    ],
+)
