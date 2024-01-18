@@ -48,3 +48,16 @@ cc_binary(
         "@fmt",
     ],
 )
+
+cc_library(
+    name = "async_api",
+    srcs = [
+        "example/async_api.cpp",
+        "example/async_api.h",
+    ],
+    includes = ["."],
+    deps = [
+        "@boost//:asio",
+        "@fmt",
+    ],
+)
