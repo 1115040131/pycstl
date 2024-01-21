@@ -61,3 +61,11 @@ cc_library(
         "@fmt",
     ],
 )
+
+cc_binary(
+    name = "async_server",
+    srcs = ["example/async_server.cpp"],
+    deps = [
+        "//network",
+    ],
+)
