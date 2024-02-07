@@ -1,3 +1,5 @@
 common --enable_bzlmod
 
 build --action_env=BAZEL_CXXOPTS="-std=c++20:-Wall:-Wextra:-Werror:-Wno-unknown-pragmas"
+
+build --compilation_mode=dbg

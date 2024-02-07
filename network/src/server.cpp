@@ -10,21 +10,22 @@ Server::Server(asio::io_context& io_context, unsigned short port_num)
     StartAccept();
 }
 
+void Server::DeleteSession(const std::string& uuid) { sessions_.erase(uuid); }
+
 void Server::StartAccept() {
-    auto session = new Session(io_context_);
+    auto session = std::make_shared<Session>(io_context_, this);
     acceptor_.async_accept(session->Socket(), [this, session](const boost::system::error_code& error_code) {
         HandleAccept(session, error_code);
         StartAccept();
     });
 }
 
-void Server::HandleAccept(Session* session, const boost::system::error_code& error_code) {
+void Server::HandleAccept(std::shared_ptr<Session> session, const boost::system::error_code& error_code) {
     if (!error_code) {
         session->Start();
+        sessions_.emplace(session->GetUuid(), session);
     } else {
         fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());
-
-        delete session;
     }
 }
 

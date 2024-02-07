@@ -14,6 +14,7 @@ cc_library(
     ],
     deps = [
         "@boost//:asio",
+        "@boost//:uuid",
         "@fmt",
     ],
 )
