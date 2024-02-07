@@ -1,12 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <string>
 
 #include <boost/asio.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <fmt/printf.h>
+
+#include "network/msg_node.h"
 
 namespace network {
 
@@ -32,20 +36,30 @@ public:
 
     tcp::socket& Socket() { return socket_; }
 
-    void Start();
-
     const std::string& GetUuid() const { return uuid_; }
 
+    /// @brief 开始异步读取数据
+    void Start();
+
+    /// @brief 往发送队列添加发送数据
+    void Send(char* msg, size_t max_len);
+
 private:
+    /// @brief 异步读取数据
     void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
 
+    /// @brief 异步写入数据
     void HandleWrite(const boost::system::error_code& error_code);
 
 private:
     tcp::socket socket_;
-    char data_[kMaxLength];
     Server* server_;
     std::string uuid_;
+
+    char data_[kMaxLength];  // 接收数据缓冲区
+
+    std::queue<std::unique_ptr<MsgNode>> send_queue_;  // 发送队列
+    std::mutex send_lock_;                             // 发送队列锁
 };
 
 }  // namespace network
