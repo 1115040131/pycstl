@@ -1,0 +1,77 @@
+cc_library(
+    name = "sync_api",
+    srcs = [
+        "sync_api.cpp",
+        "sync_api.h",
+    ],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "sync_client",
+    srcs = ["sync_client.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "sync_server",
+    srcs = ["sync_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_library(
+    name = "async_api",
+    srcs = [
+        "async_api.cpp",
+        "async_api.h",
+    ],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "async_server",
+    srcs = ["async_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "test_client",
+    srcs = ["test_client.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)

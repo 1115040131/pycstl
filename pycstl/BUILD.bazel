@@ -7,6 +7,12 @@ exports_files(["LICENSE"])
 cc_library(
     name = "pycstl",
     hdrs = glob(["include/pycstl/*.h"]),
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
     includes = [
         ".",
         "include",

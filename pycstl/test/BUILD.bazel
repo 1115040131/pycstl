@@ -4,6 +4,12 @@ cc_test(
         "*_test.cpp",
         "*.h",
     ]),
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
     deps = [
         "//pycstl",
         "@googletest//:gtest_main",

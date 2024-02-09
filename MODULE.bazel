@@ -8,3 +8,4 @@ module(
 bazel_dep(name = "fmt", version = "10.2.1")
 bazel_dep(name = "glog", version = "0.6.0")
 bazel_dep(name = "googletest", version = "1.14.0")
+bazel_dep(name = "protobuf", version = "23.1")

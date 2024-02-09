@@ -8,72 +8,21 @@ cc_library(
     name = "network",
     srcs = glob(["src/*.cpp"]),
     hdrs = glob(["include/network/*.h"]),
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
     includes = [
         ".",
         "include",
     ],
     deps = [
+        "//:protobuf_proxy",
+        "//network/proto:msg_cc_proto",
         "@boost//:asio",
         "@boost//:uuid",
         "@fmt",
-    ],
-)
-
-cc_library(
-    name = "sync_api",
-    srcs = [
-        "example/sync_api.cpp",
-        "example/sync_api.h",
-    ],
-    includes = ["."],
-    deps = [
-        "@boost//:asio",
-        "@fmt",
-    ],
-)
-
-cc_binary(
-    name = "sync_client",
-    srcs = ["example/sync_client.cpp"],
-    deps = [
-        "//network",
-    ],
-)
-
-cc_binary(
-    name = "sync_server",
-    srcs = ["example/sync_server.cpp"],
-    deps = [
-        "@boost//:asio",
-        "@fmt",
-    ],
-)
-
-cc_library(
-    name = "async_api",
-    srcs = [
-        "example/async_api.cpp",
-        "example/async_api.h",
-    ],
-    includes = ["."],
-    deps = [
-        "@boost//:asio",
-        "@fmt",
-    ],
-)
-
-cc_binary(
-    name = "async_server",
-    srcs = ["example/async_server.cpp"],
-    deps = [
-        "//network",
-    ],
-)
-
-cc_binary(
-    name = "test_client",
-    srcs = ["example/test_client.cpp"],
-    deps = [
-        "//network",
     ],
 )

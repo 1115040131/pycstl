@@ -1,0 +1,11 @@
+package(default_visibility = ["//visibility:public"])
+
+proto_library(
+    name = "msg_proto",
+    srcs = ["msg.proto"],
+)
+
+cc_proto_library(
+    name = "msg_cc_proto",
+    deps = [":msg_proto"],
+)
