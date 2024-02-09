@@ -33,7 +33,8 @@ int main() {
                 const char* request = "Hello world!";
                 MsgSizeType request_length = strlen(request);
                 char send_data[kMaxLength] = {0};
-                MsgSizeType request_length_network = asio::detail::socket_ops::host_to_network_short(request_length);
+                MsgSizeType request_length_network =
+                    asio::detail::socket_ops::host_to_network_short(request_length);
                 memcpy(send_data, &request_length_network, kHeadLength);
                 memcpy(send_data + kHeadLength, request, request_length);
                 asio::write(sock, asio::buffer(send_data, kHeadLength + request_length));

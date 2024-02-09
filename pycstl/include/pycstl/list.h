@@ -35,7 +35,9 @@ private:
 
     ListNode* newNode() { return AllocNode{alloc_}.allocate(1); }
 
-    void deleteNode(ListNode* node) noexcept { AllocNode{alloc_}.deallocate(static_cast<ListValueNode*>(node), 1); }
+    void deleteNode(ListNode* node) noexcept {
+        AllocNode{alloc_}.deallocate(static_cast<ListValueNode*>(node), 1);
+    }
 
 public:
     using value_type = T;
@@ -396,7 +398,9 @@ public:
         return ++orig_pos;
     }
 
-    iterator insert(const_iterator pos, std::initializer_list<T> ilist) { insert(pos, ilist.begin(), ilist.end()); }
+    iterator insert(const_iterator pos, std::initializer_list<T> ilist) {
+        insert(pos, ilist.begin(), ilist.end());
+    }
 
     iterator erase(const_iterator pos) noexcept {
         auto node = const_cast<ListNode*>(pos.curr);

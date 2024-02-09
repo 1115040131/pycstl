@@ -21,11 +21,11 @@ void WriteErrSession::WriteCallBack(const boost::system::error_code& error_code,
 
     if (bytes_transferred + msg_node->cur_len_ < msg_node->total_len_) {
         send_node_->cur_len_ += bytes_transferred;
-        socket_->async_write_some(
-            asio::buffer(send_node_->msg_.data() + send_node_->cur_len_, send_node_->total_len_ - send_node_->cur_len_),
-            [this](const boost::system::error_code& error_code, size_t bytes_transferred) {
-                WriteCallBack(error_code, bytes_transferred, send_node_);
-            });
+        socket_->async_write_some(asio::buffer(send_node_->msg_.data() + send_node_->cur_len_,
+                                               send_node_->total_len_ - send_node_->cur_len_),
+                                  [this](const boost::system::error_code& error_code, size_t bytes_transferred) {
+                                      WriteCallBack(error_code, bytes_transferred, send_node_);
+                                  });
     }
 }
 
@@ -53,11 +53,11 @@ void WriteSession::WriteCallBack(const boost::system::error_code& error_code, si
     auto& send_node = send_queue_.front();
     send_node->cur_len_ += bytes_transferred;
     if (send_node->cur_len_ < send_node->total_len_) {
-        socket_->async_write_some(
-            asio::buffer(send_node->msg_.data() + send_node->cur_len_, send_node->total_len_ - send_node->cur_len_),
-            [this](const boost::system::error_code& error_code, size_t bytes_transferred) {
-                WriteCallBack(error_code, bytes_transferred);
-            });
+        socket_->async_write_some(asio::buffer(send_node->msg_.data() + send_node->cur_len_,
+                                               send_node->total_len_ - send_node->cur_len_),
+                                  [this](const boost::system::error_code& error_code, size_t bytes_transferred) {
+                                      WriteCallBack(error_code, bytes_transferred);
+                                  });
 
         return;
     }
@@ -130,11 +130,11 @@ void ReadSession::ReadCallBack(const boost::system::error_code& error_code, size
 
     recv_node_->cur_len_ += bytes_transferred;
     if (recv_node_->cur_len_ < recv_node_->total_len_) {
-        socket_->async_read_some(
-            asio::buffer(recv_node_->msg_.data() + recv_node_->cur_len_, recv_node_->total_len_ - recv_node_->cur_len_),
-            [this](const boost::system::error_code& error_code, size_t bytes_transferred) {
-                ReadCallBack(error_code, bytes_transferred);
-            });
+        socket_->async_read_some(asio::buffer(recv_node_->msg_.data() + recv_node_->cur_len_,
+                                              recv_node_->total_len_ - recv_node_->cur_len_),
+                                 [this](const boost::system::error_code& error_code, size_t bytes_transferred) {
+                                     ReadCallBack(error_code, bytes_transferred);
+                                 });
         return;
     }
 

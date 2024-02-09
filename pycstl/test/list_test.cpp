@@ -34,7 +34,9 @@ TEST(ListTest, Erase) {
 
     ACTION_AND_COMPARE(
         arr, stl_arr,
-        [](auto& container) { container.erase(std::next(container.cbegin(), 2), std::next(container.cbegin(), 4)); },
+        [](auto& container) {
+            container.erase(std::next(container.cbegin(), 2), std::next(container.cbegin(), 4));
+        },
         COMPARE_CONTENT);
 }
 

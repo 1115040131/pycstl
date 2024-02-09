@@ -11,7 +11,8 @@ namespace asio = boost::asio;
 
 using MsgSizeType = unsigned short;
 static constexpr size_t kHeadLength = sizeof(MsgSizeType);
-static constexpr size_t kMaxLength = std::min(static_cast<size_t>(std::numeric_limits<MsgSizeType>::max()), 2ul * 1024);
+static constexpr size_t kMaxLength =
+    std::min(static_cast<size_t>(std::numeric_limits<MsgSizeType>::max()), 2ul * 1024);
 static constexpr size_t kMaxSendQueue = 1000;
 
 class MsgNode {

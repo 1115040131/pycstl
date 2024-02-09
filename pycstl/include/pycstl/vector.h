@@ -330,7 +330,9 @@ public:
         return data_ + insert_idx;
     }
 
-    iterator insert(const_iterator pos, std::initializer_list<T> init) { return insert(pos, init.begin(), init.end()); }
+    iterator insert(const_iterator pos, std::initializer_list<T> init) {
+        return insert(pos, init.begin(), init.end());
+    }
 
     template <typename... Args>
     T& emplace(const_iterator pos, Args&&... args) {
@@ -408,7 +410,8 @@ public:
 
 private:
     void _throw_out_of_range(size_t pos) {
-        throw std::out_of_range(fmt::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
+        throw std::out_of_range(
+            fmt::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
     }
 
 private:
