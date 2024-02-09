@@ -22,9 +22,6 @@ class Server;
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
-    static constexpr size_t kMaxLength = 1024;
-
-public:
     Session(asio::io_context& io_context, Server* server) : socket_(io_context), server_(server) {
         boost::uuids::uuid uuid = boost::uuids::random_generator()();
         uuid_ = boost::uuids::to_string(uuid);
@@ -51,6 +48,9 @@ private:
     /// @brief 异步写入数据
     void HandleWrite(const boost::system::error_code& error_code);
 
+    /// @brief 打印缓冲区数据
+    void PrintBuffer(const char* buffer, size_t len);
+
 private:
     tcp::socket socket_;
     Server* server_;
@@ -60,6 +60,10 @@ private:
 
     std::queue<std::unique_ptr<MsgNode>> send_queue_;  // 发送队列
     std::mutex send_lock_;                             // 发送队列锁
+
+    bool is_head_parsed_ = false;                                                  // 是否已经解析出头部
+    std::unique_ptr<MsgNode> recv_head_ = std::make_unique<MsgNode>(kHeadLength);  // 头部数据
+    std::unique_ptr<MsgNode> recv_msg_;                                            // 接收数据
 };
 
 }  // namespace network

@@ -3,9 +3,11 @@
 #include <boost/asio.hpp>
 #include <fmt/printf.h>
 
+#include "network/msg_node.h"
+
 namespace asio = boost::asio;
 
-static constexpr size_t kMaxLength = 1024;
+using namespace network;
 
 int main() {
     try {
@@ -26,11 +28,18 @@ int main() {
         char request[kMaxLength];
         std::cin.getline(request, kMaxLength);
         size_t request_length = strlen(request);
-        asio::write(sock, asio::buffer(request, request_length));
+        char send_data[kMaxLength] = {0};
+        memcpy(send_data, &request_length, kHeadLength);
+        memcpy(send_data + kHeadLength, request, request_length);
+        asio::write(sock, asio::buffer(send_data, kHeadLength + request_length));
 
-        char reply[kMaxLength];
-        size_t reply_length = asio::read(sock, asio::buffer(reply, request_length));
-        fmt::println("Reply is: {:.{}}", reply, reply_length);
+        char reply_head[kHeadLength];
+        asio::read(sock, asio::buffer(reply_head, kHeadLength));
+        MsgSizeType msg_len;
+        memcpy(&msg_len, reply_head, kHeadLength);
+        char msg[kMaxLength];
+        size_t msg_length = asio::read(sock, asio::buffer(msg, msg_len));
+        fmt::println("Reply is: {:.{}}\nReply len is {}", msg, msg_length, msg_length);
     } catch (const std::exception& e) {
         std::cerr << fmt::format("Exception: {}\n", e.what());
     }
