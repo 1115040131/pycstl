@@ -3,6 +3,8 @@
 #include <fmt/printf.h>
 
 #include "network/server.h"
+#include "network/utils.h"
+#include "proto/msg.pb.h"
 
 namespace network {
 
@@ -15,7 +17,7 @@ void Session::Start() {
         });
 }
 
-void Session::Send(char* msg, size_t max_len) {
+void Session::Send(const char* msg, size_t max_len) {
     std::lock_guard<std::mutex> lock(send_lock_);
     size_t send_queue_size = send_queue_.size();
     if (send_queue_size > kMaxSendQueue) {
@@ -33,6 +35,8 @@ void Session::Send(char* msg, size_t max_len) {
                           shared_this->HandleWrite(error_code);
                       });
 }
+
+void Session::Send(const std::string msg) { Send(msg.data(), msg.size()); }
 
 void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
     if (error_code) {
@@ -98,9 +102,18 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             // 更新已处理的字节数
             copy_len += data_len;
             bytes_transferred -= data_len;
-            fmt::println("[{}]: Server receive data {}", __func__, recv_msg_->data_);
+            // 发送测试数据
+            // Send(recv_msg_->data_, recv_msg_->total_len_);
+            // 解析数据
+            MsgData msg_data;
+            msg_data.ParseFromArray(recv_msg_->data_, recv_msg_->total_len_);
+            fmt::println("[{}]: Server receive msg {}", __func__, msg_data);
             // 发送数据
-            Send(recv_msg_->data_, recv_msg_->total_len_);
+            MsgData msg_response;
+            msg_response.set_id(msg_data.id());
+            msg_response.set_data(msg_data.data());
+            std::string response = msg_response.SerializeAsString();
+            Send(response);
             // 处理新的数据块
             is_head_parsed_ = false;
             recv_head_->Clear();

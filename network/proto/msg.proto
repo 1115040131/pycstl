@@ -1,7 +1,8 @@
 syntax = "proto3";
 
-message Book {
-    string name = 1;
-    int32 pages = 2;
-    float price = 3;
+package network;
+
+message MsgData {
+    int32 id = 1;
+    string data = 2;
 }

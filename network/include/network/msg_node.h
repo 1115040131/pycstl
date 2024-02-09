@@ -19,7 +19,7 @@ class MsgNode {
     friend class Session;
 
 public:
-    MsgNode(char* msg, MsgSizeType max_len) : total_len_(max_len + kHeadLength) {
+    MsgNode(const char* msg, MsgSizeType max_len) : total_len_(max_len + kHeadLength) {
         data_ = new char[total_len_ + 1];
         // 转换为网络字节序
         MsgSizeType max_len_network = asio::detail::socket_ops::host_to_network_short(max_len);

@@ -4,8 +4,15 @@ cc_test(
         "*_test.cpp",
         "*.h",
     ]),
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
     deps = [
         "//network",
+        "//network/test/proto:book_cc_proto",
         "@googletest//:gtest_main",
     ],
 )

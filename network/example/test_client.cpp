@@ -6,6 +6,8 @@
 #include <fmt/printf.h>
 
 #include "network/msg_node.h"
+#include "network/utils.h"
+#include "proto/msg.pb.h"
 
 namespace asio = boost::asio;
 
@@ -30,13 +32,16 @@ int main() {
         std::thread send_thread([&sock]() {
             for (;;) {
                 std::this_thread::sleep_for(2ms);
-                const char* request = "Hello world!";
-                MsgSizeType request_length = strlen(request);
+                MsgData msg_data;
+                msg_data.set_id(1001);
+                msg_data.set_data("Hello world!");
+                std::string request = msg_data.SerializeAsString();
+                MsgSizeType request_length = request.size();
                 char send_data[kMaxLength] = {0};
                 MsgSizeType request_length_network =
                     asio::detail::socket_ops::host_to_network_short(request_length);
                 memcpy(send_data, &request_length_network, kHeadLength);
-                memcpy(send_data + kHeadLength, request, request_length);
+                memcpy(send_data + kHeadLength, request.data(), request_length);
                 asio::write(sock, asio::buffer(send_data, kHeadLength + request_length));
             }
         });
@@ -51,7 +56,9 @@ int main() {
                 msg_len = asio::detail::socket_ops::network_to_host_short(msg_len);
                 char msg[kMaxLength];
                 size_t msg_length = asio::read(sock, asio::buffer(msg, msg_len));
-                fmt::println("Reply is: {:.{}}\nReply len is {}", msg, msg_length, msg_length);
+                MsgData recv_data;
+                recv_data.ParseFromArray(msg, msg_length);
+                fmt::println("Reply is {}\nReply len is {}", recv_data, msg_length);
             }
         });
 
