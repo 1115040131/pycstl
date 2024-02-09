@@ -16,13 +16,14 @@ void Session::Start() {
 }
 
 void Session::Send(char* msg, size_t max_len) {
-    bool pending = false;
     std::lock_guard<std::mutex> lock(send_lock_);
-    if (!send_queue_.empty()) {
-        pending = true;
+    size_t send_queue_size = send_queue_.size();
+    if (send_queue_size > kMaxSendQueue) {
+        fmt::println("[{}]: Send queue size = {} is full", __func__, send_queue_size);
+        return;
     }
     send_queue_.emplace(std::make_unique<MsgNode>(msg, max_len));
-    if (pending) {
+    if (send_queue_size > 0) {
         return;
     }
 
@@ -69,6 +70,8 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             // 获取头部数据
             MsgSizeType data_len;
             memcpy(&data_len, recv_head_->data_, kHeadLength);
+            // 网络字节序转换为主机字节序
+            data_len = asio::detail::socket_ops::network_to_host_short(data_len);
             // 头部长度非法
             if (data_len > kMaxLength) {
                 fmt::println("[{}]: Head length = {} is invalid", __func__, data_len);

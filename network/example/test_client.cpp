@@ -31,9 +31,10 @@ int main() {
             for (;;) {
                 std::this_thread::sleep_for(2ms);
                 const char* request = "Hello world!";
-                size_t request_length = strlen(request);
+                MsgSizeType request_length = strlen(request);
                 char send_data[kMaxLength] = {0};
-                memcpy(send_data, &request_length, kHeadLength);
+                MsgSizeType request_length_network = asio::detail::socket_ops::host_to_network_short(request_length);
+                memcpy(send_data, &request_length_network, kHeadLength);
                 memcpy(send_data + kHeadLength, request, request_length);
                 asio::write(sock, asio::buffer(send_data, kHeadLength + request_length));
             }
@@ -46,6 +47,7 @@ int main() {
                 asio::read(sock, asio::buffer(reply_head, kHeadLength));
                 MsgSizeType msg_len;
                 memcpy(&msg_len, reply_head, kHeadLength);
+                msg_len = asio::detail::socket_ops::network_to_host_short(msg_len);
                 char msg[kMaxLength];
                 size_t msg_length = asio::read(sock, asio::buffer(msg, msg_len));
                 fmt::println("Reply is: {:.{}}\nReply len is {}", msg, msg_length, msg_length);
