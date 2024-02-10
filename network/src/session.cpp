@@ -17,7 +17,7 @@ void Session::Start() {
         });
 }
 
-void Session::Send(const char* msg, size_t max_len, MsgSizeType msg_id) {
+void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
     std::lock_guard<std::mutex> lock(send_lock_);
     size_t send_queue_size = send_queue_.size();
     if (send_queue_size > kMaxSendQueue) {
@@ -36,7 +36,7 @@ void Session::Send(const char* msg, size_t max_len, MsgSizeType msg_id) {
                       });
 }
 
-void Session::Send(const std::string msg, MsgSizeType msg_id) { Send(msg.data(), msg.size(), msg_id); }
+void Session::Send(const std::string msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
 
 void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
     if (error_code) {
@@ -74,7 +74,7 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             // 获取头部数据
             MsgHead head = MsgHead::ParseHead(recv_head_->data_);
             // 头部长度非法
-            if (head.id > kMaxLength || head.length > kMaxLength) {
+            if (head.id > MsgId::kMaxId || head.length > kMaxLength) {
                 fmt::println("[{}]: Head: {} is invalid", __func__, head);
                 socket_.close();
                 server_->DeleteSession(uuid_);
@@ -107,10 +107,10 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             fmt::println("[{}]: {}", __func__, receive_msg);
             // 发送数据
             MsgData msg_response;
-            msg_response.set_id(msg_data.id() + 1);
+            msg_response.set_id(msg_data.id());
             msg_response.set_data(receive_msg);
             std::string response = msg_response.SerializeAsString();
-            Send(response, msg_response.id());
+            Send(response, static_cast<MsgId>(msg_response.id()));
             // 处理新的数据块
             is_head_parsed_ = false;
             recv_head_->Clear();

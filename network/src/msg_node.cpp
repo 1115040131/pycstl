@@ -6,21 +6,20 @@ namespace network {
 
 namespace asio = boost::asio;
 
-MsgHead MsgHead::MakeNetworkData(MsgSizeType id, MsgSizeType length) {
-    return MsgHead{asio::detail::socket_ops::host_to_network_short(id),
-                   asio::detail::socket_ops::host_to_network_short(length)};
-}
-
 MsgHead MsgHead::ParseHead(const char* data) {
-    const auto head = *reinterpret_cast<const MsgHead*>(data);
-    return MsgHead{asio::detail::socket_ops::network_to_host_short(head.id),
-                   asio::detail::socket_ops::network_to_host_short(head.length)};
+    using MsgType = std::pair<std::underlying_type<MsgId>::type, MsgSizeType>;
+    const auto head = *reinterpret_cast<const MsgType*>(data);
+    return MsgHead{static_cast<MsgId>(asio::detail::socket_ops::network_to_host_short(head.first)),
+                   asio::detail::socket_ops::network_to_host_short(head.second)};
 }
 
 RecvNode::RecvNode(MsgSizeType max_len) : MsgNode(max_len) {}
 
-SendNode::SendNode(const char* msg, MsgSizeType max_len, MsgSizeType msg_id) : MsgNode(max_len + kHeadLength) {
-    *reinterpret_cast<MsgHead*>(data_) = MsgHead::MakeNetworkData(msg_id, max_len);
+SendNode::SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len + kHeadLength) {
+    using MsgType = std::pair<std::underlying_type<MsgId>::type, MsgSizeType>;
+    *reinterpret_cast<MsgType*>(data_) =
+        MsgType{asio::detail::socket_ops::host_to_network_short(ToUnderlying(msg_id)),
+                asio::detail::socket_ops::host_to_network_short(max_len)};
     ::memcpy(data_ + kHeadLength, msg, max_len);
 }
 

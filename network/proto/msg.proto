@@ -3,6 +3,6 @@ syntax = "proto3";
 package network;
 
 message MsgData {
-    int32 id = 1;
+    uint32 id = 1;
     string data = 2;
 }

@@ -39,8 +39,8 @@ public:
     void Start();
 
     /// @brief 往发送队列添加发送数据
-    void Send(const char* msg, size_t max_len, MsgSizeType msg_id);
-    void Send(const std::string msg, MsgSizeType msg_id);
+    void Send(const char* msg, size_t max_len, MsgId msg_id);
+    void Send(const std::string msg, MsgId msg_id);
 
 private:
     /// @brief 异步读取数据

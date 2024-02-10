@@ -4,16 +4,21 @@
 #include <numeric>
 #include <string>
 
+#include "common/utils.h"
+
 namespace network {
 
 using MsgSizeType = unsigned short;
 
-struct MsgHead {
-    MsgSizeType id;
-    MsgSizeType length;
+enum class MsgId : MsgSizeType {
+    kMsgHelloWorld = 1001,
 
-    /// @brief 将 id 和 length 转为网络字节序后返回
-    static MsgHead MakeNetworkData(MsgSizeType id, MsgSizeType length);
+    kMaxId,
+};
+
+struct MsgHead {
+    MsgId id;
+    MsgSizeType length;
 
     /// @brief 从网络数据中解析出 id 和 length
     static MsgHead ParseHead(const char* data);
@@ -57,7 +62,7 @@ class SendNode : public MsgNode {
     friend class Session;
 
 public:
-    SendNode(const char* msg, MsgSizeType max_len, MsgSizeType msg_id);
+    SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id);
 };
 
 }  // namespace network

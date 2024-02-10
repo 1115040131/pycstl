@@ -33,10 +33,10 @@ int main() {
             for (;;) {
                 std::this_thread::sleep_for(2ms);
                 MsgData msg_data;
-                msg_data.set_id(1001);
+                msg_data.set_id(static_cast<decltype(msg_data.id())>(MsgId::kMsgHelloWorld));
                 msg_data.set_data("Hello world!");
                 std::string request = msg_data.SerializeAsString();
-                SendNode send_data(request.data(), request.length(), 1001);
+                SendNode send_data(request.data(), request.length(), MsgId::kMsgHelloWorld);
                 asio::write(sock, asio::buffer(send_data.Data(), send_data.Size()));
             }
         });
