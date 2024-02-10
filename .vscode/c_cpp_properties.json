@@ -3,12 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/bazel-pycstl/external/**"
+                "${workspaceFolder}/bazel-pycstl/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "c17",
+            "cStandard": "c23",
             "intelliSenseMode": "linux-gcc-x64"
         }
     ],

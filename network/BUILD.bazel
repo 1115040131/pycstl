@@ -24,5 +24,6 @@ cc_library(
         "@boost//:asio",
         "@boost//:uuid",
         "@fmt",
+        "@nlohmann_json//:json",
     ],
 )

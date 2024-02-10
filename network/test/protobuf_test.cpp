@@ -11,6 +11,14 @@ struct fmt::formatter<network::Book> : fmt::formatter<std::string> {
     }
 };
 
+namespace network {
+
+bool operator==(const Book& lhs, const Book& rhs) {
+    return lhs.name() == rhs.name() && lhs.pages() == rhs.pages() && lhs.price() == rhs.price();
+}
+
+}  // namespace network
+
 TEST(ProtobufTest, BookTest) {
     network::Book book;
     book.set_name("CPP programing");
@@ -24,4 +32,6 @@ TEST(ProtobufTest, BookTest) {
     network::Book book2;
     book2.ParseFromString(book_str);
     fmt::println("Book: {}", book2);
+
+    EXPECT_EQ(book, book2);
 }
