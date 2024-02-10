@@ -36,13 +36,8 @@ int main() {
                 msg_data.set_id(1001);
                 msg_data.set_data("Hello world!");
                 std::string request = msg_data.SerializeAsString();
-                MsgSizeType request_length = request.size();
-                char send_data[kMaxLength] = {0};
-                MsgSizeType request_length_network =
-                    asio::detail::socket_ops::host_to_network_short(request_length);
-                memcpy(send_data, &request_length_network, kHeadLength);
-                memcpy(send_data + kHeadLength, request.data(), request_length);
-                asio::write(sock, asio::buffer(send_data, kHeadLength + request_length));
+                SendNode send_data(request.data(), request.length(), 1001);
+                asio::write(sock, asio::buffer(send_data.Data(), send_data.Size()));
             }
         });
 
@@ -51,14 +46,13 @@ int main() {
                 std::this_thread::sleep_for(2ms);
                 char reply_head[kHeadLength];
                 asio::read(sock, asio::buffer(reply_head, kHeadLength));
-                MsgSizeType msg_len;
-                memcpy(&msg_len, reply_head, kHeadLength);
-                msg_len = asio::detail::socket_ops::network_to_host_short(msg_len);
+                MsgHead msg_head = MsgHead::ParseHead(reply_head);
+                fmt::println("Replay head: {}", msg_head);
                 char msg[kMaxLength];
-                size_t msg_length = asio::read(sock, asio::buffer(msg, msg_len));
+                size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
                 MsgData recv_data;
                 recv_data.ParseFromArray(msg, msg_length);
-                fmt::println("Reply is {}\nReply len is {}", recv_data, msg_length);
+                fmt::println("Reply: {}\nReply len = {}", recv_data, msg_length);
             }
         });
 

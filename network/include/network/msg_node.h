@@ -2,45 +2,62 @@
 
 #include <cstring>
 #include <numeric>
-
-#include <boost/asio.hpp>
+#include <string>
 
 namespace network {
 
-namespace asio = boost::asio;
-
 using MsgSizeType = unsigned short;
-static constexpr size_t kHeadLength = sizeof(MsgSizeType);
-static constexpr size_t kMaxLength =
-    std::min(static_cast<size_t>(std::numeric_limits<MsgSizeType>::max()), 2ul * 1024);
-static constexpr size_t kMaxSendQueue = 1000;
+
+struct MsgHead {
+    MsgSizeType id;
+    MsgSizeType length;
+
+    /// @brief 将 id 和 length 转为网络字节序后返回
+    static MsgHead MakeNetworkData(MsgSizeType id, MsgSizeType length);
+
+    /// @brief 从网络数据中解析出 id 和 length
+    static MsgHead ParseHead(const char* data);
+};
+
+static constexpr size_t kHeadLength = sizeof(MsgHead);  // tlv 头部长度
+static constexpr size_t kMaxLength = 2ul * 1024;        // 消息体最大长度 2KB
+static constexpr size_t kMaxSendQueue = 1000;           // 发送队列最大长度
 
 class MsgNode {
-    friend class Session;
-
 public:
-    MsgNode(const char* msg, MsgSizeType max_len) : total_len_(max_len + kHeadLength) {
+    MsgNode(MsgSizeType max_len) : total_len_(max_len) {
         data_ = new char[total_len_ + 1];
-        // 转换为网络字节序
-        MsgSizeType max_len_network = asio::detail::socket_ops::host_to_network_short(max_len);
-        memcpy(data_, &max_len_network, kHeadLength);
-        memcpy(data_ + kHeadLength, msg, max_len);
         data_[total_len_] = '\0';
     }
 
-    MsgNode(MsgSizeType max_len) : total_len_(max_len) { data_ = new char[total_len_ + 1]; }
-
     ~MsgNode() { delete[] data_; }
 
+    size_t Size() const { return total_len_; }
+    const char* Data() const { return data_; }
+
     void Clear() {
-        memset(data_, 0, total_len_);
+        ::memset(data_, 0, total_len_);
         cur_len_ = 0;
     }
 
-private:
+protected:
     size_t cur_len_ = 0;    // 已经接收/发送的数据长度
     size_t total_len_ = 0;  // 数据总长度
     char* data_ = nullptr;  // 数据缓冲区
+};
+
+class RecvNode : public MsgNode {
+    friend class Session;
+
+public:
+    RecvNode(MsgSizeType max_len);
+};
+
+class SendNode : public MsgNode {
+    friend class Session;
+
+public:
+    SendNode(const char* msg, MsgSizeType max_len, MsgSizeType msg_id);
 };
 
 }  // namespace network

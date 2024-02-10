@@ -17,14 +17,14 @@ void Session::Start() {
         });
 }
 
-void Session::Send(const char* msg, size_t max_len) {
+void Session::Send(const char* msg, size_t max_len, MsgSizeType msg_id) {
     std::lock_guard<std::mutex> lock(send_lock_);
     size_t send_queue_size = send_queue_.size();
     if (send_queue_size > kMaxSendQueue) {
         fmt::println("[{}]: Send queue size = {} is full", __func__, send_queue_size);
         return;
     }
-    send_queue_.emplace(std::make_unique<MsgNode>(msg, max_len));
+    send_queue_.emplace(std::make_unique<SendNode>(msg, max_len, msg_id));
     if (send_queue_size > 0) {
         return;
     }
@@ -36,7 +36,7 @@ void Session::Send(const char* msg, size_t max_len) {
                       });
 }
 
-void Session::Send(const std::string msg) { Send(msg.data(), msg.size()); }
+void Session::Send(const std::string msg, MsgSizeType msg_id) { Send(msg.data(), msg.size(), msg_id); }
 
 void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
     if (error_code) {
@@ -72,19 +72,16 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             copy_len += head_remain;
             bytes_transferred -= head_remain;
             // 获取头部数据
-            MsgSizeType data_len;
-            memcpy(&data_len, recv_head_->data_, kHeadLength);
-            // 网络字节序转换为主机字节序
-            data_len = asio::detail::socket_ops::network_to_host_short(data_len);
+            MsgHead head = MsgHead::ParseHead(recv_head_->data_);
             // 头部长度非法
-            if (data_len > kMaxLength) {
-                fmt::println("[{}]: Head length = {} is invalid", __func__, data_len);
+            if (head.id > kMaxLength || head.length > kMaxLength) {
+                fmt::println("[{}]: Head: {} is invalid", __func__, head);
                 socket_.close();
                 server_->DeleteSession(uuid_);
                 return;
             }
-            fmt::println("[{}]: Head length = {}", __func__, data_len);
-            recv_msg_ = std::make_unique<MsgNode>(data_len);
+            fmt::println("[{}]: Head: {}", __func__, head);
+            recv_msg_ = std::make_unique<RecvNode>(head.length);
 
             is_head_parsed_ = true;
         } else {
@@ -102,18 +99,18 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             // 更新已处理的字节数
             copy_len += data_len;
             bytes_transferred -= data_len;
-            // 发送测试数据
-            // Send(recv_msg_->data_, recv_msg_->total_len_);
             // 解析数据
             MsgData msg_data;
             msg_data.ParseFromArray(recv_msg_->data_, recv_msg_->total_len_);
-            fmt::println("[{}]: Server receive msg {}", __func__, msg_data);
+            // 打印消息
+            auto receive_msg = fmt::format("Server receive msg: {}", msg_data);
+            fmt::println("[{}]: {}", __func__, receive_msg);
             // 发送数据
             MsgData msg_response;
-            msg_response.set_id(msg_data.id());
-            msg_response.set_data(msg_data.data());
+            msg_response.set_id(msg_data.id() + 1);
+            msg_response.set_data(receive_msg);
             std::string response = msg_response.SerializeAsString();
-            Send(response);
+            Send(response, msg_response.id());
             // 处理新的数据块
             is_head_parsed_ = false;
             recv_head_->Clear();
