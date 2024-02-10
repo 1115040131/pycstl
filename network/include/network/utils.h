@@ -3,7 +3,7 @@
 #include <fmt/core.h>
 
 #include "network/msg_node.h"
-#include "proto/msg.pb.h"
+#include "network/proto/msg.pb.h"
 
 template <>
 struct fmt::formatter<network::MsgHead> : fmt::formatter<std::string> {

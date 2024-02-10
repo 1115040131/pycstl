@@ -10,6 +10,7 @@ cc_test(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = [
         "//network",
         "//network/test/proto:book_cc_proto",

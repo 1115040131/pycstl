@@ -10,6 +10,7 @@ cc_library(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -22,6 +23,7 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -34,6 +36,7 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -49,6 +52,7 @@ cc_library(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -61,6 +65,7 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -73,5 +78,6 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = ["//network"],
 )

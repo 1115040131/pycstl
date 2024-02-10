@@ -10,6 +10,7 @@ cc_test(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
+    includes = ["../"],
     deps = [
         "//pycstl",
         "@googletest//:gtest_main",

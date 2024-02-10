@@ -2,9 +2,9 @@
 
 #include <fmt/printf.h>
 
+#include "network/proto/msg.pb.h"
 #include "network/server.h"
 #include "network/utils.h"
-#include "proto/msg.pb.h"
 
 namespace network {
 

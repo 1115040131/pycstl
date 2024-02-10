@@ -14,12 +14,10 @@ cc_library(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
-    includes = [
-        ".",
-        "include",
-    ],
+    includes = ["include"],
     deps = [
         "//:protobuf_proxy",
+        "//common",
         "//network/proto:msg_cc_proto",
         "@boost//:asio",
         "@boost//:uuid",
