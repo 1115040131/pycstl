@@ -13,8 +13,6 @@ MsgHead MsgHead::ParseHead(const char* data) {
                    asio::detail::socket_ops::network_to_host_short(head.second)};
 }
 
-RecvNode::RecvNode(MsgSizeType max_len) : MsgNode(max_len) {}
-
 SendNode::SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len + kHeadLength) {
     using MsgType = std::pair<std::underlying_type<MsgId>::type, MsgSizeType>;
     *reinterpret_cast<MsgType*>(data_) =

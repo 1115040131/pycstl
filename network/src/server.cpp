@@ -20,7 +20,7 @@ void Server::StartAccept() {
     });
 }
 
-void Server::HandleAccept(std::shared_ptr<Session> session, const boost::system::error_code& error_code) {
+void Server::HandleAccept(const std::shared_ptr<Session>& session, const boost::system::error_code& error_code) {
     if (!error_code) {
         session->Start();
         sessions_.emplace(session->GetUuid(), session);

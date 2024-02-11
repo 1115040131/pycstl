@@ -40,7 +40,7 @@ public:
 
     /// @brief 往发送队列添加发送数据
     void Send(const char* msg, size_t max_len, MsgId msg_id);
-    void Send(const std::string msg, MsgId msg_id);
+    void Send(const std::string& msg, MsgId msg_id);
 
 private:
     /// @brief 异步读取数据
@@ -62,9 +62,9 @@ private:
     std::queue<std::unique_ptr<SendNode>> send_queue_;  // 发送队列
     std::mutex send_lock_;                              // 发送队列锁
 
-    bool is_head_parsed_ = false;                                                    // 是否已经解析出头部
-    std::unique_ptr<RecvNode> recv_head_ = std::make_unique<RecvNode>(kHeadLength);  // 头部数据
-    std::unique_ptr<RecvNode> recv_msg_;                                             // 接收数据
+    bool is_head_parsed_ = false;  // 是否已经解析出头部
+    std::unique_ptr<RecvNode> recv_head_ = std::make_unique<RecvNode>(kHeadLength, MsgId::kMaxId);  // 头部数据
+    std::unique_ptr<RecvNode> recv_msg_;                                                            // 接收数据
 };
 
 }  // namespace network

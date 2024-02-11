@@ -70,8 +70,21 @@ cc_binary(
 )
 
 cc_binary(
-    name = "test_client",
-    srcs = ["test_client.cpp"],
+    name = "test_client_protobuf",
+    srcs = ["test_client_protobuf.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    includes = ["../"],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "test_client_json",
+    srcs = ["test_client_json.cpp"],
     copts = [
         "-Wall",
         "-Wextra",

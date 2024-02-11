@@ -2,7 +2,7 @@
 
 #include <fmt/printf.h>
 
-#include "network/proto/msg.pb.h"
+#include "network/logic_system.h"
 #include "network/server.h"
 #include "network/utils.h"
 
@@ -36,7 +36,7 @@ void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
                       });
 }
 
-void Session::Send(const std::string msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
+void Session::Send(const std::string& msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
 
 void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
     if (error_code) {
@@ -81,7 +81,7 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
                 return;
             }
             fmt::println("[{}]: Head: {}", __func__, head);
-            recv_msg_ = std::make_unique<RecvNode>(head.length);
+            recv_msg_ = std::make_unique<RecvNode>(head.length, head.id);
 
             is_head_parsed_ = true;
         } else {
@@ -99,18 +99,9 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             // 更新已处理的字节数
             copy_len += data_len;
             bytes_transferred -= data_len;
-            // 解析数据
-            MsgData msg_data;
-            msg_data.ParseFromArray(recv_msg_->data_, recv_msg_->total_len_);
-            // 打印消息
-            auto receive_msg = fmt::format("Server receive msg: {}", msg_data);
-            fmt::println("[{}]: {}", __func__, receive_msg);
-            // 发送数据
-            MsgData msg_response;
-            msg_response.set_id(msg_data.id());
-            msg_response.set_data(receive_msg);
-            std::string response = msg_response.SerializeAsString();
-            Send(response, static_cast<MsgId>(msg_response.id()));
+            // 投递数据
+            LogicSystem::Instance().PostMsgToQueue(
+                std::make_unique<LogicNode>(shared_from_this(), std::move(recv_msg_)));
             // 处理新的数据块
             is_head_parsed_ = false;
             recv_head_->Clear();

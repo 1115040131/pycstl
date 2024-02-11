@@ -53,9 +53,13 @@ protected:
 
 class RecvNode : public MsgNode {
     friend class Session;
+    friend class LogicSystem;
 
 public:
-    RecvNode(MsgSizeType max_len);
+    RecvNode(MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len), msg_id_(msg_id) {}
+
+private:
+    MsgId msg_id_;
 };
 
 class SendNode : public MsgNode {

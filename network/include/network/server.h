@@ -16,7 +16,7 @@ public:
 private:
     void StartAccept();
 
-    void HandleAccept(std::shared_ptr<Session> session, const boost::system::error_code& error_code);
+    void HandleAccept(const std::shared_ptr<Session>& session, const boost::system::error_code& error_code);
 
 private:
     asio::io_context& io_context_;

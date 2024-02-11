@@ -12,10 +12,18 @@ const char* ToString(MsgId msg_id);
 }  // namespace network
 
 template <>
+struct fmt::formatter<network::MsgId> : fmt::formatter<std::string> {
+    template <typename FormatContext>
+    auto format(const network::MsgId& msg_id, FormatContext& ctx) -> decltype(ctx.out()) {
+        return format_to(ctx.out(), "{}", network::ToString(msg_id));
+    }
+};
+
+template <>
 struct fmt::formatter<network::MsgHead> : fmt::formatter<std::string> {
     template <typename FormatContext>
     auto format(const network::MsgHead& head, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "id = {}, length = {}", network::ToString(head.id), head.length);
+        return format_to(ctx.out(), "id = {}, length = {}", head.id, head.length);
     }
 };
 
