@@ -1,0 +1,18 @@
+cc_test(
+    name = "common_all_test",
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    includes = ["../"],
+    deps = [
+        "//common",
+        "@googletest//:gtest_main",
+    ],
+)

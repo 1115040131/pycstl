@@ -1,3 +1,5 @@
+#pragma once
+
 #include <type_traits>  // 用于 std::underlying_type
 
 // 转换枚举到其底层类型的通用函数

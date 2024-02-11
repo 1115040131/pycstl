@@ -68,6 +68,18 @@ cc_binary(
     deps = ["//network"],
 )
 
+cc_binary(
+    name = "concurrency_client",
+    srcs = ["concurrency_client.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
 # server
 cc_binary(
     name = "sync_server",

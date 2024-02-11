@@ -2,6 +2,8 @@
 
 #include <fmt/printf.h>
 
+#include "network/io_service_pool.h"
+
 namespace network {
 
 Server::Server(asio::io_context& io_context, unsigned short port_num)
@@ -13,7 +15,7 @@ Server::Server(asio::io_context& io_context, unsigned short port_num)
 void Server::DeleteSession(const std::string& uuid) { sessions_.erase(uuid); }
 
 void Server::StartAccept() {
-    auto session = std::make_shared<Session>(io_context_, this);
+    auto session = std::make_shared<Session>(IOServicePool::Instance().GetIOService(), this);
     acceptor_.async_accept(session->Socket(), [this, session](const boost::system::error_code& error_code) {
         HandleAccept(session, error_code);
         StartAccept();
