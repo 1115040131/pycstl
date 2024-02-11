@@ -1,35 +1,10 @@
+# api
 cc_library(
     name = "sync_api",
     srcs = [
         "sync_api.cpp",
         "sync_api.h",
     ],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
-    includes = ["../"],
-    deps = ["//network"],
-)
-
-cc_binary(
-    name = "sync_client",
-    srcs = ["sync_client.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
-    includes = ["../"],
-    deps = ["//network"],
-)
-
-cc_binary(
-    name = "sync_server",
-    srcs = ["sync_server.cpp"],
     copts = [
         "-Wall",
         "-Wextra",
@@ -56,29 +31,16 @@ cc_library(
     deps = ["//network"],
 )
 
+# client
 cc_binary(
-    name = "async_server",
-    srcs = ["async_server.cpp"],
+    name = "sync_client",
+    srcs = ["sync_client.cpp"],
     copts = [
         "-Wall",
         "-Wextra",
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
-    includes = ["../"],
-    deps = ["//network"],
-)
-
-cc_binary(
-    name = "async_server_std_signal",
-    srcs = ["//network/example:async_server_std_signal.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
-    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -91,7 +53,6 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
-    includes = ["../"],
     deps = ["//network"],
 )
 
@@ -104,6 +65,42 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
-    includes = ["../"],
+    deps = ["//network"],
+)
+
+# server
+cc_binary(
+    name = "sync_server",
+    srcs = ["sync_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "async_server",
+    srcs = ["async_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "async_server_std_signal",
+    srcs = ["async_server_std_signal.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
     deps = ["//network"],
 )

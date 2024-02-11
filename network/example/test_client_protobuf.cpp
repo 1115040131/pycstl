@@ -6,8 +6,8 @@
 #include <fmt/printf.h>
 
 #include "network/msg_node.h"
+#include "network/proto/msg.pb.h"
 #include "network/utils.h"
-#include "proto/msg.pb.h"
 
 namespace asio = boost::asio;
 
