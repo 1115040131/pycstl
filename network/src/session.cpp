@@ -48,10 +48,10 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
         return;
     }
 
-    // 打印接收数据
-    fmt::print("[{}]: Server receive raw data: ", __func__);
-    PrintBuffer(data_, bytes_transferred);
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // For debug 打印接收数据
+    // fmt::print("[{}]: Server receive raw data: ", __func__);
+    // PrintBuffer(data_, bytes_transferred);
+    // std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // 已经处理的字节
     size_t copy_len = 0;

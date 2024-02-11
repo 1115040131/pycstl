@@ -2,8 +2,10 @@
 
 #include <boost/asio.hpp>
 #include <fmt/printf.h>
+#include <nlohmann/json.hpp>
 
 #include "network/msg_node.h"
+#include "network/utils.h"
 
 namespace asio = boost::asio;
 
@@ -24,22 +26,24 @@ int main() {
             return 0;
         }
 
-        fmt::print("Enter message: ");
-        char request[kMaxLength];
-        std::cin.getline(request, kMaxLength);
-        size_t request_length = strlen(request);
-        char send_data[kMaxLength] = {0};
-        memcpy(send_data, &request_length, kHeadLength);
-        memcpy(send_data + kHeadLength, request, request_length);
-        asio::write(sock, asio::buffer(send_data, kHeadLength + request_length));
+        nlohmann::json root;
+        root["id"] = MsgId::kMsgHelloWorld;
+        root["data"] = "Hello world!";
+        std::string request = root.dump();
+        SendNode send_data(request.data(), request.length(), MsgId::kMsgHelloWorld);
+        asio::write(sock, asio::buffer(send_data.Data(), send_data.Size()));
 
         char reply_head[kHeadLength];
         asio::read(sock, asio::buffer(reply_head, kHeadLength));
-        MsgSizeType msg_len;
-        memcpy(&msg_len, reply_head, kHeadLength);
+        MsgHead msg_head = MsgHead::ParseHead(reply_head);
+        fmt::println("Replay head: {}", msg_head);
         char msg[kMaxLength];
-        size_t msg_length = asio::read(sock, asio::buffer(msg, msg_len));
-        fmt::println("Reply is: {:.{}}\nReply len is {}", msg, msg_length, msg_length);
+        size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
+        auto reader = nlohmann::json::parse(msg, msg + msg_length);
+        fmt::println("Reply msg id = {}, data = \"{}\"", reader["id"].get<MsgId>(),
+                     reader["data"].get<std::string>());
+
+        std::cin.get();
     } catch (const std::exception& e) {
         std::cerr << fmt::format("Exception: {}\n", e.what());
     }

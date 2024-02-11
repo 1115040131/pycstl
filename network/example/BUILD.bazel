@@ -70,6 +70,19 @@ cc_binary(
 )
 
 cc_binary(
+    name = "async_server_std_signal",
+    srcs = ["//network/example:async_server_std_signal.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    includes = ["../"],
+    deps = ["//network"],
+)
+
+cc_binary(
     name = "test_client_protobuf",
     srcs = ["test_client_protobuf.cpp"],
     copts = [

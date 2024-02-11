@@ -25,6 +25,7 @@ LogicSystem::~LogicSystem() {
     is_stop_ = true;
     consume_.notify_one();
     work_thread_.join();
+    fmt::println("[{}]: LogicSystem Exit.", __func__);
 }
 
 void LogicSystem::RegisterCallBack() {

@@ -4,8 +4,6 @@
 #include <numeric>
 #include <string>
 
-#include "common/utils.h"
-
 namespace network {
 
 using MsgSizeType = unsigned short;

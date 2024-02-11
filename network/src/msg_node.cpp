@@ -2,6 +2,8 @@
 
 #include <boost/asio.hpp>
 
+#include "common/utils.h"
+
 namespace network {
 
 namespace asio = boost::asio;
