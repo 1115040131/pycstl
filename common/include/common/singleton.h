@@ -1,5 +1,7 @@
 #pragma once
 
+namespace pyc {
+
 /// @brief 单例模板基类
 /// 用法示例:
 /// class MySingletonClass : public Singleton<MySingletonClass> {
@@ -26,3 +28,5 @@ protected:
     // 构造函数为 protected，以防止外部构造
     Singleton() = default;
 };
+
+}  // namespace pyc

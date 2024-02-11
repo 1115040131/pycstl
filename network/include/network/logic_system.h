@@ -15,12 +15,12 @@
 
 namespace network {
 
-class LogicSystem : public Singleton<LogicSystem> {
-    friend class Singleton<LogicSystem>;
+class LogicSystem : public pyc::Singleton<LogicSystem> {
+    friend class pyc::Singleton<LogicSystem>;
     using FunCallBack = std::function<void(const std::shared_ptr<Session>&, const std::string& msg_data)>;
 
 public:
-    void PostMsgToQueue( std::unique_ptr<LogicNode> msg);
+    void PostMsgToQueue(std::unique_ptr<LogicNode> msg);
 
 private:
     LogicSystem();

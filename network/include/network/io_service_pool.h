@@ -12,8 +12,8 @@ namespace network {
 
 namespace asio = boost::asio;
 
-class IOServicePool : public Singleton<IOServicePool> {
-    friend class Singleton<IOServicePool>;
+class IOServicePool : public pyc::Singleton<IOServicePool> {
+    friend class pyc::Singleton<IOServicePool>;
 
 public:
     using IOService = asio::io_context;

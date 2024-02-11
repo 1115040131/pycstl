@@ -18,7 +18,7 @@ MsgHead MsgHead::ParseHead(const char* data) {
 SendNode::SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len + kHeadLength) {
     using MsgType = std::pair<std::underlying_type<MsgId>::type, MsgSizeType>;
     *reinterpret_cast<MsgType*>(data_) =
-        MsgType{asio::detail::socket_ops::host_to_network_short(ToUnderlying(msg_id)),
+        MsgType{asio::detail::socket_ops::host_to_network_short(pyc::ToUnderlying(msg_id)),
                 asio::detail::socket_ops::host_to_network_short(max_len)};
     ::memcpy(data_ + kHeadLength, msg, max_len);
 }

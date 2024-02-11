@@ -18,7 +18,7 @@ using namespace network;
 using namespace std::literals::chrono_literals;
 
 int main() {
-    Timer timer;
+    pyc::Timer timer;
 
     constexpr size_t kConnectionNum = 100;  // 创建 100 个连接
     constexpr size_t kSendNum = 500;        // 每个连接循环发送 500 次

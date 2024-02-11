@@ -6,6 +6,8 @@
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
+namespace pyc {
+
 class Timer {
 public:
     explicit Timer(const std::source_location& location = std::source_location::current())
@@ -22,3 +24,5 @@ private:
     std::source_location location_;
     std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
+
+}  // namespace pyc
