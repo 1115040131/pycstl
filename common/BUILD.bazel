@@ -6,6 +6,7 @@ exports_files(["LICENSE"])
 
 cc_library(
     name = "common",
+    srcs = glob(["src/*.cpp"]),
     hdrs = glob(["include/common/*.h"]),
     copts = [
         "-Wall",

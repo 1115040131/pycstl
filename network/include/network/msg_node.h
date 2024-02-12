@@ -2,7 +2,8 @@
 
 #include <cstring>
 #include <numeric>
-#include <string>
+
+#include "common/noncopyable.h"
 
 namespace network {
 
@@ -26,7 +27,7 @@ static constexpr size_t kHeadLength = sizeof(MsgHead);  // tlv 头部长度
 static constexpr size_t kMaxLength = 2ul * 1024;        // 消息体最大长度 2KB
 static constexpr size_t kMaxSendQueue = 1000;           // 发送队列最大长度
 
-class MsgNode {
+class MsgNode : pyc::Noncopyable {
 public:
     MsgNode(MsgSizeType max_len) : total_len_(max_len) {
         data_ = new char[total_len_ + 1];
@@ -35,8 +36,13 @@ public:
 
     ~MsgNode() { delete[] data_; }
 
+    size_t Remain() const { return total_len_ - cur_len_; }
+
     size_t Size() const { return total_len_; }
+
     const char* Data() const { return data_; }
+
+    size_t Copy(const char* src, size_t len);
 
     void Clear() {
         ::memset(data_, 0, total_len_);
@@ -50,19 +56,16 @@ protected:
 };
 
 class RecvNode : public MsgNode {
-    friend class Session;
-    friend class LogicSystem;
-
 public:
     RecvNode(MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len), msg_id_(msg_id) {}
+
+    MsgId GetMsgId() const { return msg_id_; }
 
 private:
     MsgId msg_id_;
 };
 
 class SendNode : public MsgNode {
-    friend class Session;
-
 public:
     SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id);
 };

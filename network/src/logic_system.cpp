@@ -73,7 +73,7 @@ void LogicSystem::DealMsg() {
 
 void LogicSystem::DealFirstMsg() {
     auto& msg_node = msg_queue_.front();
-    auto msg_id = msg_node->recv_node_->msg_id_;
+    auto msg_id = msg_node->recv_node_->GetMsgId();
     fmt::println("[{}] recv msg id = {}", __func__, msg_id);
     auto iter = callback_map_.find(msg_id);
     if (iter != callback_map_.end()) {

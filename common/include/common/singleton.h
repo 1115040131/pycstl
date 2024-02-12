@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/noncopyable.h"
+
 namespace pyc {
 
 /// @brief 单例模板基类
@@ -12,12 +14,8 @@ namespace pyc {
 ///     MySingletonClass() = default;
 /// };
 template <typename T>
-class Singleton {
+class Singleton : Noncopyable {
 public:
-    // 删除拷贝构造函数和赋值操作符以防止复制
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
-
     // 提供一个访问唯一实例的方法
     static T& Instance() {
         static T instance;  // 局部静态变量，只会被初始化一次

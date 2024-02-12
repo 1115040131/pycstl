@@ -23,4 +23,11 @@ SendNode::SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id) : MsgNode
     ::memcpy(data_ + kHeadLength, msg, max_len);
 }
 
+size_t MsgNode::Copy(const char* src, size_t len) {
+    size_t copy_len = std::min(len, Remain());
+    ::memcpy(data_ + cur_len_, src, copy_len);
+    cur_len_ += copy_len;
+    return copy_len;
+}
+
 }  // namespace network

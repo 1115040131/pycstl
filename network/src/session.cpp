@@ -3,6 +3,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+#include "common/utils.h"
 #include "network/logic_system.h"
 #include "network/server.h"
 #include "network/utils.h"
@@ -20,13 +21,8 @@ Session::~Session() {
 }
 
 void Session::Start() {
-    memset(data_, 0, kMaxLength);
-    socket_.async_read_some(
-        asio::buffer(data_, kMaxLength),
-        asio::bind_executor(strand_, [shared_this = shared_from_this()](
-                                         const boost::system::error_code& error_code, size_t bytes_transferred) {
-            shared_this->HandleRead(error_code, bytes_transferred);
-        }));
+    fmt::println("[{}]: Session {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
+    AsyncRead();
 }
 
 void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
@@ -41,7 +37,30 @@ void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
         return;
     }
 
-    asio::async_write(socket_, asio::buffer(send_queue_.front()->data_, send_queue_.front()->total_len_),
+    AsyncWrite();
+}
+
+void Session::Send(const std::string& msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
+
+void Session::Stop() {
+    // 关闭 socket 并取消所有挂起的异步操作
+    socket_.close();
+    // 从服务器中删除 session 引用
+    server_->DeleteSession(uuid_);
+}
+
+void Session::AsyncRead() {
+    ::memset(data_, 0, kMaxLength);
+    socket_.async_read_some(
+        asio::buffer(data_, kMaxLength),
+        asio::bind_executor(strand_, [shared_this = shared_from_this()](
+                                         const boost::system::error_code& error_code, size_t bytes_transferred) {
+            shared_this->HandleRead(error_code, bytes_transferred);
+        }));
+}
+
+void Session::AsyncWrite() {
+    asio::async_write(socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
                       asio::bind_executor(
                           strand_, [shared_this = shared_from_this()](const boost::system::error_code& error_code,
                                                                       [[maybe_unused]] size_t bytes_transferred) {
@@ -49,15 +68,10 @@ void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
                           }));
 }
 
-void Session::Send(const std::string& msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
-
 void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
     if (error_code) {
         fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());
-        // 关闭 socket 并取消所有挂起的异步操作
-        socket_.close();
-        // 从服务器中删除 session 引用
-        server_->DeleteSession(uuid_);
+        Stop();
         return;
     }
 
@@ -67,30 +81,25 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
     // std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // 已经处理的字节
-    size_t copy_len = 0;
+    size_t offset = 0;
     while (bytes_transferred > 0) {
         if (!is_head_parsed_) {
-            size_t head_remain = kHeadLength - recv_head_->cur_len_;  // 头部剩余长度
+            size_t copy_len = recv_head_->Copy(data_ + offset, bytes_transferred);
 
             // 收到的数据不足以解析出头部
-            if (bytes_transferred < head_remain) {
-                memcpy(recv_head_->data_ + recv_head_->cur_len_, data_ + copy_len, bytes_transferred);
-                recv_head_->cur_len_ += bytes_transferred;
+            if (recv_head_->Remain() > 0) {
                 break;
             }
 
-            // 收到的数据足够解析出头部
-            memcpy(recv_head_->data_ + recv_head_->cur_len_, data_ + copy_len, head_remain);
             // 更新已处理的字节数
-            copy_len += head_remain;
-            bytes_transferred -= head_remain;
+            offset += copy_len;
+            bytes_transferred -= copy_len;
             // 获取头部数据
-            MsgHead head = MsgHead::ParseHead(recv_head_->data_);
+            MsgHead head = MsgHead::ParseHead(recv_head_->Data());
             // 头部长度非法
             if (head.id > MsgId::kMaxId || head.length > kMaxLength) {
                 fmt::println("[{}]: Server receive valid head: {}", __func__, head);
-                socket_.close();
-                server_->DeleteSession(uuid_);
+                Stop();
                 return;
             }
             fmt::println("[{}]: Server receive head: {}", __func__, head);
@@ -98,20 +107,16 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
 
             is_head_parsed_ = true;
         } else {
-            size_t data_len = recv_msg_->total_len_ - recv_msg_->cur_len_;  // 数据剩余长度
+            size_t copy_len = recv_msg_->Copy(data_ + offset, bytes_transferred);
 
             // 消息的长度小于头部长度, 数据未收全
-            if (bytes_transferred < data_len) {
-                memcpy(recv_msg_->data_ + recv_msg_->cur_len_, data_ + copy_len, bytes_transferred);
-                recv_msg_->cur_len_ += bytes_transferred;
+            if (recv_msg_->Remain() > 0) {
                 break;
             }
 
-            // 消息的长度大于等于头部长度, 数据已收全
-            memcpy(recv_msg_->data_ + recv_msg_->cur_len_, data_ + copy_len, data_len);
             // 更新已处理的字节数
-            copy_len += data_len;
-            bytes_transferred -= data_len;
+            offset += copy_len;
+            bytes_transferred -= copy_len;
             // 投递数据
             LogicSystem::Instance().PostMsgToQueue(
                 std::make_unique<LogicNode>(shared_from_this(), std::move(recv_msg_)));
@@ -122,31 +127,20 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
     }
 
     // 继续轮询剩余未处理数据
-    memset(data_, 0, kMaxLength);
-    socket_.async_read_some(
-        asio::buffer(data_, kMaxLength),
-        asio::bind_executor(strand_, [shared_this = shared_from_this()](
-                                         const boost::system::error_code& error_code, size_t bytes_transferred) {
-            shared_this->HandleRead(error_code, bytes_transferred);
-        }));
+    AsyncRead();
 }
 
 void Session::HandleWrite(const boost::system::error_code& error_code) {
-    if (!error_code) {
-        std::lock_guard<std::mutex> lock(send_lock_);
-        send_queue_.pop();
-        if (!send_queue_.empty()) {
-            asio::async_write(socket_, asio::buffer(send_queue_.front()->data_, send_queue_.front()->total_len_),
-                              asio::bind_executor(strand_, [shared_this = shared_from_this()](
-                                                               const boost::system::error_code& error_code,
-                                                               [[maybe_unused]] size_t bytes_transferred) {
-                                  shared_this->HandleWrite(error_code);
-                              }));
-        }
-    } else {
+    if (error_code) {
         fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());
-        socket_.close();
-        server_->DeleteSession(uuid_);
+        Stop();
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(send_lock_);
+    send_queue_.pop();
+    if (!send_queue_.empty()) {
+        AsyncWrite();
     }
 }
 

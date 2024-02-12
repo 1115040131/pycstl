@@ -35,10 +35,19 @@ public:
     void Send(const std::string& msg, MsgId msg_id);
 
 private:
+    /// @brief 关闭连接, 并打印错误消息
+    void Stop();
+
     /// @brief 异步读取数据
-    void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
+    void AsyncRead();
 
     /// @brief 异步写入数据
+    void AsyncWrite();
+
+    /// @brief 异步读回调
+    void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
+
+    /// @brief 异步写回调
     void HandleWrite(const boost::system::error_code& error_code);
 
     /// @brief 打印缓冲区数据
