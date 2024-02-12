@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fmt/core.h>
+#include <fmt/printf.h>
 
 #include "network/msg_node.h"
 #include "network/proto/msg.pb.h"
@@ -11,26 +11,31 @@ const char* ToString(MsgId msg_id);
 
 }  // namespace network
 
+// fmt 格式化
+namespace fmt {
+
 template <>
-struct fmt::formatter<network::MsgId> : fmt::formatter<std::string> {
+struct formatter<network::MsgId> : formatter<std::string> {
     template <typename FormatContext>
-    auto format(const network::MsgId& msg_id, FormatContext& ctx) -> decltype(ctx.out()) {
+    auto format(const network::MsgId& msg_id, FormatContext& ctx) {
         return format_to(ctx.out(), "{}", network::ToString(msg_id));
     }
 };
 
 template <>
-struct fmt::formatter<network::MsgHead> : fmt::formatter<std::string> {
+struct formatter<network::MsgHead> : formatter<std::string> {
     template <typename FormatContext>
-    auto format(const network::MsgHead& head, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "id = {}, length = {}", head.id, head.length);
+    auto format(const network::MsgHead& head, FormatContext& ctx) {
+        return format_to(ctx.out(), "MsgHead(id: {}, length: {})", head.id, head.length);
     }
 };
 
 template <>
-struct fmt::formatter<network::MsgData> : fmt::formatter<std::string> {
+struct formatter<network::MsgData> : formatter<std::string> {
     template <typename FormatContext>
-    auto format(const network::MsgData& msg_data, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "id = {}, data = \"{}\"", msg_data.id(), msg_data.data());
+    auto format(const network::MsgData& msg_data, FormatContext& ctx) {
+        return format_to(ctx.out(), "id = {}, data = \'{}\'", msg_data.id(), msg_data.data());
     }
 };
+
+}  // namespace fmt

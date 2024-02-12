@@ -1,12 +1,22 @@
 #include "network/session.h"
 
-#include <fmt/printf.h>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 #include "network/logic_system.h"
 #include "network/server.h"
 #include "network/utils.h"
 
 namespace network {
+
+Session::Session(asio::io_context& io_context, Server* server) : socket_(io_context), server_(server) {
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    uuid_ = boost::uuids::to_string(uuid);
+}
+
+Session::~Session() {
+    fmt::println("[{}]: Session {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
+}
 
 void Session::Start() {
     memset(data_, 0, kMaxLength);
@@ -75,12 +85,12 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             MsgHead head = MsgHead::ParseHead(recv_head_->data_);
             // 头部长度非法
             if (head.id > MsgId::kMaxId || head.length > kMaxLength) {
-                fmt::println("[{}]: Head: {} is invalid", __func__, head);
+                fmt::println("[{}]: Server receive valid head: {}", __func__, head);
                 socket_.close();
                 server_->DeleteSession(uuid_);
                 return;
             }
-            fmt::println("[{}]: Head: {}", __func__, head);
+            fmt::println("[{}]: Server receive head: {}", __func__, head);
             recv_msg_ = std::make_unique<RecvNode>(head.length, head.id);
 
             is_head_parsed_ = true;
