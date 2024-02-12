@@ -15,7 +15,7 @@ def run():
 
     bin_path = f"{repo_path}/bazel-bin"
 
-    server_path = "network/example/async_server"
+    server_path = "network/example/async_server_thread_pool"
     client_path = "network/example/concurrency_client"
 
     # 创建新的tmux会话，名称为"my_session"

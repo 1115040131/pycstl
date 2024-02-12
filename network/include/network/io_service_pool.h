@@ -7,22 +7,20 @@
 #include <boost/asio.hpp>
 
 #include "common/singleton.h"
+#include "network/pool_base.h"
 
 namespace network {
 
 namespace asio = boost::asio;
 
-class IOServicePool : public pyc::Singleton<IOServicePool> {
+class IOServicePool : public PoolBase, public pyc::Singleton<IOServicePool> {
     friend class pyc::Singleton<IOServicePool>;
 
 public:
-    using IOService = asio::io_context;
-    using Work = asio::io_context::work;
-
     /// @brief 使用 round-robin 返回一个 io_context
-    IOService& GetIOService();
+    IOService& GetIOService() override;
 
-    void Stop();
+    void Stop() override;
 
 private:
     IOServicePool(size_t size = std::max(1u, std::thread::hardware_concurrency() / 2));

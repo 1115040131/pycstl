@@ -4,8 +4,6 @@
 #include <vector>
 
 #include <boost/asio.hpp>
-#include <fmt/chrono.h>
-#include <fmt/core.h>
 #include <nlohmann/json.hpp>
 
 #include "common/timer.h"

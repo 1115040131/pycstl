@@ -9,7 +9,8 @@
 
 namespace network {
 
-Session::Session(asio::io_context& io_context, Server* server) : socket_(io_context), server_(server) {
+Session::Session(asio::io_context& io_context, Server* server)
+    : socket_(io_context), server_(server), strand_(io_context.get_executor()) {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     uuid_ = boost::uuids::to_string(uuid);
 }
@@ -22,9 +23,10 @@ void Session::Start() {
     memset(data_, 0, kMaxLength);
     socket_.async_read_some(
         asio::buffer(data_, kMaxLength),
-        [shared_this = shared_from_this()](const boost::system::error_code& error_code, size_t bytes_transferred) {
+        asio::bind_executor(strand_, [shared_this = shared_from_this()](
+                                         const boost::system::error_code& error_code, size_t bytes_transferred) {
             shared_this->HandleRead(error_code, bytes_transferred);
-        });
+        }));
 }
 
 void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
@@ -40,10 +42,11 @@ void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
     }
 
     asio::async_write(socket_, asio::buffer(send_queue_.front()->data_, send_queue_.front()->total_len_),
-                      [shared_this = shared_from_this()](const boost::system::error_code& error_code,
-                                                         [[maybe_unused]] size_t bytes_transferred) {
-                          shared_this->HandleWrite(error_code);
-                      });
+                      asio::bind_executor(
+                          strand_, [shared_this = shared_from_this()](const boost::system::error_code& error_code,
+                                                                      [[maybe_unused]] size_t bytes_transferred) {
+                              shared_this->HandleWrite(error_code);
+                          }));
 }
 
 void Session::Send(const std::string& msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
@@ -122,9 +125,10 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
     memset(data_, 0, kMaxLength);
     socket_.async_read_some(
         asio::buffer(data_, kMaxLength),
-        [shared_this = shared_from_this()](const boost::system::error_code& error_code, size_t bytes_transferred) {
+        asio::bind_executor(strand_, [shared_this = shared_from_this()](
+                                         const boost::system::error_code& error_code, size_t bytes_transferred) {
             shared_this->HandleRead(error_code, bytes_transferred);
-        });
+        }));
 }
 
 void Session::HandleWrite(const boost::system::error_code& error_code) {
@@ -133,10 +137,11 @@ void Session::HandleWrite(const boost::system::error_code& error_code) {
         send_queue_.pop();
         if (!send_queue_.empty()) {
             asio::async_write(socket_, asio::buffer(send_queue_.front()->data_, send_queue_.front()->total_len_),
-                              [shared_this = shared_from_this()](const boost::system::error_code& error_code,
-                                                                 [[maybe_unused]] size_t bytes_transferred) {
+                              asio::bind_executor(strand_, [shared_this = shared_from_this()](
+                                                               const boost::system::error_code& error_code,
+                                                               [[maybe_unused]] size_t bytes_transferred) {
                                   shared_this->HandleWrite(error_code);
-                              });
+                              }));
         }
     } else {
         fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());

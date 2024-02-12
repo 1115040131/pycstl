@@ -116,3 +116,15 @@ cc_binary(
     ],
     deps = ["//network"],
 )
+
+cc_binary(
+    name = "async_server_thread_pool",
+    srcs = ["async_server_thread_pool.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
