@@ -9,3 +9,6 @@ lib
 # bazel
 bazel-*
 MODULE.bazel.lock
+
+# python
+__pycache__

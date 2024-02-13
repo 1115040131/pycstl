@@ -1,0 +1,10 @@
+{
+    "async_server": {
+        "server": "async_server_thread_pool",
+        "client": "concurrency_client"
+    },
+    "coroutine_server": {
+        "server": "coroutine_server",
+        "client": "sync_client"
+    }
+}
