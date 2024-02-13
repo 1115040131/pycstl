@@ -7,13 +7,13 @@
 #include <boost/asio.hpp>
 
 #include "common/singleton.h"
-#include "network/pool_base.h"
+#include "network/base/pool.h"
 
 namespace network {
 
 namespace asio = boost::asio;
 
-class IOServicePool : public PoolBase, public pyc::Singleton<IOServicePool> {
+class IOServicePool : public Pool, public pyc::Singleton<IOServicePool> {
     friend class pyc::Singleton<IOServicePool>;
 
 public:

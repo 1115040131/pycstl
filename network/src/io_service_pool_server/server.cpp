@@ -1,4 +1,6 @@
-#include "network/io_service_pool_server.h"
+#include "network/io_service_pool_server/server.h"
+
+#include "network/base/session.h"
 
 namespace network {
 

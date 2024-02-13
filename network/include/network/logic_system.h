@@ -9,9 +9,9 @@
 #include <unordered_map>
 
 #include "common/singleton.h"
+#include "network/base/session.h"
 #include "network/logic_node.h"
 #include "network/msg_node.h"
-#include "network/session.h"
 
 namespace network {
 

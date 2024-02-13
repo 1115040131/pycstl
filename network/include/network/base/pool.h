@@ -6,12 +6,12 @@ namespace network {
 
 namespace asio = boost::asio;
 
-class PoolBase {
+class Pool {
 public:
     using IOService = asio::io_context;
     using Work = asio::io_context::work;
 
-    virtual ~PoolBase() = default;
+    virtual ~Pool() = default;
 
     virtual IOService& GetIOService() = 0;
 

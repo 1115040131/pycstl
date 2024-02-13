@@ -6,12 +6,12 @@
 
 #include <boost/asio.hpp>
 
-#include "network/session.h"
-
 namespace network {
 
 namespace asio = boost::asio;
 using asio::ip::tcp;
+
+class Session;
 
 class Server {
 public:

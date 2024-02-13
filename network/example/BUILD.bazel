@@ -12,7 +12,10 @@ cc_library(
         "-Wno-unknown-pragmas",
     ],
     includes = ["../"],
-    deps = ["//network"],
+    deps = [
+        "//common",
+        "@boost//:asio",
+    ],
 )
 
 cc_library(
@@ -28,7 +31,10 @@ cc_library(
         "-Wno-unknown-pragmas",
     ],
     includes = ["../"],
-    deps = ["//network"],
+    deps = [
+        "//common",
+        "@boost//:asio",
+    ],
 )
 
 # client
@@ -108,6 +114,18 @@ cc_binary(
 cc_binary(
     name = "async_thread_pool_server",
     srcs = ["async_thread_pool_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "simple_coroutine_server",
+    srcs = ["simple_coroutine_server.cpp"],
     copts = [
         "-Wall",
         "-Wextra",

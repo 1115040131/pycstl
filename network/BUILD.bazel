@@ -6,8 +6,8 @@ exports_files(["LICENSE"])
 
 cc_library(
     name = "network",
-    srcs = glob(["src/*.cpp"]),
-    hdrs = glob(["include/network/*.h"]),
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/network/**/*.h"]),
     copts = [
         "-Wall",
         "-Wextra",

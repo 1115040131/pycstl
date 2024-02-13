@@ -1,7 +1,7 @@
 #pragma once
 
-#include "network/io_service_pool.h"
-#include "network/server.h"
+#include "network/base/server.h"
+#include "network/io_service_pool_server/pool.h"
 
 namespace network {
 
