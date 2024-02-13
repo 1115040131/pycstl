@@ -10,8 +10,7 @@
 
 namespace network {
 
-Session::Session(asio::io_context& io_context, Server* server)
-    : socket_(io_context), server_(server), strand_(io_context.get_executor()) {
+Session::Session(asio::io_context& io_context, Server* server) : socket_(io_context), server_(server) {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     uuid_ = boost::uuids::to_string(uuid);
 }
@@ -47,25 +46,6 @@ void Session::Stop() {
     socket_.close();
     // 从服务器中删除 session 引用
     server_->DeleteSession(uuid_);
-}
-
-void Session::AsyncRead() {
-    ::memset(data_, 0, kMaxLength);
-    socket_.async_read_some(
-        asio::buffer(data_, kMaxLength),
-        asio::bind_executor(strand_, [shared_this = shared_from_this()](
-                                         const boost::system::error_code& error_code, size_t bytes_transferred) {
-            shared_this->HandleRead(error_code, bytes_transferred);
-        }));
-}
-
-void Session::AsyncWrite() {
-    asio::async_write(socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
-                      asio::bind_executor(
-                          strand_, [shared_this = shared_from_this()](const boost::system::error_code& error_code,
-                                                                      [[maybe_unused]] size_t bytes_transferred) {
-                              shared_this->HandleWrite(error_code);
-                          }));
 }
 
 void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {

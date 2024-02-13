@@ -21,7 +21,7 @@ class Session : public std::enable_shared_from_this<Session> {
 public:
     Session(asio::io_context& io_context, Server* server);
 
-    ~Session();
+    virtual ~Session();
 
     tcp::socket& Socket() { return socket_; }
 
@@ -34,15 +34,15 @@ public:
     void Send(const char* msg, size_t max_len, MsgId msg_id);
     void Send(const std::string& msg, MsgId msg_id);
 
-private:
-    /// @brief 关闭连接, 并打印错误消息
+protected:
+    /// @brief 关闭连接
     void Stop();
 
     /// @brief 异步读取数据
-    void AsyncRead();
+    virtual void AsyncRead() = 0;
 
     /// @brief 异步写入数据
-    void AsyncWrite();
+    virtual void AsyncWrite() = 0;
 
     /// @brief 异步读回调
     void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
@@ -53,13 +53,11 @@ private:
     /// @brief 打印缓冲区数据
     void PrintBuffer(const char* buffer, size_t len);
 
-private:
+protected:
     tcp::socket socket_;
     Server* server_;
     std::string uuid_;
-    // 将 io_context 与 strand 关联, 当 socket 就绪后并不是由多个线程调用每个 socket 注册的回调函数,
-    // 而是将回调函数投递给 strand 管理队列, 再由 strand 统一调度派发, 确保同一个 session 串行执行
-    asio::strand<asio::io_context::executor_type> strand_;
+
 
     char data_[kMaxLength];  // 接收数据缓冲区
 
