@@ -128,3 +128,15 @@ cc_binary(
     ],
     deps = ["//network"],
 )
+
+cc_binary(
+    name = "coroutine_server",
+    srcs = ["coroutine_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
