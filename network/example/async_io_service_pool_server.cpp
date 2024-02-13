@@ -1,9 +1,6 @@
 #include <iostream>
 
-#include <boost/asio.hpp>
-
-#include "network/io_service_pool.h"
-#include "network/server.h"
+#include "network/io_service_pool_server.h"
 
 int main() {
     try {
@@ -14,7 +11,8 @@ int main() {
             network::IOServicePool::Instance().Stop();
         });
 
-        network::Server server(io_context, 10086);
+        network::IOServicePoolServer server(io_context, 10086);
+        server.StartAccept();
         io_context.run();
     } catch (const std::exception& e) {
         std::cerr << e.what() << '\n';

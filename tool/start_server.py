@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import time
 import json
 import os
 import subprocess
@@ -63,8 +64,12 @@ def run_tmux(server, client):
         return
 
     if not os.path.isfile(client_file):
-        logger.error(f"Server file {client_file} not exist.")
+        logger.error(f"Client file {client_file} not exist.")
         return
+
+    logger.info(f"Start Server \"{server}\"")
+    logger.info(f"Start Client \"{client}\"")
+    time.sleep(1)
 
     # 创建新的tmux会话，名称为"my_session"
     session_name = "sync_server"

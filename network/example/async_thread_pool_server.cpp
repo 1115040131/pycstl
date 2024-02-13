@@ -3,11 +3,7 @@
 #include <iostream>
 #include <mutex>
 
-#include <boost/asio.hpp>
-
-#include "network/server.h"
-#include "network/thread_pool.h"
-#include <fmt/printf.h>
+#include "network/thread_pool_server.h"
 
 static std::atomic<bool> is_stop{false};
 static std::condition_variable cond_quit;
@@ -24,7 +20,8 @@ int main() {
             cond_quit.notify_one();
         });
 
-        network::Server server(io_context, 10086);
+        network::ThreadPoolServer server(io_context, 10086);
+        server.StartAccept();
         {
             std::unique_lock lock(mutex_quit);
 

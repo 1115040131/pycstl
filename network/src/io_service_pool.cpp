@@ -21,8 +21,8 @@ IOServicePool::IOServicePool(size_t size) : io_services_(size) {
 IOServicePool::~IOServicePool() { fmt::println("[{}]: IOServicePool Exit.", __func__); }
 
 IOServicePool::IOService& IOServicePool::GetIOService() {
-    auto& io_service = io_services_[curr_idx_];
-    curr_idx_ = (curr_idx_ + 1) % io_services_.size();
+    auto& io_service = io_services_[curr_idx_++];
+    curr_idx_ %= io_services_.size();
     return io_service;
 }
 

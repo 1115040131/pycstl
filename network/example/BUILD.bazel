@@ -94,8 +94,8 @@ cc_binary(
 )
 
 cc_binary(
-    name = "async_server",
-    srcs = ["async_server.cpp"],
+    name = "async_io_service_pool_server",
+    srcs = ["async_io_service_pool_server.cpp"],
     copts = [
         "-Wall",
         "-Wextra",
@@ -106,20 +106,8 @@ cc_binary(
 )
 
 cc_binary(
-    name = "async_server_std_signal",
-    srcs = ["async_server_std_signal.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
-    deps = ["//network"],
-)
-
-cc_binary(
-    name = "async_server_thread_pool",
-    srcs = ["async_server_thread_pool.cpp"],
+    name = "async_thread_pool_server",
+    srcs = ["async_thread_pool_server.cpp"],
     copts = [
         "-Wall",
         "-Wextra",

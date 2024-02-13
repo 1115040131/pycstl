@@ -15,19 +15,19 @@ MsgHead MsgHead::ParseHead(const char* data) {
                    asio::detail::socket_ops::network_to_host_short(head.second)};
 }
 
+size_t MsgNode::Copy(const char* src, size_t len) {
+    size_t copy_len = std::min(len, Remain());
+    ::memcpy(data_ + cur_len_, src, copy_len);
+    cur_len_ += copy_len;
+    return copy_len;
+}
+
 SendNode::SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len + kHeadLength) {
     using MsgType = std::pair<std::underlying_type<MsgId>::type, MsgSizeType>;
     *reinterpret_cast<MsgType*>(data_) =
         MsgType{asio::detail::socket_ops::host_to_network_short(pyc::ToUnderlying(msg_id)),
                 asio::detail::socket_ops::host_to_network_short(max_len)};
     ::memcpy(data_ + kHeadLength, msg, max_len);
-}
-
-size_t MsgNode::Copy(const char* src, size_t len) {
-    size_t copy_len = std::min(len, Remain());
-    ::memcpy(data_ + cur_len_, src, copy_len);
-    cur_len_ += copy_len;
-    return copy_len;
 }
 
 }  // namespace network

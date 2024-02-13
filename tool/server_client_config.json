@@ -1,6 +1,10 @@
 {
-    "async_server": {
-        "server": "async_server_thread_pool",
+    "async_io_service_pool_server": {
+        "server": "async_io_service_pool_server",
+        "client": "concurrency_client"
+    },
+    "async_thread_pool_server": {
+        "server": "async_thread_pool_server",
         "client": "concurrency_client"
     },
     "coroutine_server": {
