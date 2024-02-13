@@ -27,7 +27,7 @@ static constexpr size_t kHeadLength = sizeof(MsgHead);  // tlv 头部长度
 static constexpr size_t kMaxLength = 2ul * 1024;        // 消息体最大长度 2KB
 static constexpr size_t kMaxSendQueue = 1000;           // 发送队列最大长度
 
-class MsgNode : pyc::Noncopyable {
+class MsgNode : public pyc::Noncopyable {
 public:
     MsgNode(MsgSizeType max_len) : total_len_(max_len) {
         data_ = new char[total_len_ + 1];

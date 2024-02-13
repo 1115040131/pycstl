@@ -14,7 +14,7 @@ namespace pyc {
 ///     MySingletonClass() = default;
 /// };
 template <typename T>
-class Singleton : Noncopyable {
+class Singleton : public Noncopyable {
 public:
     // 提供一个访问唯一实例的方法
     static T& Instance() {
