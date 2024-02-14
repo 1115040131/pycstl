@@ -6,4 +6,4 @@ build --compilation_mode=dbg
 
 # PATH 环境变量在不同的终端会话中有所不同
 # 明确设置所需的 PATH 而不是依赖于系统的 PATH 防止重复编译
-build --action_env=PATH="/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+build --client_env=PATH="/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"

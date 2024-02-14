@@ -12,8 +12,8 @@ from logger import Logger
 logger = Logger()
 
 
-def run_cmd(cmd):
-    subprocess.run(shlex.split(cmd))
+def run_cmd(cmd, check=True):
+    subprocess.run(shlex.split(cmd), check=check)
 
 
 def read_config(config_name):
@@ -73,7 +73,7 @@ def run_tmux(server, client):
 
     # 创建新的tmux会话，名称为"my_session"
     session_name = "sync_server"
-    run_cmd(f"tmux kill-session -t {session_name}")
+    run_cmd(f"tmux kill-session -t {session_name}", check=False)
     run_cmd(f"tmux new-session -d -s {session_name}")
 
     # 将会话分割成左右两个窗格
@@ -104,6 +104,7 @@ def run(config_name):
         return
 
     # 编译
+    run_cmd("bazel build //network")
     run_cmd("bazel build //network/...")
 
     # 运行

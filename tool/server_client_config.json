@@ -9,6 +9,6 @@
     },
     "coroutine_server": {
         "server": "coroutine_server",
-        "client": "sync_client"
+        "client": "concurrency_client"
     }
 }

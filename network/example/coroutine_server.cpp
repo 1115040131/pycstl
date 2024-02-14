@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "network/io_service_pool/io_service_pool_server.h"
+#include "network/coroutine/coroutine_server.h"
 
 int main() {
     try {
@@ -11,7 +11,7 @@ int main() {
             io_context.stop();
             pool.Stop();
         });
-        network::IOServicePoolServer server(io_context, 10086);
+        network::CoroutineServer server(io_context, 10086);
         server.StartAccept();
         io_context.run();
     } catch (const std::exception& e) {

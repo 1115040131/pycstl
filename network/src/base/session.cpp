@@ -33,19 +33,17 @@ void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
 void Session::Send(const std::string& msg, MsgId msg_id) { Send(msg.data(), msg.size(), msg_id); }
 
 void Session::Stop() {
+    if (is_stop_.exchange(true)) {
+        return;
+    }
+
     // 关闭 socket 并取消所有挂起的异步操作
     socket_.close();
     // 从服务器中删除 session 引用
     server_->DeleteSession(uuid_);
 }
 
-void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
-    if (error_code) {
-        fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());
-        Stop();
-        return;
-    }
-
+void Session::ParseBuffer(size_t bytes_transferred) {
     // For debug 打印接收数据
     // fmt::print("[{}]: Server receive raw data: ", __func__);
     // PrintBuffer(data_, bytes_transferred);
@@ -96,6 +94,16 @@ void Session::HandleRead(const boost::system::error_code& error_code, size_t byt
             recv_head_->Clear();
         }
     }
+}
+
+void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
+    if (error_code) {
+        fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());
+        Stop();
+        return;
+    }
+
+    ParseBuffer(bytes_transferred);
 
     // 继续轮询剩余未处理数据
     AsyncRead();

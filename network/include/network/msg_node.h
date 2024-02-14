@@ -41,6 +41,8 @@ public:
 
     size_t Size() const { return total_len_; }
 
+    char* Data() { return data_; }
+
     const char* Data() const { return data_; }
 
     size_t Copy(const char* src, size_t len);

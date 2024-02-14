@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -30,13 +31,19 @@ public:
     /// @brief 开始异步读取数据
     virtual void Start() = 0;
 
-    /// @brief 往发送队列添加发送数据
+    /// @brief 往发送队列添加发送数据并异步发送
     void Send(const char* msg, size_t max_len, MsgId msg_id);
     void Send(const std::string& msg, MsgId msg_id);
 
 protected:
     /// @brief 关闭连接
     void Stop();
+
+    /// @brief 对缓冲区数据进行粘包处理
+    void ParseBuffer(size_t bytes_transferred);
+
+    /// @brief 打印缓冲区数据
+    void PrintBuffer(const char* buffer, size_t len);
 
     /// @brief 异步读取数据
     virtual void AsyncRead() = 0;
@@ -45,18 +52,16 @@ protected:
     virtual void AsyncWrite() = 0;
 
     /// @brief 异步读回调
-    void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
+    virtual void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
 
     /// @brief 异步写回调
-    void HandleWrite(const boost::system::error_code& error_code);
-
-    /// @brief 打印缓冲区数据
-    void PrintBuffer(const char* buffer, size_t len);
+    virtual void HandleWrite(const boost::system::error_code& error_code);
 
 protected:
     tcp::socket socket_;
     Server* server_;
     std::string uuid_;
+    std::atomic<bool> is_stop_{false};
 
     char data_[kMaxLength];  // 接收数据缓冲区
 
