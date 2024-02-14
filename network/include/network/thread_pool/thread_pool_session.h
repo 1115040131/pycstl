@@ -8,6 +8,10 @@ class ThreadPoolSession : public Session {
 public:
     ThreadPoolSession(asio::io_context& io_context, Server* server);
 
+    ~ThreadPoolSession() override;
+
+    void Start() override;
+
 protected:
     void AsyncRead() override;
     void AsyncWrite() override;

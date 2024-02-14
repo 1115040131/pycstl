@@ -1,9 +1,21 @@
-#include "network/thread_pool_server/session.h"
+#include "network/thread_pool/thread_pool_session.h"
+
+#include <fmt/printf.h>
 
 namespace network {
 
 ThreadPoolSession::ThreadPoolSession(asio::io_context& io_context, Server* server)
     : Session(io_context, server), strand_(io_context.get_executor()) {}
+
+ThreadPoolSession::~ThreadPoolSession() {
+    fmt::println("[{}]: ThreadPoolSession {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this),
+                 uuid_);
+}
+
+void ThreadPoolSession::Start() {
+    fmt::println("[{}]: ThreadPoolSession {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
+    AsyncRead();
+}
 
 void ThreadPoolSession::AsyncRead() {
     ::memset(data_, 0, kMaxLength);

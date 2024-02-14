@@ -1,6 +1,19 @@
-#include "network/io_service_pool_server/session.h"
+#include "network/io_service_pool/io_service_pool_session.h"
+
+#include <fmt/printf.h>
 
 namespace network {
+
+IOServicePoolSession::~IOServicePoolSession() {
+    fmt::println("[{}]: IOServicePoolSession {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this),
+                 uuid_);
+}
+
+void IOServicePoolSession::Start() {
+    fmt::println("[{}]: IOServicePoolSession {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this),
+                 uuid_);
+    AsyncRead();
+}
 
 void IOServicePoolSession::AsyncRead() {
     ::memset(data_, 0, kMaxLength);

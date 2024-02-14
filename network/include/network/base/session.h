@@ -21,14 +21,14 @@ class Session : public std::enable_shared_from_this<Session> {
 public:
     Session(asio::io_context& io_context, Server* server);
 
-    virtual ~Session();
+    virtual ~Session() = default;
 
     tcp::socket& Socket() { return socket_; }
 
     const std::string& GetUuid() const { return uuid_; }
 
     /// @brief 开始异步读取数据
-    void Start();
+    virtual void Start() = 0;
 
     /// @brief 往发送队列添加发送数据
     void Send(const char* msg, size_t max_len, MsgId msg_id);
@@ -57,7 +57,6 @@ protected:
     tcp::socket socket_;
     Server* server_;
     std::string uuid_;
-
 
     char data_[kMaxLength];  // 接收数据缓冲区
 

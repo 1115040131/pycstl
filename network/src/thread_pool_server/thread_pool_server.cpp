@@ -1,6 +1,6 @@
-#include "network/thread_pool_server/server.h"
+#include "network/thread_pool/thread_pool_server.h"
 
-#include "network/thread_pool_server/session.h"
+#include "network/thread_pool/thread_pool_session.h"
 
 namespace network {
 

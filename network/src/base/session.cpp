@@ -15,15 +15,6 @@ Session::Session(asio::io_context& io_context, Server* server) : socket_(io_cont
     uuid_ = boost::uuids::to_string(uuid);
 }
 
-Session::~Session() {
-    fmt::println("[{}]: Session {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
-}
-
-void Session::Start() {
-    fmt::println("[{}]: Session {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
-    AsyncRead();
-}
-
 void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
     std::lock_guard<std::mutex> lock(send_lock_);
     size_t send_queue_size = send_queue_.size();
