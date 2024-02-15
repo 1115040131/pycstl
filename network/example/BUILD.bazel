@@ -146,3 +146,16 @@ cc_binary(
     ],
     deps = ["//network"],
 )
+
+#http
+cc_binary(
+    name = "http_client",
+    srcs = ["http_client.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//network"],
+)
