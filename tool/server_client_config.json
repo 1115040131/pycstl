@@ -10,5 +10,8 @@
     "coroutine_server": {
         "server": "coroutine_server",
         "client": "concurrency_client"
+    },
+    "http_server": {
+        "server": "http_server"
     }
 }

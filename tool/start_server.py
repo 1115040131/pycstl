@@ -27,14 +27,21 @@ def read_config(config_name):
         config = data.get(config_name)
         if config is not None:
             # 检查是否存在 server 和 client 属性
-            server = config.get('server')
             client = config.get('client')
-            if server is not None and client is not None:
-                return server, client
-            else:
+            server = config.get('server')
+
+            # 没有配置 server 直接退出
+            if server is None:
                 logger.error(
-                    f"The '{config_name}'  config is missing the 'server' or 'client' property.")
+                    f"The '{config_name}' config is missing the 'server' property.")
                 return None, None
+
+            # 没有配置 client
+            if client is None:
+                logger.warn(
+                    f"The '{config_name}' config is missing the 'client' property.")
+
+            return server, client
         else:
             logger.error(f"No config found with name '{config_name}'.")
             return None, None
@@ -56,19 +63,23 @@ def run_tmux(server, client):
 
     bin_path = f"{repo_path}/bazel-bin/network/example"
 
+    # 检查 server 文件是否存在
+    if server is None:
+        return
     server_file = f"{bin_path}/{server}"
-    client_file = f"{bin_path}/{client}"
-
     if not os.path.isfile(server_file):
         logger.error(f"Server file {server_file} not exist.")
         return
-
-    if not os.path.isfile(client_file):
-        logger.error(f"Client file {client_file} not exist.")
-        return
-
     logger.info(f"Start Server \"{server}\"")
-    logger.info(f"Start Client \"{client}\"")
+
+    # 检查 client 文件是否存在
+    if client is not None:
+        client_file = f"{bin_path}/{client}"
+        if not os.path.isfile(client_file):
+            logger.error(f"Client file {client_file} not exist.")
+            return
+        logger.info(f"Start Client \"{client}\"")
+
     time.sleep(1)
 
     # 创建新的tmux会话，名称为"my_session"
@@ -84,9 +95,10 @@ def run_tmux(server, client):
         f"tmux send-keys -t {session_name}:0.0 '{server_file}' C-m")
 
     # 在第二个窗格运行程序B
-    run_cmd(f"tmux send-keys -t {session_name}:0.1 'sleep 1' C-m")
-    run_cmd(
-        f"tmux send-keys -t {session_name}:0.1 '{client_file}' C-m")
+    if client is not None:
+        run_cmd(f"tmux send-keys -t {session_name}:0.1 'sleep 1' C-m")
+        run_cmd(
+            f"tmux send-keys -t {session_name}:0.1 '{client_file}' C-m")
 
     try:
         # 附加到tmux会话以查看输出
@@ -100,7 +112,7 @@ def run_tmux(server, client):
 def run(config_name):
     # 读取配置
     server, client = read_config(config_name)
-    if server is None or client is None:
+    if server is None:
         return
 
     # 运行
