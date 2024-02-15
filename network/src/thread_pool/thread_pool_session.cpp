@@ -30,14 +30,13 @@ void ThreadPoolSession::AsyncRead() {
 }
 
 void ThreadPoolSession::AsyncWrite() {
-    asio::async_write(
-        socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
-        asio::bind_executor(
-            // 此处的转型一定是安全的
-            strand_, [shared_this = std::static_pointer_cast<ThreadPoolSession>(shared_from_this())](
-                         const boost::system::error_code& error_code, [[maybe_unused]] size_t bytes_transferred) {
-                shared_this->HandleWrite(error_code);
-            }));
+    asio::async_write(socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
+                      asio::bind_executor(
+                          // 此处的转型一定是安全的
+                          strand_, [shared_this = std::static_pointer_cast<ThreadPoolSession>(shared_from_this())](
+                                       const boost::system::error_code& error_code, size_t) {
+                              shared_this->HandleWrite(error_code);
+                          }));
 }
 
 }  // namespace network
