@@ -35,11 +35,10 @@ asio::awaitable<void> CoroutineSession::CoawaitRead() {
 }
 
 void CoroutineSession::AsyncWrite() {
-    asio::async_write(socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
-                      [shared_this = std::static_pointer_cast<CoroutineSession>(shared_from_this())](
-                          const boost::system::error_code& error_code, [[maybe_unused]] size_t bytes_transferred) {
-                          shared_this->HandleWrite(error_code);
-                      });
+    asio::async_write(
+        socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
+        [shared_this = std::static_pointer_cast<CoroutineSession>(shared_from_this())](
+            const boost::system::error_code& error_code, size_t) { shared_this->HandleWrite(error_code); });
 }
 
 }  // namespace network
