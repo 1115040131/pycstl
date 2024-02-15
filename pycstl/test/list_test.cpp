@@ -9,7 +9,7 @@ static std::initializer_list<int> init_list{1, 2, 5, 7, 9, 392, 213, 1, -321, 12
 
 TEST(DISABLED_ListTest, Visit) {
     pycstl::List<int> arr{1, 2, 3, 4, 5};
-    size_t i = 0;
+    std::size_t i = 0;
     for (auto it = arr.cbegin(); it != arr.cend(); ++it) {
         const int& val = *it;
         fmt::println("arr[{}] = {}", i, val);

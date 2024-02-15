@@ -49,7 +49,7 @@ int main() {
                 MsgHead msg_head = MsgHead::ParseHead(reply_head);
                 fmt::println("Replay head: {}", msg_head);
                 char msg[kMaxLength];
-                size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
+                std::size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
                 MsgData recv_data;
                 recv_data.ParseFromArray(msg, msg_length);
                 fmt::println("Reply: {}\nReply len = {}", recv_data, msg_length);

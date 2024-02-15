@@ -4,16 +4,16 @@
 
 namespace network {
 
-IOServicePool::IOServicePool(size_t size) : io_services_(size) {
+IOServicePool::IOServicePool(std::size_t size) : io_services_(size) {
     fmt::println("[{}]: Create {} io_context.", __func__, size);
 
     works_.reserve(size);
-    for (size_t i = 0; i < size; ++i) {
+    for (std::size_t i = 0; i < size; ++i) {
         works_.emplace_back(std::make_unique<Work>(io_services_[i]));
     }
 
     threads_.reserve(size);
-    for (size_t i = 0; i < size; ++i) {
+    for (std::size_t i = 0; i < size; ++i) {
         threads_.emplace_back([this, i] { io_services_[i].run(); });
     }
 }

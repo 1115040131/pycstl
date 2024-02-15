@@ -103,10 +103,6 @@ def run(config_name):
     if server is None or client is None:
         return
 
-    # 编译
-    run_cmd("bazel build //network")
-    run_cmd("bazel build //network/...")
-
     # 运行
     run_tmux(server, client)
 

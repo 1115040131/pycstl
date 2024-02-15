@@ -23,7 +23,7 @@ public:
     void Stop() override;
 
 private:
-    IOServicePool(size_t size = std::max(1u, std::thread::hardware_concurrency() / 2));
+    IOServicePool(std::size_t size = std::max(1u, std::thread::hardware_concurrency() / 2));
 
     ~IOServicePool();
 
@@ -31,7 +31,7 @@ private:
     std::vector<IOService> io_services_;
     std::vector<std::unique_ptr<Work>> works_;  // 防止 IOService run 后直接返回
     std::vector<std::thread> threads_;
-    size_t curr_idx_ = 0;  // 当前 io_service 下标
+    std::size_t curr_idx_ = 0;  // 当前 io_service 下标
 };
 
 }  // namespace network

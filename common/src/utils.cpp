@@ -3,10 +3,10 @@
 namespace pyc {
 
 std::string_view GetSimpleName(std::string_view functionName) {
-    size_t end = functionName.find('(');  // 找到函数参数列表的开始
+    std::size_t end = functionName.find('(');  // 找到函数参数列表的开始
     if (end != std::string_view::npos) {
         // 我们需要在 "(" 之前找到 "::"
-        size_t start = functionName.rfind("::", end);
+        std::size_t start = functionName.rfind("::", end);
         if (start != std::string_view::npos) {
             return functionName.substr(start + 2, end - (start + 2));  // Skip the "::"
         }

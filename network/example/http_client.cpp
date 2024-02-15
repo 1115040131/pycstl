@@ -24,7 +24,7 @@ public:
             "Connection: close\r\n\r\n",
             path, server);
 
-        size_t pos = server.find(":");
+        std::size_t pos = server.find(":");
         std::string_view ip = server.substr(0, pos);
         std::string_view port = server.substr(pos + 1);
 
@@ -60,7 +60,7 @@ private:
             return;
         }
 
-        asio::async_write(socket_, request_, [this](const boost::system::error_code& error_code, size_t) {
+        asio::async_write(socket_, request_, [this](const boost::system::error_code& error_code, std::size_t) {
             HandleWriteRequest(error_code);
         });
     }
@@ -71,9 +71,10 @@ private:
             return;
         }
 
-        asio::async_read_until(
-            socket_, response_, "\r\n",
-            [this](const boost::system::error_code& error_code, size_t) { HandleReadStatusLine(error_code); });
+        asio::async_read_until(socket_, response_, "\r\n",
+                               [this](const boost::system::error_code& error_code, std::size_t) {
+                                   HandleReadStatusLine(error_code);
+                               });
     }
 
     void HandleReadStatusLine(const boost::system::error_code& error_code) {
@@ -101,7 +102,7 @@ private:
 
         asio::async_read_until(
             socket_, response_, "\r\n\r\n",
-            [this](const boost::system::error_code& error_code, size_t) { HandleReadHeaders(error_code); });
+            [this](const boost::system::error_code& error_code, std::size_t) { HandleReadHeaders(error_code); });
     }
 
     void HandleReadHeaders(const boost::system::error_code& error_code) {
@@ -127,7 +128,7 @@ private:
         // 读取直到 EOF
         asio::async_read(
             socket_, response_, asio::transfer_at_least(1),
-            [this](const boost::system::error_code& error_code, size_t) { HandleReadContent(error_code); });
+            [this](const boost::system::error_code& error_code, std::size_t) { HandleReadContent(error_code); });
     }
 
     void HandleReadContent(const boost::system::error_code& error_code) {
@@ -142,7 +143,7 @@ private:
         // 读取剩余数据直到 EOF
         asio::async_read(
             socket_, response_, asio::transfer_at_least(1),
-            [this](const boost::system::error_code& error_code, size_t) { HandleReadContent(error_code); });
+            [this](const boost::system::error_code& error_code, std::size_t) { HandleReadContent(error_code); });
     }
 
 private:

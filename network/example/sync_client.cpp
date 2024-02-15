@@ -38,7 +38,7 @@ int main() {
         MsgHead msg_head = MsgHead::ParseHead(reply_head);
         fmt::println("Replay head: {}", msg_head);
         char msg[kMaxLength];
-        size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
+        std::size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
         auto reader = nlohmann::json::parse(msg, msg + msg_length);
         fmt::println("Reply msg id = {}, data = \"{}\"", reader["id"].get<MsgId>(),
                      reader["data"].get<std::string>());

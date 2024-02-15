@@ -4,10 +4,10 @@
 
 namespace network {
 
-ThreadPool::ThreadPool(size_t size) {
+ThreadPool::ThreadPool(std::size_t size) {
     threads_.reserve(size);
 
-    for (size_t i = 0; i < size; ++i) {
+    for (std::size_t i = 0; i < size; ++i) {
         threads_.emplace_back([this] { io_service_.run(); });
     }
 }

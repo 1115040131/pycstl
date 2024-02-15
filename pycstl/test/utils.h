@@ -15,7 +15,7 @@
         EXPECT_EQ(container1.capacity(), container2.capacity());   \
         auto iter1 = container1.begin();                           \
         auto iter2 = container2.begin();                           \
-        for (size_t i = 0; i < container2.size(); i++) {           \
+        for (std::size_t i = 0; i < container2.size(); i++) {      \
             EXPECT_EQ(*iter1, *iter2) << fmt::format("pos={}", i); \
             iter1++;                                               \
             iter2++;                                               \
@@ -28,7 +28,7 @@
         EXPECT_EQ(container1.size(), container2.size());           \
         auto iter1 = container1.begin();                           \
         auto iter2 = container2.begin();                           \
-        for (size_t i = 0; i < container2.size(); i++) {           \
+        for (std::size_t i = 0; i < container2.size(); i++) {      \
             EXPECT_EQ(*iter1, *iter2) << fmt::format("pos={}", i); \
             iter1++;                                               \
             iter2++;                                               \

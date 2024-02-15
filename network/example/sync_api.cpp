@@ -225,7 +225,7 @@ void UseConstBuffer() {
 void UseBufferStr() { [[maybe_unused]] asio::const_buffers_1 output_buf = asio::buffer("hello world"); }
 
 void UseBufferArray() {
-    constexpr size_t kBufSizeBytes = 20;
+    constexpr std::size_t kBufSizeBytes = 20;
     std::unique_ptr<char[]> buf(new char[kBufSizeBytes]);
     [[maybe_unused]] asio::mutable_buffers_1 input_buf =
         asio::buffer(static_cast<void*>(buf.get()), kBufSizeBytes);
@@ -252,7 +252,7 @@ void UseStreamBuffer() {
 /// @brief 同步写 write_some
 void WriteToSocket(asio::ip::tcp::socket& sock) {
     std::string buf = "Hello World";
-    size_t total_bytes_written = 0;
+    std::size_t total_bytes_written = 0;
 
     // 循环发送
     while (total_bytes_written != buf.length()) {
@@ -346,7 +346,7 @@ int SendDataByWrite() {
 std::string ReadFromSocket(asio::ip::tcp::socket& sock) {
     constexpr unsigned char kMessageSize = 7;
     char buf[kMessageSize];
-    size_t total_bytes_read = 0;
+    std::size_t total_bytes_read = 0;
 
     // 循环读
     while (total_bytes_read != kMessageSize) {

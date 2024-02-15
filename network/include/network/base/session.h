@@ -32,7 +32,7 @@ public:
     virtual void Start() = 0;
 
     /// @brief 往发送队列添加发送数据并异步发送
-    void Send(const char* msg, size_t max_len, MsgId msg_id);
+    void Send(const char* msg, std::size_t max_len, MsgId msg_id);
     void Send(const std::string& msg, MsgId msg_id);
 
 protected:
@@ -40,10 +40,10 @@ protected:
     void Stop();
 
     /// @brief 对缓冲区数据进行粘包处理
-    void ParseBuffer(size_t bytes_transferred);
+    void ParseBuffer(std::size_t bytes_transferred);
 
     /// @brief 打印缓冲区数据
-    void PrintBuffer(const char* buffer, size_t len);
+    void PrintBuffer(const char* buffer, std::size_t len);
 
     /// @brief 异步读取数据
     virtual void AsyncRead() = 0;
@@ -52,7 +52,7 @@ protected:
     virtual void AsyncWrite() = 0;
 
     /// @brief 异步读回调
-    virtual void HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred);
+    virtual void HandleRead(const boost::system::error_code& error_code, std::size_t bytes_transferred);
 
     /// @brief 异步写回调
     virtual void HandleWrite(const boost::system::error_code& error_code);

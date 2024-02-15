@@ -159,3 +159,18 @@ cc_binary(
     ],
     deps = ["//network"],
 )
+
+cc_binary(
+    name = "http_server",
+    srcs = ["http_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = [
+        "//network",
+        "@boost//:beast",
+    ],
+)

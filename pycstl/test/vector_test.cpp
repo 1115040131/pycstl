@@ -25,7 +25,7 @@ TEST(VectorTest, test_construction) {
     std::vector<int> stl_vec4(7, 8);
     COMPARE_ALL(vec4, stl_vec4);
 
-    for (size_t i = 0; i < stl_vec4.size(); i++) {
+    for (std::size_t i = 0; i < stl_vec4.size(); i++) {
         vec4[i] = static_cast<int>(100 + i);
         stl_vec4[i] = static_cast<int>(100 + i);
     }
@@ -98,7 +98,7 @@ TEST(VectorTest, test_erase_insert) {
     std::vector<int> vec2;
     vec1.reserve(16);
     vec2.reserve(16);
-    for (size_t i = 0; i < vec2.capacity(); i++) {
+    for (std::size_t i = 0; i < vec2.capacity(); i++) {
         vec1.push_back(static_cast<int>(i));
         vec2.push_back(static_cast<int>(i));
     }

@@ -22,7 +22,7 @@ public:
     void Stop() override;
 
 private:
-    ThreadPool(size_t size = std::max(1u, std::thread::hardware_concurrency() / 2));
+    ThreadPool(std::size_t size = std::max(1u, std::thread::hardware_concurrency() / 2));
 
     ~ThreadPool();
 

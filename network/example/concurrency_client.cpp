@@ -18,13 +18,13 @@ using namespace std::literals::chrono_literals;
 int main() {
     pyc::Timer timer;
 
-    constexpr size_t kConnectionNum = 100;  // 创建 100 个连接
-    constexpr size_t kSendNum = 500;        // 每个连接循环发送 500 次
+    constexpr std::size_t kConnectionNum = 100;  // 创建 100 个连接
+    constexpr std::size_t kSendNum = 500;        // 每个连接循环发送 500 次
 
     std::vector<std::thread> threads;
     threads.reserve(kConnectionNum);
 
-    for (size_t i = 0; i < kConnectionNum; ++i) {
+    for (std::size_t i = 0; i < kConnectionNum; ++i) {
         threads.emplace_back([] {
             try {
                 // 创建上下文
@@ -41,7 +41,7 @@ int main() {
                     return;
                 }
 
-                for (size_t j = 0; j < kSendNum; ++j) {
+                for (std::size_t j = 0; j < kSendNum; ++j) {
                     nlohmann::json root;
                     root["id"] = MsgId::kMsgHelloWorld;
                     root["data"] = "Hello world!";
@@ -54,7 +54,7 @@ int main() {
                     MsgHead msg_head = MsgHead::ParseHead(reply_head);
                     fmt::println("Replay head: {}", msg_head);
                     char msg[kMaxLength];
-                    size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
+                    std::size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
                     auto reader = nlohmann::json::parse(msg, msg + msg_length);
                     fmt::println("Reply msg id = {}, data = \"{}\"", reader["id"].get<MsgId>(),
                                  reader["data"].get<std::string>());

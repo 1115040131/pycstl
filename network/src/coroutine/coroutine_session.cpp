@@ -23,7 +23,7 @@ void CoroutineSession::Start() {
 asio::awaitable<void> CoroutineSession::CoawaitRead() {
     try {
         while (is_stop_.load() == false) {
-            size_t recv_size =
+            std::size_t recv_size =
                 co_await socket_.async_read_some(asio::buffer(data_, kMaxLength), asio::use_awaitable);
 
             ParseBuffer(recv_size);
@@ -38,7 +38,7 @@ void CoroutineSession::AsyncWrite() {
     asio::async_write(
         socket_, asio::buffer(send_queue_.front()->Data(), send_queue_.front()->Size()),
         [shared_this = std::static_pointer_cast<CoroutineSession>(shared_from_this())](
-            const boost::system::error_code& error_code, size_t) { shared_this->HandleWrite(error_code); });
+            const boost::system::error_code& error_code, std::size_t) { shared_this->HandleWrite(error_code); });
 }
 
 }  // namespace network

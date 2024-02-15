@@ -9,7 +9,7 @@ namespace network {
 
 namespace asio = boost::asio;
 
-constexpr size_t kRecvSize = 1024;
+constexpr std::size_t kRecvSize = 1024;
 
 class MsgNode {
 private:
@@ -22,11 +22,11 @@ private:
 public:
     MsgNode(std::string msg) : msg_(std::move(msg)), total_len_(msg.size()) {}
 
-    explicit MsgNode(size_t total_len) : total_len_(total_len) {}
+    explicit MsgNode(std::size_t total_len) : total_len_(total_len) {}
 
 private:
-    size_t total_len_;
-    size_t cur_len_ = 0;
+    std::size_t total_len_;
+    std::size_t cur_len_ = 0;
     std::string msg_;
 };
 
@@ -48,7 +48,7 @@ public:
     void WriteToSocket(const std::string& msg);
 
 private:
-    void WriteCallBack(const boost::system::error_code& error_code, size_t bytes_transferred,
+    void WriteCallBack(const boost::system::error_code& error_code, std::size_t bytes_transferred,
                        std::shared_ptr<MsgNode> node);
 
 private:
@@ -62,7 +62,7 @@ public:
     void WriteToSocket(const std::string& msg);
 
 private:
-    void WriteCallBack(const boost::system::error_code& error_code, size_t bytes_transferred);
+    void WriteCallBack(const boost::system::error_code& error_code, std::size_t bytes_transferred);
 
 private:
     std::queue<std::shared_ptr<MsgNode>> send_queue_;
@@ -77,7 +77,7 @@ public:
     void WriteToSocket(const std::string& msg);
 
 private:
-    void WriteCallBack(const boost::system::error_code& error_code, size_t bytes_transferred);
+    void WriteCallBack(const boost::system::error_code& error_code, std::size_t bytes_transferred);
 
 private:
     std::queue<std::shared_ptr<MsgNode>> send_queue_;
@@ -91,7 +91,7 @@ public:
     void ReadFromSocket();
 
 private:
-    void ReadCallBack(const boost::system::error_code& error_code, size_t bytes_transferred);
+    void ReadCallBack(const boost::system::error_code& error_code, std::size_t bytes_transferred);
 
 private:
     std::shared_ptr<MsgNode> recv_node_ = std::make_shared<MsgNode>(kRecvSize);
@@ -105,7 +105,7 @@ public:
     void ReadFromSocket();
 
 private:
-    void ReadCallBack(const boost::system::error_code& error_code, size_t bytes_transferred);
+    void ReadCallBack(const boost::system::error_code& error_code, std::size_t bytes_transferred);
 
 private:
     std::shared_ptr<MsgNode> recv_node_ = std::make_shared<MsgNode>(kRecvSize);

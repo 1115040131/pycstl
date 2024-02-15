@@ -15,9 +15,9 @@ Session::Session(asio::io_context& io_context, Server* server) : socket_(io_cont
     uuid_ = boost::uuids::to_string(uuid);
 }
 
-void Session::Send(const char* msg, size_t max_len, MsgId msg_id) {
+void Session::Send(const char* msg, std::size_t max_len, MsgId msg_id) {
     std::lock_guard<std::mutex> lock(send_lock_);
-    size_t send_queue_size = send_queue_.size();
+    std::size_t send_queue_size = send_queue_.size();
     if (send_queue_size > kMaxSendQueue) {
         fmt::println("[{}]: Send queue size = {} is full", __func__, send_queue_size);
         return;
@@ -43,17 +43,17 @@ void Session::Stop() {
     server_->DeleteSession(uuid_);
 }
 
-void Session::ParseBuffer(size_t bytes_transferred) {
+void Session::ParseBuffer(std::size_t bytes_transferred) {
     // For debug 打印接收数据
     // fmt::print("[{}]: Server receive raw data: ", __func__);
     // PrintBuffer(data_, bytes_transferred);
     // std::this_thread::sleep_for(std::chrono::seconds(2));
 
     // 已经处理的字节
-    size_t offset = 0;
+    std::size_t offset = 0;
     while (bytes_transferred > 0) {
         if (!is_head_parsed_) {
-            size_t copy_len = recv_head_->Copy(data_ + offset, bytes_transferred);
+            std::size_t copy_len = recv_head_->Copy(data_ + offset, bytes_transferred);
 
             // 收到的数据不足以解析出头部
             if (recv_head_->Remain() > 0) {
@@ -76,7 +76,7 @@ void Session::ParseBuffer(size_t bytes_transferred) {
 
             is_head_parsed_ = true;
         } else {
-            size_t copy_len = recv_msg_->Copy(data_ + offset, bytes_transferred);
+            std::size_t copy_len = recv_msg_->Copy(data_ + offset, bytes_transferred);
 
             // 消息的长度小于头部长度, 数据未收全
             if (recv_msg_->Remain() > 0) {
@@ -96,7 +96,7 @@ void Session::ParseBuffer(size_t bytes_transferred) {
     }
 }
 
-void Session::HandleRead(const boost::system::error_code& error_code, size_t bytes_transferred) {
+void Session::HandleRead(const boost::system::error_code& error_code, std::size_t bytes_transferred) {
     if (error_code) {
         fmt::println("[{}]: Error code = {}. Message: {}", __func__, error_code.value(), error_code.message());
         Stop();
@@ -123,8 +123,8 @@ void Session::HandleWrite(const boost::system::error_code& error_code) {
     }
 }
 
-void Session::PrintBuffer(const char* buffer, size_t len) {
-    for (size_t i = 0; i < len; ++i) {
+void Session::PrintBuffer(const char* buffer, std::size_t len) {
+    for (std::size_t i = 0; i < len; ++i) {
         fmt::print("{:02x} ", buffer[i]);
     }
     fmt::print("\n");

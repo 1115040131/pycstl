@@ -1,6 +1,6 @@
 #pragma once
 
-#include <numeric>
+#include <memory>
 
 namespace pycstl {
 
@@ -25,7 +25,7 @@ private:
     using AllocNode = std::allocator_traits<Allocator>::template rebind_alloc<ListValueNode>;
 
     ListNode dummy_;
-    size_t size_ = 0;
+    std::size_t size_ = 0;
 
 #ifdef _MSC_VER
     [[msvc::no_unique_address]] Allocator alloc_;
@@ -144,9 +144,9 @@ public:
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 private:
-    void _uninit_assign(size_t count, const T& value) {
+    void _uninit_assign(std::size_t count, const T& value) {
         ListNode* prev = &dummy_;
-        for (size_t i = 0; i < count; ++i) {
+        for (std::size_t i = 0; i < count; ++i) {
             ListNode* curr = newNode();
             prev->next_ = curr;
             curr->prev_ = prev;
@@ -158,9 +158,9 @@ private:
         size_ = count;
     }
 
-    void _uninit_assign(size_t count) {
+    void _uninit_assign(std::size_t count) {
         ListNode* prev = &dummy_;
-        for (size_t i = 0; i < count; ++i) {
+        for (std::size_t i = 0; i < count; ++i) {
             ListNode* curr = newNode();
             prev->next_ = curr;
             curr->prev_ = prev;
@@ -209,12 +209,14 @@ public:
     explicit List(const Allocator& alloc) noexcept : alloc_(alloc) { _uninit_assign(0); }
 
     // 构造函数 (3)
-    List(size_t count, const T& value, const Allocator& alloc = Allocator()) : alloc_(alloc) {
+    List(std::size_t count, const T& value, const Allocator& alloc = Allocator()) : alloc_(alloc) {
         _uninit_assign(count, value);
     }
 
     // 构造函数 (4)
-    explicit List(size_t count, const Allocator& alloc = Allocator()) : alloc_(alloc) { _uninit_assign(count); }
+    explicit List(std::size_t count, const Allocator& alloc = Allocator()) : alloc_(alloc) {
+        _uninit_assign(count);
+    }
 
     // input_iterator 支持 *it it++ ++it it!=it it==it
     // output_iterator 支持 *it=val it++ ++it it!=it it==it
@@ -275,7 +277,7 @@ public:
         return *this;
     }
 
-    void assign(size_t count, const T& value) {
+    void assign(std::size_t count, const T& value) {
         clear();
         _uninit_assign(count, value);
     }
@@ -336,9 +338,9 @@ public:
 
     bool empty() const noexcept { return dummy_.next_ != &dummy_; }
 
-    size_t size() const noexcept { return size_; }
+    std::size_t size() const noexcept { return size_; }
 
-    static constexpr size_t max_size() noexcept { return std::numeric_limits<size_t>::max(); }
+    static constexpr std::size_t max_size() noexcept { return std::numeric_limits<std::size_t>::max(); }
 
 #pragma endregion
 
@@ -373,7 +375,7 @@ public:
 
     iterator insert(const_iterator pos, T&& value) { return emplace(pos, std::move_if_noexcept(value)); }
 
-    iterator insert(const_iterator pos, size_t count, const T& value) {
+    iterator insert(const_iterator pos, std::size_t count, const T& value) {
         if (count == 0) [[unlikely]] {
             return pos;
         }
@@ -454,8 +456,8 @@ public:
         inset(pos, std::make_move_iterator(other.begin()), std::make_move_iterator(other.end()));
     }
 
-    size_t remove(const T& value) noexcept {
-        size_t count = 0;
+    std::size_t remove(const T& value) noexcept {
+        std::size_t count = 0;
         auto first = begin();
         auto last = end();
         while (first != last) {
@@ -470,8 +472,8 @@ public:
     }
 
     template <typename UnaryPredicate>
-    size_t remove_if(UnaryPredicate p) {
-        size_t count = 0;
+    std::size_t remove_if(UnaryPredicate p) {
+        std::size_t count = 0;
         auto first = begin();
         auto last = end();
         while (first != last) {

@@ -11,13 +11,14 @@ namespace asio = boost::asio;
 
 using asio::ip::tcp;
 
-static constexpr size_t kMaxSize = 1024;
+static constexpr std::size_t kMaxSize = 1024;
 
 asio::awaitable<void> Echo(tcp::socket socket) {
     try {
         char data[1024];
         for (;;) {
-            size_t read_size = co_await socket.async_read_some(asio::buffer(data, kMaxSize), asio::use_awaitable);
+            std::size_t read_size =
+                co_await socket.async_read_some(asio::buffer(data, kMaxSize), asio::use_awaitable);
             co_await asio::async_write(socket, asio::buffer(data, read_size), asio::use_awaitable);
         }
     } catch (const std::exception& e) {

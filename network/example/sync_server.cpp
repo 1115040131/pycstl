@@ -8,7 +8,7 @@
 
 namespace asio = boost::asio;
 
-static constexpr size_t kMaxLength = 1024;
+static constexpr std::size_t kMaxLength = 1024;
 
 static std::unordered_set<std::shared_ptr<std::thread>> g_threads;
 
@@ -18,7 +18,7 @@ void Session(const std::shared_ptr<asio::ip::tcp::socket>& sock) {
         while (true) {
             char data[kMaxLength] = {0};
             boost::system::error_code error_code;
-            size_t length = sock->read_some(asio::buffer(data, kMaxLength), error_code);
+            std::size_t length = sock->read_some(asio::buffer(data, kMaxLength), error_code);
             if (error_code == asio::error::eof) {
                 fmt::println("Connection closed by peer");
                 break;

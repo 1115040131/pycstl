@@ -15,8 +15,8 @@ MsgHead MsgHead::ParseHead(const char* data) {
                    asio::detail::socket_ops::network_to_host_short(head.second)};
 }
 
-size_t MsgNode::Copy(const char* src, size_t len) {
-    size_t copy_len = std::min(len, Remain());
+std::size_t MsgNode::Copy(const char* src, std::size_t len) {
+    std::size_t copy_len = std::min(len, Remain());
     ::memcpy(data_ + cur_len_, src, copy_len);
     cur_len_ += copy_len;
     return copy_len;
