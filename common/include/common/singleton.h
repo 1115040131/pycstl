@@ -17,7 +17,7 @@ template <typename T>
 class Singleton : public Noncopyable {
 public:
     // 提供一个访问唯一实例的方法
-    static T& Instance() {
+    static T& GetInstance() {
         static T instance;  // 局部静态变量，只会被初始化一次
         return instance;
     }

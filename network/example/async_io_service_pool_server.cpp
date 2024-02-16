@@ -8,7 +8,7 @@ int main() {
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
         signals.async_wait([&io_context](auto, auto) {
             io_context.stop();
-            network::IOServicePool::Instance().Stop();
+            network::IOServicePool::GetInstance().Stop();
         });
 
         network::IOServicePoolServer server(io_context, 10086);

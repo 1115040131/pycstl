@@ -13,5 +13,8 @@
     },
     "http_server": {
         "server": "http_server"
+    },
+    "websocket_server": {
+        "server": "websocket_server"
     }
 }

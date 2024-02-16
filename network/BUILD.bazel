@@ -20,6 +20,7 @@ cc_library(
         "//common",
         "//network/proto:msg_cc_proto",
         "@boost//:asio",
+        "@boost//:beast",
         "@boost//:uuid",
         "@fmt",
         "@nlohmann_json//:json",

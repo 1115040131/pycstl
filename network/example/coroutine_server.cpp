@@ -4,7 +4,7 @@
 
 int main() {
     try {
-        auto& pool = network::IOServicePool::Instance();
+        auto& pool = network::IOServicePool::GetInstance();
         boost::asio::io_context io_context;
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
         signals.async_wait([&](auto, auto) {

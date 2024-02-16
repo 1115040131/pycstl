@@ -8,14 +8,14 @@
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
 
+namespace network {
+
 using namespace std::literals::chrono_literals;
 
 namespace asio = boost::asio;
 namespace beast = boost::beast;
 namespace http = beast::http;
 using tcp = asio::ip::tcp;
-
-namespace network {
 
 std::size_t RequestCount() {
     static std::size_t count = 0;
@@ -176,10 +176,10 @@ void HttpServer(tcp::acceptor& acceptor) {
 
 int main() {
     try {
-        const auto address = asio::ip::make_address("127.0.0.1");
+        const auto address = boost::asio::ip::make_address("127.0.0.1");
         unsigned short port = 8080u;
-        asio::io_context io_context{1};
-        tcp::acceptor acceptor{io_context, {address, port}};
+        boost::asio::io_context io_context{1};
+        boost::asio::ip::tcp::acceptor acceptor{io_context, {address, port}};
         network::HttpServer(acceptor);
         io_context.run();
     } catch (const std::exception& e) {

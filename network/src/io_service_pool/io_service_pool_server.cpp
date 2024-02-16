@@ -5,7 +5,7 @@
 namespace network {
 
 void IOServicePoolServer::StartAccept() {
-    auto session = std::make_shared<IOServicePoolSession>(IOServicePool::Instance().GetIOService(), this);
+    auto session = std::make_shared<IOServicePoolSession>(IOServicePool::GetInstance().GetIOService(), this);
     acceptor_.async_accept(session->Socket(), [this, session](const boost::system::error_code& error_code) {
         HandleAccept(session, error_code);
         StartAccept();

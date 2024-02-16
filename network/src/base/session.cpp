@@ -87,7 +87,7 @@ void Session::ParseBuffer(std::size_t bytes_transferred) {
             offset += copy_len;
             bytes_transferred -= copy_len;
             // 投递数据
-            LogicSystem::Instance().PostMsgToQueue(
+            LogicSystem::GetInstance().PostMsgToQueue(
                 std::make_unique<LogicNode>(shared_from_this(), std::move(recv_msg_)));
             // 处理新的数据块
             is_head_parsed_ = false;

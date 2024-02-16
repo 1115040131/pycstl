@@ -169,8 +169,17 @@ cc_binary(
         "-Werror",
         "-Wno-unknown-pragmas",
     ],
-    deps = [
-        "//network",
-        "@boost//:beast",
+    deps = ["//network"],
+)
+
+cc_binary(
+    name = "websocket_server",
+    srcs = ["websocket_server.cpp"],
+    copts = [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unknown-pragmas",
     ],
+    deps = ["//network"],
 )

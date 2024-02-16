@@ -11,11 +11,11 @@ static std::mutex mutex_quit;
 
 int main() {
     try {
-        boost::asio::io_context& io_context = network::ThreadPool::Instance().GetIOService();
+        boost::asio::io_context& io_context = network::ThreadPool::GetInstance().GetIOService();
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
         signals.async_wait([&io_context](auto, auto) {
             io_context.stop();
-            network::ThreadPool::Instance().Stop();
+            network::ThreadPool::GetInstance().Stop();
             is_stop = true;
             cond_quit.notify_one();
         });

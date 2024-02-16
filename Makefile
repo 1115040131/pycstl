@@ -1,13 +1,12 @@
 # build for all
 .PHONY: all all_test
 
-all:
-	bazel build //...
+all: common network pycstl
 
-all_test:
+all_test: all
 	bazel test //...
 
-# build for test
+# build for common
 .PHONY: common
 
 common:
@@ -20,7 +19,7 @@ network:
 	bazel build //network
 	bazel build //network/...
 
-network_test:
+network_test: network
 	bazel test //network/test:network_all_test --test_output=all
 
 #build for pycstl
@@ -29,5 +28,5 @@ network_test:
 pycstl:
 	bazel build //pycstl
 	bazel build //pycstl/...
-pycstl_test:
+pycstl_test: pycstl
 	bazel test //pycstl/test:pycstl_all_test --test_output=all
