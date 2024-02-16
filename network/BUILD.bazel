@@ -16,7 +16,6 @@ cc_library(
     ],
     includes = ["include"],
     deps = [
-        "//:protobuf_proxy",
         "//common",
         "//network/proto:msg_cc_proto",
         "@boost//:asio",

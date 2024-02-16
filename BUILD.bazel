@@ -1,7 +1,0 @@
-package(default_visibility = ["//visibility:public"])
-
-cc_library(
-    name = "protobuf_proxy",  # 创建一个新的代理目标
-    copts = [],  # 明确地设置为空，避免使用全局编译选项
-    deps = ["@protobuf"],
-)
