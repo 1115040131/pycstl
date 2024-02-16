@@ -1,3 +1,5 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -8,12 +10,7 @@ cc_library(
     name = "common",
     srcs = glob(["src/*.cpp"]),
     hdrs = glob(["include/common/*.h"]),
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     includes = ["include"],
     deps = ["@fmt"],
 )

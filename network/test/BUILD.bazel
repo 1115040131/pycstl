@@ -1,15 +1,12 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
 cc_test(
     name = "network_all_test",
     srcs = glob([
         "*_test.cpp",
         "*.h",
     ]),
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     includes = ["../"],
     deps = [
         "//network",

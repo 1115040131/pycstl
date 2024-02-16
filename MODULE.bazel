@@ -1,3 +1,5 @@
+"""c++ project build by bazel"""
+
 module(
     name = "pycstl",
     version = "0.0.1",
@@ -6,7 +8,8 @@ module(
 # 1. The metadata of glog is fetched from the BCR, including its dependencies (gflags).
 # 2. The `repo_name` attribute allows users to reference this dependency via the `gtest` repo name.
 bazel_dep(name = "fmt", version = "10.2.1")
+bazel_dep(name = "grpc", version = "1.48.1.bcr.2", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "nlohmann_json", version = "3.11.3")
 
 # for test
-bazel_dep(name = "googletest", version = "1.14.0")
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1")

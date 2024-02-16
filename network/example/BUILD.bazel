@@ -1,16 +1,13 @@
-# api
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
+# asio api
 cc_library(
     name = "sync_api",
     srcs = [
         "sync_api.cpp",
         "sync_api.h",
     ],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     includes = ["../"],
     deps = [
         "//common",
@@ -24,12 +21,7 @@ cc_library(
         "async_api.cpp",
         "async_api.h",
     ],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     includes = ["../"],
     deps = [
         "//common",
@@ -37,149 +29,97 @@ cc_library(
     ],
 )
 
-# client
+# asio client
 cc_binary(
     name = "sync_client",
     srcs = ["sync_client.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "test_client_protobuf",
     srcs = ["test_client_protobuf.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "test_client_json",
     srcs = ["test_client_json.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "concurrency_client",
     srcs = ["concurrency_client.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
-# server
+# asio server
 cc_binary(
     name = "sync_server",
     srcs = ["sync_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "async_io_service_pool_server",
     srcs = ["async_io_service_pool_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "async_thread_pool_server",
     srcs = ["async_thread_pool_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "simple_coroutine_server",
     srcs = ["simple_coroutine_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "coroutine_server",
     srcs = ["coroutine_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
-#http
+# beast http
 cc_binary(
     name = "http_client",
     srcs = ["http_client.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "http_server",
     srcs = ["http_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
     deps = ["//network"],
 )
 
 cc_binary(
     name = "websocket_server",
     srcs = ["websocket_server.cpp"],
-    copts = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = COPTS,
+    deps = ["//network"],
+)
+
+# grpc
+cc_binary(
+    name = "grpc_server",
+    srcs = ["grpc_server.cpp"],
+    copts = COPTS,
     deps = ["//network"],
 )

@@ -1,5 +1,8 @@
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+
 package(default_visibility = ["//visibility:public"])
 
+# msg.pb
 proto_library(
     name = "msg_proto",
     srcs = ["msg.proto"],
@@ -7,5 +10,23 @@ proto_library(
 
 cc_proto_library(
     name = "msg_cc_proto",
-    deps = [":msg_proto"],
+    deps = ["msg_proto"],
+)
+
+# greeter.grpc
+proto_library(
+    name = "greeter_proto",
+    srcs = ["greeter.proto"],
+)
+
+cc_proto_library(
+    name = "greeter_cc_proto",
+    deps = ["greeter_proto"],
+)
+
+cc_grpc_library(
+    name = "greeter_cc_grpc",
+    srcs = ["greeter_proto"],
+    grpc_only = True,
+    deps = ["greeter_cc_proto"],
 )
