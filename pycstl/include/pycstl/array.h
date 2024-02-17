@@ -4,7 +4,7 @@
 
 namespace pycstl {
 
-template <typename _Tp, size_t _N>
+template <typename _Tp, std::size_t _N>
 class Array {
 public:
     using value_type = _Tp;
@@ -19,27 +19,27 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    static constexpr size_t Size() noexcept { return _N; }
+    static constexpr std::size_t Size() noexcept { return _N; }
 
     // 元素访问
 
-    _Tp& at(size_t _Pos) {
+    _Tp& at(std::size_t _Pos) {
         if (_Pos >= _N) [[unlikely]] {
             throwOutOfRange(_Pos);
         }
         return _M_elements[_Pos];
     }
 
-    const _Tp& at(size_t _Pos) const {
+    const _Tp& at(std::size_t _Pos) const {
         if (_Pos >= _N) [[unlikely]] {
             throwOutOfRange(_Pos);
         }
         return _M_elements[_Pos];
     }
 
-    _Tp& operator[](size_t _Pos) noexcept { return _M_elements[_Pos]; }
+    _Tp& operator[](std::size_t _Pos) noexcept { return _M_elements[_Pos]; }
 
-    const _Tp& operator[](size_t _Pos) const noexcept { return _M_elements[_Pos]; }
+    const _Tp& operator[](std::size_t _Pos) const noexcept { return _M_elements[_Pos]; }
 
     _Tp& front() noexcept { return _M_elements[0]; }
 
@@ -73,20 +73,20 @@ public:
 
     constexpr bool empty() const noexcept { return false; }
 
-    constexpr size_t size() const noexcept { return _N; }
+    constexpr std::size_t size() const noexcept { return _N; }
 
-    constexpr size_t max_size() const noexcept { return _N; }
+    constexpr std::size_t max_size() const noexcept { return _N; }
 
     // 操作
 
     void fill(const _Tp& _Val) noexcept(std::is_nothrow_copy_assignable_v<_Tp>) {
-        for (size_t _Pos = 0; _Pos < _N; _Pos++) {
+        for (std::size_t _Pos = 0; _Pos < _N; _Pos++) {
             _M_elements[_Pos] = _Val;
         }
     }
 
     void swap(Array& _Other) noexcept(std::is_nothrow_swappable_v<_Tp>) {
-        for (size_t _Pos = 0; _Pos < _N; _Pos++) {
+        for (std::size_t _Pos = 0; _Pos < _N; _Pos++) {
             std::swap(_M_elements[_Pos], _Other._M_elements[_Pos]);
         }
     }
@@ -95,7 +95,7 @@ public:
     _Tp _M_elements[_N];
 
 private:
-    void throwOutOfRange(size_t _Pos) {
+    void throwOutOfRange(std::size_t _Pos) {
         throw std::out_of_range(fmt::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), _N, _Pos));
     }
 };
@@ -127,17 +127,17 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    static constexpr size_t Size() noexcept { return 0; }
+    static constexpr std::size_t Size() noexcept { return 0; }
 
     // 元素访问
 
-    _Tp& at(size_t _Pos) { throwOutOfRange(_Pos); }
+    _Tp& at(std::size_t _Pos) { throwOutOfRange(_Pos); }
 
-    const _Tp& at(size_t _Pos) const { throwOutOfRange(_Pos); }
+    const _Tp& at(std::size_t _Pos) const { throwOutOfRange(_Pos); }
 
-    _Tp& operator[](size_t _Pos) noexcept { _LIBPYCCXX_UNREACHABLE(); }
+    _Tp& operator[](std::size_t _Pos) noexcept { _LIBPYCCXX_UNREACHABLE(); }
 
-    const _Tp& operator[](size_t _Pos) const noexcept { _LIBPYCCXX_UNREACHABLE(); }
+    const _Tp& operator[](std::size_t _Pos) const noexcept { _LIBPYCCXX_UNREACHABLE(); }
 
     _Tp& front() noexcept { _LIBPYCCXX_UNREACHABLE(); }
 
@@ -171,9 +171,9 @@ public:
 
     constexpr bool empty() const noexcept { return true; }
 
-    constexpr size_t size() const noexcept { return 0; }
+    constexpr std::size_t size() const noexcept { return 0; }
 
-    constexpr size_t max_size() const noexcept { return 0; }
+    constexpr std::size_t max_size() const noexcept { return 0; }
 
     // 操作
 
@@ -182,7 +182,7 @@ public:
     void swap(Array& _Other) noexcept {}
 
 private:
-    void throwOutOfRange(size_t _Pos) {
+    void throwOutOfRange(std::size_t _Pos) {
         throw std::out_of_range(fmt::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), 0, _Pos));
     }
 };
@@ -191,12 +191,12 @@ private:
 template <typename _Tp, typename... _Ts>
 Array(_Tp, _Ts...) -> Array<_Tp, 1 + sizeof...(_Ts)>;
 
-template <typename _Tp, size_t _N, size_t... _Idx>
+template <typename _Tp, std::size_t _N, std::size_t... _Idx>
 constexpr Array<std::decay_t<_Tp>, _N> _To_Array_Impl(_Tp (&_Array)[_N], std::index_sequence<_Idx...>) {
     return {{_Array[_Idx]...}};
 }
 
-template <typename _Tp, size_t _N>
+template <typename _Tp, std::size_t _N>
 constexpr Array<std::decay_t<_Tp>, _N> to_array(_Tp (&_Array)[_N]) {
     return _To_Array_Impl(_Array, std::make_index_sequence<_N>{});
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <fmt/format.h>
 
 namespace pycstl {
@@ -28,9 +30,9 @@ public:
     constexpr explicit Vector(const Allocator& alloc) noexcept : alloc_(alloc) {}
 
     // 构造函数 (3)
-    constexpr Vector(size_t count, const T& value, const Allocator& alloc = Allocator()) : alloc_(alloc) {
+    constexpr Vector(std::size_t count, const T& value, const Allocator& alloc = Allocator()) : alloc_(alloc) {
         data_ = alloc_.allocate(count);
-        for (size_t i = 0; i < count; i++) {
+        for (std::size_t i = 0; i < count; i++) {
             std::construct_at(&data_[i], value);
         }
         size_ = count;
@@ -38,9 +40,9 @@ public:
     }
 
     // 构造函数 (4)
-    constexpr explicit Vector(size_t count, const Allocator& alloc = Allocator()) : alloc_(alloc) {
+    constexpr explicit Vector(std::size_t count, const Allocator& alloc = Allocator()) : alloc_(alloc) {
         data_ = alloc_.allocate(count);
-        for (size_t i = 0; i < count; i++) {
+        for (std::size_t i = 0; i < count; i++) {
             std::construct_at(&data_[i]);
         }
         size_ = count;
@@ -50,9 +52,9 @@ public:
     // 构造函数 (5)
     template <std::input_iterator InpuIt>
     constexpr Vector(InpuIt first, InpuIt last, const Allocator& alloc = Allocator()) : alloc_(alloc) {
-        size_t count = last - first;
+        std::size_t count = last - first;
         data_ = alloc_.allocate(count);
-        for (size_t i = 0; i < count; i++) {
+        for (std::size_t i = 0; i < count; i++) {
             std::construct_at(&data_[i], *first);
             ++first;
         }
@@ -67,7 +69,7 @@ public:
         alloc_ = other.alloc_;
         if (size_ != 0) {
             data_ = alloc_.allocate(size_);
-            for (size_t i = 0; i < size_; i++) {
+            for (std::size_t i = 0; i < size_; i++) {
                 std::construct_at(&data_[i], std::as_const(other.data_[i]));
             }
         } else {
@@ -98,7 +100,7 @@ public:
         reserve(other.size_);
         size_ = other.size_;
         capacity_ = other.size_;
-        for (size_t i = 0; i < size_; i++) {
+        for (std::size_t i = 0; i < size_; i++) {
             std::construct_at(&data_[i], std::as_const(other.data_[i]));
         }
         return *this;
@@ -124,9 +126,9 @@ public:
     Vector& operator=(std::initializer_list<T> init) {
         auto first = init.begin();
         auto last = init.end();
-        size_t count = last - first;
+        std::size_t count = last - first;
         data_ = alloc_.allocate(count);
-        for (size_t i = 0; i < count; i++) {
+        for (std::size_t i = 0; i < count; i++) {
             data_[i] = *first;
             ++first;
         }
@@ -136,7 +138,7 @@ public:
     }
 
     ~Vector() noexcept {
-        for (size_t i = 0; i < size_; i++) {
+        for (std::size_t i = 0; i < size_; i++) {
             std::destroy_at(&data_[i]);
         }
         if (capacity_) {
@@ -144,7 +146,7 @@ public:
         }
     }
 
-    void assign(size_t count, const T& value) {
+    void assign(std::size_t count, const T& value) {
         clear();
         insert(begin(), count, value);
     }
@@ -161,23 +163,23 @@ public:
 
     // 元素访问
 
-    T& at(size_t pos) {
+    T& at(std::size_t pos) {
         if (pos >= size_) [[unlikely]] {
             _throw_out_of_range(pos);
         }
         return data_[pos];
     }
 
-    const T& at(size_t pos) const {
+    const T& at(std::size_t pos) const {
         if (pos >= size_) [[unlikely]] {
             _throw_out_of_range(pos);
         }
         return data_[pos];
     }
 
-    T& operator[](size_t pos) noexcept { return data_[pos]; }
+    T& operator[](std::size_t pos) noexcept { return data_[pos]; }
 
-    const T& operator[](size_t pos) const noexcept { return data_[pos]; }
+    const T& operator[](std::size_t pos) const noexcept { return data_[pos]; }
 
     T& front() noexcept { return data_[0]; }
 
@@ -221,14 +223,14 @@ public:
 
     bool empty() const noexcept { return size_ > 0; }
 
-    size_t size() const noexcept { return size_; }
+    std::size_t size() const noexcept { return size_; }
 
-    void reserve(size_t count) {
+    void reserve(std::size_t count) {
         if (count <= capacity_) [[likely]] {
             return;
         }
 #ifdef _MSC_VER
-        count = std::max(count, static_cast<size_t>(capacity_ * 1.5));
+        count = std::max(count, static_cast<std::size_t>(capacity_ * 1.5));
 #else
         count = std::max(count, size_ * 2);
 #endif
@@ -242,14 +244,14 @@ public:
             capacity_ = count;
         }
         if (old_capacity) {
-            for (size_t i = 0; i < size_; i++) {
+            for (std::size_t i = 0; i < size_; i++) {
                 std::construct_at(&data_[i], std::as_const(old_data[i]));
             }
             alloc_.deallocate(old_data, old_capacity);
         }
     }
 
-    size_t capacity() const noexcept { return capacity_; }
+    std::size_t capacity() const noexcept { return capacity_; }
 
     void shrink_to_fit() {
         if (capacity_ == size_) [[unlikely]] {
@@ -265,7 +267,7 @@ public:
             data_ = alloc_.allocate(size_);
         }
         if (old_capacity) {
-            for (size_t i = 0; i < size_; i++) {
+            for (std::size_t i = 0; i < size_; i++) {
                 std::construct_at(&data_[i], std::as_const(old_data[i]));
             }
             alloc_.deallocate(old_data, old_capacity);
@@ -275,16 +277,16 @@ public:
     // 修改器
 
     void clear() noexcept {
-        for (size_t i = 0; i < size_; i++) {
+        for (std::size_t i = 0; i < size_; i++) {
             std::destroy_at(&data_[i]);
         }
         size_ = 0;
     }
 
     iterator insert(const_iterator pos, const T& value) {
-        size_t insert_idx = pos - data_;
+        std::size_t insert_idx = pos - data_;
         reserve(size_ + 1);
-        for (size_t offset = size_; offset > insert_idx; offset--) {
+        for (std::size_t offset = size_; offset > insert_idx; offset--) {
             std::construct_at(&data_[offset], std::move_if_noexcept(data_[offset - 1]));
             std::destroy_at(&data_[offset - 1]);
         }
@@ -293,17 +295,17 @@ public:
         return data_ + insert_idx;
     }
 
-    iterator insert(const_iterator pos, size_t count, const T& value) {
+    iterator insert(const_iterator pos, std::size_t count, const T& value) {
         if (count == 0) [[unlikely]] {
             return const_cast<iterator>(pos);
         }
-        size_t insert_idx = pos - data_;
+        std::size_t insert_idx = pos - data_;
         reserve(size_ + count);
-        for (size_t offset = size_; offset > insert_idx; offset--) {
+        for (std::size_t offset = size_; offset > insert_idx; offset--) {
             std::construct_at(&data_[offset - 1 + count], std::move_if_noexcept(data_[offset - 1]));
             std::destroy_at(&data_[offset - 1]);
         }
-        for (size_t offset = insert_idx; offset < insert_idx + count; offset++) {
+        for (std::size_t offset = insert_idx; offset < insert_idx + count; offset++) {
             std::construct_at(&data_[offset], value);
         }
         size_ += count;
@@ -312,17 +314,17 @@ public:
 
     template <std::input_iterator InpuIt>
     iterator insert(const_iterator pos, InpuIt first, InpuIt last) {
-        size_t count = last - first;
+        std::size_t count = last - first;
         if (count == 0) [[unlikely]] {
             return const_cast<iterator>(pos);
         }
-        size_t insert_idx = pos - data_;
+        std::size_t insert_idx = pos - data_;
         reserve(size_ + count);
-        for (size_t offset = size_; offset > insert_idx; offset--) {
+        for (std::size_t offset = size_; offset > insert_idx; offset--) {
             std::construct_at(&data_[offset - 1 + count], std::move_if_noexcept(data_[offset - 1]));
             std::destroy_at(&data_[offset - 1]);
         }
-        for (size_t offset = insert_idx; offset < insert_idx + count; offset++) {
+        for (std::size_t offset = insert_idx; offset < insert_idx + count; offset++) {
             std::construct_at(&data_[offset], *first);
             ++first;
         }
@@ -330,13 +332,15 @@ public:
         return data_ + insert_idx;
     }
 
-    iterator insert(const_iterator pos, std::initializer_list<T> init) { return insert(pos, init.begin(), init.end()); }
+    iterator insert(const_iterator pos, std::initializer_list<T> init) {
+        return insert(pos, init.begin(), init.end());
+    }
 
     template <typename... Args>
     T& emplace(const_iterator pos, Args&&... args) {
-        size_t insert_idx = pos - data_;
+        std::size_t insert_idx = pos - data_;
         reserve(size_ + 1);
-        for (size_t offset = size_; offset > insert_idx; offset--) {
+        for (std::size_t offset = size_; offset > insert_idx; offset--) {
             std::construct_at(&data_[offset], std::move_if_noexcept(data_[offset - 1]));
             std::destroy_at(&data_[offset - 1]);
         }
@@ -345,14 +349,14 @@ public:
         return data_ + insert_idx;
     }
 
-    void resize(size_t count, const T& value = T()) {
+    void resize(std::size_t count, const T& value = T()) {
         if (count < size_) {
-            for (size_t i = count; i < size_; i++) {
+            for (std::size_t i = count; i < size_; i++) {
                 std::destroy_at(&data_[i]);
             }
         } else if (count > size_) {
             reserve(count);
-            for (size_t i = size_; i < count; i++) {
+            for (std::size_t i = size_; i < count; i++) {
                 std::construct_at(&data_[i], value);
             }
         }
@@ -360,7 +364,7 @@ public:
     }
 
     iterator erase(const_iterator pos) noexcept {
-        for (size_t i = pos - data_ + 1; i < size_; i++) {
+        for (std::size_t i = pos - data_ + 1; i < size_; i++) {
             data_[i - 1] = std::move_if_noexcept(data_[i]);
         }
         size_--;
@@ -369,12 +373,12 @@ public:
     }
 
     iterator erase(const_iterator first, const_iterator last) noexcept {
-        size_t diff = last - first;
-        for (size_t i = last - data_; i < size_; i++) {
+        std::size_t diff = last - first;
+        for (std::size_t i = last - data_; i < size_; i++) {
             data_[i - diff] = std::move_if_noexcept(data_[i]);
         }
         size_ -= diff;
-        for (size_t i = size_; i < size_ + diff; i++) {
+        for (std::size_t i = size_; i < size_ + diff; i++) {
             std::destroy_at(&data_[i]);
         }
         return const_cast<iterator>(first);
@@ -407,14 +411,15 @@ public:
     }
 
 private:
-    void _throw_out_of_range(size_t pos) {
-        throw std::out_of_range(fmt::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
+    void _throw_out_of_range(std::size_t pos) {
+        throw std::out_of_range(
+            fmt::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
     }
 
 private:
     T* data_;
-    size_t size_;
-    size_t capacity_;
+    std::size_t size_;
+    std::size_t capacity_;
 #ifdef _MSC_VER
     [[msvc::no_unique_address]] Allocator alloc_;
 #else

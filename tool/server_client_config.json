@@ -1,0 +1,24 @@
+{
+    "async_io_service_pool_server": {
+        "server": "async_io_service_pool_server",
+        "client": "concurrency_client"
+    },
+    "async_thread_pool_server": {
+        "server": "async_thread_pool_server",
+        "client": "concurrency_client"
+    },
+    "coroutine_server": {
+        "server": "coroutine_server",
+        "client": "concurrency_client"
+    },
+    "grpc_server": {
+        "server": "grpc_server",
+        "client": "grpc_concurrency_client"
+    },
+    "http_server": {
+        "server": "http_server"
+    },
+    "websocket_server": {
+        "server": "websocket_server"
+    }
+}

@@ -1,3 +1,5 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -7,9 +9,7 @@ exports_files(["LICENSE"])
 cc_library(
     name = "pycstl",
     hdrs = glob(["include/pycstl/*.h"]),
-    includes = [
-        ".",
-        "include",
-    ],
+    copts = COPTS,
+    includes = ["include"],
     deps = ["@fmt"],
 )

@@ -2,14 +2,14 @@ BasedOnStyle: Google
 # 访问说明符(public、private等)的偏移
 AccessModifierOffset: -4
 # 每行字符的限制，0表示没有限制
-ColumnLimit: 120
+ColumnLimit: 115
 # 继承最常用的指针和引用的对齐方式
 DerivePointerAlignment: false
 # 可以定义负数优先级从而保证某些#include永远在最前面
 IncludeCategories:
   # first, non system headers that are included like <> - these are all
   # local carveouts, and get sorted below c++ but before non grpc "" files
-  - Regex: '^<(boost/|gmock/|gtest/|spdlog/|zlib|fmt/)'
+  - Regex: '^<(boost/|fmt/|gmock/|grpcpp/|gtest/|nlohmann/|spdlog/|zlib)'
     Priority: 30
   # first C system headers - they have a . in the filename
   - Regex: '^<.*\.'

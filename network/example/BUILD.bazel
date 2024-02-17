@@ -1,0 +1,62 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
+# asio api
+cc_library(
+    name = "sync_api",
+    srcs = [
+        "sync_api.cpp",
+        "sync_api.h",
+    ],
+    copts = COPTS,
+    includes = ["../"],
+    deps = [
+        "//common",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "async_api",
+    srcs = [
+        "async_api.cpp",
+        "async_api.h",
+    ],
+    copts = COPTS,
+    includes = ["../"],
+    deps = [
+        "//common",
+        "@boost//:asio",
+    ],
+)
+
+BINARIES = [
+    # asio client
+    "sync_client",
+    "test_client_protobuf",
+    "test_client_json",
+    "concurrency_client",
+
+    # asio server
+    "sync_server",
+    "async_io_service_pool_server",
+    "async_thread_pool_server",
+    "simple_coroutine_server",
+    "coroutine_server",
+
+    # beast http
+    "http_client",
+    "http_server",
+    "websocket_server",
+
+    #grpc
+    "grpc_server",
+    "grpc_client",
+    "grpc_concurrency_client",
+]
+
+[cc_binary(
+    name = binary,
+    srcs = ["%s.cpp" % binary],
+    copts = COPTS,
+    deps = ["//network"],
+) for binary in BINARIES]

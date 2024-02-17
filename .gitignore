@@ -1,4 +1,6 @@
-.vscode
+.vscode/*
+!.vscode/c_cpp_properties.json
+!.vscode/launch.json
 
 bin
 build
@@ -7,3 +9,6 @@ lib
 # bazel
 bazel-*
 MODULE.bazel.lock
+
+# python
+__pycache__

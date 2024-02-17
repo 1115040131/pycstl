@@ -1,3 +1,5 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
@@ -6,13 +8,19 @@ exports_files(["LICENSE"])
 
 cc_library(
     name = "network",
-    srcs = glob(["src/*.cpp"]),
-    includes = [
-        ".",
-        "include",
-    ],
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/network/**/*.h"]),
+    copts = COPTS,
+    includes = ["include"],
     deps = [
+        "//common",
+        "//network/proto:greeter_cc_grpc",
+        "//network/proto:msg_cc_proto",
         "@boost//:asio",
+        "@boost//:beast",
+        "@boost//:uuid",
+        "@com_github_grpc_grpc//:grpc++",
         "@fmt",
+        "@nlohmann_json//:json",
     ],
 )
