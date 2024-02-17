@@ -11,6 +11,10 @@
         "server": "coroutine_server",
         "client": "concurrency_client"
     },
+    "grpc_server": {
+        "server": "grpc_server",
+        "client": "grpc_client"
+    },
     "http_server": {
         "server": "http_server"
     },

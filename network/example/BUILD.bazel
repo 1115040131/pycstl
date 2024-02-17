@@ -123,3 +123,10 @@ cc_binary(
     copts = COPTS,
     deps = ["//network"],
 )
+
+cc_binary(
+    name = "grpc_client",
+    srcs = ["grpc_client.cpp"],
+    copts = COPTS,
+    deps = ["//network"],
+)
