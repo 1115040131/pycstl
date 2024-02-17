@@ -34,7 +34,7 @@ private:
 }  // namespace network
 
 int main() {
-    auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
+    auto channel = grpc::CreateChannel("127.0.0.1:50051", grpc::InsecureChannelCredentials());
     network::GreeterClient client(channel);
     auto result = client.SayHello("hello world");
     fmt::println("Greeter client receive: \"{}\"", result);

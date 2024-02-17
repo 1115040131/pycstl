@@ -48,7 +48,7 @@ int main() {
 
     for (std::size_t i = 0; i < kConnectionNum; ++i) {
         threads.emplace_back([] {
-            auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
+            auto channel = grpc::CreateChannel("127.0.0.1:50051", grpc::InsecureChannelCredentials());
             network::GreeterClient client(channel);
 
             for (std::size_t j = 0; j < kSendNum; ++j) {

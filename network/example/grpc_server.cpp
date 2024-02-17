@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <thread>
+
 #include <fmt/core.h>
 #include <grpcpp/server.h>
 #include <grpcpp/server_builder.h>
@@ -20,11 +23,17 @@ void RunServer() {
     std::string server_address("127.0.0.1:50051");
     GreeterServiceImpl service;
     grpc::ServerBuilder builder;
+
+    const std::size_t num_threads = 1;
+    builder.SetSyncServerOption(grpc::ServerBuilder::SyncServerOption::NUM_CQS, num_threads);
+    builder.SetSyncServerOption(grpc::ServerBuilder::SyncServerOption::MIN_POLLERS, num_threads);
+    builder.SetSyncServerOption(grpc::ServerBuilder::SyncServerOption::MAX_POLLERS, num_threads);
+
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-    fmt::println("Server listening on {}", server_address);
+    fmt::println("Server listening on {} with {} threads", server_address, num_threads);
     server->Wait();
 }
 
