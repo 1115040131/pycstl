@@ -9,7 +9,9 @@ namespace network {
 class GreeterServiceImpl final : public Greeter::Service {
     grpc::Status SayHello([[maybe_unused]] grpc::ServerContext* context, const network::HelloRequest* request,
                           network::HelloReply* response) override {
-        response->set_message(fmt::format("Greeter server receive: \"{}\"", request->message()));
+        auto message = fmt::format("Greeter server receive: \"{}\"", request->message());
+        response->set_message(message);
+        fmt::println("[{}]: {}", __func__, message);
         return grpc::Status::OK;
     }
 };

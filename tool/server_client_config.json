@@ -13,7 +13,7 @@
     },
     "grpc_server": {
         "server": "grpc_server",
-        "client": "grpc_client"
+        "client": "grpc_concurrency_client"
     },
     "http_server": {
         "server": "http_server"
