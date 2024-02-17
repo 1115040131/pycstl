@@ -17,15 +17,10 @@ ThreadPool::~ThreadPool() { fmt::println("[{}]: ThreadPool Exit.", __func__); }
 ThreadPool::IOService& ThreadPool::GetIOService() { return io_service_; }
 
 void ThreadPool::Stop() {
+    io_service_.stop();
     work_.reset();
     for (auto& thread : threads_) {
-        if (thread.joinable()) {
-            if (thread.get_id() != std::this_thread::get_id()) {
-                thread.join();
-            } else {
-                thread.detach();  // 确保不会从线程内部尝试 join 自己。
-            }
-        }
+        thread.join();
     }
 }
 

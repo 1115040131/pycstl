@@ -27,6 +27,9 @@ IOServicePool::IOService& IOServicePool::GetIOService() {
 }
 
 void IOServicePool::Stop() {
+    for (auto& io_service : io_services_) {
+        io_service.stop();
+    }
     for (auto& work : works_) {
         work.reset();
     }

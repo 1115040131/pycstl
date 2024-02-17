@@ -5,13 +5,11 @@
 namespace network {
 
 IOServicePoolSession::~IOServicePoolSession() {
-    fmt::println("[{}]: IOServicePoolSession {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this),
-                 uuid_);
+    fmt::println("[{}]: Session {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
 }
 
 void IOServicePoolSession::Start() {
-    fmt::println("[{}]: IOServicePoolSession {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this),
-                 uuid_);
+    fmt::println("[{}]: Session {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
     AsyncRead();
 }
 

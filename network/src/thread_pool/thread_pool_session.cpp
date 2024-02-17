@@ -8,12 +8,11 @@ ThreadPoolSession::ThreadPoolSession(asio::io_context& io_context, Server* serve
     : Session(io_context, server), strand_(io_context.get_executor()) {}
 
 ThreadPoolSession::~ThreadPoolSession() {
-    fmt::println("[{}]: ThreadPoolSession {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this),
-                 uuid_);
+    fmt::println("[{}]: Session {} destruct uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
 }
 
 void ThreadPoolSession::Start() {
-    fmt::println("[{}]: ThreadPoolSession {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
+    fmt::println("[{}]: Session {} start uuid = {}", __func__, reinterpret_cast<uint64_t>(this), uuid_);
     AsyncRead();
 }
 
