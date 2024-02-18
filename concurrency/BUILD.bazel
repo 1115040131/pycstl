@@ -7,8 +7,9 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 
 cc_library(
-    name = "pycstl",
-    hdrs = glob(["include/pycstl/*.h"]),
+    name = "concurrency",
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/concurrency/**/*.h"]),
     copts = COPTS,
     includes = ["include"],
     deps = [

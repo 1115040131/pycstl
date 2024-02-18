@@ -5,7 +5,8 @@ export PATH=/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ######################### build for all #########################
 .PHONY: all
 
-all: common network pycstl
+all:
+	bazel build //...
 
 all_test:
 	bazel test //...
@@ -15,6 +16,14 @@ all_test:
 
 common:
 	bazel build //common
+
+######################### build for concurrency #########################
+.PHONY: concurrency
+
+concurrency:
+	bazel build //concurrency
+concurrency_test:
+	bazel test //concurrency/test:concurrency_all_test --test_output=all
 
 ######################### build for network #########################
 .PHONY: network
