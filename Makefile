@@ -21,7 +21,7 @@ common:
 .PHONY: concurrency
 
 concurrency:
-	bazel build //concurrency
+	bazel build //concurrency //concurrency/test/...
 concurrency_test:
 	bazel test //concurrency/test:concurrency_all_test --test_output=all
 
@@ -40,3 +40,10 @@ pycstl:
 	bazel build //pycstl //pycstl/test/...
 pycstl_test: pycstl
 	bazel test //pycstl/test:pycstl_all_test --test_output=all
+
+# 测试文件, 单独编译
+######################### build for hello_world #########################
+.PHONY: hello_world
+
+hello_world:
+	bazel run //hello_world

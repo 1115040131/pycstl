@@ -1,0 +1,7 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
+cc_binary(
+    name = "hello_world",
+    srcs = ["hello_world.cpp"],
+    copts = COPTS,
+)
