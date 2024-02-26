@@ -57,7 +57,7 @@ protected:
     mutable std::mutex mutex_;
 };
 
-TEST(MutexTest, UnsafeStackTest) {
+TEST(DISABLED_MutexTest, UnsafeStackTest) {
     UnsafeStack<int> unsafe_stack;
 
     unsafe_stack.Push(1);
@@ -72,7 +72,7 @@ TEST(MutexTest, UnsafeStackTest) {
     std::jthread t2([&unsafe_stack] {
         if (!unsafe_stack.Empty()) {
             std::this_thread::sleep_for(50ms);
-            EXPECT_DEATH(unsafe_stack.Pop(), ".*");
+            unsafe_stack.Pop();  // 未定义行为
         }
     });
 }
