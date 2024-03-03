@@ -14,15 +14,10 @@ namespace pyc {
 namespace concurrency {
 
 class ThreadPool : public Singleton<ThreadPool> {
+    friend class Singleton<ThreadPool>;
+
 public:
     using Task = std::packaged_task<void()>;
-
-    ThreadPool(unsigned int num = 5) {
-        thread_num_ = std::max(num, 1u);
-        Start();
-    }
-
-    ~ThreadPool() { Stop(); }
 
     template <typename F, typename... Args>
     auto Commit(F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
@@ -45,6 +40,13 @@ public:
     int IdleThreadCount() const { return thread_num_; }
 
 private:
+    ThreadPool(unsigned int num = 5) {
+        thread_num_ = std::max(num, 1u);
+        Start();
+    }
+
+    ~ThreadPool() { Stop(); }
+
     void Start();
 
     void Stop();
