@@ -32,5 +32,4 @@ TEST(SpinLockTest, SpinLockTest) {
 }
 
 }  // namespace concurrency
-
 }  // namespace pyc
