@@ -92,7 +92,7 @@ TEST(MemoryOrderTest, AcquireRelease) {
 
 TEST(MemoryOrderTest, ReleasAcquireDanger) {
     std::atomic<int> z;
-    for (std::size_t i = 0; i < 1000; ++i) {
+    for (std::size_t i = 0; i < 3000; ++i) {
         std::atomic<int> x, y;
         {
             // 多个线程对同一个变量 release 操作，另一个线程对这个变量 acquire，那么只有一个线程的 release
