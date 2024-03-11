@@ -3,22 +3,22 @@
 #include <condition_variable>
 #include <mutex>
 #include <optional>
-#include <queue>
+#include <stack>
 
 namespace pyc {
 namespace concurrency {
 
 template <typename T>
-class ThreadSafeQueue {
+class ThreadSafeStack {
 public:
-    ThreadSafeQueue() = default;
+    ThreadSafeStack() = default;
 
-    ThreadSafeQueue(const ThreadSafeQueue& other) {
+    ThreadSafeStack(const ThreadSafeStack& other) {
         std::lock_guard<std::mutex> lock(other.mtx_);
         data_ = other.data_;
     }
 
-    ThreadSafeQueue& operator=(const ThreadSafeQueue&) = delete;
+    ThreadSafeStack& operator=(const ThreadSafeStack&) = delete;
 
     template <typename... Args>
     void Emplace(Args&&... args) {
@@ -34,7 +34,7 @@ public:
     T WaitAndPop() {
         std::unique_lock<std::mutex> lock(mtx_);
         data_cond_.wait(lock, [this] { return !data_.empty(); });
-        T value = std::move(data_.front());
+        T value = std::move(data_.top());
         data_.pop();
         return value;
     }
@@ -44,7 +44,7 @@ public:
         if (data_.empty()) {
             return {};
         }
-        T value = std::move(data_.front());
+        T value = std::move(data_.top());
         data_.pop();
         return value;
     }
@@ -56,7 +56,7 @@ public:
 
 private:
     mutable std::mutex mtx_;
-    std::queue<T> data_;
+    std::stack<T> data_;
     std::condition_variable data_cond_;
 };
 

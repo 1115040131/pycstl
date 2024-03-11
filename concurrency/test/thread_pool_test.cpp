@@ -8,7 +8,7 @@ namespace concurrency {
 
 using namespace std::literals::chrono_literals;
 
-TEST(THreadPoolTest, CommitFunction) {
+TEST(ThreadPoolTest, CommitFunction) {
     int m = 0;
     ThreadPool::GetInstance().Commit([](int& m) { m = 1024; }, m);
     std::this_thread::sleep_for(10ms);
