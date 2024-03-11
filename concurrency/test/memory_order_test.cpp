@@ -177,6 +177,31 @@ TEST(MemoryOrderTest, MemoryOrderConsume) {
     }
 }
 
+// 通过栅栏 2 和 5 同步, 1 和 6 也实现了同步
+TEST(MemoryOrderTest, Fence) {
+    for (std::size_t i = 0; i < 100; ++i) {
+        std::atomic<bool> x{false};
+        std::atomic<bool> y{false};
+        std::atomic<int> z{0};
+        {
+            std::jthread write_x_then_y_fence([&]() {
+                x.store(true, std::memory_order_relaxed);             // 1
+                std::atomic_thread_fence(std::memory_order_release);  // 2
+                y.store(true, std::memory_order_relaxed);             // 3
+            });
+            std::jthread read_y_then_x_fence([&]() {
+                while (!y.load(std::memory_order_relaxed)) {  // 4
+                }
+                std::atomic_thread_fence(std::memory_order_acquire);  // 5
+                if (x.load(std::memory_order_relaxed)) {              // 6
+                    ++z;
+                }
+            });
+        }
+        EXPECT_EQ(z.load(), 1);
+    }
+}
+
 // 利用智能指针解决释放问题
 class SingleMemoryModel {
 private:
