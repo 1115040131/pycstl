@@ -7,13 +7,10 @@
 #include "concurrency/thread_safe_queue.h"
 #include "concurrency/thread_safe_queue_ht.h"
 #include "concurrency/thread_safe_stack.h"
+#include "test/my_class.h"
 
 namespace pyc {
 namespace concurrency {
-
-struct MyClass {
-    std::size_t data;
-};
 
 template <typename T>
 void PopWhilePush(T& thread_safe_container, const std::size_t kMaxNum, const std::size_t kThreadNum) {
@@ -44,7 +41,7 @@ void PopWhilePush(T& thread_safe_container, const std::size_t kMaxNum, const std
             pop_threads.emplace_back([&]() {
                 for (std::size_t j = 0; j < kBlockSize; j++) {
                     auto result = thread_safe_container.WaitAndPop();
-                    EXPECT_TRUE(result.data < kMaxNum);
+                    EXPECT_TRUE(result.data < static_cast<int>(kMaxNum));
                     check[result.data] = true;
                 }
             });
@@ -86,7 +83,7 @@ void TryPopWhilePush(T& thread_safe_container, const std::size_t kMaxNum, const 
                 for (std::size_t j = 0; j < kBlockSize * 2; j++) {
                     auto result = thread_safe_container.TryPop();
                     if (result.has_value()) {
-                        EXPECT_TRUE(result.value().data < kMaxNum);
+                        EXPECT_TRUE(result.value().data < static_cast<int>(kMaxNum));
                         check[result.value().data] = true;
                     } else {
                         ++fail_time;

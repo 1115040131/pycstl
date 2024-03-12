@@ -8,13 +8,10 @@
 #include "concurrency/circular_queue_lock.h"
 #include "concurrency/circular_queue_seq.h"
 #include "concurrency/circular_queue_sync.h"
+#include "test/my_class.h"
 
 namespace pyc {
 namespace concurrency {
-
-struct MyClass {
-    std::size_t data;
-};
 
 template <template <typename, std::size_t, typename> class QueueType>
 void TestCircularQueue(const std::size_t kThreadNum) {
@@ -51,7 +48,7 @@ void TestCircularQueue(const std::size_t kThreadNum) {
                 for (;;) {
                     auto result = queue.Pop();
                     if (result.has_value()) {
-                        EXPECT_TRUE(result.value().data < kMaxNum);
+                        EXPECT_TRUE(result.value().data < static_cast<int>(kMaxNum));
                         check[result.value().data] = true;
                         ++count;
                     }
