@@ -1,11 +1,9 @@
 #include <chrono>
-#include <thread>
-#include <unordered_set>
 
 #include <gtest/gtest.h>
 
 #include "concurrency/thread_safe_hash_table.h"
-#include "test/my_class.h"
+#include "test/utils.h"
 
 namespace pyc {
 namespace concurrency {
@@ -22,40 +20,32 @@ void AddWhileGet(const std::size_t kMaxNum, const std::size_t kThreadNum) {
     for (std::size_t i = 0; i < kMaxNum; i++) {
         EXPECT_FALSE(check[i]);
     }
-    {
-        std::vector<std::jthread> push_threads;
-        push_threads.reserve(kThreadNum);
-        std::vector<std::jthread> pop_threads;
-        pop_threads.reserve(kThreadNum);
 
-        // push 的时候插入 [0, 2kMaxNum) 的数据
-        for (std::size_t i = 0; i < kThreadNum; i++) {
-            push_threads.emplace_back([&, i]() {
-                const std::size_t kStart = i * kBlockSize * 2;
-                for (std::size_t j = 0; j < kBlockSize * 2; j++) {
-                    table.AddOrUpdateMapping(kStart + j, std::make_shared<MyClass>(kStart + j));
-                }
-            });
+    std::vector<std::function<void(std::size_t)>> actions;
+    // 插入 [0, 2kMaxNum) 的数据
+    actions.emplace_back([&](std::size_t i) {
+        const std::size_t kStart = i * kBlockSize * 2;
+        for (std::size_t j = 0; j < kBlockSize * 2; j++) {
+            table.AddOrUpdateMapping(kStart + j, std::make_shared<MyClass>(kStart + j));
         }
+    });
+    // 查找并删除 [0, kMaxNum) 的数据
+    actions.emplace_back([&](std::size_t i) {
+        const std::size_t kStart = i * kBlockSize;
+        for (std::size_t j = 0; j < kBlockSize;) {
+            auto find_res = table.ValueFor(kStart + j);
+            if (find_res) {
+                EXPECT_TRUE(find_res->data < static_cast<int>(kMaxNum));
+                table.RemoveMapping(find_res->data);
+                check[find_res->data] = true;
+                j++;
+            } else {
+                std::this_thread::sleep_for(10ms);
+            }
+        }
+    });
+    MultiThreadExecute(kThreadNum, actions);
 
-        // 查找并删除 [0, kMaxNum) 的数据
-        for (std::size_t i = 0; i < kThreadNum; i++) {
-            pop_threads.emplace_back([&, i]() {
-                const std::size_t kStart = i * kBlockSize;
-                for (std::size_t j = 0; j < kBlockSize;) {
-                    auto find_res = table.ValueFor(kStart + j);
-                    if (find_res) {
-                        EXPECT_TRUE(find_res->data < static_cast<int>(kMaxNum));
-                        table.RemoveMapping(find_res->data);
-                        check[find_res->data] = true;
-                        j++;
-                    } else {
-                        std::this_thread::sleep_for(10ms);
-                    }
-                }
-            });
-        }
-    }
     for (std::size_t i = 0; i < kMaxNum; i++) {
         EXPECT_TRUE(check[i]) << i;
     }
