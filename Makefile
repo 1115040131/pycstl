@@ -27,9 +27,10 @@ concurrency:
 	bazel build //concurrency //concurrency/test/...
 concurrency_test:
 	bazel test //concurrency/test:concurrency_all_test --test_output=all --test_filter="$(TEST_FILTER)"
-concurrency_valgrind: concurrency_test
+concurrency_valgrind: concurrency
 	valgrind --leak-check=full --track-origins=yes \
-	./bazel-bin/concurrency/test/concurrency_all_test --gtest_filter='ThreadSafeAdaptorTest.*'
+	./bazel-bin/concurrency/test/concurrency_all_test \
+	--gtest_filter='ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
 
 ######################### build for network #########################
 .PHONY: network
