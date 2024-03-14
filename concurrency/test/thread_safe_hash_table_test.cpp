@@ -10,49 +10,33 @@ namespace concurrency {
 
 using namespace std::literals;
 
-void AddWhileGet(const std::size_t kMaxNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kMaxNum > kThreadNum && (kMaxNum % kThreadNum == 0)) << "kMaxNum 要能被 kThreadNum 均分";
+void AddWhileRemove(const std::size_t kDataNum, const std::size_t kThreadNum) {
+    ASSERT_TRUE(kDataNum > kThreadNum && (kDataNum % kThreadNum == 0))
+        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
 
     ThreadSafeHashTable<int, std::shared_ptr<MyClass>> table(97);
-    const std::size_t kBlockSize = kMaxNum / kThreadNum;
-    bool check[kMaxNum] = {false};
+    bool check[kDataNum] = {false};
 
-    for (std::size_t i = 0; i < kMaxNum; i++) {
-        EXPECT_FALSE(check[i]);
-    }
-
-    std::vector<std::function<void(std::size_t)>> actions;
-    // 插入 [0, 2kMaxNum) 的数据
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize * 2;
-        for (std::size_t j = 0; j < kBlockSize * 2; j++) {
-            table.AddOrUpdateMapping(kStart + j, std::make_shared<MyClass>(kStart + j));
+    // 插入 [0, 2kDataNum) 的数据
+    auto add = [&](std::size_t data) { table.AddOrUpdateMapping(data, std::make_shared<MyClass>(data)); };
+    // 查找并删除 [0, kDataNum) 的数据
+    auto remove = [&](std::size_t data) {
+        auto find_result = table.ValueFor(data);
+        if (find_result) {
+            table.RemoveMapping(find_result->data);
+            check[find_result->data] = true;
         }
-    });
-    // 查找并删除 [0, kMaxNum) 的数据
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize;) {
-            auto find_res = table.ValueFor(kStart + j);
-            if (find_res) {
-                EXPECT_TRUE(find_res->data < static_cast<int>(kMaxNum));
-                table.RemoveMapping(find_res->data);
-                check[find_res->data] = true;
-                j++;
-            } else {
-                std::this_thread::sleep_for(10ms);
-            }
-        }
-    });
-    MultiThreadExecute(kThreadNum, actions);
+        return find_result;
+    };
+    PushWhilePop(kDataNum * 2, kDataNum, kThreadNum, add, remove);
 
-    for (std::size_t i = 0; i < kMaxNum; i++) {
+    for (std::size_t i = 0; i < kDataNum; i++) {
         EXPECT_TRUE(check[i]) << i;
     }
 
     auto data = table.GetMap();
-    EXPECT_EQ(data.size(), kMaxNum);
-    for (std::size_t i = kMaxNum; i < kMaxNum * 2; i++) {
+    EXPECT_EQ(data.size(), kDataNum);
+    for (std::size_t i = kDataNum; i < kDataNum * 2; i++) {
         auto iter = data.find(i);
         EXPECT_TRUE(iter != data.end());
         if (iter != data.end()) {
@@ -61,7 +45,7 @@ void AddWhileGet(const std::size_t kMaxNum, const std::size_t kThreadNum) {
     }
 }
 
-TEST(ThreadSafeHashTableTest, ThreadSafeHashTableTest) { AddWhileGet(5000, 8); }
+TEST(ThreadSafeHashTableTest, AddWhileRemoveTest) { AddWhileRemove(5000, 8); }
 
 }  // namespace concurrency
 }  // namespace pyc

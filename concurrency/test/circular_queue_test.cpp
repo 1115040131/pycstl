@@ -1,7 +1,3 @@
-#include <atomic>
-#include <thread>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include "concurrency/circular_queue_light.h"
@@ -14,70 +10,54 @@ namespace pyc {
 namespace concurrency {
 
 template <template <typename, std::size_t, typename> class QueueType>
-void TestCircularQueue(const std::size_t kThreadNum) {
+void PushWhilePop(const std::size_t kDataNum, const std::size_t kThreadNum) {
+    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
+        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+
     QueueType<MyClass, 1000, std::allocator<MyClass>> queue;
-    constexpr std::size_t kMaxNum = 10000;
-    const std::size_t kBlockSize = kMaxNum / kThreadNum;
-    std::atomic<std::size_t> count{0};
-    bool check[kMaxNum] = {false};
+    bool check[kDataNum] = {false};
 
-    for (std::size_t i = 0; i < kMaxNum; i++) {
-        EXPECT_FALSE(check[i]);
-    }
-
-    std::vector<std::function<void(std::size_t)>> actions;
-    // kThreadNum 个线程同时 Push [0, kMaxNum) 的数据
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize; j++) {
-            while (!queue.Push(MyClass(kStart + j))) {
-            }
+    auto push = [&](std::size_t data) {
+        while (!queue.Push(MyClass(data))) {
         }
-    });
-    // kThreadNum 个线程同时 Pop [0, kMaxNum) 的数据
-    actions.emplace_back([&](std::size_t) {
-        for (;;) {
-            auto result = queue.Pop();
-            if (result.has_value()) {
-                EXPECT_TRUE(result.value().data < static_cast<int>(kMaxNum));
-                check[result.value().data] = true;
-                ++count;
-            }
-            if (count == kMaxNum) {
-                break;
-            }
+    };
+    auto pop = [&](std::size_t) {
+        auto result = queue.Pop();
+        if (result.has_value()) {
+            check[result.value().data] = true;
         }
-    });
-    MultiThreadExecute(kThreadNum, actions);
+        return result;
+    };
+    PushWhilePop(kDataNum, kDataNum, kThreadNum, push, pop);
 
-    for (std::size_t i = 0; i < kMaxNum; i++) {
+    for (std::size_t i = 0; i < kDataNum; i++) {
         EXPECT_TRUE(check[i]) << i;
     }
 }
 
-TEST(CircularQueueTest, CircularQueueLock1Thread) { TestCircularQueue<CircularQueueLock>(1); }
-TEST(CircularQueueTest, CircularQueueLock2Thread) { TestCircularQueue<CircularQueueLock>(2); }
-TEST(CircularQueueTest, CircularQueueLock4Thread) { TestCircularQueue<CircularQueueLock>(4); }
-TEST(CircularQueueTest, CircularQueueLock8Thread) { TestCircularQueue<CircularQueueLock>(8); }
-TEST(CircularQueueTest, CircularQueueLock16Thread) { TestCircularQueue<CircularQueueLock>(16); }
+TEST(CircularQueueTest, CircularQueueLock1Thread) { PushWhilePop<CircularQueueLock>(10000, 1); }
+TEST(CircularQueueTest, CircularQueueLock2Thread) { PushWhilePop<CircularQueueLock>(10000, 2); }
+TEST(CircularQueueTest, CircularQueueLock4Thread) { PushWhilePop<CircularQueueLock>(10000, 4); }
+TEST(CircularQueueTest, CircularQueueLock8Thread) { PushWhilePop<CircularQueueLock>(10000, 8); }
+TEST(CircularQueueTest, CircularQueueLock16Thread) { PushWhilePop<CircularQueueLock>(10000, 16); }
 
-TEST(CircularQueueTest, CircularQueueSeq1Thread) { TestCircularQueue<CircularQueueSeq>(1); }
-TEST(CircularQueueTest, CircularQueueSeq2Thread) { TestCircularQueue<CircularQueueSeq>(2); }
-TEST(DISABLED_CircularQueueTest, CircularQueueSeq4Thread) { TestCircularQueue<CircularQueueSeq>(4); }
-TEST(DISABLED_CircularQueueTest, CircularQueueSeq8Thread) { TestCircularQueue<CircularQueueSeq>(8); }
-TEST(DISABLED_CircularQueueTest, CircularQueueSeq16Thread) { TestCircularQueue<CircularQueueSeq>(16); }
+TEST(CircularQueueTest, CircularQueueSeq1Thread) { PushWhilePop<CircularQueueSeq>(10000, 1); }
+TEST(CircularQueueTest, CircularQueueSeq2Thread) { PushWhilePop<CircularQueueSeq>(10000, 2); }
+TEST(DISABLED_CircularQueueTest, CircularQueueSeq4Thread) { PushWhilePop<CircularQueueSeq>(10000, 4); }
+TEST(DISABLED_CircularQueueTest, CircularQueueSeq8Thread) { PushWhilePop<CircularQueueSeq>(10000, 8); }
+TEST(DISABLED_CircularQueueTest, CircularQueueSeq16Thread) { PushWhilePop<CircularQueueSeq>(10000, 16); }
 
-TEST(CircularQueueTest, CircularQueueLight1Thread) { TestCircularQueue<CircularQueueLight>(1); }
-TEST(CircularQueueTest, CircularQueueLight2Thread) { TestCircularQueue<CircularQueueLight>(2); }
-TEST(CircularQueueTest, CircularQueueLight4Thread) { TestCircularQueue<CircularQueueLight>(4); }
-TEST(CircularQueueTest, CircularQueueLight8Thread) { TestCircularQueue<CircularQueueLight>(8); }
-TEST(CircularQueueTest, CircularQueueLight16Thread) { TestCircularQueue<CircularQueueLight>(16); }
+TEST(CircularQueueTest, CircularQueueLight1Thread) { PushWhilePop<CircularQueueLight>(10000, 1); }
+TEST(CircularQueueTest, CircularQueueLight2Thread) { PushWhilePop<CircularQueueLight>(10000, 2); }
+TEST(CircularQueueTest, CircularQueueLight4Thread) { PushWhilePop<CircularQueueLight>(10000, 4); }
+TEST(CircularQueueTest, CircularQueueLight8Thread) { PushWhilePop<CircularQueueLight>(10000, 8); }
+TEST(CircularQueueTest, CircularQueueLight16Thread) { PushWhilePop<CircularQueueLight>(10000, 16); }
 
-TEST(CircularQueueTest, CircularQueueSync1Thread) { TestCircularQueue<CircularQueueSync>(1); }
-TEST(CircularQueueTest, CircularQueueSync2Thread) { TestCircularQueue<CircularQueueSync>(2); }
-TEST(CircularQueueTest, CircularQueueSync4Thread) { TestCircularQueue<CircularQueueSync>(4); }
-TEST(CircularQueueTest, CircularQueueSync8Thread) { TestCircularQueue<CircularQueueSync>(8); }
-TEST(CircularQueueTest, CircularQueueSync16Thread) { TestCircularQueue<CircularQueueSync>(16); }
+TEST(CircularQueueTest, CircularQueueSync1Thread) { PushWhilePop<CircularQueueSync>(10000, 1); }
+TEST(CircularQueueTest, CircularQueueSync2Thread) { PushWhilePop<CircularQueueSync>(10000, 2); }
+TEST(CircularQueueTest, CircularQueueSync4Thread) { PushWhilePop<CircularQueueSync>(10000, 4); }
+TEST(CircularQueueTest, CircularQueueSync8Thread) { PushWhilePop<CircularQueueSync>(10000, 8); }
+TEST(CircularQueueTest, CircularQueueSync16Thread) { PushWhilePop<CircularQueueSync>(10000, 16); }
 
 }  // namespace concurrency
 }  // namespace pyc

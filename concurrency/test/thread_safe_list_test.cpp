@@ -8,125 +8,108 @@ namespace pyc {
 namespace concurrency {
 
 template <typename T>
-void FindWhilePushFront(const std::size_t kMaxNum, const std::size_t kThreadNum, T& thread_safe_list) {
-    ASSERT_TRUE(kMaxNum >= kThreadNum && (kMaxNum % kThreadNum == 0)) << "kMaxNum 要能被 kThreadNum 均分";
+void PushFrontWhileFind(T& thread_safe_list, const std::size_t kDataNum, const std::size_t kThreadNum) {
+    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
+        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
 
-    const std::size_t kBlockSize = kMaxNum / kThreadNum;
-    bool check[kMaxNum] = {false};
+    bool check[kDataNum] = {false};
 
-    for (std::size_t i = 0; i < kMaxNum; i++) {
-        EXPECT_FALSE(check[i]);
-    }
-
-    std::vector<std::function<void(std::size_t)>> actions;
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize; j++) {
-            thread_safe_list.PushFront(MyClass{static_cast<int>(kStart + j)});
+    auto push_front = [&](std::size_t data) { thread_safe_list.PushFront(MyClass{static_cast<int>(data)}); };
+    auto find = [&](std::size_t data) {
+        auto find_result =
+            thread_safe_list.FindFirstIf([&](const MyClass& item) { return item.data == static_cast<int>(data); });
+        if (find_result) {
+            check[find_result->data] = true;
         }
-    });
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize;) {
-            auto find_res = thread_safe_list.FindFirstIf(
-                [&](const MyClass& item) { return item.data == static_cast<int>(kStart + j); });
-            if (find_res != nullptr) {
-                EXPECT_EQ(find_res->data, static_cast<int>(kStart + j));
-                check[find_res->data] = true;
-                j++;
-            }
-        }
-    });
-    MultiThreadExecute(kThreadNum, actions);
+        return find_result;
+    };
+    PushWhilePop(kDataNum, kDataNum, kThreadNum, push_front, find);
 
-    for (std::size_t i = 0; i < kMaxNum; i++) {
+    for (std::size_t i = 0; i < kDataNum; i++) {
         EXPECT_TRUE(check[i]) << i;
     }
 }
 
 template <typename T>
-void RemoveWhilePush(const std::size_t kMaxNum, const std::size_t kThreadNum, T& thread_safe_list) {
-    ASSERT_TRUE(kMaxNum >= kThreadNum && (kMaxNum % kThreadNum == 0)) << "kMaxNum 要能被 kThreadNum 均分";
+void PushFrontWhileRemove(T& thread_safe_list, const std::size_t kDataNum, const std::size_t kThreadNum) {
+    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
+        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
 
-    const std::size_t kBlockSize = kMaxNum / kThreadNum;
+    bool check[kDataNum] = {false};
 
-    std::vector<std::function<void(std::size_t)>> actions;
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize; j++) {
-            thread_safe_list.PushFront(MyClass{static_cast<int>(kStart + j)});
+    auto push_front = [&](std::size_t data) { thread_safe_list.PushFront(MyClass{static_cast<int>(data)}); };
+    auto remove = [&](std::size_t data) {
+        auto predicate = [&](const MyClass& item) { return item.data == static_cast<int>(data); };
+        auto find_result = thread_safe_list.FindFirstIf(predicate);
+        if (find_result) {
+            thread_safe_list.RemoveIf(predicate);
+            check[find_result->data] = true;
         }
-    });
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize;) {
-            auto predicate = [&](const MyClass& item) { return item.data == static_cast<int>(kStart + j); };
-            if (thread_safe_list.FindFirstIf(predicate)) {
-                thread_safe_list.RemoveIf(predicate);
-                j++;
-            }
-        }
-    });
-    MultiThreadExecute(kThreadNum, actions);
+        return find_result;
+    };
+    PushWhilePop(kDataNum, kDataNum, kThreadNum, push_front, remove);
+
+    for (std::size_t i = 0; i < kDataNum; i++) {
+        EXPECT_TRUE(check[i]) << i;
+    }
 
     int cnt = 0;
     thread_safe_list.ForEach([&](const MyClass&) { cnt++; });
     EXPECT_EQ(cnt, 0);
 }
 
-void RemoveWhileDoublePush(const std::size_t kMaxNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kMaxNum >= kThreadNum && (kMaxNum % kThreadNum == 0)) << "kMaxNum 要能被 kThreadNum 均分";
+void DoublePushWhileRemove(const std::size_t kDataNum, const std::size_t kThreadNum) {
+    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
+        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
 
     DoublePushList<MyClass> double_push_list;
-    const std::size_t kBlockSize = kMaxNum / kThreadNum;
+    bool check[2 * kDataNum] = {false};
 
-    std::vector<std::function<void(std::size_t)>> actions;
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize; j++) {
-            double_push_list.PushFront(MyClass{static_cast<int>(kStart + j)});
+    auto push = [&](std::size_t data) {
+        double_push_list.PushFront(MyClass{static_cast<int>(data)});
+        double_push_list.PushBack(MyClass{static_cast<int>(data + kDataNum)});
+    };
+    auto remove = [&](std::size_t data) {
+        auto predicate = [=](const MyClass& item) { return item.data == static_cast<int>(data + kDataNum / 2); };
+        auto find_result = double_push_list.FindFirstIf(predicate);
+        if (find_result) {
+            double_push_list.RemoveIf(predicate);
+            check[find_result->data] = true;
         }
-    });
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = kMaxNum + i * kBlockSize;
-        for (std::size_t j = 0; j < kBlockSize; j++) {
-            double_push_list.PushBack(MyClass{static_cast<int>(kStart + j)});
+        return find_result;
+    };
+    PushWhilePop(kDataNum, kDataNum, kThreadNum, push, remove);
+
+    for (std::size_t i = 0; i < kDataNum * 2; i++) {
+        if (i < kDataNum / 2 || i >= kDataNum / 2 + kDataNum) {
+            EXPECT_FALSE(check[i]) << i;
+        } else {
+            EXPECT_TRUE(check[i]) << i;
         }
-    });
-    actions.emplace_back([&](std::size_t i) {
-        const std::size_t kStart = i * kBlockSize * 2;
-        for (std::size_t j = 0; j < kBlockSize * 2;) {
-            auto predicate = [&](const MyClass& item) { return item.data == static_cast<int>(kStart + j); };
-            if (double_push_list.FindFirstIf(predicate)) {
-                double_push_list.RemoveIf(predicate);
-                j++;
-            }
-        }
-    });
-    MultiThreadExecute(kThreadNum, actions);
+    }
 
     int cnt = 0;
     double_push_list.ForEach([&](const MyClass&) { cnt++; });
-    EXPECT_EQ(cnt, 0);
+    EXPECT_EQ(cnt, kDataNum);
 }
 
 TEST(ThreadSafeListTest, FindWhilePushTest) {
     ThreadSafeList<MyClass> thread_safe_list;
-    FindWhilePushFront(2000, 16, thread_safe_list);
+    PushFrontWhileFind(thread_safe_list, 2000, 16);
 
     DoublePushList<MyClass> double_push_list;
-    FindWhilePushFront(2000, 16, double_push_list);
+    PushFrontWhileFind(double_push_list, 2000, 16);
 }
 
-TEST(ThreadSafeListTest, RemoveWhilePushTest) {
+TEST(ThreadSafeListTest, PushFrontWhileRemoveTest) {
     ThreadSafeList<MyClass> thread_safe_list;
-    RemoveWhilePush(2000, 16, thread_safe_list);
+    PushFrontWhileRemove(thread_safe_list, 2000, 16);
 
     DoublePushList<MyClass> double_push_list;
-    RemoveWhilePush(2000, 16, double_push_list);
+    PushFrontWhileRemove(double_push_list, 2000, 16);
 }
 
-TEST(ThreadSafeListTest, RemoveWhileDoublePushTest) { RemoveWhileDoublePush(2000, 16); }
+TEST(ThreadSafeListTest, DoublePushWhileRemoveTest) { DoublePushWhileRemove(2000, 16); }
 
 }  // namespace concurrency
 }  // namespace pyc
