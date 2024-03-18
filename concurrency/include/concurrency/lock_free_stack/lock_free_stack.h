@@ -17,7 +17,11 @@ class LockFreeStack : public PushOnlyStack<T, Allocator> {
 public:
     using PushOnlyStack<T, Allocator>::PushOnlyStack;
 
-    ~LockFreeStack() override { DeleteNodes(to_be_deleted_); }
+    ~LockFreeStack() override {
+        DeleteNodes(to_be_deleted_);
+        while (Pop()) {
+        }
+    }
 
     virtual std::optional<T> Pop() override {
         ++threads_in_pop_;

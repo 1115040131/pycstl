@@ -52,7 +52,11 @@ class HazardPointerStack : public PushOnlyStack<T, Allocator> {
 public:
     using PushOnlyStack<T, Allocator>::PushOnlyStack;
 
-    ~HazardPointerStack() override = default;
+    ~HazardPointerStack() {
+        DeleteNodesWithNoHazards();
+        while (Pop()) {
+        }
+    }
 
     virtual std::optional<T> Pop() override {
         // 1. 从风险列表中获取一个节点给当前线程
@@ -89,11 +93,11 @@ public:
     }
 
 private:
-    struct data_to_reclaim {
+    struct DataToReclaim {
         Node* data;
-        data_to_reclaim* next;
-        data_to_reclaim(Node* p) : data(p), next(nullptr) {}
-        ~data_to_reclaim() { delete data; }
+        DataToReclaim* next;
+        DataToReclaim(Node* p) : data(p), next(nullptr) {}
+        ~DataToReclaim() = default;  // 资源由 HazardPointerStack 释放
     };
 
     std::atomic<void*>& GetHazardPointerForCurrentThread() {
@@ -110,19 +114,20 @@ private:
         return false;
     }
 
-    void ReclaimLater(Node* old_head) { AddToReclaimList(new data_to_reclaim(old_head)); }
+    void ReclaimLater(Node* old_head) { AddToReclaimList(new DataToReclaim(old_head)); }
 
-    void AddToReclaimList(data_to_reclaim* reclaim_node) {
+    void AddToReclaimList(DataToReclaim* reclaim_node) {
         reclaim_node->next = nodes_to_reclaim.load();
         while (!nodes_to_reclaim.compare_exchange_weak(reclaim_node->next, reclaim_node)) {
         }
     }
 
     void DeleteNodesWithNoHazards() {
-        data_to_reclaim* current = nodes_to_reclaim.exchange(nullptr);
+        DataToReclaim* current = nodes_to_reclaim.exchange(nullptr);
         while (current) {
-            data_to_reclaim* const next = current->next;
+            DataToReclaim* const next = current->next;
             if (!OutstandingHazardPointersFor(current->data)) {
+                DeallocateNode(current->data);
                 delete current;
             } else {
                 AddToReclaimList(current);
@@ -132,7 +137,7 @@ private:
     }
 
 private:
-    std::atomic<data_to_reclaim*> nodes_to_reclaim;
+    std::atomic<DataToReclaim*> nodes_to_reclaim;
 };
 
 }  // namespace concurrency
