@@ -1,16 +1,17 @@
 #include <gtest/gtest.h>
 
-#include "concurrency/lock_free_stack.h"
+#include "concurrency/lock_free_stack/hazard_pointer_stack.h"
+#include "concurrency/lock_free_stack/lock_free_stack.h"
 #include "test/utils.h"
 
 namespace pyc {
 namespace concurrency {
 
-void PushWhilePop(const std::size_t kDataNum, const std::size_t kThreadNum) {
+template <typename T>
+void PushWhilePop(T& lock_free_stack, const std::size_t kDataNum, const std::size_t kThreadNum) {
     ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
         << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
 
-    LockFreeStack<MyClass> lock_free_stack;
     bool check[kDataNum] = {false};
 
     auto push = [&](std::size_t data) { lock_free_stack.Emplace(data); };
@@ -30,7 +31,15 @@ void PushWhilePop(const std::size_t kDataNum, const std::size_t kThreadNum) {
     EXPECT_FALSE(lock_free_stack.Pop());
 }
 
-TEST(LockFreeStackTest, PushWhilePopTest) { PushWhilePop(2000, 16); }
+TEST(LockFreeStackTest, LockFreeStackTest) {
+    LockFreeStack<MyClass> lock_free_stack;
+    PushWhilePop(lock_free_stack, 10000, 16);
+}
+
+TEST(LockFreeStackTest, LockFreeStackHazardPointerTest) {
+    HazardPointerStack<MyClass> lock_free_stack;
+    PushWhilePop(lock_free_stack, 10000, 16);
+}
 
 }  // namespace concurrency
 }  // namespace pyc
