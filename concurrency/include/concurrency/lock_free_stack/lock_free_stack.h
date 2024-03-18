@@ -3,27 +3,46 @@
 #include <atomic>
 #include <optional>
 
-#include "concurrency/lock_free_stack/push_only_stack.h"
+#include "common/allocator_wrapper.h"
+#include "common/noncopyable.h"
 
 namespace pyc {
 namespace concurrency {
 
 template <typename T, typename Allocator = std::allocator<T>>
-class LockFreeStack : public PushOnlyStack<T, Allocator> {
-    using Node = typename PushOnlyStack<T, Allocator>::Node;  // 引入 Node 类型
-    using PushOnlyStack<T, Allocator>::DeallocateNode;        // 引入 DeallocateNode 方法
-    using PushOnlyStack<T, Allocator>::head_;                 // 引入 head_ 成员
+class LockFreeStack : public Noncopyable {
+private:
+    struct Node {
+        T data;
+        Node* next;
+
+        Node() = default;
+        Node(const T& _data) : data(_data) {}
+    };
 
 public:
-    using PushOnlyStack<T, Allocator>::PushOnlyStack;
+    LockFreeStack() = default;
 
-    ~LockFreeStack() override {
+    ~LockFreeStack() {
         DeleteNodes(to_be_deleted_);
         while (Pop()) {
         }
     }
 
-    virtual std::optional<T> Pop() override {
+    template <typename... Args>
+    void Emplace(Args&&... args) {
+        Node* new_node = alloc_.Allocate();
+        std::construct_at(&new_node->data, std::forward<Args>(args)...);
+        new_node->next = head_.load();
+        while (!head_.compare_exchange_weak(new_node->next, new_node)) {
+        }
+    }
+
+    void Push(const T& value) { Emplace(value); }
+
+    void Push(T&& value) { Emplace(std::move(value)); }
+
+    std::optional<T> Pop() {
         ++threads_in_pop_;
         Node* old_head = head_.load();
         while (old_head) {
@@ -51,7 +70,7 @@ private:
                 // 5 有其他线程在 pop 且待删列表不为空, 更新待删列表首节点
                 ChainPendingNodes(nodes_to_delete);
             }
-            DeallocateNode(old_head);
+            alloc_.Deallocate(old_head);
         } else {
             // 多个线程 Pop 竞争, 将其放入待删列表
             ChainPendingNode(old_head);
@@ -62,7 +81,7 @@ private:
     void DeleteNodes(Node* node) {
         while (node) {
             Node* next = node->next;
-            DeallocateNode(node);
+            alloc_.Deallocate(node);
             node = next;
         }
     }
@@ -87,8 +106,10 @@ private:
     }
 
 private:
+    std::atomic<Node*> head_{nullptr};
     std::atomic<int> threads_in_pop_;   // 正在执行 pop 的线程数
     std::atomic<Node*> to_be_deleted_;  // 待删列表首节点
+    [[no_unique_address]] AllocatorWrapper<Node, Allocator> alloc_;
 };
 
 }  // namespace concurrency

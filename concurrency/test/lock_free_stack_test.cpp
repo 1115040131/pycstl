@@ -18,7 +18,7 @@ void PushWhilePop(T& lock_free_stack, const std::size_t kDataNum, const std::siz
     auto pop = [&](std::size_t) {
         auto pop_result = lock_free_stack.Pop();
         if (pop_result.has_value()) {
-            check[pop_result.value().data] = true;
+            check[pop_result.value().Data()] = true;
         }
         return pop_result.has_value();
     };
@@ -32,12 +32,14 @@ void PushWhilePop(T& lock_free_stack, const std::size_t kDataNum, const std::siz
 }
 
 TEST(LockFreeStackTest, LockFreeStackTest) {
-    LockFreeStack<MyClass> lock_free_stack;
+    LockFreeStack<HeapData> lock_free_stack;
+    EXPECT_EQ(sizeof(lock_free_stack), 24);
     PushWhilePop(lock_free_stack, 10000, 16);
 }
 
 TEST(LockFreeStackTest, LockFreeStackHazardPointerTest) {
-    HazardPointerStack<MyClass> lock_free_stack;
+    HazardPointerStack<HeapData> lock_free_stack;
+    EXPECT_EQ(sizeof(lock_free_stack), 16);
     PushWhilePop(lock_free_stack, 10000, 16);
 }
 

@@ -12,6 +12,58 @@ namespace concurrency {
 
 struct MyClass {
     int data;
+
+    int Data() const { return data; }
+};
+
+class HeapData {
+public:
+    // Constructor
+    HeapData(int data) { data_ = new int(data); }
+
+    // Destructor
+    ~HeapData() { delete data_; }
+
+    // Copy constructor
+    HeapData(const HeapData& other) {
+        if (other.data_) {
+            data_ = new int(*(other.data_));
+        } else {
+            data_ = nullptr;
+        }
+    }
+
+    // Copy assignment operator
+    HeapData& operator=(const HeapData& other) {
+        if (this != &other) {
+            delete data_;
+            data_ = nullptr;
+
+            if (other.data_) {
+                data_ = new int(*(other.data_));
+            }
+        }
+        return *this;
+    }
+
+    // Move constructor
+    HeapData(HeapData&& other) noexcept : data_(other.data_) { other.data_ = nullptr; }
+
+    // Move assignment operator
+    HeapData& operator=(HeapData&& other) noexcept {
+        if (this != &other) {
+            delete data_;
+            data_ = other.data_;
+            other.data_ = nullptr;
+        }
+        return *this;
+    }
+
+    // Accessor
+    int Data() const { return *data_; }
+
+private:
+    int* data_;
 };
 
 /// @brief 对于 actions 中的每个函数, 启动 kThreadNum 个线程执行

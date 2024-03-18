@@ -2,8 +2,10 @@
 
 #include <atomic>
 #include <optional>
+#include <thread>
 
-#include "concurrency/lock_free_stack/push_only_stack.h"
+#include "common/allocator_wrapper.h"
+#include "common/noncopyable.h"
 
 namespace pyc {
 namespace concurrency {
@@ -44,13 +46,18 @@ private:
 };
 
 template <typename T, typename Allocator = std::allocator<T>>
-class HazardPointerStack : public PushOnlyStack<T, Allocator> {
-    using Node = typename PushOnlyStack<T, Allocator>::Node;  // 引入 Node 类型
-    using PushOnlyStack<T, Allocator>::DeallocateNode;        // 引入 DeallocateNode 方法
-    using PushOnlyStack<T, Allocator>::head_;                 // 引入 head_ 成员
+class HazardPointerStack : public Noncopyable {
+private:
+    struct Node {
+        T data;
+        Node* next;
+
+        Node() = default;
+        Node(const T& _data) : data(_data) {}
+    };
 
 public:
-    using PushOnlyStack<T, Allocator>::PushOnlyStack;
+    HazardPointerStack() = default;
 
     ~HazardPointerStack() {
         DeleteNodesWithNoHazards();
@@ -58,7 +65,20 @@ public:
         }
     }
 
-    virtual std::optional<T> Pop() override {
+    template <typename... Args>
+    void Emplace(Args&&... args) {
+        Node* new_node = alloc_.Allocate();
+        std::construct_at(&new_node->data, std::forward<Args>(args)...);
+        new_node->next = head_.load();
+        while (!head_.compare_exchange_weak(new_node->next, new_node)) {
+        }
+    }
+
+    void Push(const T& value) { Emplace(value); }
+
+    void Push(T&& value) { Emplace(std::move(value)); }
+
+    std::optional<T> Pop() {
         // 1. 从风险列表中获取一个节点给当前线程
         std::atomic<void*>& hp = GetHazardPointerForCurrentThread();
         Node* old_head = head_.load();
@@ -82,7 +102,7 @@ public:
                     ReclaimLater(old_head);
                 } else {
                     // 7 删除头部节点
-                    DeallocateNode(old_head);
+                    alloc_.Deallocate(old_head);
                 }
                 // 8 删除没有风险的节点
                 DeleteNodesWithNoHazards();
@@ -114,7 +134,11 @@ private:
         return false;
     }
 
-    void ReclaimLater(Node* old_head) { AddToReclaimList(new DataToReclaim(old_head)); }
+    void ReclaimLater(Node* old_head) {
+        DataToReclaim* reclaim_node = reclaim_alloc_.Allocate();
+        std::construct_at(&reclaim_node->data, old_head);
+        AddToReclaimList(reclaim_node);
+    }
 
     void AddToReclaimList(DataToReclaim* reclaim_node) {
         reclaim_node->next = nodes_to_reclaim.load();
@@ -127,8 +151,8 @@ private:
         while (current) {
             DataToReclaim* const next = current->next;
             if (!OutstandingHazardPointersFor(current->data)) {
-                DeallocateNode(current->data);
-                delete current;
+                alloc_.Deallocate(current->data);
+                reclaim_alloc_.Deallocate(current);
             } else {
                 AddToReclaimList(current);
             }
@@ -137,7 +161,10 @@ private:
     }
 
 private:
+    std::atomic<Node*> head_{nullptr};
     std::atomic<DataToReclaim*> nodes_to_reclaim;
+    [[no_unique_address]] AllocatorWrapper<Node, Allocator> alloc_;
+    [[no_unique_address]] AllocatorWrapper<DataToReclaim, Allocator> reclaim_alloc_;
 };
 
 }  // namespace concurrency
