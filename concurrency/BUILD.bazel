@@ -12,6 +12,7 @@ cc_library(
     hdrs = glob(["include/concurrency/**/*.h"]),
     copts = COPTS,
     includes = ["include"],
+    linkopts = ["-latomic"],
     deps = [
         "//common",
         "@fmt",

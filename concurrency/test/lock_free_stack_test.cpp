@@ -2,6 +2,7 @@
 
 #include "concurrency/lock_free_stack/hazard_pointer_stack.h"
 #include "concurrency/lock_free_stack/lock_free_stack.h"
+#include "concurrency/lock_free_stack/ref_count_stack.h"
 #include "test/utils.h"
 
 namespace pyc {
@@ -14,7 +15,7 @@ void PushWhilePop(T& lock_free_stack, const std::size_t kDataNum, const std::siz
 
     bool check[kDataNum] = {false};
 
-    auto push = [&](std::size_t data) { lock_free_stack.Emplace(data); };
+    auto push = [&](std::size_t data) { lock_free_stack.Emplace(static_cast<int>(data)); };
     auto pop = [&](std::size_t) {
         auto pop_result = lock_free_stack.Pop();
         if (pop_result.has_value()) {
@@ -37,8 +38,14 @@ TEST(LockFreeStackTest, LockFreeStackTest) {
     PushWhilePop(lock_free_stack, 10000, 16);
 }
 
-TEST(LockFreeStackTest, LockFreeStackHazardPointerTest) {
+TEST(LockFreeStackTest, HazardPointerStackTest) {
     HazardPointerStack<HeapData> lock_free_stack;
+    EXPECT_EQ(sizeof(lock_free_stack), 16);
+    PushWhilePop(lock_free_stack, 10000, 16);
+}
+
+TEST(LockFreeStackTest, RefCountStackTest) {
+    RefCountStack<HeapData> lock_free_stack;
     EXPECT_EQ(sizeof(lock_free_stack), 16);
     PushWhilePop(lock_free_stack, 10000, 16);
 }
