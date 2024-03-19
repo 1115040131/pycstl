@@ -45,9 +45,15 @@ TEST(LockFreeStackTest, HazardPointerStackTest) {
 }
 
 TEST(LockFreeStackTest, RefCountStackTest) {
-    RefCountStack<HeapData> lock_free_stack;
+    RefCountStack<HeapData, false> lock_free_stack;
     EXPECT_EQ(sizeof(lock_free_stack), 16);
-    PushWhilePop(lock_free_stack, 10000, 16);
+    PushWhilePop(lock_free_stack, 100000, 16);
+}
+
+TEST(LockFreeStackTest, RefCountStackUseMemoryOrderTest) {
+    RefCountStack<HeapData, true> lock_free_stack;
+    EXPECT_EQ(sizeof(lock_free_stack), 16);
+    PushWhilePop(lock_free_stack, 100000, 16);
 }
 
 }  // namespace concurrency

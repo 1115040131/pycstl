@@ -8,8 +8,29 @@
 namespace pyc {
 namespace concurrency {
 
-template <typename T>
+struct StdMemoryOrder {
+    static constexpr auto memory_order_relaxed = std::memory_order_relaxed;
+    static constexpr auto memory_order_consume = std::memory_order_consume;
+    static constexpr auto memory_order_acquire = std::memory_order_acquire;
+    static constexpr auto memory_order_release = std::memory_order_release;
+    static constexpr auto memory_order_acq_rel = std::memory_order_acq_rel;
+    static constexpr auto memory_order_seq_cst = std::memory_order_seq_cst;
+};
+
+struct DefaultMemoryOrder {
+    static constexpr auto memory_order_relaxed = std::memory_order_seq_cst;
+    static constexpr auto memory_order_consume = std::memory_order_seq_cst;
+    static constexpr auto memory_order_acquire = std::memory_order_seq_cst;
+    static constexpr auto memory_order_release = std::memory_order_seq_cst;
+    static constexpr auto memory_order_acq_rel = std::memory_order_seq_cst;
+    static constexpr auto memory_order_seq_cst = std::memory_order_seq_cst;
+};
+
+template <typename T, bool UseMemoryOrder>
 class RefCountStack : public Noncopyable {
+    // 根据 UseMemoryOrder 值，选择适当的内存顺序
+    using MemoryOrder = std::conditional_t<UseMemoryOrder, StdMemoryOrder, DefaultMemoryOrder>;
+
 private:
     struct RefNode;
 
@@ -44,7 +65,8 @@ public:
     template <typename... Args>
     void Emplace(Args&&... args) {
         RefNode new_node(head_.load(), std::forward<Args>(args)...);
-        while (!head_.compare_exchange_weak(new_node.node_ptr->next, new_node)) {
+        while (!head_.compare_exchange_weak(new_node.node_ptr->next, new_node, MemoryOrder::memory_order_release,
+                                            MemoryOrder::memory_order_relaxed)) {
         }
     }
 
@@ -62,7 +84,8 @@ public:
             do {
                 new_head = old_head;
                 ++new_head.ref_count;
-            } while (!head_.compare_exchange_weak(old_head, new_head));
+            } while (!head_.compare_exchange_weak(old_head, new_head, MemoryOrder::memory_order_acquire,
+                                                  MemoryOrder::memory_order_relaxed));
             old_head = new_head;
 
             // 3
@@ -72,17 +95,19 @@ public:
             }
 
             // 4. 比较 head 和 old_head 是否相等
-            if (head_.compare_exchange_strong(old_head, node_ptr->next)) {
+            if (head_.compare_exchange_strong(old_head, node_ptr->next, MemoryOrder::memory_order_relaxed)) {
                 T value = std::move(node_ptr->data);
 
                 // 5. 增加的数量
                 int increase_count = old_head.ref_count - 2;
-                if (node_ptr->dec_count.fetch_add(increase_count) == -increase_count) {
+                if (node_ptr->dec_count.fetch_add(increase_count, MemoryOrder::memory_order_release) ==
+                    -increase_count) {
                     delete node_ptr;
                 }
                 return value;
             } else {
-                if (node_ptr->dec_count.fetch_sub(1) == 1) {
+                if (node_ptr->dec_count.fetch_sub(1, MemoryOrder::memory_order_relaxed) == 1) {
+                    node_ptr->dec_count.load(MemoryOrder::memory_order_acquire);
                     delete node_ptr;
                 }
             }
