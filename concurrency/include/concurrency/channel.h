@@ -14,7 +14,7 @@ class Channel {
 public:
     Channel(std::size_t capacity = 0) : capacity_(capacity) {}
 
-    template<typename... Args>
+    template <typename... Args>
     bool Send(Args&&... args) {
         std::unique_lock<std::mutex> lock(mtx_);
         producer_.wait(lock, [this]() {
