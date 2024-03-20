@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "concurrency/thread_safe_hash_table.h"
+#include "concurrency/thread_safe_hash_table/thread_safe_hash_table.h"
 #include "test/utils.h"
 
 namespace pyc {

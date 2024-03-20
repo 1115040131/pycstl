@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "concurrency/thread_safe_queue.h"
-#include "concurrency/thread_safe_queue_ht.h"
-#include "concurrency/thread_safe_stack.h"
+#include "concurrency/thread_safe_queue/thread_safe_queue.h"
+#include "concurrency/thread_safe_queue/thread_safe_queue_ht.h"
+#include "concurrency/thread_safe_stack/thread_safe_stack.h"
 #include "test/utils.h"
 
 namespace pyc {
