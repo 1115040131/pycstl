@@ -6,6 +6,7 @@
 #include <fmt/ranges.h>
 #include <gtest/gtest.h>
 
+#include "concurrency/sorter.h"
 #include "concurrency/thread_pool.h"
 
 namespace pyc {
@@ -88,7 +89,7 @@ TEST(QuickSortTest, SequentialQuickSortTest) {
 
 /// @brief 并行快速排序
 template <typename T>
-std::list<T> ParallelQuickSort(std::list<T> input) {
+std::list<T> AsyncQuickSort(std::list<T> input) {
     if (input.empty()) {
         return input;
     }
@@ -117,9 +118,9 @@ std::list<T> ParallelQuickSort(std::list<T> input) {
     return result;
 }
 
-TEST(QuickSortTest, ParallelQuickSortTest) {
+TEST(QuickSortTest, AsyncQuickSortTest) {
     std::list<int> arr = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
-    auto result = ParallelQuickSort(arr);
+    auto result = AsyncQuickSort(arr);
     EXPECT_EQ(result, std::list<int>({1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9}));
 }
 
@@ -157,6 +158,13 @@ std::list<T> ThreadPoolQuickSort(std::list<T> input) {
 TEST(QuickSortTest, ThreadPoolQuickSortTest) {
     std::list<int> arr = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
     auto result = ThreadPoolQuickSort(arr);
+    EXPECT_EQ(result, std::list<int>({1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9}));
+}
+
+/// @brief Sorter 版本
+TEST(QuickSortTest, ParallelQuickSortTest) {
+    std::list<int> arr = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
+    auto result = ParallelQuickSort(arr);
     EXPECT_EQ(result, std::list<int>({1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9}));
 }
 
