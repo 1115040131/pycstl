@@ -20,18 +20,17 @@ public:
     using Task = std::packaged_task<void()>;
 
     template <typename F, typename... Args>
-    auto Commit(F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
-        using RetType = decltype(f(args...));
+    auto Commit(F&& f, Args&&... args) {
+        using RetType = decltype(std::forward<F>(f)(std::forward<Args>(args)...));
         if (stop_) {
             return std::future<RetType>{};
         }
-        auto task = std::make_shared<std::packaged_task<RetType()>>(
-            std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+        std::packaged_task<RetType()> task(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
 
-        std::future<RetType> result = task->get_future();
+        std::future<RetType> result = task.get_future();
         {
             std::lock_guard<std::mutex> lock(mtx_);
-            tasks_.emplace([task] { (*task)(); });
+            tasks_.emplace([task = std::move(task)]() mutable { task(); });
         }
         cv_lock_.notify_one();
         return result;
