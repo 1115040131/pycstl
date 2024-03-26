@@ -25,7 +25,9 @@ public:
     ~Sorter() {
         end_of_data_ = true;
         for (auto& thread : threads_) {
-            thread.join();
+            if (thread.joinable()) {
+                thread.join();
+            }
         }
     }
 
@@ -46,7 +48,7 @@ public:
         std::future<std::list<T>> new_lower = lower_chunk.promise.get_future();
         chunks_.Push(std::move(lower_chunk));
         if (threads_.size() < max_thread_count_) {
-            threads_.push_back(std::thread(&Sorter<T>::SortThread, this));
+            threads_.push_back(std::thread(&Sorter<T>::TrySortChunk, this));
         }
 
         std::list<T> new_higher(DoSort(chunk_data));
@@ -69,11 +71,11 @@ private:
     void TrySortChunk() {
         auto chunk = chunks_.TryPop();
         if (chunk) {
-            SortChunk(std::move(chunk.value()));
+            SortChunk(chunk.value());
         }
     }
 
-    void SortChunk(ChunkToSort chunk) { chunk.promise.set_value(DoSort(chunk.data)); }
+    void SortChunk(ChunkToSort& chunk) { chunk.promise.set_value(DoSort(chunk.data)); }
 
 private:
     ThreadSafeStack<ChunkToSort> chunks_;
