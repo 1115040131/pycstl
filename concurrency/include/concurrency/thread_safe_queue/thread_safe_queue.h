@@ -69,7 +69,7 @@ public:
     }
 
     std::optional<T> TrySteal() {
-        std::scoped_lock<std::mutex> guard(head_mtx_, tail_mtx_);
+        std::scoped_lock guard(head_mtx_, tail_mtx_);
         if (head_ == tail_) {
             return {};
         }

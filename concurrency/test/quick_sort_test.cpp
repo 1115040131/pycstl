@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 
 #include "concurrency/sorter.h"
-#include "concurrency/thread_pool.h"
+#include "concurrency/thread_pool/thread_pool.h"
 
 namespace pyc {
 namespace concurrency {
