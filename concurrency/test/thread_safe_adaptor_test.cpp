@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "concurrency/thread_safe_queue/simple_thread_safe_queue.h"
 #include "concurrency/thread_safe_queue/thread_safe_queue.h"
-#include "concurrency/thread_safe_queue/thread_safe_queue_ht.h"
 #include "concurrency/thread_safe_stack/thread_safe_stack.h"
 #include "test/utils.h"
 
@@ -64,14 +64,14 @@ TEST(ThreadSafeAdaptorTest, ThreadSafeStackTest) {
     TryPopWhilePush(stack, 10000, 16);
 }
 
-TEST(ThreadSafeAdaptorTest, ThreadSafeQueueTest) {
-    ThreadSafeQueue<MyClass> queue;
+TEST(ThreadSafeAdaptorTest, SimpleThreadSafeQueueTest) {
+    SimpleThreadSafeQueue<MyClass> queue;
     PushWhilePop(queue, 10000, 16);
     TryPopWhilePush(queue, 10000, 16);
 }
 
-TEST(ThreadSafeAdaptorTest, ThreadSafeQueueHtTest) {
-    ThreadSafeQueueHt<MyClass> queue;
+TEST(ThreadSafeAdaptorTest, ThreadSafeQueueTest) {
+    ThreadSafeQueue<MyClass> queue;
     PushWhilePop(queue, 10000, 16);
     TryPopWhilePush(queue, 10000, 16);
 }
