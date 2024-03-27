@@ -25,7 +25,10 @@ public:
         if (stop_) {
             return std::future<RetType>{};
         }
-        std::packaged_task<RetType()> task(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+        std::packaged_task<RetType()> task(
+            [f = std::forward<F>(f), ... args = std::forward<Args>(args)]() mutable {
+                return f(std::forward<Args>(args)...);
+            });
 
         std::future<RetType> result = task.get_future();
         {
