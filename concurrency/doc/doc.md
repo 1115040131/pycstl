@@ -1,0 +1,1 @@
+[原子操作和内存模型](https://gitbookcpp.llfc.club/sections/cpp/concurrent/concpp11.html)
