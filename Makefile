@@ -69,6 +69,12 @@ else
 	bazel test //pycstl/test:pycstl_all_test --test_output=all
 endif
 
+######################### build for tetris #########################
+.PHONY: tetris
+
+tetris:
+	bazel run //tetris
+
 # 测试文件, 单独编译
 ######################### build for hello_world #########################
 .PHONY: hello_world
