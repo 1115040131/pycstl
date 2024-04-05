@@ -1,26 +1,13 @@
-
-#include <chrono>
-#include <thread>
-
-#include "tetris/terminal.h"
-
-using namespace std::literals::chrono_literals;
-
-using namespace pyc::tetris;
+#include "tetris/engine.h"
 
 int main() {
-    Terminal::HideCursor();
-    int i = 1;
-    while (true) {
-        Terminal::GetInstance()
-            .clear()
-            .move_to(i++, 10)
-            .set_background_color(ColorId::kBrightWhite)
-            .output("   ")
-            .reset()
-            .flush();
-        std::this_thread::sleep_for(300ms);
-    }
+    auto& engine = pyc::tetris::Engine::GetInstance();
+
+    engine.Init();
+
+    engine.Loop();
+
+    engine.Exit();
 
     return 0;
 }
