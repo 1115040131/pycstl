@@ -2,8 +2,11 @@
 
 #include <thread>
 
+#include "tetris/control.h"
 #include "tetris/draw.h"
+#include "tetris/game.h"
 #include "tetris/terminal.h"
+#include "tetris/utils.h"
 
 namespace pyc {
 namespace tetris {
@@ -12,38 +15,51 @@ using namespace std::literals::chrono_literals;
 
 void Engine::Init() {
     Terminal::HideCursor();
-    Terminal::Clear();
+    Control::StartListener();  // 开启键盘监听
+    Game::GetInstance().Init();
 
     prev_time_ = std::chrono::steady_clock::now();
-
-    Window<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
-    Window<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
-    Window<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
-    Window<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
-    Window(1, 22, 8, 18, "Next");
 }
 
 void Engine::Loop() {
-    int i = 4;
-    while (true) {
+    const auto& game = Game::GetInstance();
+
+    while (Game::GetInstance().Running()) {
         auto end_time = std::chrono::steady_clock::now();
         auto delta = end_time - prev_time_;
         prev_time_ = end_time;
         // lag_ += delta;
 
+        // 重绘窗口
+        Terminal::Clear();
+        Window<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
+        Window<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
+        Window<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
+        Window<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
+        Window(1, 22, 8, 18, "Next");
+
         UpdateFps(delta);
 
         Terminal::GetInstance()
-            .move_to(i % 20, 10)
+            .move_to(game.Row(), Block2Col(game.Col()))
             .set_background_color(ColorId::kBrightWhite)
             .output("  ")
             .reset()
             .flush();
-        std::this_thread::sleep_for(100ms);
+        std::this_thread::sleep_for(50ms);
     }
 }
 
-void Engine::Exit() { Terminal::GetInstance().show_cursor().reset().flush(); }
+void Engine::Exit() {
+    Terminal::GetInstance()
+        .show_cursor()
+        .reset()
+        .clear()
+        .move_to(1, 1)
+        .set_color(ColorId::kBrightRed)
+        .output("Bye!")
+        .flush();
+}
 
 void Engine::UpdateFps(std::chrono::nanoseconds delta) {
     static std::chrono::nanoseconds total{};

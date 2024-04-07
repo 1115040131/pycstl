@@ -1,10 +1,9 @@
 #include "tetris/draw.h"
 
-#include <array>
-
 #include <fmt/core.h>
 
 #include "tetris/terminal.h"
+#include "tetris/utils.h"
 
 namespace pyc {
 namespace tetris {
@@ -22,8 +21,6 @@ U+256x	╠	╡	╢	╣	╤	╥	╦	╧	╨	╩	╪	╫	╬	╭	╮	╯
 U+257x	╰	╱	╲	╳	╴	╵	╶	╷	╸	╹	╺	╻	╼	╽	╾	╿
 */
 // clang-format on
-
-inline constexpr int Block2Col(int block_idx) { return 2 * block_idx - 1; }
 
 template <WindowStyle style>
 void Window(int top, int left, int width, int height, std::string_view title) {
