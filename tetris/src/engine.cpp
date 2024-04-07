@@ -16,11 +16,11 @@ void Engine::Init() {
 
     prev_time_ = std::chrono::steady_clock::now();
 
-    Window(1, 1, 6, 9, "Hold");
-    Window(1, 10, 22, 12, "Tetriz");
-    Window(7, 1, 16, 9, "Status");
-    Window(19, 22, 4, 8, "Info");
-    Window(1, 22, 18, 8, "Next");
+    Window<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
+    Window<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
+    Window<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
+    Window<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
+    Window(1, 22, 8, 18, "Next");
 }
 
 void Engine::Loop() {
@@ -56,7 +56,7 @@ void Engine::UpdateFps(std::chrono::nanoseconds delta) {
         frame_count = 0;
     }
 
-    Terminal::GetInstance().move_to(10, 4).output(fmt::format("FPS: {}", fps_));
+    Terminal::GetInstance().move_to(10, 4).output("FPS: {}", fps_);
 }
 
 }  // namespace tetris

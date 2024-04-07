@@ -1,5 +1,7 @@
 #include "tetris/draw.h"
 
+#include <array>
+
 #include <fmt/core.h>
 
 #include "tetris/terminal.h"
@@ -21,26 +23,50 @@ U+257x	╰	╱	╲	╳	╴	╵	╶	╷	╸	╹	╺	╻	╼	╽	╾	╿
 */
 // clang-format on
 
-inline int Block2Col(int block_idx) { return 2 * block_idx - 1; }
+inline constexpr int Block2Col(int block_idx) { return 2 * block_idx - 1; }
 
-void Window(int top, int left, int height, int width, std::string_view title) {
+template <WindowStyle style>
+void Window(int top, int left, int width, int height, std::string_view title) {
     if (width < 2 || height < 2) {
         fmt::println("Draw window error,width: {}, left: {}", width, height);
         return;
     }
 
-    const auto& termianl = Terminal::GetInstance();
+    const auto& terminal = Terminal::GetInstance();
 
-    // 第一行
-    termianl.move_to(top, Block2Col(left)).output(fmt::format(" ┌{:─^{}}┐ ", title, 2 * width - 4));
+    int padding_width = 2 * width - 4;
 
-    for (int i = 1; i < height - 1; i++) {
-        termianl.move_to(top + i, Block2Col(left)).output(fmt::format(" │{:<{}}│ ", "", 2 * width - 4));
+    if constexpr (style == WindowStyle::kStyle1) {
+        terminal.move_to(top, Block2Col(left)).output(" ┌{:─^{}}┐ ", title, padding_width);
+        for (int i = 1; i < height - 1; i++) {
+            terminal.move_to(top + i, Block2Col(left)).output(" │{:<{}}│ ", "", padding_width);
+        }
+        terminal.move_to(top + height - 1, Block2Col(left)).output(" └{:─<{}}┘ ", "", padding_width);
+    } else if constexpr (style == WindowStyle::kStyle2) {
+        terminal.move_to(top, Block2Col(left)).output(" ╔{:═^{}}╗ ", title, padding_width);
+        for (int i = 1; i < height - 1; i++) {
+            terminal.move_to(top + i, Block2Col(left)).output(" ║{:<{}}║ ", "", padding_width);
+        }
+        terminal.move_to(top + height - 1, Block2Col(left)).output(" ╚{:═<{}}╝ ", "", padding_width);
+    } else if constexpr (style == WindowStyle::kStyle3) {
+        terminal.move_to(top, Block2Col(left)).output(" ┏{:━^{}}┓ ", title, padding_width);
+        for (int i = 1; i < height - 1; i++) {
+            terminal.move_to(top + i, Block2Col(left)).output(" ┃{:<{}}┃ ", "", padding_width);
+        }
+        terminal.move_to(top + height - 1, Block2Col(left)).output(" ┗{:━<{}}┛ ", "", padding_width);
+    } else if constexpr (style == WindowStyle::kStyle4) {
+        terminal.move_to(top, Block2Col(left)).output(" ╭{:─^{}}╮ ", title, padding_width);
+        for (int i = 1; i < height - 1; i++) {
+            terminal.move_to(top + i, Block2Col(left)).output(" │{:<{}}│ ", "", padding_width);
+        }
+        terminal.move_to(top + height - 1, Block2Col(left)).output(" ╰{:─<{}}╯ ", "", padding_width);
     }
-
-    // 最后一行
-    termianl.move_to(top + height - 1, Block2Col(left)).output(fmt::format(" └{:─<{}}┘ ", "", 2 * width - 4));
 }
+
+template void Window<WindowStyle::kStyle1>(int top, int left, int height, int width, std::string_view title);
+template void Window<WindowStyle::kStyle2>(int top, int left, int height, int width, std::string_view title);
+template void Window<WindowStyle::kStyle3>(int top, int left, int height, int width, std::string_view title);
+template void Window<WindowStyle::kStyle4>(int top, int left, int height, int width, std::string_view title);
 
 }  // namespace tetris
 }  // namespace pyc
