@@ -6,7 +6,6 @@
 #include "tetris/draw.h"
 #include "tetris/game.h"
 #include "tetris/terminal.h"
-#include "tetris/utils.h"
 
 namespace pyc {
 namespace tetris {
@@ -32,20 +31,17 @@ void Engine::Loop() {
 
         // 重绘窗口
         Terminal::Clear();
-        Window<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
-        Window<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
-        Window<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
-        Window<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
-        Window(1, 22, 8, 18, "Next");
-
         UpdateFps(delta);
 
-        Terminal::GetInstance()
-            .move_to(game.Row(), Block2Col(game.Col()))
-            .set_background_color(ColorId::kBrightWhite)
-            .output("  ")
-            .reset()
-            .flush();
+        DrawWindow<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
+        DrawWindow<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
+        DrawWindow<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
+        DrawWindow<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
+        DrawWindow(1, 22, 8, 18, "Next");
+
+        DrawTetromino(game.Curr(), game.Row(), game.Col(), game.Index());
+
+        Terminal::Flush();
         std::this_thread::sleep_for(50ms);
     }
 }

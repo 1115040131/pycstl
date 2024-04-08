@@ -1,5 +1,7 @@
 #include "tetris/draw.h"
 
+#include <unordered_map>
+
 #include <fmt/core.h>
 
 #include "tetris/terminal.h"
@@ -23,7 +25,7 @@ U+257x	╰	╱	╲	╳	╴	╵	╶	╷	╸	╹	╺	╻	╼	╽	╾	╿
 // clang-format on
 
 template <WindowStyle style>
-void Window(int top, int left, int width, int height, std::string_view title) {
+void DrawWindow(int top, int left, int width, int height, std::string_view title) {
     if (width < 2 || height < 2) {
         fmt::println("Draw window error,width: {}, left: {}", width, height);
         return;
@@ -60,10 +62,73 @@ void Window(int top, int left, int width, int height, std::string_view title) {
     }
 }
 
-template void Window<WindowStyle::kStyle1>(int top, int left, int height, int width, std::string_view title);
-template void Window<WindowStyle::kStyle2>(int top, int left, int height, int width, std::string_view title);
-template void Window<WindowStyle::kStyle3>(int top, int left, int height, int width, std::string_view title);
-template void Window<WindowStyle::kStyle4>(int top, int left, int height, int width, std::string_view title);
+template void DrawWindow<WindowStyle::kStyle1>(int top, int left, int height, int width, std::string_view title);
+template void DrawWindow<WindowStyle::kStyle2>(int top, int left, int height, int width, std::string_view title);
+template void DrawWindow<WindowStyle::kStyle3>(int top, int left, int height, int width, std::string_view title);
+template void DrawWindow<WindowStyle::kStyle4>(int top, int left, int height, int width, std::string_view title);
+
+ColorId GetColor(char c) {
+    static const std::unordered_map<char, ColorId> color_map{
+        {'I', ColorId::kBrightCyan},   {'J', ColorId::kBrightBlue}, {'L', ColorId::kOrange},
+        {'O', ColorId::kBrightYellow}, {'S', ColorId::kGreen},      {'T', ColorId::kMagenta},
+        {'Z', ColorId::kBrightRed},
+    };
+    auto iter = color_map.find(c);
+    if (iter != color_map.end()) {
+        return iter->second;
+    }
+    return ColorId::kBlack;
+}
+
+template <std::size_t M, std::size_t N>
+void DrawTetromino(const v1::Tetromino<M, N>& tetromino, int top, int left) {
+    const auto& terminal = Terminal::GetInstance();
+    for (std::size_t i = 0; i < M; i++) {
+        for (std::size_t j = 0; j < N; j++) {
+            if (tetromino[i][j] > '0') {
+                terminal.move_to(top + i, Block2Col(left + j))
+                    .set_background_color(GetColor(tetromino[i][j]))
+                    .output("  ")
+                    .reset();
+            }
+        }
+    }
+}
+
+template void DrawTetromino(const v1::Tetromino<3, 3>& tetromino, int top, int left);
+template void DrawTetromino(const v1::Tetromino<5, 5>& tetromino, int top, int left);
+
+constexpr bool GetBit(int t, int i, int j) { return static_cast<bool>((1 << (i * 4 + j)) & t); }
+
+void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index) {
+    const auto& terminal = Terminal::GetInstance();
+    int data = tetromino.data[index];
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (GetBit(data, i, j)) {
+                terminal.move_to(top + i, Block2Col(left + j))
+                    .set_background_color(tetromino.color)
+                    .output("  ")
+                    .reset();
+            }
+        }
+    }
+}
+
+void DrawTetromino(const Tetromino& tetromino, int top, int left, int index) {
+    const auto& terminal = Terminal::GetInstance();
+
+    terminal.set_background_color(tetromino.color);
+
+    // (dx, dy) -> (row, col)
+    // row = row - dy;
+    // col = col + dx;
+    for (const auto& point : tetromino.data[index]) {
+        terminal.move_to(top - point.y, Block2Col(left + point.x)).output("  ");
+    }
+    terminal.reset();
+}
 
 }  // namespace tetris
 }  // namespace pyc

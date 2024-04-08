@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/singleton.h"
+#include "tetris/tetromino.h"
 
 namespace pyc {
 namespace tetris {
@@ -18,10 +19,14 @@ public:
 
     int Col() const { return col_; }
 
+    int Index() const { return index_; }
+
+    Tetromino Curr() const { return curr_; }
+
 private:
     void Quit() { running_ = false; }
 
-    void Rotate() { row_--; }
+    void Rotate() { index_ = (index_ + 1) % 4; }
 
     void Left() { col_--; }
 
@@ -33,6 +38,8 @@ private:
     bool running_{false};
     int row_{2};
     int col_{15};
+    int index_{0};
+    Tetromino curr_{I};
 };
 
 }  // namespace tetris

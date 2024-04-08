@@ -2,13 +2,22 @@
 
 #include <string_view>
 
+#include "tetromino.h"
+
 namespace pyc {
 namespace tetris {
 
 enum class WindowStyle { kStyle1, kStyle2, kStyle3, kStyle4 };
 
-template<WindowStyle style = WindowStyle::kStyle1>
-void Window(int top, int left, int width, int height, std::string_view title);
+template <WindowStyle style = WindowStyle::kStyle1>
+void DrawWindow(int top, int left, int width, int height, std::string_view title);
+
+template <std::size_t M, std::size_t N>
+void DrawTetromino(const v1::Tetromino<M, N>& tetromino, int top, int left);
+
+void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index);
+
+void DrawTetromino(const Tetromino& tetromino, int top, int left, int index);
 
 }  // namespace tetris
 }  // namespace pyc
