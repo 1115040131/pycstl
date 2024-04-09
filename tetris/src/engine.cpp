@@ -21,17 +21,17 @@ void Engine::Init() {
 }
 
 void Engine::Loop() {
-    const auto& game = Game::GetInstance();
+    auto& game = Game::GetInstance();
 
     while (Game::GetInstance().Running()) {
         auto end_time = std::chrono::steady_clock::now();
         auto delta = end_time - prev_time_;
         prev_time_ = end_time;
-        // lag_ += delta;
+
+        game.Process(delta);
 
         // 重绘窗口
         Terminal::Clear();
-        UpdateFps(delta);
 
         DrawWindow<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
         DrawWindow<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
@@ -39,7 +39,9 @@ void Engine::Loop() {
         DrawWindow<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
         DrawWindow(1, 22, 8, 18, "Next");
 
-        DrawTetromino(game.Curr(), game.Row(), game.Col(), game.Index());
+        UpdateFps(delta);
+
+        game.Render();
 
         Terminal::Flush();
         std::this_thread::sleep_for(50ms);

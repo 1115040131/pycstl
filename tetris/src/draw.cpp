@@ -116,16 +116,38 @@ void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index)
     }
 }
 
-void DrawTetromino(const Tetromino& tetromino, int top, int left, int index) {
+void DrawTetromino(const v3::TetrominoSet& tetromino_set, int top, int left, int index) {
     const auto& terminal = Terminal::GetInstance();
 
-    terminal.set_background_color(tetromino.color);
+    terminal.set_background_color(tetromino_set.color);
 
     // (dx, dy) -> (row, col)
     // row = row - dy;
     // col = col + dx;
-    for (const auto& point : tetromino.data[index]) {
+    for (const auto& point : tetromino_set.data[index]) {
         terminal.move_to(top - point.y, Block2Col(left + point.x)).output("  ");
+    }
+    terminal.reset();
+}
+
+void DrawFrame(const PlayField& frame, int top, int left) {
+    const auto& terminal = Terminal::GetInstance();
+
+    const std::size_t kRowMax = frame[0].size() - 2;
+    for (std::size_t x = 0; x < frame.size(); x++) {
+        for (std::size_t y = 0; y < kRowMax; y++) {
+            int row = top + kRowMax - y - 1;
+            int col = left + x;
+            terminal.move_to(row, Block2Col(col)).reset();
+            if (frame[x][y] > 0) {
+                terminal.set_background_color(static_cast<ColorId>(frame[x][y])).output("  ");
+            } else if (frame[x][y] < 0) {
+                // terminal.set_color(static_cast<ColorId>(-frame[x][y])).output("\u25e3\u25e5");
+                terminal.set_color(static_cast<ColorId>(-frame[x][y])).output("**");
+            } else {
+                terminal.output("\u30FB");
+            }
+        }
     }
     terminal.reset();
 }

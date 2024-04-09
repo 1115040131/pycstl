@@ -1,7 +1,10 @@
 #pragma once
 
+#include <array>
+#include <chrono>
+
 #include "common/singleton.h"
-#include "tetris/tetromino.h"
+#include "tetris/piece.h"
 
 namespace pyc {
 namespace tetris {
@@ -13,33 +16,29 @@ class Game : public Singleton<Game> {
 public:
     bool Running() const { return running_; }
 
-    void Init() { running_ = true; }
+    void Init();
 
-    int Row() const { return row_; }
+    void Process(std::chrono::nanoseconds delta);
 
-    int Col() const { return col_; }
+    void Render();
 
-    int Index() const { return index_; }
-
-    Tetromino Curr() const { return curr_; }
+    const PlayField& GetPlayField() { return play_field_; }
 
 private:
     void Quit() { running_ = false; }
 
-    void Rotate() { index_ = (index_ + 1) % 4; }
+    void Rotate() { piece_.Rotate(); }
 
-    void Left() { col_--; }
+    void Left() { piece_.Left(); }
 
-    void Right() { col_++; }
+    void Right() { piece_.Right(); }
 
-    void Down() { row_++; }
+    void Down() { piece_.Down(); }
 
 private:
     bool running_{false};
-    int row_{2};
-    int col_{15};
-    int index_{0};
-    Tetromino curr_{I};
+    PlayField play_field_{};
+    Piece piece_{};
 };
 
 }  // namespace tetris

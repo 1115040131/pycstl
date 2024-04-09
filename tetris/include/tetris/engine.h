@@ -22,7 +22,6 @@ private:
 
 private:
     std::chrono::steady_clock::time_point prev_time_;
-    std::chrono::nanoseconds lag_{};
     std::size_t fps_{};
 };
 

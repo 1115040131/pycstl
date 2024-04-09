@@ -116,14 +116,16 @@ struct Point {
     int y;
 };
 
-using Points = std::array<Point, 4>;
+using Tetromino = std::array<Point, 4>;
 
-struct Tetromino {
+struct TetrominoSet {
     ColorId color;
-    std::array<Points, 4> data;
+    std::array<Tetromino, 4> data;
 };
 
-constexpr Tetromino I{ColorId::kBrightCyan,
+namespace prototype {
+
+constexpr TetrominoSet I{ColorId::kBrightCyan,
                       {{
                           {{{0, 0}, {-1, 0}, {1, 0}, {2, 0}}},   // 0
                           {{{0, 0}, {0, 1}, {0, -1}, {0, -2}}},  // R
@@ -131,7 +133,7 @@ constexpr Tetromino I{ColorId::kBrightCyan,
                           {{{0, 0}, {0, 2}, {0, 1}, {0, -1}}},   // L
                       }}};
 
-constexpr Tetromino J{ColorId::kBrightBlue,
+constexpr TetrominoSet J{ColorId::kBrightBlue,
                       {{
                           {{{0, 0}, {-1, 1}, {-1, 0}, {1, 0}}},   // 0
                           {{{0, 0}, {1, 1}, {0, 1}, {0, -1}}},    // R
@@ -139,7 +141,7 @@ constexpr Tetromino J{ColorId::kBrightBlue,
                           {{{0, 0}, {0, 1}, {-1, -1}, {0, -1}}},  // L
                       }}};
 
-constexpr Tetromino L{ColorId::kOrange,
+constexpr TetrominoSet L{ColorId::kOrange,
                       {{
                           {{{0, 0}, {-1, 0}, {1, 0}, {1, 1}}},    // 0
                           {{{0, 0}, {0, 1}, {0, -1}, {1, -1}}},   // R
@@ -147,7 +149,7 @@ constexpr Tetromino L{ColorId::kOrange,
                           {{{0, 0}, {-1, 1}, {0, 1}, {0, -1}}},   // L
                       }}};
 
-constexpr Tetromino O{ColorId::kBrightYellow,
+constexpr TetrominoSet O{ColorId::kBrightYellow,
                       {{
                           {{{0, 0}, {0, 1}, {1, 1}, {1, 0}}},      // 0
                           {{{0, 0}, {0, -1}, {1, 0}, {1, -1}}},    // R
@@ -155,7 +157,7 @@ constexpr Tetromino O{ColorId::kBrightYellow,
                           {{{0, 0}, {-1, 1}, {-1, 0}, {0, 1}}},    // L
                       }}};
 
-constexpr Tetromino S{ColorId::kGreen,
+constexpr TetrominoSet S{ColorId::kGreen,
                       {{
                           {{{0, 0}, {-1, 0}, {0, 1}, {1, 1}}},    // 0
                           {{{0, 0}, {0, 1}, {1, 0}, {1, -1}}},    // R
@@ -163,7 +165,7 @@ constexpr Tetromino S{ColorId::kGreen,
                           {{{0, 0}, {-1, 1}, {-1, 0}, {0, -1}}},  // L
                       }}};
 
-constexpr Tetromino T{ColorId::kMagenta,
+constexpr TetrominoSet T{ColorId::kMagenta,
                       {{
                           {{{0, 0}, {-1, 0}, {0, 1}, {1, 0}}},   // 0
                           {{{0, 0}, {0, 1}, {1, 0}, {0, -1}}},   // R
@@ -171,13 +173,15 @@ constexpr Tetromino T{ColorId::kMagenta,
                           {{{0, 0}, {-1, 0}, {0, 1}, {0, -1}}},  // L
                       }}};
 
-constexpr Tetromino Z{ColorId::kBrightRed,
+constexpr TetrominoSet Z{ColorId::kBrightRed,
                       {{
                           {{{0, 0}, {-1, 1}, {0, 1}, {1, 0}}},    // 0
                           {{{0, 0}, {1, 1}, {1, 0}, {0, -1}}},    // R
                           {{{0, 0}, {-1, 0}, {0, -1}, {1, -1}}},  // 2
                           {{{0, 0}, {-1, -1}, {-1, 0}, {0, 1}}},  // L
                       }}};
+
+}  // namespace prototype
 
 }  // namespace v3
 
