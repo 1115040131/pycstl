@@ -132,17 +132,9 @@ void DrawTetromino(const v3::TetrominoSet& tetromino_set, int top, int left, int
     terminal.Reset();
 }
 
-/// @brief 初始化一个值均为 std::numeric_limits<int>::max() 的数组作为上一帧的缓存
-PlayField InitPrevFrame() {
-    PlayField play_field;
-    for (auto& row : play_field) {
-        row.fill(std::numeric_limits<int>::max());
-    }
-    return play_field;
-}
-
-void DrawFrame(const PlayField& frame, int top, int left) {
-    static PlayField prev_frame = InitPrevFrame();
+void DrawFrame(const Matrix& frame, int top, int left) {
+    /// @brief 初始化一个值均为 std::numeric_limits<int>::max() 的数组作为上一帧的缓存
+    static Matrix prev_frame(kPlayFieldRow - 2, std::vector<int>(kPlayFieldCol, std::numeric_limits<int>::max()));
 
     const auto& terminal = Terminal::GetInstance();
 
@@ -163,6 +155,31 @@ void DrawFrame(const PlayField& frame, int top, int left) {
                 terminal.SetColor(static_cast<ColorId>(-frame[y][x])).Output("**");
             } else {
                 terminal.Output("\u30FB");
+            }
+        }
+    }
+    terminal.Reset().Flush();
+}
+
+void DrawPreview(const Matrix& preview, int top, int left) {
+    static Matrix prev_preview(kPreviewRow, std::vector<int>(kPreviewCol, std::numeric_limits<int>::max()));
+
+    const auto& terminal = Terminal::GetInstance();
+
+    for (std::size_t y = 0; y < kPreviewRow; y++) {
+        for (std::size_t x = 0; x < kPreviewCol; x++) {
+            if (prev_preview[y][x] == preview[y][x]) [[likely]] {
+                continue;
+            }
+            prev_preview[y][x] = preview[y][x];
+
+            int row = top + kPreviewRow - y - 1;
+            int col = left + x;
+            terminal.MoveTo(row, Block2Col(col)).Reset();
+            if (preview[y][x] > 0) {
+                terminal.SetBackgroundColor(static_cast<ColorId>(preview[y][x])).Output("  ");
+            } else {
+                terminal.Output("  ");
             }
         }
     }

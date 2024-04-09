@@ -21,8 +21,8 @@ void Engine::Init() {
     DrawWindow<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
     DrawWindow(1, 22, 8, 18, "Next");
 
-    Control::StartListener();  // 开启键盘监听
     Game::GetInstance().Init();
+    Control::StartListener();  // 开启键盘监听
 }
 
 void Engine::Loop() {

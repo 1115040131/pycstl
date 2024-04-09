@@ -1,8 +1,10 @@
 #pragma once
 
+#include <list>
 #include <string_view>
 
 #include "tetris/piece.h"
+#include "tetris/play_field.h"
 #include "tetris/tetromino.h"
 
 namespace pyc {
@@ -20,7 +22,9 @@ void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index)
 
 void DrawTetromino(const v3::TetrominoSet& tetromino_set, int top, int left, int index);
 
-void DrawFrame(const PlayField& frame, int top, int left);
+void DrawFrame(const Matrix& frame, int top, int left);
+
+void DrawPreview(const Matrix& preview, int top, int left);
 
 }  // namespace tetris
 }  // namespace pyc

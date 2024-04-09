@@ -5,10 +5,7 @@
 namespace pyc {
 namespace tetris {
 
-inline constexpr std::size_t kPlayFieldRow = 22;
-inline constexpr std::size_t kPlayFieldCol = 10;
 
-using PlayField = std::array<std::array<int, kPlayFieldCol>, kPlayFieldRow>;
 
 struct Piece {
     TetrominoSet tetromino_set;
@@ -16,6 +13,9 @@ struct Piece {
     int x;
     int y;
     int index;
+
+    enum class Type { kNormal, kShadow };
+    Type type;
 
     ColorId GetColor() const { return tetromino_set.color; }
 

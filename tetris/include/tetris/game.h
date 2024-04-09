@@ -1,10 +1,11 @@
 #pragma once
 
-#include <array>
 #include <chrono>
+#include <list>
 
 #include "common/singleton.h"
 #include "tetris/piece.h"
+#include "tetris/play_field.h"
 
 namespace pyc {
 namespace tetris {
@@ -22,7 +23,7 @@ public:
 
     void Render();
 
-    const PlayField& GetPlayField() { return play_field_; }
+    const Matrix& GetPlayField() { return play_field_; }
 
 private:
     void Quit() { running_ = false; }
@@ -66,8 +67,9 @@ private:
 
 private:
     bool running_{false};
-    PlayField play_field_{};
+    Matrix play_field_ = std::vector<std::vector<int>>(kPlayFieldRow, std::vector<int>(kPlayFieldCol));
     Piece piece_{};
+    std::list<Piece> preview_;  // 预览队列
 
     bool lock_flag_ = false;
 };
