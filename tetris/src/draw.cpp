@@ -146,21 +146,21 @@ void DrawFrame(const PlayField& frame, int top, int left) {
 
     const auto& terminal = Terminal::GetInstance();
 
-    const std::size_t kRowMax = frame[0].size() - 2;
-    for (std::size_t x = 0; x < frame.size(); x++) {
-        for (std::size_t y = 0; y < kRowMax; y++) {
-            if (prev_frame[x][y] == frame[x][y]) [[likely]] {
+    constexpr std::size_t kRenderRow = kPlayFieldRow - 2;
+    for (std::size_t y = 0; y < kRenderRow; y++) {
+        for (std::size_t x = 0; x < kPlayFieldCol; x++) {
+            if (prev_frame[y][x] == frame[y][x]) [[likely]] {
                 continue;
             }
-            prev_frame[x][y] = frame[x][y];
+            prev_frame[y][x] = frame[y][x];
 
-            int row = top + kRowMax - y - 1;
+            int row = top + kRenderRow - y - 1;
             int col = left + x;
             terminal.MoveTo(row, Block2Col(col)).Reset();
-            if (frame[x][y] > 0) {
-                terminal.SetBackgroundColor(static_cast<ColorId>(frame[x][y])).Output("  ");
-            } else if (frame[x][y] < 0) {
-                terminal.SetColor(static_cast<ColorId>(-frame[x][y])).Output("**");
+            if (frame[y][x] > 0) {
+                terminal.SetBackgroundColor(static_cast<ColorId>(frame[y][x])).Output("  ");
+            } else if (frame[y][x] < 0) {
+                terminal.SetColor(static_cast<ColorId>(-frame[y][x])).Output("**");
             } else {
                 terminal.Output("\u30FB");
             }

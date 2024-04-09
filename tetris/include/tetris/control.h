@@ -12,22 +12,13 @@ public:
 private:
     static void ProcessCommand();
 
-    static void CommandQuit();
-
-    static void CommandRotate();
-
-    static void CommandLeft();
-
-    static void CommandRight();
-
-    static void CommandDown();
-
 private:
     static constexpr char kKeyQ = 'q';
     static constexpr char kKeyW = 'w';
     static constexpr char kKeyA = 'a';
     static constexpr char kKeyD = 'd';
     static constexpr char kKeyS = 's';
+    static constexpr char kKeySpace = ' ';
 };
 
 }  // namespace tetris

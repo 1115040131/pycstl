@@ -5,7 +5,10 @@
 namespace pyc {
 namespace tetris {
 
-using PlayField = std::array<std::array<int, 22>, 10>;
+inline constexpr std::size_t kPlayFieldRow = 22;
+inline constexpr std::size_t kPlayFieldCol = 10;
+
+using PlayField = std::array<std::array<int, kPlayFieldCol>, kPlayFieldRow>;
 
 struct Piece {
     TetrominoSet tetromino_set;
@@ -18,23 +21,18 @@ struct Piece {
 
     const Tetromino& GetTetromino() const { return tetromino_set.data[index]; }
 
-    bool Test(int x, int y) const;
+    bool Test(int target_x, int target_y, int target_index) const;
 
-    void Rotate() { index = (index + 1) % 4; }
+    bool Rotate() { return Move(0, 0, (index + 1) % 4); }
 
-    void Left() { Move(-1, 0); }
+    bool Left() { return Move(-1, 0, index); }
 
-    void Right() { Move(1, 0); }
+    bool Right() { return Move(1, 0, index); }
 
-    void Down() { Move(0, -1); }
+    bool Down() { return Move(0, -1, index); }
 
 private:
-    void Move(int dx, int dy) {
-        if (Test(x + dx, y + dy)) {
-            x += dx;
-            y += dy;
-        }
-    }
+    bool Move(int dx, int dy, int target_index);
 };
 
 }  // namespace tetris

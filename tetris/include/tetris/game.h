@@ -27,18 +27,49 @@ public:
 private:
     void Quit() { running_ = false; }
 
-    void Rotate() { piece_.Rotate(); }
+    void Rotate() {
+        if (!lock_flag_) {
+            piece_.Rotate();
+        }
+    }
 
-    void Left() { piece_.Left(); }
+    void Left() {
+        if (!lock_flag_) {
+            piece_.Left();
+        }
+    }
 
-    void Right() { piece_.Right(); }
+    void Right() {
+        if (!lock_flag_) {
+            piece_.Right();
+        }
+    }
 
-    void Down() { piece_.Down(); }
+    void Down() {
+        if (!lock_flag_) {
+            piece_.Down();
+        }
+    }
+
+    /// @brief 锁定
+    void Lock();
+
+    /// @brief 消行
+    void Clear();
+
+    /// @brief 直落
+    void Drop() {
+        lock_flag_ = true;
+        while (piece_.Down())
+            ;
+    }
 
 private:
     bool running_{false};
     PlayField play_field_{};
     Piece piece_{};
+
+    bool lock_flag_ = false;
 };
 
 }  // namespace tetris

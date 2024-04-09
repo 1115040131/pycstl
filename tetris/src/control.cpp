@@ -32,34 +32,28 @@ void Control::ProcessCommand() {
     while (Game::GetInstance().Running()) {
         switch (std::cin.get()) {
             case kKeyQ:
-                CommandQuit();
+                Game::GetInstance().Quit();
                 break;
             case kKeyW:
-                CommandRotate();
+                Game::GetInstance().Rotate();
                 break;
             case kKeyA:
-                CommandLeft();
+                Game::GetInstance().Left();
                 break;
             case kKeyD:
-                CommandRight();
+                Game::GetInstance().Right();
                 break;
             case kKeyS:
-                CommandDown();
+                Game::GetInstance().Down();
+                break;
+            case kKeySpace:
+                Game::GetInstance().Drop();
+                break;
             default:
                 break;
         }
     }
 }
-
-void Control::CommandQuit() { Game::GetInstance().Quit(); }
-
-void Control::CommandRotate() { Game::GetInstance().Rotate(); }
-
-void Control::CommandLeft() { Game::GetInstance().Left(); }
-
-void Control::CommandRight() { Game::GetInstance().Right(); }
-
-void Control::CommandDown() { Game::GetInstance().Down(); }
 
 }  // namespace tetris
 }  // namespace pyc
