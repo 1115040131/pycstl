@@ -1,5 +1,7 @@
 #include "tetris/draw.h"
 
+#include <limits>
+#include <sstream>
 #include <unordered_map>
 
 #include <fmt/core.h>
@@ -27,7 +29,7 @@ U+257x	╰	╱	╲	╳	╴	╵	╶	╷	╸	╹	╺	╻	╼	╽	╾	╿
 template <WindowStyle style>
 void DrawWindow(int top, int left, int width, int height, std::string_view title) {
     if (width < 2 || height < 2) {
-        fmt::println("Draw window error,width: {}, left: {}", width, height);
+        fmt::println("Draw window error, width: {}, left: {}", width, height);
         return;
     }
 
@@ -36,29 +38,29 @@ void DrawWindow(int top, int left, int width, int height, std::string_view title
     int padding_width = 2 * width - 4;
 
     if constexpr (style == WindowStyle::kStyle1) {
-        terminal.move_to(top, Block2Col(left)).output(" ┌{:─^{}}┐ ", title, padding_width);
+        terminal.MoveTo(top, Block2Col(left)).Output(fmt::format(" ┌{:─^{}}┐ ", title, padding_width));
         for (int i = 1; i < height - 1; i++) {
-            terminal.move_to(top + i, Block2Col(left)).output(" │{:<{}}│ ", "", padding_width);
+            terminal.MoveTo(top + i, Block2Col(left)).Output(fmt::format(" │{:<{}}│ ", "", padding_width));
         }
-        terminal.move_to(top + height - 1, Block2Col(left)).output(" └{:─<{}}┘ ", "", padding_width);
+        terminal.MoveTo(top + height - 1, Block2Col(left)).Output(fmt::format(" └{:─<{}}┘ ", "", padding_width));
     } else if constexpr (style == WindowStyle::kStyle2) {
-        terminal.move_to(top, Block2Col(left)).output(" ╔{:═^{}}╗ ", title, padding_width);
+        terminal.MoveTo(top, Block2Col(left)).Output(fmt::format(" ╔{:═^{}}╗ ", title, padding_width));
         for (int i = 1; i < height - 1; i++) {
-            terminal.move_to(top + i, Block2Col(left)).output(" ║{:<{}}║ ", "", padding_width);
+            terminal.MoveTo(top + i, Block2Col(left)).Output(fmt::format(" ║{:<{}}║ ", "", padding_width));
         }
-        terminal.move_to(top + height - 1, Block2Col(left)).output(" ╚{:═<{}}╝ ", "", padding_width);
+        terminal.MoveTo(top + height - 1, Block2Col(left)).Output(fmt::format(" ╚{:═<{}}╝ ", "", padding_width));
     } else if constexpr (style == WindowStyle::kStyle3) {
-        terminal.move_to(top, Block2Col(left)).output(" ┏{:━^{}}┓ ", title, padding_width);
+        terminal.MoveTo(top, Block2Col(left)).Output(fmt::format(" ┏{:━^{}}┓ ", title, padding_width));
         for (int i = 1; i < height - 1; i++) {
-            terminal.move_to(top + i, Block2Col(left)).output(" ┃{:<{}}┃ ", "", padding_width);
+            terminal.MoveTo(top + i, Block2Col(left)).Output(fmt::format(" ┃{:<{}}┃ ", "", padding_width));
         }
-        terminal.move_to(top + height - 1, Block2Col(left)).output(" ┗{:━<{}}┛ ", "", padding_width);
+        terminal.MoveTo(top + height - 1, Block2Col(left)).Output(fmt::format(" ┗{:━<{}}┛ ", "", padding_width));
     } else if constexpr (style == WindowStyle::kStyle4) {
-        terminal.move_to(top, Block2Col(left)).output(" ╭{:─^{}}╮ ", title, padding_width);
+        terminal.MoveTo(top, Block2Col(left)).Output(fmt::format(" ╭{:─^{}}╮ ", title, padding_width));
         for (int i = 1; i < height - 1; i++) {
-            terminal.move_to(top + i, Block2Col(left)).output(" │{:<{}}│ ", "", padding_width);
+            terminal.MoveTo(top + i, Block2Col(left)).Output(fmt::format(" │{:<{}}│ ", "", padding_width));
         }
-        terminal.move_to(top + height - 1, Block2Col(left)).output(" ╰{:─<{}}╯ ", "", padding_width);
+        terminal.MoveTo(top + height - 1, Block2Col(left)).Output(fmt::format(" ╰{:─<{}}╯ ", "", padding_width));
     }
 }
 
@@ -86,10 +88,10 @@ void DrawTetromino(const v1::Tetromino<M, N>& tetromino, int top, int left) {
     for (std::size_t i = 0; i < M; i++) {
         for (std::size_t j = 0; j < N; j++) {
             if (tetromino[i][j] > '0') {
-                terminal.move_to(top + i, Block2Col(left + j))
-                    .set_background_color(GetColor(tetromino[i][j]))
-                    .output("  ")
-                    .reset();
+                terminal.MoveTo(top + i, Block2Col(left + j))
+                    .SetBackgroundColor(GetColor(tetromino[i][j]))
+                    .Output("  ")
+                    .Reset();
             }
         }
     }
@@ -107,10 +109,10 @@ void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index)
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             if (GetBit(data, i, j)) {
-                terminal.move_to(top + i, Block2Col(left + j))
-                    .set_background_color(tetromino.color)
-                    .output("  ")
-                    .reset();
+                terminal.MoveTo(top + i, Block2Col(left + j))
+                    .SetBackgroundColor(tetromino.color)
+                    .Output("  ")
+                    .Reset();
             }
         }
     }
@@ -119,37 +121,52 @@ void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index)
 void DrawTetromino(const v3::TetrominoSet& tetromino_set, int top, int left, int index) {
     const auto& terminal = Terminal::GetInstance();
 
-    terminal.set_background_color(tetromino_set.color);
+    terminal.SetBackgroundColor(tetromino_set.color);
 
     // (dx, dy) -> (row, col)
     // row = row - dy;
     // col = col + dx;
     for (const auto& point : tetromino_set.data[index]) {
-        terminal.move_to(top - point.y, Block2Col(left + point.x)).output("  ");
+        terminal.MoveTo(top - point.y, Block2Col(left + point.x)).Output("  ");
     }
-    terminal.reset();
+    terminal.Reset();
+}
+
+/// @brief 初始化一个值均为 std::numeric_limits<int>::max() 的数组作为上一帧的缓存
+PlayField InitPrevFrame() {
+    PlayField play_field;
+    for (auto& row : play_field) {
+        row.fill(std::numeric_limits<int>::max());
+    }
+    return play_field;
 }
 
 void DrawFrame(const PlayField& frame, int top, int left) {
+    static PlayField prev_frame = InitPrevFrame();
+
     const auto& terminal = Terminal::GetInstance();
 
     const std::size_t kRowMax = frame[0].size() - 2;
     for (std::size_t x = 0; x < frame.size(); x++) {
         for (std::size_t y = 0; y < kRowMax; y++) {
+            if (prev_frame[x][y] == frame[x][y]) [[likely]] {
+                continue;
+            }
+            prev_frame[x][y] = frame[x][y];
+
             int row = top + kRowMax - y - 1;
             int col = left + x;
-            terminal.move_to(row, Block2Col(col)).reset();
+            terminal.MoveTo(row, Block2Col(col)).Reset();
             if (frame[x][y] > 0) {
-                terminal.set_background_color(static_cast<ColorId>(frame[x][y])).output("  ");
+                terminal.SetBackgroundColor(static_cast<ColorId>(frame[x][y])).Output("  ");
             } else if (frame[x][y] < 0) {
-                // terminal.set_color(static_cast<ColorId>(-frame[x][y])).output("\u25e3\u25e5");
-                terminal.set_color(static_cast<ColorId>(-frame[x][y])).output("**");
+                terminal.SetColor(static_cast<ColorId>(-frame[x][y])).Output("**");
             } else {
-                terminal.output("\u30FB");
+                terminal.Output("\u30FB");
             }
         }
     }
-    terminal.reset();
+    terminal.Reset().Flush();
 }
 
 }  // namespace tetris

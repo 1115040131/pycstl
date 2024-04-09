@@ -83,16 +83,14 @@ enum class ColorId {
 };
 
 /// @brief 移动光标
-inline std::string MoveTo(int line, int column) { return fmt::format("{}{};{}H", CSI, line, column); }
+inline std::string MoveTo(int line, int column) { return fmt::format(CSI "{};{}H", line, column); }
 
 /// @brief 设置前景色
-inline std::string SetColor(ColorId color_id) {
-    return fmt::format("{}38;5;{}m", CSI, static_cast<int>(color_id));
-}
+inline std::string SetColor(ColorId color_id) { return fmt::format(CSI "38;5;{}m", static_cast<int>(color_id)); }
 
 /// @brief 设置背景色
 inline std::string SetBackgroundColor(ColorId color_id) {
-    return fmt::format("{}48;5;{}m", CSI, static_cast<int>(color_id));
+    return fmt::format(CSI "48;5;{}m", static_cast<int>(color_id));
 }
 
 }  // namespace tetris

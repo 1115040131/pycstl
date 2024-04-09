@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fmt/core.h>
+#include <iostream>
 
 #include "common/singleton.h"
 #include "tetris/ansi.h"
@@ -12,71 +12,45 @@ class Terminal : public Singleton<Terminal> {
     friend class Singleton<Terminal>;
 
 public:
-    static void Flush() { fmt::println(""); }
+    void Flush(std::ostream& os = std::cout) const { os << std::flush; }
 
-    template <typename... Args>
-    static void Output(fmt::format_string<Args...> fmt, Args&&... args) {
-        fmt::print(fmt, std::forward<Args>(args)...);
-    }
-
-    static void MoveTo(int line, int column) {
-        { fmt::print("{}", ::pyc::tetris::MoveTo(line, column)); }
-    }
-
-    static void Clear() { fmt::print("{}", kClear); }
-
-    static void Reset() { fmt::print("{}", kReset); }
-
-    static void SetColor(ColorId color_id) { fmt::print("{}", ::pyc::tetris::SetColor(color_id)); }
-
-    static void SetBackgroundColor(ColorId color_id) {
-        fmt::print("{}", ::pyc::tetris::SetBackgroundColor(color_id));
-    }
-
-    static void HideCursor() { fmt::print("{}", kCursorInvisible); }
-
-    static void ShowCursor() { fmt::print("{}", kCursorVisible); }
-
-    void flush() const { Flush(); }
-
-    template <typename... Args>
-    const Terminal& output(fmt::format_string<Args...> fmt, Args&&... args) const {
-        Output(fmt, std::forward<Args>(args)...);
+    const Terminal& Output(std::string_view msg, std::ostream& os = std::cout) const {
+        os << msg;
         return *this;
     }
 
-    const Terminal& move_to(int line, int column) const {
-        MoveTo(line, column);
+    const Terminal& MoveTo(int line, int column, std::ostream& os = std::cout) const {
+        os << ::pyc::tetris::MoveTo(line, column);
         return *this;
     }
 
-    const Terminal& clear() const {
-        Clear();
+    const Terminal& Clear(std::ostream& os = std::cout) const {
+        os << kClear;
         return *this;
     }
 
-    const Terminal& reset() const {
-        Reset();
+    const Terminal& Reset(std::ostream& os = std::cout) const {
+        os << kReset;
         return *this;
     }
 
-    const Terminal& set_color(ColorId color_id) const {
-        SetColor(color_id);
+    const Terminal& SetColor(ColorId color_id, std::ostream& os = std::cout) const {
+        os << ::pyc::tetris::SetColor(color_id);
         return *this;
     }
 
-    const Terminal& set_background_color(ColorId color_id) const {
-        SetBackgroundColor(color_id);
+    const Terminal& SetBackgroundColor(ColorId color_id, std::ostream& os = std::cout) const {
+        os << ::pyc::tetris::SetBackgroundColor(color_id);
         return *this;
     }
 
-    const Terminal& hide_cursor() const {
-        HideCursor();
+    const Terminal& HideCursor(std::ostream& os = std::cout) const {
+        os << kCursorInvisible;
         return *this;
     }
 
-    const Terminal& show_cursor() const {
-        ShowCursor();
+    const Terminal& ShowCursor(std::ostream& os = std::cout) const {
+        os << kCursorVisible;
         return *this;
     }
 };

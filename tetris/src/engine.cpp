@@ -13,50 +13,46 @@ namespace tetris {
 using namespace std::literals::chrono_literals;
 
 void Engine::Init() {
-    Terminal::HideCursor();
+    // 绘制窗口
+    Terminal::GetInstance().HideCursor().Clear();
+    DrawWindow<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
+    DrawWindow<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
+    DrawWindow<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
+    DrawWindow<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
+    DrawWindow(1, 22, 8, 18, "Next");
+
     Control::StartListener();  // 开启键盘监听
     Game::GetInstance().Init();
-
-    prev_time_ = std::chrono::steady_clock::now();
 }
 
 void Engine::Loop() {
     auto& game = Game::GetInstance();
 
+    auto prev_time = std::chrono::steady_clock::now();
     while (Game::GetInstance().Running()) {
         auto end_time = std::chrono::steady_clock::now();
-        auto delta = end_time - prev_time_;
-        prev_time_ = end_time;
+        auto delta = end_time - prev_time;
+        prev_time = end_time;
 
         game.Process(delta);
-
-        // 重绘窗口
-        Terminal::Clear();
-
-        DrawWindow<WindowStyle::kStyle1>(1, 1, 9, 6, "Hold");
-        DrawWindow<WindowStyle::kStyle2>(1, 10, 12, 22, "Tetriz");
-        DrawWindow<WindowStyle::kStyle3>(7, 1, 9, 16, "Status");
-        DrawWindow<WindowStyle::kStyle4>(19, 22, 8, 4, "Info");
-        DrawWindow(1, 22, 8, 18, "Next");
 
         UpdateFps(delta);
 
         game.Render();
 
-        Terminal::Flush();
-        std::this_thread::sleep_for(50ms);
+        std::this_thread::sleep_for(10ms);
     }
 }
 
 void Engine::Exit() {
     Terminal::GetInstance()
-        .show_cursor()
-        .reset()
-        .clear()
-        .move_to(1, 1)
-        .set_color(ColorId::kBrightRed)
-        .output("Bye!")
-        .flush();
+        .ShowCursor()
+        .Reset()
+        .Clear()
+        .MoveTo(1, 1)
+        .SetColor(ColorId::kBrightRed)
+        .Output("Bye!")
+        .Flush();
 }
 
 void Engine::UpdateFps(std::chrono::nanoseconds delta) {
@@ -65,12 +61,12 @@ void Engine::UpdateFps(std::chrono::nanoseconds delta) {
     total += delta;
     frame_count++;
     if (total >= 1s) {
-        fps_ = frame_count / std::chrono::duration_cast<std::chrono::seconds>(total).count();
+        Terminal::GetInstance().MoveTo(10, 4).Output(
+            fmt::format("FPS: {}", frame_count / std::chrono::duration_cast<std::chrono::seconds>(total).count()));
+
         total = std::chrono::nanoseconds{};
         frame_count = 0;
     }
-
-    Terminal::GetInstance().move_to(10, 4).output("FPS: {}", fps_);
 }
 
 }  // namespace tetris
