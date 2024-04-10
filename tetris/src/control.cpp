@@ -17,36 +17,42 @@ void Control::StartListener() {
         ::tcgetattr(STDIN_FILENO, &original_termios);
         termios raw_termios = original_termios;
         // 修改终端设置为原始模式
-        cfmakeraw(&raw_termios);
+        ::cfmakeraw(&raw_termios);
         // 应用新的终端设置
-        tcsetattr(STDIN_FILENO, TCSANOW, &raw_termios);
+        ::tcsetattr(STDIN_FILENO, TCSANOW, &raw_termios);
 
         Control::ProcessCommand();
 
         // 恢复终端设置
-        tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
+        ::tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
     });
 }
 
 void Control::ProcessCommand() {
     while (Game::GetInstance().Running()) {
         switch (std::cin.get()) {
-            case kKeyQ:
+            case KeyQ:
                 Game::GetInstance().Quit();
                 break;
-            case kKeyW:
-                Game::GetInstance().Rotate();
+            case KeyW:
+                Game::GetInstance().RotateR();
                 break;
-            case kKeyA:
+            case KeyA:
                 Game::GetInstance().Left();
                 break;
-            case kKeyD:
+            case KeyD:
                 Game::GetInstance().Right();
                 break;
-            case kKeyS:
+            case KeyS:
                 Game::GetInstance().Down();
                 break;
-            case kKeySpace:
+            case KeyZ:
+                Game::GetInstance().RotateL();
+                break;
+            case KeyX:
+                Game::GetInstance().Rotate2();
+                break;
+            case KeySpace:
                 Game::GetInstance().Drop();
                 break;
             default:

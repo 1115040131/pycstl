@@ -13,12 +13,14 @@ private:
     static void ProcessCommand();
 
 private:
-    static constexpr char kKeyQ = 'q';
-    static constexpr char kKeyW = 'w';
-    static constexpr char kKeyA = 'a';
-    static constexpr char kKeyD = 'd';
-    static constexpr char kKeyS = 's';
-    static constexpr char kKeySpace = ' ';
+    static constexpr char KeyQ = 'q';
+    static constexpr char KeyW = 'w';
+    static constexpr char KeyA = 'a';
+    static constexpr char KeyS = 's';
+    static constexpr char KeyD = 'd';
+    static constexpr char KeyZ = 'z';
+    static constexpr char KeyX = 'x';
+    static constexpr char KeySpace = ' ';
 };
 
 }  // namespace tetris

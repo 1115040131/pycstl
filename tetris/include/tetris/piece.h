@@ -5,8 +5,6 @@
 namespace pyc {
 namespace tetris {
 
-
-
 struct Piece {
     TetrominoSet tetromino_set;
     // 正交直角坐标
@@ -23,16 +21,22 @@ struct Piece {
 
     bool Test(int target_x, int target_y, int target_index) const;
 
-    bool Rotate() { return Move(0, 0, (index + 1) % 4); }
+    bool RotateL() { Rotate((index + 3) % 4); }
 
-    bool Left() { return Move(-1, 0, index); }
+    bool RotateR() { Rotate((index + 1) % 4); }
 
-    bool Right() { return Move(1, 0, index); }
+    bool Rotate2() { Rotate((index + 2) % 4); }
 
-    bool Down() { return Move(0, -1, index); }
+    bool Left() { return Transform(-1, 0, index); }
+
+    bool Right() { return Transform(1, 0, index); }
+
+    bool Down() { return Transform(0, -1, index); }
 
 private:
-    bool Move(int dx, int dy, int target_index);
+    bool Transform(int dx, int dy, int target_index);
+
+    bool Rotate(int target_index);
 };
 
 }  // namespace tetris

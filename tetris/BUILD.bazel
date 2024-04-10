@@ -13,6 +13,7 @@ cc_binary(
         "include/tetris/*.h",
     ]),
     copts = COPTS,
+    data = glob(["resource/**"]),
     includes = ["include"],
     deps = [
         "//common",

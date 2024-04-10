@@ -1,7 +1,10 @@
 #include "tetris/game.h"
 
 #include <algorithm>
+#include <cassert>
+#include <fstream>
 #include <random>
+#include <ranges>
 #include <vector>
 
 #include "tetris/draw.h"
@@ -42,6 +45,8 @@ void Game::Init() {
     for (std::size_t i = 0; i < kPreviewSize; i++) {
         preview_.push_back(PickPiece());
     }
+
+    Load();
 
     running_ = true;
 }
@@ -114,6 +119,27 @@ void Game::Clear() {
             std::rotate(iter, iter + 1, play_field_.end());
         } else {
             ++iter;
+        }
+    }
+}
+
+void Game::Drop() {
+    lock_flag_ = true;
+    while (piece_.Down())
+        ;
+}
+
+void Game::Load() {
+    std::ifstream fs("tetris/resource/map.txt");
+    assert(fs.is_open());
+
+    std::string line;
+    for (auto& row : play_field_ | std::ranges::views::take(20) | std::ranges::views::reverse) {
+        std::getline(fs, line);
+        for (std::size_t i = 0; i < kPlayFieldRow; i++) {
+            if (line[i] == '1') {
+                row[i] = static_cast<int>(ColorId::kBrightWhite);
+            }
         }
     }
 }

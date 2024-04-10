@@ -51,7 +51,7 @@ void Engine::Exit() {
         .Clear()
         .MoveTo(1, 1)
         .SetColor(ColorId::kBrightRed)
-        .Output("Bye!")
+        .Output("Bye!\n")
         .Flush();
 }
 
@@ -61,8 +61,8 @@ void Engine::UpdateFps(std::chrono::nanoseconds delta) {
     total += delta;
     frame_count++;
     if (total >= 1s) {
-        Terminal::GetInstance().MoveTo(10, 4).Output(
-            fmt::format("FPS: {}", frame_count / std::chrono::duration_cast<std::chrono::seconds>(total).count()));
+        Terminal::GetInstance().MoveTo(10, 4).Output(fmt::format(
+            "FPS: {:<3}", frame_count / std::chrono::duration_cast<std::chrono::seconds>(total).count()));
 
         total = std::chrono::nanoseconds{};
         frame_count = 0;

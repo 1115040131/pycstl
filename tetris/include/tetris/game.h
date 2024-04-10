@@ -28,9 +28,21 @@ public:
 private:
     void Quit() { running_ = false; }
 
-    void Rotate() {
+    void Rotate2() {
         if (!lock_flag_) {
-            piece_.Rotate();
+            piece_.Rotate2();
+        }
+    }
+
+    void RotateR() {
+        if (!lock_flag_) {
+            piece_.RotateR();
+        }
+    }
+
+    void RotateL() {
+        if (!lock_flag_) {
+            piece_.RotateL();
         }
     }
 
@@ -59,11 +71,10 @@ private:
     void Clear();
 
     /// @brief 直落
-    void Drop() {
-        lock_flag_ = true;
-        while (piece_.Down())
-            ;
-    }
+    void Drop();
+
+    /// @brief 载入预设地图
+    void Load();
 
 private:
     bool running_{false};
