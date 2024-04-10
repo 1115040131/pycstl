@@ -26,5 +26,7 @@ void DrawFrame(const Matrix& frame, int top, int left);
 
 void DrawPreview(const Matrix& preview, int top, int left);
 
+void DrawHold(const Matrix& hold, int top,int left);
+
 }  // namespace tetris
 }  // namespace pyc

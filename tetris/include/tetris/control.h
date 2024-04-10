@@ -20,6 +20,7 @@ private:
     static constexpr char KeyD = 'd';
     static constexpr char KeyZ = 'z';
     static constexpr char KeyX = 'x';
+    static constexpr char KeyC = 'c';
     static constexpr char KeySpace = ' ';
 };
 

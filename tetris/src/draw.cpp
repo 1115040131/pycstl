@@ -186,5 +186,30 @@ void DrawPreview(const Matrix& preview, int top, int left) {
     terminal.Reset().Flush();
 }
 
+void DrawHold(const Matrix& hold, int top, int left) {
+    static Matrix prev(kHoldRow, std::vector<int>(kHoldCol, std::numeric_limits<int>::max()));
+
+    const auto& terminal = Terminal::GetInstance();
+
+    for (std::size_t y = 0; y < kHoldRow; y++) {
+        for (std::size_t x = 0; x < kHoldCol; x++) {
+            if (prev[y][x] == hold[y][x]) [[likely]] {
+                continue;
+            }
+            prev[y][x] = hold[y][x];
+
+            int row = top + kHoldRow - y - 1;
+            int col = left + x;
+            terminal.MoveTo(row, Block2Col(col)).Reset();
+            if (hold[y][x] > 0) {
+                terminal.SetBackgroundColor(static_cast<ColorId>(hold[y][x])).Output("  ");
+            } else {
+                terminal.Output("  ");
+            }
+        }
+    }
+    terminal.Reset().Flush();
+}
+
 }  // namespace tetris
 }  // namespace pyc

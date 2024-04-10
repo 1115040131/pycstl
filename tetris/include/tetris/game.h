@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <list>
+#include <optional>
 
 #include "common/singleton.h"
 #include "tetris/piece.h"
@@ -26,40 +27,49 @@ public:
     const Matrix& GetPlayField() { return play_field_; }
 
 private:
+    /// @brief 随机生成一个块
+    Piece GeneratePiece();
+
+    /// @brief 获取一个 piece
+    void PickPiece();
+
+    /// @brief 载入预设地图
+    void Load();
+
     void Quit() { running_ = false; }
 
     void Rotate2() {
-        if (!lock_flag_) {
+        if (!locking_) {
             piece_.Rotate2();
         }
     }
 
     void RotateR() {
-        if (!lock_flag_) {
+        if (!locking_) {
             piece_.RotateR();
         }
     }
 
     void RotateL() {
-        if (!lock_flag_) {
+        if (!locking_) {
             piece_.RotateL();
         }
     }
 
     void Left() {
-        if (!lock_flag_) {
+        if (!locking_) {
             piece_.Left();
         }
     }
 
     void Right() {
-        if (!lock_flag_) {
+        if (!locking_) {
             piece_.Right();
         }
     }
 
     void Down() {
-        if (!lock_flag_) {
+        if (!locking_) {
             piece_.Down();
         }
     }
@@ -73,16 +83,22 @@ private:
     /// @brief 直落
     void Drop();
 
-    /// @brief 载入预设地图
-    void Load();
+    /// @brief 暂存
+    void Hold();
 
 private:
+    static constexpr int kPieceInitX = 4;
+    static constexpr int kPieceInitY = 20;
+    static constexpr int kPieceInitIndex = 0;
+
     bool running_{false};
+    bool locking_ = false;
+    bool holding_ = false;  // 是否使用过暂存
+
     Matrix play_field_ = std::vector<std::vector<int>>(kPlayFieldRow, std::vector<int>(kPlayFieldCol));
     Piece piece_{};
-    std::list<Piece> preview_;  // 预览队列
-
-    bool lock_flag_ = false;
+    std::list<Piece> preview_;         // 预览队列
+    std::optional<Piece> hold_piece_;  // 暂存块
 };
 
 }  // namespace tetris

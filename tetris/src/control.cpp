@@ -52,6 +52,9 @@ void Control::ProcessCommand() {
             case KeyX:
                 Game::GetInstance().Rotate2();
                 break;
+            case KeyC:
+                Game::GetInstance().Hold();
+                break;
             case KeySpace:
                 Game::GetInstance().Drop();
                 break;
