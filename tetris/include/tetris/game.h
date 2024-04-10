@@ -11,18 +11,26 @@
 namespace pyc {
 namespace tetris {
 
+using namespace std::chrono_literals;
+
 class Game : public Singleton<Game> {
     friend class Singleton<Game>;
     friend class Control;
 
 public:
-    bool Running() const { return running_; }
-
     void Init();
 
     void Process(std::chrono::nanoseconds delta);
 
-    void Render();
+    bool Running() const { return running_; }
+
+    bool Ending() const { return ending_; }
+
+    int Level() const { return level_; }
+
+    int Score() const { return score_; }
+
+    int Lines() const { return lines_; }
 
     const Matrix& GetPlayField() { return play_field_; }
 
@@ -35,6 +43,9 @@ private:
 
     /// @brief 载入预设地图
     void Load();
+
+    /// @brief 渲染
+    void Render();
 
     void Quit() { running_ = false; }
 
@@ -86,14 +97,31 @@ private:
     /// @brief 暂存
     void Hold();
 
+    /// @brief 升级
+    void Levelup();
+
 private:
     static constexpr int kPieceInitX = 4;
     static constexpr int kPieceInitY = 20;
     static constexpr int kPieceInitIndex = 0;
 
     bool running_{false};
-    bool locking_ = false;
-    bool holding_ = false;  // 是否使用过暂存
+    bool locking_{false};
+    bool holding_{false};  // 是否使用过暂存
+    bool ending_{false};
+
+    /*
+    Single 100 x level
+    Double 300 x level
+    Triple 500 x level
+    Tetris 800 x level
+    Soft Drop 1
+    Hard Drop 2
+    */
+    int level_ = 1;
+    int score_ = 0;
+    int lines_ = 0;
+    std::chrono::duration<double> down_duration_{800ms};
 
     Matrix play_field_ = std::vector<std::vector<int>>(kPlayFieldRow, std::vector<int>(kPlayFieldCol));
     Piece piece_{};

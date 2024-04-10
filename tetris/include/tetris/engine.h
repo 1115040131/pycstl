@@ -18,7 +18,7 @@ public:
     void Exit();
 
 private:
-    void UpdateFps(std::chrono::nanoseconds delta);
+    void Update(std::chrono::nanoseconds delta);
 };
 
 }  // namespace tetris

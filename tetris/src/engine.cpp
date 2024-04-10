@@ -36,9 +36,7 @@ void Engine::Loop() {
 
         game.Process(delta);
 
-        UpdateFps(delta);
-
-        game.Render();
+        Update(delta);
 
         std::this_thread::sleep_for(10ms);
     }
@@ -55,17 +53,35 @@ void Engine::Exit() {
         .Flush();
 }
 
-void Engine::UpdateFps(std::chrono::nanoseconds delta) {
+void Engine::Update(std::chrono::nanoseconds delta) {
     static std::chrono::nanoseconds total{};
     static std::size_t frame_count{};
     total += delta;
     frame_count++;
+
+    const auto& terminal = Terminal::GetInstance();
+    const auto& game = Game::GetInstance();
+
     if (total >= 1s) {
-        Terminal::GetInstance().MoveTo(10, 4).Output(fmt::format(
+        terminal.MoveTo(10, 4).Output(fmt::format(
             "FPS: {:<3}", frame_count / std::chrono::duration_cast<std::chrono::seconds>(total).count()));
 
         total = std::chrono::nanoseconds{};
         frame_count = 0;
+    }
+
+    terminal.MoveTo(12, 4)
+        .Output(fmt::format("Level: {}", game.Level()))
+        .MoveTo(13, 4)
+        .Output(fmt::format("Score: {}", game.Score()))
+        .MoveTo(14, 4)
+        .Output(fmt::format("Lines: {}", game.Lines()));
+
+    static bool draw_end = false;
+    if (game.Ending() && !draw_end) {
+        draw_end = true;
+        DrawWindow<WindowStyle::kStyle4>(9, 12, 8, 3, "");
+        terminal.MoveTo(10, 26).SetColor(ColorId::kBrightRed).Output("Game Over!").Reset();
     }
 }
 

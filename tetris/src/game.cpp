@@ -45,6 +45,10 @@ void Game::PickPiece() {
         preview_.pop_front();
     }
 
+    if (!piece_.Test(kPieceInitX, kPieceInitY, kPieceInitIndex)) {
+        ending_ = true;
+    }
+
     // 补充预览队列
     constexpr std::size_t kPreviewSize = 5;
     while (preview_.size() < kPreviewSize) {
@@ -74,25 +78,31 @@ void Game::Load() {
 }
 
 void Game::Process(std::chrono::nanoseconds delta) {
-    static std::chrono::nanoseconds lag;
-    static constexpr auto kDownDuration = 500ms;
+    if (ending_) {
+        return;
+    }
+
+    static std::chrono::duration<double> lag;
     lag += delta;
-    if (lag >= kDownDuration) {
-        lag -= kDownDuration;
+    if (lag >= down_duration_) {
+        lag -= down_duration_;
 
         // 无法继续下落时, 依然可以调整位置或者旋转), 下一周期再真正锁定
         if (!piece_.Down()) {
             if (locking_) {
                 Lock();
                 Clear();
+                Levelup();
                 PickPiece();
                 locking_ = false;
                 holding_ = false;
             } else {
                 locking_ = true;
+                score_++;  // Soft Drop
             }
         }
     }
+    Render();
 }
 
 void Game::Render() {
@@ -142,6 +152,7 @@ void Game::Lock() {
 }
 
 void Game::Clear() {
+    int count = 0;  // 消除行数
     for (auto iter = play_field_.begin(); iter != play_field_.end();) {
         bool full = true;
         for (int cell : *iter) {
@@ -153,16 +164,29 @@ void Game::Clear() {
         if (full) {
             iter->assign(kPlayFieldCol, 0);
             std::rotate(iter, iter + 1, play_field_.end());
+            count++;
         } else {
             ++iter;
         }
     }
+
+    if (count == 1) {
+        score_ += 100 * level_;
+    } else if (count == 2) {
+        score_ += 300 * level_;
+    } else if (count == 3) {
+        score_ += 500 * level_;
+    } else if (count == 4) {
+        score_ += 800 * level_;
+    }
+    lines_ += count;
 }
 
 void Game::Drop() {
     locking_ = true;
     while (piece_.Down())
         ;
+    score_ += 2;  // Hard Drop
 }
 
 // 1. 如果暂存区为空, 当前块放入暂存区, 重新生成一个块从头掉落
@@ -180,6 +204,11 @@ void Game::Hold() {
             piece_.y = kPieceInitY;
         }
     }
+}
+
+void Game::Levelup() {
+    level_ = lines_ / 1 + 1;
+    down_duration_ = std::chrono::duration<double>(std::pow((0.8 - (level_ - 1) * 0.007), level_ - 1));
 }
 
 }  // namespace tetris
