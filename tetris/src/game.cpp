@@ -239,7 +239,7 @@ void Game::Hold() {
 }
 
 void Game::Levelup() {
-    level_ = lines_ / 1 + 1;
+    level_ = lines_ / 10 + 1;
     down_duration_ = std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::duration<double>(std::pow((0.8 - (level_ - 1) * 0.007), level_ - 1)));
 }
