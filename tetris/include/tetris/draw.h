@@ -22,11 +22,11 @@ void DrawTetromino(const v2::Tetromino& tetromino, int top, int left, int index)
 
 void DrawTetromino(const v3::TetrominoSet& tetromino_set, int top, int left, int index);
 
-void DrawFrame(const Matrix& frame, int top, int left);
+void DrawFrame(const Matrix& frame, int top, int left, bool clear_buffer);
 
 void DrawPreview(const Matrix& preview, int top, int left);
 
-void DrawHold(const Matrix& hold, int top,int left);
+void DrawHold(const Matrix& hold, int top, int left);
 
 }  // namespace tetris
 }  // namespace pyc

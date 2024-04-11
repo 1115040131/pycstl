@@ -132,9 +132,13 @@ void DrawTetromino(const v3::TetrominoSet& tetromino_set, int top, int left, int
     terminal.Reset();
 }
 
-void DrawFrame(const Matrix& frame, int top, int left) {
+void DrawFrame(const Matrix& frame, int top, int left, bool clear_buffer) {
     /// @brief 初始化一个值均为 std::numeric_limits<int>::max() 的数组作为上一帧的缓存
     static Matrix prev_frame(kPlayFieldRow - 2, std::vector<int>(kPlayFieldCol, std::numeric_limits<int>::max()));
+    if (clear_buffer) {
+        prev_frame = std::vector<std::vector<int>>(
+            kPlayFieldRow - 2, std::vector<int>(kPlayFieldCol, std::numeric_limits<int>::max()));
+    }
 
     const auto& terminal = Terminal::GetInstance();
 
@@ -158,7 +162,7 @@ void DrawFrame(const Matrix& frame, int top, int left) {
             }
         }
     }
-    terminal.Reset().Flush();
+    terminal.Reset();
 }
 
 void DrawPreview(const Matrix& preview, int top, int left) {
@@ -183,7 +187,7 @@ void DrawPreview(const Matrix& preview, int top, int left) {
             }
         }
     }
-    terminal.Reset().Flush();
+    terminal.Reset();
 }
 
 void DrawHold(const Matrix& hold, int top, int left) {
@@ -208,7 +212,7 @@ void DrawHold(const Matrix& hold, int top, int left) {
             }
         }
     }
-    terminal.Reset().Flush();
+    terminal.Reset();
 }
 
 }  // namespace tetris

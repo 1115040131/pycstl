@@ -21,7 +21,7 @@ void Control::StartListener() {
         // 应用新的终端设置
         ::tcsetattr(STDIN_FILENO, TCSANOW, &raw_termios);
 
-        Control::ProcessCommand();
+        ProcessCommand();
 
         // 恢复终端设置
         ::tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
@@ -54,6 +54,12 @@ void Control::ProcessCommand() {
                 break;
             case KeyC:
                 Game::GetInstance().Hold();
+                break;
+            case KeyR:
+                Game::GetInstance().Reset();
+                break;
+            case KeyH:
+                Game::GetInstance().Help();
                 break;
             case KeySpace:
                 Game::GetInstance().Drop();

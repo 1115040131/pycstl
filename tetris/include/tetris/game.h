@@ -26,13 +26,23 @@ public:
 
     bool Ending() const { return ending_; }
 
+    bool Helping() const { return helping_; }
+
+    std::size_t FPS() const { return fps_; }
+
     int Level() const { return level_; }
 
     int Score() const { return score_; }
 
     int Lines() const { return lines_; }
 
-    const Matrix& GetPlayField() { return play_field_; }
+    const Matrix& GetPlayField() const { return play_field_; }
+
+    const Matrix& GetFrame() const { return frame_; }
+
+    const Matrix& GetPreviewField() const { return preview_field_; }
+
+    const Matrix& GetHoldField() const { return hold_field_; }
 
 private:
     /// @brief 随机生成一个块
@@ -43,6 +53,12 @@ private:
 
     /// @brief 载入预设地图
     void Load();
+
+    void UpdateFps(std::chrono::nanoseconds delta);
+
+    void UpdateLogic(std::chrono::nanoseconds delta);
+
+    void UpdateRender();
 
     /// @brief 渲染
     void Render();
@@ -100,6 +116,12 @@ private:
     /// @brief 升级
     void Levelup();
 
+    /// @brief 重置
+    void Reset();
+
+    /// @brief 展示 Help
+    void Help();
+
 private:
     static constexpr int kPieceInitX = 4;
     static constexpr int kPieceInitY = 20;
@@ -109,7 +131,9 @@ private:
     bool locking_{false};
     bool holding_{false};  // 是否使用过暂存
     bool ending_{false};
+    bool helping_{false};
 
+    std::size_t fps_ = 0;
     /*
     Single 100 x level
     Double 300 x level
@@ -121,12 +145,20 @@ private:
     int level_ = 1;
     int score_ = 0;
     int lines_ = 0;
-    std::chrono::duration<double> down_duration_{800ms};
+    std::chrono::nanoseconds down_duration_{800ms};
 
     Matrix play_field_ = std::vector<std::vector<int>>(kPlayFieldRow, std::vector<int>(kPlayFieldCol));
     Piece piece_{};
-    std::list<Piece> preview_;         // 预览队列
+
+    std::vector<TetrominoSet> bags_;
+    std::list<Piece> preview_;  // 预览队列
+
     std::optional<Piece> hold_piece_;  // 暂存块
+
+    // 渲染用
+    Matrix frame_;
+    Matrix preview_field_;
+    Matrix hold_field_;
 };
 
 }  // namespace tetris

@@ -16,9 +16,6 @@ public:
     void Loop();
 
     void Exit();
-
-private:
-    void Update(std::chrono::nanoseconds delta);
 };
 
 }  // namespace tetris

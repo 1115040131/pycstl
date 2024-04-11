@@ -21,6 +21,8 @@ private:
     static constexpr char KeyZ = 'z';
     static constexpr char KeyX = 'x';
     static constexpr char KeyC = 'c';
+    static constexpr char KeyR = 'r';
+    static constexpr char KeyH = 'h';
     static constexpr char KeySpace = ' ';
 };
 

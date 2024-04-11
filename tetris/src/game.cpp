@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include <random>
 #include <ranges>
 #include <vector>
@@ -19,20 +20,20 @@ Piece Game::GeneratePiece() {
     // 方块原型
     static constexpr std::array<TetrominoSet, 7> kPrototypes{
         prototype::I, prototype::J, prototype::L, prototype::O, prototype::S, prototype::T, prototype::Z};
+
     // bag7 算法
-    static std::vector<TetrominoSet> bags(kPrototypes.begin(), kPrototypes.end());
+    if (bags_.empty()) {
+        bags_.assign(kPrototypes.begin(), kPrototypes.end());
+    }
 
     // 随机数生成器初始化
     static std::random_device rd;   // 用于获得种子
     static std::mt19937 gen(rd());  // 使用 Mersenne Twister 算法
+    std::uniform_int_distribution<> dis(0, bags_.size() - 1);
 
-    std::uniform_int_distribution<> dis(0, bags.size() - 1);
     int index = dis(gen);
-    auto result = std::move(bags[index]);
-    bags.erase(bags.begin() + index);
-    if (bags.empty()) {
-        bags.assign(kPrototypes.begin(), kPrototypes.end());
-    }
+    auto result = std::move(bags_[index]);
+    bags_.erase(bags_.begin() + index);
 
     return Piece{std::move(result), kPieceInitX, kPieceInitY, kPieceInitIndex, Piece::Type::kNormal};
 }
@@ -57,9 +58,22 @@ void Game::PickPiece() {
 }
 
 void Game::Init() {
+    running_ = true;
+    locking_ = false;
+    holding_ = false;
+    ending_ = false;
+    level_ = 1;
+    score_ = 0;
+    lines_ = 0;
+    down_duration_ = 800ms;
+
+    play_field_ = std::vector<std::vector<int>>(kPlayFieldRow, std::vector<int>(kPlayFieldCol));
+    bags_.clear();
+    preview_.clear();
+    hold_piece_.reset();
+
     Load();
     PickPiece();
-    running_ = true;
 }
 
 void Game::Load() {
@@ -69,9 +83,11 @@ void Game::Load() {
     std::string line;
     for (auto& row : play_field_ | std::ranges::views::take(20) | std::ranges::views::reverse) {
         std::getline(fs, line);
-        for (std::size_t i = 0; i < kPlayFieldRow; i++) {
+        for (std::size_t i = 0; i < kPlayFieldCol; i++) {
             if (line[i] == '1') {
                 row[i] = static_cast<int>(ColorId::kBrightBlack);
+            } else {
+                row[i] = 0;
             }
         }
     }
@@ -81,8 +97,26 @@ void Game::Process(std::chrono::nanoseconds delta) {
     if (ending_) {
         return;
     }
+    UpdateFps(delta);
+    UpdateLogic(delta);
+    UpdateRender();
+}
 
-    static std::chrono::duration<double> lag;
+void Game::UpdateFps(std::chrono::nanoseconds delta) {
+    static std::chrono::nanoseconds lag{};
+    static std::size_t frame_count{};
+    lag += delta;
+    frame_count++;
+
+    if (lag >= 1s) {
+        fps_ = frame_count / std::chrono::duration_cast<std::chrono::seconds>(lag).count();
+        lag -= std::chrono::duration_cast<std::chrono::seconds>(lag);
+        frame_count = 0;
+    }
+}
+
+void Game::UpdateLogic(std::chrono::nanoseconds delta) {
+    static std::chrono::nanoseconds lag;
     lag += delta;
     if (lag >= down_duration_) {
         lag -= down_duration_;
@@ -102,34 +136,31 @@ void Game::Process(std::chrono::nanoseconds delta) {
             }
         }
     }
-    Render();
 }
 
-void Game::Render() {
+void Game::UpdateRender() {
     // frame
-    auto frame = play_field_;
-    Merge(frame, piece_);
+    frame_ = play_field_;
+    Merge(frame_, piece_);
     auto shadow = piece_;
     shadow.type = Piece::Type::kShadow;
     while (shadow.Down())
         ;
-    Merge(frame, shadow);
-    DrawFrame(frame, 2, 11);
+    Merge(frame_, shadow);
 
     // preview_field
-    Matrix preview_field(kPreviewRow, std::vector<int>(kPreviewCol));
+    preview_field_ = std::vector<std::vector<int>>(kPreviewRow, std::vector<int>(kPreviewCol));
     int y = 12;
     for (auto piece : preview_) {
         piece.x = 2;
         piece.y = y;
-        Merge(preview_field, piece);
+        Merge(preview_field_, piece);
         y -= 3;
     }
-    DrawPreview(preview_field, 2, 23);
 
     // hold_field
+    hold_field_ = std::vector<std::vector<int>>(kHoldRow, std::vector<int>(kHoldCol, 0));
     if (hold_piece_.has_value()) {
-        Matrix hold_field(kHoldRow, std::vector<int>(kHoldCol, 0));
         auto hold_piece = hold_piece_.value();
         hold_piece.x = 3;
         hold_piece.y = 1;
@@ -138,8 +169,7 @@ void Game::Render() {
         if (holding_) {
             hold_piece.tetromino_set.color = ColorId::kBrightWhite;
         }
-        Merge(hold_field, hold_piece);
-        DrawHold(hold_field, 2, 2);
+        Merge(hold_field_, hold_piece);
     }
 }
 
@@ -183,10 +213,12 @@ void Game::Clear() {
 }
 
 void Game::Drop() {
-    locking_ = true;
-    while (piece_.Down())
-        ;
-    score_ += 2;  // Hard Drop
+    if (!locking_) {
+        locking_ = true;
+        while (piece_.Down())
+            ;
+        score_ += 2;  // Hard Drop
+    }
 }
 
 // 1. 如果暂存区为空, 当前块放入暂存区, 重新生成一个块从头掉落
@@ -208,8 +240,13 @@ void Game::Hold() {
 
 void Game::Levelup() {
     level_ = lines_ / 1 + 1;
-    down_duration_ = std::chrono::duration<double>(std::pow((0.8 - (level_ - 1) * 0.007), level_ - 1));
+    down_duration_ = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::duration<double>(std::pow((0.8 - (level_ - 1) * 0.007), level_ - 1)));
 }
+
+void Game::Reset() { Init(); }
+
+void Game::Help() { helping_ = !helping_; }
 
 }  // namespace tetris
 }  // namespace pyc
