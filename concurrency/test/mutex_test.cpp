@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #include "common/noncopyable.h"
-#include "common/utils.h"
+#include "common/thread_id.h"
 
 namespace pyc {
 namespace concurrency {
@@ -180,7 +180,7 @@ private:
 };
 
 void DangerSwap(BigObjectManager& lhs, BigObjectManager& rhs) {
-    fmt::println("thread [{}] begin", GetThreadId());
+    fmt::println("thread [{}] begin", ThreadId());
     if (&lhs == &rhs) {
         return;
     }
@@ -191,11 +191,11 @@ void DangerSwap(BigObjectManager& lhs, BigObjectManager& rhs) {
     std::lock_guard<std::mutex> guard2(rhs.mutex_);
 
     std::swap(lhs.obj_, rhs.obj_);
-    fmt::println("thread [{}] end", GetThreadId());
+    fmt::println("thread [{}] end", ThreadId());
 }
 
 void SafeSwap(BigObjectManager& lhs, BigObjectManager& rhs) {
-    fmt::println("thread [{}] begin", GetThreadId());
+    fmt::println("thread [{}] begin", ThreadId());
     if (&lhs == &rhs) {
         return;
     }
@@ -207,11 +207,11 @@ void SafeSwap(BigObjectManager& lhs, BigObjectManager& rhs) {
     std::lock_guard<std::mutex> guard2(rhs.mutex_, std::adopt_lock);
 
     std::swap(lhs.obj_, rhs.obj_);
-    fmt::println("thread [{}] end", GetThreadId());
+    fmt::println("thread [{}] end", ThreadId());
 }
 
 void SafeSwapScope(BigObjectManager& lhs, BigObjectManager& rhs) {
-    fmt::println("thread [{}] begin", GetThreadId());
+    fmt::println("thread [{}] begin", ThreadId());
     if (&lhs == &rhs) {
         return;
     }
@@ -219,7 +219,7 @@ void SafeSwapScope(BigObjectManager& lhs, BigObjectManager& rhs) {
     std::scoped_lock guard(lhs.mutex_, rhs.mutex_);
 
     std::swap(lhs.obj_, rhs.obj_);
-    fmt::println("thread [{}] end", GetThreadId());
+    fmt::println("thread [{}] end", ThreadId());
 }
 
 // 发生死锁

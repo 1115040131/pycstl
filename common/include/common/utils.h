@@ -14,7 +14,4 @@ constexpr auto ToUnderlying(E e) -> typename std::underlying_type<E>::type {
 /// @brief 从带有作用域的函数名中删除命名空间和类名
 std::string_view GetSimpleName(std::string_view functionName);
 
-/// @brief 将线程 ID 转换为 string
-std::string GetThreadId();
-
 }  // namespace pyc

@@ -24,10 +24,4 @@ std::string_view GetSimpleName(std::string_view functionName) {
     return functionName;  // 如果没有找到 "(", 则返回原始字符串
 }
 
-std::string GetThreadId() {
-    std::stringstream ss;
-    ss << std::this_thread::get_id();
-    return ss.str();
-}
-
 }  // namespace pyc
