@@ -43,6 +43,19 @@ else
 	--gtest_filter='ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
 endif
 
+######################### build for logger #########################
+.PHONY: logger
+
+logger:
+	bazel build //logger //logger/test/...
+
+logger_test:
+ifdef TEST_FILTER
+	bazel test //logger/test:logger_all_test --test_output=all --test_filter="$(TEST_FILTER)"
+else
+	bazel test //logger/test:logger_all_test --test_output=all
+endif
+
 ######################### build for network #########################
 .PHONY: network
 
