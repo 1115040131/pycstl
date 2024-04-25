@@ -21,11 +21,11 @@ struct Piece {
 
     bool Test(int target_x, int target_y, int target_index) const;
 
-    bool RotateL() { Rotate((index + 3) % 4); }
+    bool RotateL() { return Rotate((index + 3) % 4); }
 
-    bool RotateR() { Rotate((index + 1) % 4); }
+    bool RotateR() { return Rotate((index + 1) % 4); }
 
-    bool Rotate2() { Rotate((index + 2) % 4); }
+    bool Rotate2() { return Rotate((index + 2) % 4); }
 
     bool Left() { return Transform(-1, 0, index); }
 
