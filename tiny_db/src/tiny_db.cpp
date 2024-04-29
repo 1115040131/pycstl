@@ -1,7 +1,7 @@
-#include "tiny_db/parser.h"
+#include "tiny_db/machine.h"
 
 int main() {
-    tiny_db::Parser parser;
-    parser.Start();
+    tiny_db::Machine machine;
+    machine.Start();
     return 0;
 }

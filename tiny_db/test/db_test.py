@@ -10,12 +10,12 @@ class TestDatabase(unittest.TestCase):
     def test_exit_and_unrecognized_command(self):
         result = self.run_script([
             "hello world",
-            "HELLO WORLD",
+            ".HELLO WORLD",
             ".exit",
         ])
         self.assertEqual(result, [
-            "db > Unrecognized command: hello world",
-            "db > Unrecognized command: HELLO WORLD",
+            "db > Unrecognized keyword at start of 'hello world'.",
+            "db > Unrecognized command: .HELLO WORLD",
             "db > Bye!",
         ])
 
