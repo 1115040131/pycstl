@@ -1,0 +1,5 @@
+py_test(
+    name = "db_test",
+    srcs = ["db_test.py"],
+    data = ["//tiny_db"],
+)

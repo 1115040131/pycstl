@@ -88,6 +88,18 @@ endif
 tetris:
 	bazel run //tetris
 
+######################### build for tiny_db #########################
+.PHONY: tiny_db
+
+tiny_db:
+	bazel build //tiny_db
+
+tiny_db_run:
+	bazel run //tiny_db
+
+tiny_db_test:
+	bazel run //tiny_db/test:db_test
+
 # 测试文件, 单独编译
 ######################### build for hello_world #########################
 .PHONY: hello_world
