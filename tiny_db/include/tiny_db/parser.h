@@ -18,15 +18,18 @@ private:
         kSuccess,
         kUnrecognizedCommand,
     };
+    MetaCommandResult DoMetaCommand(std::string_view command);
 
     enum class PrepareResult {
         kSuccess,
+        kNegtiveId,
+        kStringTooLong,
+        kSyntaxError,
+
         kUnrecognizedStatement,
     };
-
-    MetaCommandResult DoMetaCommand(std::string_view command);
-
     PrepareResult PrepareStatement(std::string_view input_line, Statement& statement);
+    PrepareResult PrepareInsert(std::string_view input_line, Statement& statement);
 };
 
 }  // namespace tiny_db

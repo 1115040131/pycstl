@@ -34,16 +34,45 @@ void Machine::Start() {
 }
 
 void Machine::ExecuteStatement(Statement& statement) {
+    ExecuteResult result;
     switch (statement.type) {
         case Statement::Type::kInsert:
-            fmt::println("Executing insert statement");
+            result = ExecuteInsert(statement);
             break;
         case Statement::Type::kSelect:
-            fmt::println("Executing select statement");
+            result = ExecuteSelect();
             break;
         default:
             break;
     }
+
+    switch (result) {
+        case ExecuteResult::kSuccess:
+            fmt::println("Executed.");
+            break;
+        case ExecuteResult::kTableFull:
+            fmt::println("Error: Table full.");
+            break;
+        default:
+            break;
+    }
+}
+
+Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
+    if (table_.num_rows >= kTableMaxRows) {
+        return ExecuteResult::kTableFull;
+    }
+
+    table_.GetRow(table_.num_rows) = statement.row_to_insert;
+    table_.num_rows++;
+    return ExecuteResult::kSuccess;
+}
+
+Machine::ExecuteResult Machine::ExecuteSelect() {
+    for (uint32_t i = 0; i < table_.num_rows; i++) {
+        fmt::println("{}", table_.GetRow(i).ToString());
+    }
+    return ExecuteResult::kSuccess;
 }
 
 }  // namespace tiny_db
