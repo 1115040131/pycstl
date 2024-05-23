@@ -1,22 +1,18 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
+#include "tiny_db/pager.h"
 #include "tiny_db/row.h"
 
 namespace tiny_db {
 
-inline constexpr uint32_t kPageSize = 4096;
-inline constexpr uint32_t kRowsPerPage = kPageSize / kRowSize;
-
-inline constexpr uint32_t kTableMaxPages = 100;
-inline constexpr uint32_t kTableMaxRows = kRowsPerPage * kTableMaxPages;
-
 struct Table {
     uint32_t num_rows = 0;
-    void* pages[kTableMaxPages] = {nullptr};
+    Pager pager;
 
-    Table() = default;
+    Table(std::string_view filename) : pager(filename) { num_rows = pager.file_length / kRowSize; }
     ~Table();
 
     Row& GetRow(uint32_t row_num);

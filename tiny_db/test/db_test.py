@@ -1,11 +1,19 @@
+import os
+import shlex
 import subprocess
 import unittest
 
 
 class TestDatabase(unittest.TestCase):
+    @classmethod
+    def setUp(self):
+        # 确保每次运行测试类前，测试数据库文件不在
+        if os.path.exists('test.db'):
+            os.remove('test.db')
+
     def run_script(self, commands):
-        process = subprocess.Popen(
-            "tiny_db/tiny_db", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        process = subprocess.Popen(shlex.split("tiny_db/tiny_db test.db"),
+                                   stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output, _ = process.communicate(
             input='\n'.join(commands).encode('utf-8'))
         return output.decode().splitlines()
@@ -112,6 +120,28 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(result, [
             "db > ID must be positive.",
             "db > Executed.",
+            "db > Bye!",
+        ])
+
+    def test_keeps_data_after_closing_connection(self):
+        """测试数据持久化功能"""
+
+        result1 = self.run_script([
+            "insert 1 user1 person1@example.com",
+            ".exit",
+        ])
+        self.assertEqual(result1, [
+            "db > Executed.",
+            "db > Bye!",
+        ])
+
+        result2 = self.run_script([
+            "select",
+            ".exit",
+        ])
+        self.assertEqual(result2, [
+            "db > (1, user1, person1@example.com)",
+            "Executed.",
             "db > Bye!",
         ])
 
