@@ -173,14 +173,14 @@ Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
         return ExecuteResult::kTableFull;
     }
 
-    table_->GetRow(table_->num_rows) = statement.row_to_insert;
+    *(table_->end()) = statement.row_to_insert;
     table_->num_rows++;
     return ExecuteResult::kSuccess;
 }
 
 Machine::ExecuteResult Machine::ExecuteSelect() {
-    for (uint32_t i = 0; i < table_->num_rows; i++) {
-        fmt::println("{}", table_->GetRow(i).ToString());
+    for (const auto& row : *table_) {
+        fmt::println("{}", row.ToString());
     }
     return ExecuteResult::kSuccess;
 }
