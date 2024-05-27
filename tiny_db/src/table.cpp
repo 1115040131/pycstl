@@ -4,40 +4,40 @@
 
 namespace tiny_db {
 
-Table::~Table() {
-    uint32_t num_full_pages = num_rows / kRowsPerPage;
+Table::Table(std::string_view filename) : pager_(filename) {
+    if (pager_.page_num_ == 0) {
+        GetData(0).head.is_root = true;
+    }
+}
 
-    if (pager.file.fail()) {
+Table::~Table() {
+    if (pager_.file_.fail()) {
         fmt::print(stderr, "Error: file is in a bad state\n");
         exit(EXIT_FAILURE);
     }
 
-    for (uint32_t i = 0; i < num_full_pages; i++) {
-        if (pager.pages[i] == nullptr) {
+    for (uint32_t i = 0; i < pager_.page_num_; i++) {
+        if (pager_.pages_[i] == nullptr) {
             continue;
         }
-        pager.PageFlush(i, kPageSize);
-        free(pager.pages[i]);
-        pager.pages[i] = nullptr;
-    }
-
-    uint32_t num_additional_rows = num_rows % kRowsPerPage;
-    if (num_additional_rows > 0) {
-        uint32_t page_num = num_full_pages;
-        if (pager.pages[page_num] != nullptr) {
-            pager.PageFlush(page_num, num_additional_rows * kRowSize);
-            free(pager.pages[page_num]);
-            pager.pages[page_num] = nullptr;
-        }
+        pager_.PageFlush(i);
+        pager_.pages_[i].reset();
     }
 
     for (uint32_t i = 0; i < kTableMaxPages; i++) {
-        if (pager.pages[i] != nullptr) {
+        if (pager_.pages_[i] != nullptr) {
             fmt::print(stderr, "Page {} is not nullptr\n", i);
-            free(pager.pages[i]);
-            pager.pages[i] = nullptr;
+            pager_.pages_[i].reset();
         }
     }
+}
+
+Table::iterator Table::Insert(const_iterator pos, const Row& value) {
+    auto insert_pos = static_cast<iterator>(pos);
+    insert_pos->key = value.id;
+    insert_pos->value = value;
+    GetData(insert_pos.page_index_).head.cell_num++;
+    return insert_pos;
 }
 
 }  // namespace tiny_db

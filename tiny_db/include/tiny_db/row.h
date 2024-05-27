@@ -6,7 +6,7 @@
 
 namespace tiny_db {
 
-inline constexpr uint32_t kUsernameSize = 31;
+inline constexpr uint32_t kUsernameSize = 32;
 inline constexpr uint32_t kEmailSize = 255;
 
 struct Row {

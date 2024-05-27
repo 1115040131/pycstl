@@ -3,6 +3,12 @@ import shlex
 import subprocess
 import unittest
 
+USERNAME_SIZE = 32
+EMAIL_SIZE = 255
+MAX_CELLS_PER_PAGE = 13
+MAX_PAGES = 100
+MAX_CELLS = MAX_CELLS_PER_PAGE * MAX_PAGES
+
 
 class TestDatabase(unittest.TestCase):
     @classmethod
@@ -62,11 +68,11 @@ class TestDatabase(unittest.TestCase):
         """测试 table 满了之后的错误提示"""
 
         commands = [
-            f"insert {i} user{i} person{i}@example.com" for i in range(1, 1402)]
+            f"insert {i} user{i} person{i}@example.com" for i in range(MAX_CELLS + 1)]
         commands.append(".exit")
         result = self.run_script(commands)
 
-        expect = ["db > Executed." for i in range(1, 1401)]
+        expect = ["db > Executed." for _ in range(MAX_CELLS)]
         expect.append("db > Error: Table full.")
         expect.append("db > Bye!")
 
@@ -75,8 +81,8 @@ class TestDatabase(unittest.TestCase):
     def test_allows_inserting_strings_that_are_the_maximum_length(self):
         """输入最长的用户名和邮箱"""
 
-        long_username = "a" * 31
-        long_email = "a" * 255
+        long_username = "a" * USERNAME_SIZE
+        long_email = "a" * EMAIL_SIZE
 
         result = self.run_script([
             f"insert 1 {long_username} {long_email}",
@@ -93,8 +99,8 @@ class TestDatabase(unittest.TestCase):
     def test_prints_error_message_if_strings_are_too_long(self):
         """测试插入超过长度的用户名和邮箱"""
 
-        long_username = "a" * 32
-        long_email = "a" * 256
+        long_username = "a" * (USERNAME_SIZE + 1)
+        long_email = "a" * (EMAIL_SIZE + 1)
 
         result = self.run_script([
             f"insert 1 {long_username} person1@example.com",
@@ -144,6 +150,45 @@ class TestDatabase(unittest.TestCase):
             "Executed.",
             "db > Bye!",
         ])
+
+    def test_print_btree_structure(self):
+        script = [
+            f"insert {i} user{i} person{i}@example.com" for i in [3, 1, 2]
+        ]
+        script.append(".btree")
+        script.append(".exit")
+        result = self.run_script(script)
+
+        expected = [
+            "db > Executed.",
+            "db > Executed.",
+            "db > Executed.",
+            "db > Tree:",
+            "leaf (size 3)",
+            "  - 0 : 3",
+            "  - 1 : 1",
+            "  - 2 : 2",
+            "db > Bye!",
+        ]
+        self.assertEqual(result, expected)
+
+    def test_print_constants(self):
+        script = [
+            ".constants",
+            ".exit",
+        ]
+        result = self.run_script(script)
+
+        expected = [
+            "db > Constants:",
+            "  kRowSize: 296",
+            "  kHeadSize: 24",
+            "  kCellSize: 300",
+            "  kSpaceForCells: 4072",
+            "  kMaxCells: 13",
+            "db > Bye!",
+        ]
+        self.assertEqual(result, expected)
 
 
 if __name__ == '__main__':

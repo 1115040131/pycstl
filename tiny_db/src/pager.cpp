@@ -18,90 +18,85 @@ std::string StreamStateToString(std::ios& stream) {
     }
 }
 
-Pager::Pager(std::string_view filename) {
-    if (std::filesystem::exists(filename)) {
-        file.open(filename.data(), std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
+Pager::Pager(std::string_view file_name) {
+    if (std::filesystem::exists(file_name)) {
+        file_.open(file_name.data(), std::ios::binary | std::ios::in | std::ios::out | std::ios::ate);
     } else {
-        file.open(filename.data(), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
+        file_.open(file_name.data(), std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
     }
 
-    if (!file.is_open()) {
-        fmt::print(stderr, "Error: cannot open file: \"{}\" - {}\n", filename, StreamStateToString(file));
+    if (!file_.is_open()) {
+        fmt::print(stderr, "Error: cannot open file_: \"{}\" - {}\n", file_name, StreamStateToString(file_));
         exit(EXIT_FAILURE);
     }
 
-    if (file.fail()) {
-        fmt::print(stderr, "Error: file is in a bad state\n");
+    if (file_.fail()) {
+        fmt::print(stderr, "Error: file_ is in a bad state\n");
         exit(EXIT_FAILURE);
     }
 
-    file_length = file.tellg();
+    file_length_ = file_.tellg();
+
+    if (file_length_ % kPageSize != 0) {
+        fmt::print(stderr, "Db file_ is not a whole number of pages_. Corrupt file_.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    page_num_ = file_length_ / kPageSize;
 }
 
-void* Pager::GetPage(uint32_t page_num) {
-    if (page_num > kTableMaxPages) {
-        fmt::println("Tried to fetch page number out of bounds. {} > {}", page_num, kTableMaxPages);
+char* Pager::GetPage(uint32_t index) {
+    if (index > kTableMaxPages) {
+        fmt::println("Tried to fetch page number out of bounds. {} > {}", index, kTableMaxPages);
         exit(EXIT_FAILURE);
     }
 
-    if (pages[page_num] == nullptr) {
+    if (pages_[index] == nullptr) {
         // Cache missed
-        void* page = malloc(kPageSize);
+        char* page = new char[kPageSize];
 
         // 读取完整页面
-        uint32_t full_page_num = file_length / kPageSize;
-        if (page_num < full_page_num) {
-            file.seekg(page_num * kPageSize, std::ios::beg);
-            if (file.fail()) {
-                fmt::print(stderr, "Error: seekg page_num: {} failed: {}\n", page_num, StreamStateToString(file));
+        if (index < page_num_) {
+            file_.seekg(index * kPageSize, std::ios::beg);
+            if (file_.fail()) {
+                fmt::print(stderr, "Error: seekg page index: {} failed: {}\n", index, StreamStateToString(file_));
                 exit(EXIT_FAILURE);
             }
 
-            file.read(static_cast<char*>(page), kPageSize);
-            if (file.fail()) {
-                fmt::print(stderr, "Error: read page_num: {} failed: {}\n", page_num, StreamStateToString(file));
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        // 读取不完整页面
-        if ((file_length % kPageSize) && page_num == full_page_num) {
-            file.seekg(page_num * kPageSize, std::ios::beg);
-            if (file.fail()) {
-                fmt::print(stderr, "Error: seekg page_num: {} failed: {}\n", page_num, StreamStateToString(file));
-                exit(EXIT_FAILURE);
-            }
-
-            file.read(static_cast<char*>(page), file_length % kPageSize);
-            if (file.fail()) {
-                fmt::print(stderr, "Error: read page_num: {} failed: {}\n", page_num, StreamStateToString(file));
+            file_.read(page, kPageSize);
+            if (file_.fail()) {
+                fmt::print(stderr, "Error: read page index: {} failed: {}\n", index, StreamStateToString(file_));
                 exit(EXIT_FAILURE);
             }
         }
 
-        pages[page_num] = page;
+        pages_[index].reset(page);
+
+        if (index >= page_num_) {
+            page_num_ = index + 1;
+        }
     }
 
-    return pages[page_num];
+    return pages_[index].get();
 }
 
-void Pager::PageFlush(uint32_t page_num, uint32_t size) {
-    auto page = pages[page_num];
+void Pager::PageFlush(uint32_t index) {
+    auto page = pages_[index].get();
 
     if (page == nullptr) {
-        fmt::print(stderr, "Tried to flush null page {}\n", page_num);
+        fmt::print(stderr, "Tried to flush null page {}\n", index);
         exit(EXIT_FAILURE);
     }
 
-    file.seekp(page_num * kPageSize, std::ios::beg);
-    if (file.fail()) {
-        fmt::print(stderr, "Error: seekp: {} failed: {}\n", page_num * kPageSize, StreamStateToString(file));
+    file_.seekp(index * kPageSize, std::ios::beg);
+    if (file_.fail()) {
+        fmt::print(stderr, "Error: seekp: {} failed: {}\n", index * kPageSize, StreamStateToString(file_));
         exit(EXIT_FAILURE);
     }
 
-    file.write(static_cast<char*>(page), size);
-    if (file.fail()) {
-        fmt::print(stderr, "Error: write page_num: {} failed: {}\n", page_num, StreamStateToString(file));
+    file_.write(static_cast<char*>(page), kPageSize);
+    if (file_.fail()) {
+        fmt::print(stderr, "Error: write page index: {} failed: {}\n", index, StreamStateToString(file_));
         exit(EXIT_FAILURE);
     }
 }

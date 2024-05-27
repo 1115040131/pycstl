@@ -1,28 +1,30 @@
 #pragma once
 
 #include <fstream>
+#include <memory>
 #include <string_view>
 
-#include "tiny_db/row.h"
+#include "tiny_db/defines.h"
 
 namespace tiny_db {
 
-inline constexpr uint32_t kPageSize = 4096;
-inline constexpr uint32_t kRowsPerPage = kPageSize / kRowSize;
-
-inline constexpr uint32_t kTableMaxPages = 100;
-inline constexpr uint32_t kTableMaxRows = kRowsPerPage * kTableMaxPages;
-
 struct Pager {
-    std::fstream file;
-    std::streampos file_length;
-    void* pages[kTableMaxPages] = {nullptr};
+    friend class Table;
 
+public:
     Pager(std::string_view filename);
 
-    void* GetPage(uint32_t page_num);
+    char* GetPage(uint32_t index);
 
-    void PageFlush(uint32_t page_num, uint32_t size);
+    const char* GetPage(uint32_t index) const { return GetPage(index); }
+
+    void PageFlush(uint32_t index);
+
+private:
+    std::fstream file_;
+    std::streampos file_length_;
+    std::unique_ptr<char[]> pages_[kTableMaxPages];
+    uint32_t page_num_{1};
 };
 
 }  // namespace tiny_db

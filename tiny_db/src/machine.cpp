@@ -57,6 +57,18 @@ Machine::MetaCommandResult Machine::DoMetaCommand(std::string_view command) {
         table_.reset();
         fmt::println("Bye!");
         exit(EXIT_SUCCESS);
+    } else if (command == ".btree") {
+        fmt::println("Tree:");
+        table_->RootPage().Print();
+        return MetaCommandResult::kSuccess;
+    } else if (command == ".constants") {
+        fmt::println("Constants:");
+        fmt::println("  kRowSize: {}", kRowSize);
+        fmt::println("  kHeadSize: {}", Table::DataType::kHeadSize);
+        fmt::println("  kCellSize: {}", Table::DataType::kCellSize);
+        fmt::println("  kSpaceForCells: {}", kPageSize - Table::DataType::kHeadSize);
+        fmt::println("  kMaxCells: {}", Table::DataType::kMaxCells);
+        return MetaCommandResult::kSuccess;
     }
     return MetaCommandResult::kUnrecognizedCommand;
 }
@@ -169,18 +181,17 @@ void Machine::ExecuteStatement(Statement& statement) {
 }
 
 Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
-    if (table_->num_rows >= kTableMaxRows) {
+    if (table_->GetPageNum() == kTableMaxPages && table_->BackPage().head.cell_num == Table::DataType::kMaxCells) {
         return ExecuteResult::kTableFull;
     }
 
-    *(table_->end()) = statement.row_to_insert;
-    table_->num_rows++;
+    table_->Insert(table_->end(), statement.row_to_insert);
     return ExecuteResult::kSuccess;
 }
 
 Machine::ExecuteResult Machine::ExecuteSelect() {
     for (const auto& row : *table_) {
-        fmt::println("{}", row.ToString());
+        fmt::println("{}", row.value.ToString());
     }
     return ExecuteResult::kSuccess;
 }
