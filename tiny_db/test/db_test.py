@@ -152,28 +152,9 @@ class TestDatabase(unittest.TestCase):
             "db > Bye!",
         ])
 
-    def test_print_btree_structure(self):
-        script = [
-            f"insert {i} user{i} person{i}@example.com" for i in [3, 1, 2]
-        ]
-        script.append(".btree")
-        script.append(".exit")
-        result = self.run_script(script)
-
-        expected = [
-            "db > Executed.",
-            "db > Executed.",
-            "db > Executed.",
-            "db > Tree:",
-            "leaf (size 3)",
-            "  - 0 : 3",
-            "  - 1 : 1",
-            "  - 2 : 2",
-            "db > Bye!",
-        ]
-        self.assertEqual(result, expected)
-
     def test_print_constants(self):
+        """测试打印常量"""
+
         script = [
             ".constants",
             ".exit",
@@ -187,6 +168,48 @@ class TestDatabase(unittest.TestCase):
             "  kCellSize: 300",
             "  kSpaceForCells: 4072",
             "  kMaxCells: 13",
+            "db > Bye!",
+        ]
+        self.assertEqual(result, expected)
+
+    def test_print_btree_structure(self):
+        """测试排序打印 btree 结构"""
+
+        script = [
+            f"insert {i} user{i} person{i}@example.com" for i in [3, 1, 2]
+        ]
+        script.append(".btree")
+        script.append(".exit")
+        result = self.run_script(script)
+
+        expected = [
+            "db > Executed.",
+            "db > Executed.",
+            "db > Executed.",
+            "db > Tree:",
+            "leaf (size 3)",
+            "  - 0 : 1",
+            "  - 1 : 2",
+            "  - 2 : 3",
+            "db > Bye!",
+        ]
+        self.assertEqual(result, expected)
+
+    def test_prints_an_error_message_if_there_is_a_duplicate_id(self):
+        """测试插入重复id"""
+        script = [
+            "insert 1 user1 person1@example.com",
+            "insert 1 user1 person1@example.com",
+            "select",
+            ".exit",
+        ]
+        result = self.run_script(script)
+
+        expected = [
+            "db > Executed.",
+            "db > Error: Duplicate key.",
+            "db > (1, user1, person1@example.com)",
+            "Executed.",
             "db > Bye!",
         ]
         self.assertEqual(result, expected)

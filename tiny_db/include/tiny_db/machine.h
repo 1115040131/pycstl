@@ -42,6 +42,7 @@ private:
     enum class ExecuteResult {
         kSuccess,
         kTableFull,
+        kDuplicateKey,
     };
     ExecuteResult ExecuteInsert(const Statement& statement);
     ExecuteResult ExecuteSelect();

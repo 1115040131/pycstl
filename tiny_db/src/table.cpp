@@ -6,7 +6,9 @@ namespace tiny_db {
 
 Table::Table(std::string_view filename) : pager_(filename) {
     if (pager_.page_num_ == 0) {
-        GetData(0).head.is_root = true;
+        auto& root_page = GetData(0);
+        root_page.head.type = DataType::Head::Type::kLeaf;
+        root_page.head.is_root = true;
     }
 }
 
@@ -34,10 +36,29 @@ Table::~Table() {
 
 Table::iterator Table::Insert(const_iterator pos, const Row& value) {
     auto insert_pos = static_cast<iterator>(pos);
+    auto& page_data = GetData(insert_pos.page_index_);
+
+    for (uint32_t i = page_data.head.cell_num; i > insert_pos.cell_index_; i--) {
+        std::swap(page_data.cells[i], page_data.cells[i - 1]);
+    }
+
     insert_pos->key = value.id;
     insert_pos->value = value;
-    GetData(insert_pos.page_index_).head.cell_num++;
+    page_data.head.cell_num++;
     return insert_pos;
+}
+
+Table::iterator Table::LowerBound(uint32_t key) {
+    const auto& root_page = RootPage();
+    if (root_page.head.type == DataType::Head::Type::kLeaf) {
+        auto iter = std::lower_bound(root_page.cells.begin(), root_page.cells.begin() + root_page.head.cell_num,
+                                     key, [](const auto& cell, uint32_t key) { return cell.key < key; });
+        return iterator(this, root_page_index_, iter - root_page.cells.begin());
+    } else {
+        fmt::println("Need to implement searching internal nodes.");
+        exit(EXIT_FAILURE);
+    }
+    return end();
 }
 
 }  // namespace tiny_db

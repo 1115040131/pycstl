@@ -40,6 +40,9 @@ public:
             }
         }
 
+        iterator(Table* table, uint32_t page_index, uint32_t cell_index) noexcept
+            : table_(table), page_index_(page_index), cell_index_(cell_index) {}
+
         friend class Table;
 
     public:
@@ -107,6 +110,9 @@ public:
             }
         }
 
+        const_iterator(const Table* table, uint32_t page_index, uint32_t cell_index) noexcept
+            : table_(table), page_index_(page_index), cell_index_(cell_index) {}
+
         friend class Table;
 
     public:
@@ -115,7 +121,9 @@ public:
         const_iterator(iterator that) noexcept
             : table_(that.table_), page_index_(that.page_index_), cell_index_(that.cell_index_) {}
 
-        explicit operator iterator() const noexcept { return iterator{const_cast<Table*>(table_), page_index_}; }
+        explicit operator iterator() const noexcept {
+            return iterator{const_cast<Table*>(table_), page_index_, cell_index_};
+        }
 
         const_iterator& operator++() noexcept {  //++iterator
             if (cell_index_ + 1 < DataType::kMaxCells) {
@@ -219,8 +227,15 @@ public:
 
 #pragma region 修改器
 
-    // TODO: 当前只能在最后一个元素插入
     iterator Insert(const_iterator pos, const Row& value);
+
+#pragma endregion
+
+#pragma region 查找
+
+    // iterator Find(uint32_t key);
+
+    iterator LowerBound(uint32_t key);
 
 #pragma endregion
 

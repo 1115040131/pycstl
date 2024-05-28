@@ -175,6 +175,9 @@ void Machine::ExecuteStatement(Statement& statement) {
         case ExecuteResult::kTableFull:
             fmt::println("Error: Table full.");
             break;
+        case ExecuteResult::kDuplicateKey:
+            fmt::println("Error: Duplicate key.");
+            break;
         default:
             break;
     }
@@ -185,7 +188,12 @@ Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
         return ExecuteResult::kTableFull;
     }
 
-    table_->Insert(table_->end(), statement.row_to_insert);
+    auto insert_pos = table_->LowerBound(statement.row_to_insert.id);
+    if (insert_pos != table_->end() && insert_pos->key == statement.row_to_insert.id) {
+        return ExecuteResult::kDuplicateKey;
+    }
+
+    table_->Insert(insert_pos, statement.row_to_insert);
     return ExecuteResult::kSuccess;
 }
 
