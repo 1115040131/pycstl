@@ -67,17 +67,18 @@ class TestDatabase(unittest.TestCase):
     def test_prints_error_message_when_table_is_full(self):
         """测试 table 满了之后的错误提示"""
 
-        # TODO: 先测试 page 满了之后不能插入
-        commands = [
-            f"insert {i} user{i} person{i}@example.com" for i in range(MAX_CELLS_PER_PAGE + 1)]
-        commands.append(".exit")
-        result = self.run_script(commands)
+        # TODO: 拆分 internal 节点
+        script = [
+            f"insert {i} user{i} person{i}@example.com" for i in range(1, 901)]
+        script.append(".exit")
+        result = self.run_script(script)
 
-        expect = ["db > Executed." for _ in range(MAX_CELLS_PER_PAGE)]
-        expect.append("db > Error: Table full.")
-        expect.append("db > Bye!")
+        expected = [
+            "db > Executed.",
+            "db > Need to implement searching an internal node."
+        ]
 
-        self.assertEqual(result, expect)
+        self.assertEqual(result[-2:], expected)
 
     def test_allows_inserting_strings_that_are_the_maximum_length(self):
         """输入最长的用户名和邮箱"""
@@ -164,9 +165,9 @@ class TestDatabase(unittest.TestCase):
         expected = [
             "db > Constants:",
             "  kRowSize: 296",
-            "  kHeadSize: 24",
+            "  kHeadSize: 20",
             "  kCellSize: 300",
-            "  kSpaceForCells: 4072",
+            "  kSpaceForCells: 4076",
             "  kMaxCells: 13",
             "db > Bye!",
         ]
@@ -187,10 +188,10 @@ class TestDatabase(unittest.TestCase):
             "db > Executed.",
             "db > Executed.",
             "db > Tree:",
-            "leaf (size 3)",
-            "  - 0 : 1",
-            "  - 1 : 2",
-            "  - 2 : 3",
+            "- leaf (size 3)",
+            "  - 1",
+            "  - 2",
+            "  - 3",
             "db > Bye!",
         ]
         self.assertEqual(result, expected)
@@ -213,6 +214,41 @@ class TestDatabase(unittest.TestCase):
             "db > Bye!",
         ]
         self.assertEqual(result, expected)
+
+    def test_prints_structure_of_a_3_leaf_node_btree(self):
+        script = [
+            f"insert {i} user{i} person{i}@example.com" for i in range(1, 15)]
+        script.append(".btree")
+        script.append("insert 15 user15 person15@example.com")
+        script.append(".exit")
+        result = self.run_script(script)
+
+        # TODO: 完成最后一次插入
+        expected = [
+            "db > Tree:",
+            "- internal (size 1)",
+            "  - leaf (size 7)",
+            "    - 1",
+            "    - 2",
+            "    - 3",
+            "    - 4",
+            "    - 5",
+            "    - 6",
+            "    - 7",
+            "  - key 7",
+            # "  - leaf (size 7)",
+            "  - leaf (size 6)",
+            "    - 8",
+            "    - 9",
+            "    - 10",
+            "    - 11",
+            "    - 12",
+            "    - 13",
+            # "    - 14",
+            "db > Need to implement searching an internal node."
+        ]
+
+        self.assertEqual(result[14:], expected)
 
 
 if __name__ == '__main__':

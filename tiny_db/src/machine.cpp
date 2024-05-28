@@ -59,15 +59,15 @@ Machine::MetaCommandResult Machine::DoMetaCommand(std::string_view command) {
         exit(EXIT_SUCCESS);
     } else if (command == ".btree") {
         fmt::println("Tree:");
-        table_->RootPage().Print();
+        table_->PrintTree();
         return MetaCommandResult::kSuccess;
     } else if (command == ".constants") {
         fmt::println("Constants:");
         fmt::println("  kRowSize: {}", kRowSize);
-        fmt::println("  kHeadSize: {}", Table::DataType::kHeadSize);
-        fmt::println("  kCellSize: {}", Table::DataType::kCellSize);
-        fmt::println("  kSpaceForCells: {}", kPageSize - Table::DataType::kHeadSize);
-        fmt::println("  kMaxCells: {}", Table::DataType::kMaxCells);
+        fmt::println("  kHeadSize: {}", Table::LeafNodeType::kHeadSize);
+        fmt::println("  kCellSize: {}", Table::LeafNodeType::kCellSize);
+        fmt::println("  kSpaceForCells: {}", kPageSize - Table::LeafNodeType::kHeadSize);
+        fmt::println("  kMaxCells: {}", Table::LeafNodeType::kMaxCells);
         return MetaCommandResult::kSuccess;
     }
     return MetaCommandResult::kUnrecognizedCommand;
@@ -184,10 +184,6 @@ void Machine::ExecuteStatement(Statement& statement) {
 }
 
 Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
-    if (table_->Full()) {
-        return ExecuteResult::kTableFull;
-    }
-
     auto insert_pos = table_->LowerBound(statement.row_to_insert.id);
     if (insert_pos != table_->end() && insert_pos->key == statement.row_to_insert.id) {
         return ExecuteResult::kDuplicateKey;

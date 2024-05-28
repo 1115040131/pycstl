@@ -22,7 +22,7 @@ private:
     std::fstream file_;
     std::streampos file_length_;
     std::unique_ptr<char[]> pages_[kTableMaxPages];
-    uint32_t page_num_{1};
+    uint32_t page_num_{0};
 };
 
 }  // namespace tiny_db

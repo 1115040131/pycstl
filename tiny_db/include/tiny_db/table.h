@@ -11,17 +11,30 @@ namespace tiny_db {
 
 class Table {
 public:
-    using DataType = Node<uint32_t, Row>;
+    using LeafNodeType = LeafNode<uint32_t, Row>;
+    using InternalNodeType = InternalNode<uint32_t>;
 
     Table(std::string_view filename);
     ~Table();
 
-    inline DataType& GetData(uint32_t page_index) {
-        return *reinterpret_cast<DataType*>(pager_.GetPage(page_index));
+    inline Node& GetNode(uint32_t page_index) { return *reinterpret_cast<Node*>(pager_.GetPage(page_index)); }
+
+    inline const Node& GetNode(uint32_t page_index) const { return const_cast<Table*>(this)->GetNode(page_index); }
+
+    inline LeafNodeType& GetLeafNode(uint32_t page_index) {
+        return *reinterpret_cast<LeafNodeType*>(pager_.GetPage(page_index));
     }
 
-    inline const DataType& GetData(uint32_t page_index) const {
-        return const_cast<Table*>(this)->GetData(page_index);
+    inline const LeafNodeType& GetLeafNode(uint32_t page_index) const {
+        return const_cast<Table*>(this)->GetLeafNode(page_index);
+    }
+
+    inline InternalNodeType& GetInternalNode(uint32_t page_index) {
+        return *reinterpret_cast<InternalNodeType*>(pager_.GetPage(page_index));
+    }
+
+    inline const InternalNodeType& GetInternalNode(uint32_t page_index) const {
+        return const_cast<Table*>(this)->GetInternalNode(page_index);
     }
 
     inline uint32_t GetPageNum() const noexcept { return pager_.page_num_; }
@@ -33,8 +46,8 @@ public:
     private:
         explicit iterator(Table* table) noexcept : table_(table) {}
         iterator(Table* table, uint32_t page_index) noexcept : table_(table), page_index_(page_index) {
-            cell_index_ = table_->GetData(page_index).head.cell_num;
-            if (cell_index_ == DataType::kMaxCells) {
+            cell_index_ = table_->GetLeafNode(page_index).cell_num;
+            if (cell_index_ == LeafNodeType::kMaxCells) {
                 cell_index_ = 0;
                 page_index_++;
             }
@@ -49,7 +62,7 @@ public:
         iterator() = default;
 
         iterator& operator++() noexcept {  //++iterator
-            if (cell_index_ + 1 < DataType::kMaxCells) {
+            if (cell_index_ + 1 < LeafNodeType::kMaxCells) {
                 cell_index_++;
             } else {
                 cell_index_ = 0;
@@ -68,7 +81,7 @@ public:
             if (cell_index_ > 0) {
                 cell_index_--;
             } else {
-                cell_index_ = DataType::kMaxCells - 1;
+                cell_index_ = LeafNodeType::kMaxCells - 1;
                 page_index_--;
             }
             return *this;
@@ -80,9 +93,9 @@ public:
             return tmp;
         }
 
-        DataType::Cell& operator*() const { return table_->GetData(page_index_).cells[cell_index_]; }
+        LeafNodeType::Cell& operator*() const { return table_->GetLeafNode(page_index_).cells[cell_index_]; }
 
-        DataType::Cell* operator->() const { return &table_->GetData(page_index_).cells[cell_index_]; }
+        LeafNodeType::Cell* operator->() const { return &table_->GetLeafNode(page_index_).cells[cell_index_]; }
 
         bool operator!=(const iterator& that) const noexcept {
             return table_ != that.table_ || page_index_ != that.page_index_ || cell_index_ != that.cell_index_;
@@ -103,8 +116,8 @@ public:
     private:
         explicit const_iterator(const Table* table) noexcept : table_(table) {}
         const_iterator(const Table* table, uint32_t page_index) noexcept : table_(table), page_index_(page_index) {
-            cell_index_ = table_->GetData(page_index).head.cell_num;
-            if (cell_index_ == DataType::kMaxCells) {
+            cell_index_ = table_->GetLeafNode(page_index).cell_num;
+            if (cell_index_ == LeafNodeType::kMaxCells) {
                 cell_index_ = 0;
                 page_index_++;
             }
@@ -126,7 +139,7 @@ public:
         }
 
         const_iterator& operator++() noexcept {  //++iterator
-            if (cell_index_ + 1 < DataType::kMaxCells) {
+            if (cell_index_ + 1 < LeafNodeType::kMaxCells) {
                 cell_index_++;
             } else {
                 cell_index_ = 0;
@@ -145,7 +158,7 @@ public:
             if (cell_index_ > 0) {
                 cell_index_--;
             } else {
-                cell_index_ = DataType::kMaxCells - 1;
+                cell_index_ = LeafNodeType::kMaxCells - 1;
                 page_index_--;
             }
             return *this;
@@ -157,9 +170,11 @@ public:
             return tmp;
         }
 
-        const DataType::Cell& operator*() const { return table_->GetData(page_index_).cells[cell_index_]; }
+        const LeafNodeType::Cell& operator*() const { return table_->GetLeafNode(page_index_).cells[cell_index_]; }
 
-        const DataType::Cell* operator->() const { return &table_->GetData(page_index_).cells[cell_index_]; }
+        const LeafNodeType::Cell* operator->() const {
+            return &table_->GetLeafNode(page_index_).cells[cell_index_];
+        }
 
         bool operator!=(const iterator& that) const noexcept {
             return table_ != that.table_ || page_index_ != that.page_index_ || cell_index_ != that.cell_index_;
@@ -206,28 +221,30 @@ public:
 
 #pragma region 元素访问
 
-    inline DataType& RootPage() { return GetData(root_page_index_); }
-    inline const DataType& RootPage() const { return GetData(root_page_index_); }
+    inline Node& RootPage() { return GetNode(root_page_index_); }
+    inline const Node& RootPage() const { return GetNode(root_page_index_); }
 
-    inline DataType& FrontPage() { return GetData(0); }
-    inline const DataType& FrontPage() const { return GetData(0); }
+    // inline DataType& FrontPage() { return GetData(0); }
+    // inline const DataType& FrontPage() const { return GetData(0); }
 
-    inline DataType& BackPage() { return GetData(GetPageNum() - 1); }
-    inline const DataType& BackPage() const { return GetData(GetPageNum() - 1); }
+    // inline DataType& BackPage() { return GetData(GetPageNum() - 1); }
+    // inline const DataType& BackPage() const { return GetData(GetPageNum() - 1); }
 
 #pragma endregion
 
 #pragma region 容量
 
-    bool Empty() const { return RootPage().head.cell_num == 0; }
+    // bool Empty() const { return RootPage().head.cell_num == 0; }
 
-    bool Full() const { return RootPage().head.cell_num == DataType::kMaxCells; }
+    bool Full() const { return GetLeafNode(root_page_index_).cell_num == LeafNodeType::kMaxCells; }
 
 #pragma endregion
 
 #pragma region 修改器
 
     iterator Insert(const_iterator pos, const Row& value);
+
+    void Split(const_iterator pos);
 
 #pragma endregion
 
@@ -238,6 +255,15 @@ public:
     iterator LowerBound(uint32_t key);
 
 #pragma endregion
+
+#pragma region 观察者
+
+    void PrintTree() const { PrintNode(root_page_index_, 0); }
+
+#pragma endregion
+
+private:
+    void PrintNode(uint32_t page_index, uint32_t indentation_level) const;
 
 private:
     uint32_t root_page_index_ = 0;
