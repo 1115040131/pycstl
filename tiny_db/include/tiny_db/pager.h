@@ -16,8 +16,6 @@ public:
 
     char* GetPage(uint32_t index);
 
-    const char* GetPage(uint32_t index) const { return GetPage(index); }
-
     void PageFlush(uint32_t index);
 
 private:

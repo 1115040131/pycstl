@@ -67,12 +67,13 @@ class TestDatabase(unittest.TestCase):
     def test_prints_error_message_when_table_is_full(self):
         """测试 table 满了之后的错误提示"""
 
+        # TODO: 先测试 page 满了之后不能插入
         commands = [
-            f"insert {i} user{i} person{i}@example.com" for i in range(MAX_CELLS + 1)]
+            f"insert {i} user{i} person{i}@example.com" for i in range(MAX_CELLS_PER_PAGE + 1)]
         commands.append(".exit")
         result = self.run_script(commands)
 
-        expect = ["db > Executed." for _ in range(MAX_CELLS)]
+        expect = ["db > Executed." for _ in range(MAX_CELLS_PER_PAGE)]
         expect.append("db > Error: Table full.")
         expect.append("db > Bye!")
 

@@ -181,7 +181,7 @@ void Machine::ExecuteStatement(Statement& statement) {
 }
 
 Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
-    if (table_->GetPageNum() == kTableMaxPages && table_->BackPage().head.cell_num == Table::DataType::kMaxCells) {
+    if (table_->Full()) {
         return ExecuteResult::kTableFull;
     }
 

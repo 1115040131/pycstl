@@ -21,7 +21,7 @@ public:
     }
 
     inline const DataType& GetData(uint32_t page_index) const {
-        return *reinterpret_cast<const DataType*>(pager_.GetPage(page_index));
+        return const_cast<Table*>(this)->GetData(page_index);
     }
 
     inline uint32_t GetPageNum() const noexcept { return pager_.page_num_; }
@@ -206,6 +206,14 @@ public:
 
     inline DataType& BackPage() { return GetData(GetPageNum() - 1); }
     inline const DataType& BackPage() const { return GetData(GetPageNum() - 1); }
+
+#pragma endregion
+
+#pragma region 容量
+
+    bool Empty() const { return RootPage().head.cell_num == 0; }
+
+    bool Full() const { return RootPage().head.cell_num == DataType::kMaxCells; }
 
 #pragma endregion
 
