@@ -75,7 +75,7 @@ class TestDatabase(unittest.TestCase):
 
         expected = [
             "db > Executed.",
-            "db > Need to implement searching an internal node."
+            "db > Need to implement updating parent after split."
         ]
 
         self.assertEqual(result[-2:], expected)
@@ -220,10 +220,10 @@ class TestDatabase(unittest.TestCase):
             f"insert {i} user{i} person{i}@example.com" for i in range(1, 15)]
         script.append(".btree")
         script.append("insert 15 user15 person15@example.com")
+        script.append(".btree")
         script.append(".exit")
         result = self.run_script(script)
 
-        # TODO: 完成最后一次插入
         expected = [
             "db > Tree:",
             "- internal (size 1)",
@@ -236,16 +236,36 @@ class TestDatabase(unittest.TestCase):
             "    - 6",
             "    - 7",
             "  - key 7",
-            # "  - leaf (size 7)",
-            "  - leaf (size 6)",
+            "  - leaf (size 7)",
             "    - 8",
             "    - 9",
             "    - 10",
             "    - 11",
             "    - 12",
             "    - 13",
-            # "    - 14",
-            "db > Need to implement searching an internal node."
+            "    - 14",
+            "db > Executed.",
+            "db > Tree:",
+            "- internal (size 1)",
+            "  - leaf (size 7)",
+            "    - 1",
+            "    - 2",
+            "    - 3",
+            "    - 4",
+            "    - 5",
+            "    - 6",
+            "    - 7",
+            "  - key 7",
+            "  - leaf (size 8)",
+            "    - 8",
+            "    - 9",
+            "    - 10",
+            "    - 11",
+            "    - 12",
+            "    - 13",
+            "    - 14",
+            "    - 15",
+            "db > Bye!"
         ]
 
         self.assertEqual(result[14:], expected)

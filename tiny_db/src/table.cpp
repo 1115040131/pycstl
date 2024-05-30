@@ -38,12 +38,6 @@ Table::iterator Table::Insert(const_iterator pos, const Row& value) {
     auto insert_pos = static_cast<iterator>(pos);
     auto& page_data = GetLeafNode(insert_pos.page_index_);
 
-    if (page_data.cell_num == LeafNodeType::kMaxCells) {
-        Split(insert_pos);
-        // TODO: 重新定位 insert_pos 完成插入
-        return {};
-    }
-
     for (uint32_t i = page_data.cell_num; i > insert_pos.cell_index_; i--) {
         std::swap(page_data.cells[i], page_data.cells[i - 1]);
     }
@@ -56,6 +50,13 @@ Table::iterator Table::Insert(const_iterator pos, const Row& value) {
 
 void Table::Split(const_iterator pos) {
     auto& parent = GetNode(pos.page_index_);
+
+    // TODO: 暂不实现更新拆分后的父节点
+    if (parent.parent) {
+        fmt::print(stderr, "Need to implement updating parent after split.\n");
+        exit(EXIT_FAILURE);
+    }
+
     Node old_head = parent;  // 保存旧的头部信息
 
     constexpr uint32_t kSplitPoint = (LeafNodeType::kMaxCells + 1) / 2;
@@ -93,18 +94,31 @@ void Table::Split(const_iterator pos) {
     new_parent.right_child = right_child_page_num;
 }
 
-Table::iterator Table::LowerBound(uint32_t key) {
-    const auto& root_page = RootPage();
-    if (root_page.type == Node::Type::kLeaf) {
-        const auto& leaf_page = reinterpret_cast<const LeafNodeType&>(root_page);
-        auto iter = std::lower_bound(leaf_page.cells.begin(), leaf_page.cells.begin() + leaf_page.cell_num, key,
-                                     [](const auto& cell, uint32_t key) { return cell.key < key; });
-        return iterator(this, root_page_index_, iter - leaf_page.cells.begin());
-    } else {
-        fmt::println("Need to implement searching an internal node.");
-        exit(EXIT_FAILURE);
+Table::iterator Table::lower_bound(uint32_t key, uint32_t page_index) {
+    const auto& page = GetNode(page_index);
+    switch (page.type) {
+        case Node::Type::kInternal: {
+            const auto& internal_page = reinterpret_cast<const InternalNodeType&>(page);
+            auto iter = std::lower_bound(internal_page.children.begin(),
+                                         internal_page.children.begin() + internal_page.child_num, key,
+                                         [](const auto& child, uint32_t key) { return child.max_key < key; });
+            if (iter == internal_page.children.begin() + internal_page.child_num) {
+                return lower_bound(key, internal_page.right_child);
+            } else {
+                return lower_bound(key, iter->page_index);
+            }
+        }
+        case Node::Type::kLeaf: {
+            const auto& leaf_page = reinterpret_cast<const LeafNodeType&>(page);
+            auto iter = std::lower_bound(leaf_page.cells.begin(), leaf_page.cells.begin() + leaf_page.cell_num,
+                                         key, [](const auto& cell, uint32_t key) { return cell.key < key; });
+            return iterator(this, page_index, iter - leaf_page.cells.begin());
+        }
+        default:
+            fmt::println("Unknown node type");
+            exit(EXIT_FAILURE);
+            break;
     }
-    return end();
 }
 
 void indent(uint32_t level) {
@@ -113,19 +127,19 @@ void indent(uint32_t level) {
     }
 }
 
-void Table::PrintNode(uint32_t page_index, uint32_t indentation_level) const {
+void Table::print_tree(uint32_t page_index, uint32_t indentation_level) const {
     switch (GetNode(page_index).type) {
         case Node::Type::kInternal: {
             const auto& node = GetInternalNode(page_index);
             indent(indentation_level);
             fmt::println("- internal (size {})", node.child_num);
             for (uint32_t i = 0; i < node.child_num; i++) {
-                PrintNode(node.children[i].page_index, indentation_level + 1);
+                print_tree(node.children[i].page_index, indentation_level + 1);
 
                 indent(indentation_level + 1);
                 fmt::println("- key {}", node.children[i].max_key);
             }
-            PrintNode(node.right_child, indentation_level + 1);
+            print_tree(node.right_child, indentation_level + 1);
             break;
         }
         case Node::Type::kLeaf: {

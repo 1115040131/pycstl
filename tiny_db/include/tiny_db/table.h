@@ -236,7 +236,9 @@ public:
 
     // bool Empty() const { return RootPage().head.cell_num == 0; }
 
-    bool Full() const { return GetLeafNode(root_page_index_).cell_num == LeafNodeType::kMaxCells; }
+    bool PageFull(const_iterator pos) const {
+        return GetLeafNode(pos.page_index_).cell_num == LeafNodeType::kMaxCells;
+    }
 
 #pragma endregion
 
@@ -252,18 +254,20 @@ public:
 
     // iterator Find(uint32_t key);
 
-    iterator LowerBound(uint32_t key);
+    iterator LowerBound(uint32_t key) { return lower_bound(key, root_page_index_); }
 
 #pragma endregion
 
 #pragma region 观察者
 
-    void PrintTree() const { PrintNode(root_page_index_, 0); }
+    void PrintTree() const { print_tree(root_page_index_, 0); }
 
 #pragma endregion
 
 private:
-    void PrintNode(uint32_t page_index, uint32_t indentation_level) const;
+    iterator lower_bound(uint32_t key, uint32_t page_index);
+
+    void print_tree(uint32_t page_index, uint32_t indentation_level) const;
 
 private:
     uint32_t root_page_index_ = 0;
