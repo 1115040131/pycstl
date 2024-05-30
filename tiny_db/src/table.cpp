@@ -62,8 +62,8 @@ void Table::Split(const_iterator pos) {
     constexpr uint32_t kSplitPoint = (LeafNodeType::kMaxCells + 1) / 2;
 
     // cells 拷贝到新的左子节点
-    int left_child_page_num = pager_.page_num_;
-    auto& left_child = GetLeafNode(left_child_page_num);
+    int left_child_page_index = pager_.page_num_;
+    auto& left_child = GetLeafNode(left_child_page_index);
     left_child = LeafNodeType(&parent);
 
     for (uint32_t i = 0; i < kSplitPoint; i++) {
@@ -72,14 +72,16 @@ void Table::Split(const_iterator pos) {
     }
 
     // cells 拷贝到新的右子节点
-    int right_child_page_num = pager_.page_num_;
-    auto& right_child = GetLeafNode(right_child_page_num);
+    int right_child_page_index = pager_.page_num_;
+    auto& right_child = GetLeafNode(right_child_page_index);
     right_child = LeafNodeType(&parent);
 
     for (uint32_t i = kSplitPoint; i < LeafNodeType::kMaxCells; i++) {
         right_child.cells[i - kSplitPoint] = std::move(reinterpret_cast<LeafNodeType&>(parent).cells[i]);
         right_child.cell_num++;
     }
+
+    left_child.next_leaf = right_child_page_index;
 
     // 更新父节点
     auto& new_parent = reinterpret_cast<InternalNodeType&>(parent);
@@ -89,9 +91,17 @@ void Table::Split(const_iterator pos) {
     new_parent.parent = old_head.parent;
 
     new_parent.child_num = 1;
-    new_parent.children[0].page_index = left_child_page_num;
+    new_parent.children[0].page_index = left_child_page_index;
     new_parent.children[0].max_key = left_child.cells[left_child.cell_num - 1].key;
-    new_parent.right_child = right_child_page_num;
+    new_parent.right_child = right_child_page_index;
+
+    // 更新头尾叶子节点
+    if (first_leaf_page_index_ == pos.page_index_) {
+        first_leaf_page_index_ = left_child_page_index;
+    }
+    if (last_leaf_page_index_ == pos.page_index_) {
+        last_leaf_page_index_ = right_child_page_index;
+    }
 }
 
 Table::iterator Table::lower_bound(uint32_t key, uint32_t page_index) {

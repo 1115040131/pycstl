@@ -165,9 +165,9 @@ class TestDatabase(unittest.TestCase):
         expected = [
             "db > Constants:",
             "  kRowSize: 296",
-            "  kHeadSize: 20",
+            "  kHeadSize: 24",
             "  kCellSize: 300",
-            "  kSpaceForCells: 4076",
+            "  kSpaceForCells: 4072",
             "  kMaxCells: 13",
             "db > Bye!",
         ]
@@ -216,6 +216,8 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_prints_structure_of_a_3_leaf_node_btree(self):
+        """测试3个叶子节点的 btree 结构"""
+
         script = [
             f"insert {i} user{i} person{i}@example.com" for i in range(1, 15)]
         script.append(".btree")
@@ -267,8 +269,37 @@ class TestDatabase(unittest.TestCase):
             "    - 15",
             "db > Bye!"
         ]
-
         self.assertEqual(result[14:], expected)
+
+    def test_print_all_rows_in_a_multi_level_tree(self):
+        """测试多级 btree 结构 select 的结果"""
+
+        script = [
+            f"insert {i} user{i} person{i}@example.com" for i in range(1, 16)]
+        script.append("select")
+        script.append(".exit")
+        result = self.run_script(script)
+
+        expected_results = [
+            "db > (1, user1, person1@example.com)",
+            "(2, user2, person2@example.com)",
+            "(3, user3, person3@example.com)",
+            "(4, user4, person4@example.com)",
+            "(5, user5, person5@example.com)",
+            "(6, user6, person6@example.com)",
+            "(7, user7, person7@example.com)",
+            "(8, user8, person8@example.com)",
+            "(9, user9, person9@example.com)",
+            "(10, user10, person10@example.com)",
+            "(11, user11, person11@example.com)",
+            "(12, user12, person12@example.com)",
+            "(13, user13, person13@example.com)",
+            "(14, user14, person14@example.com)",
+            "(15, user15, person15@example.com)",
+            "Executed.",
+            "db > Bye!"
+        ]
+        self.assertEqual(result[15:], expected_results)
 
 
 if __name__ == '__main__':

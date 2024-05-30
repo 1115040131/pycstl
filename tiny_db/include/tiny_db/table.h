@@ -45,13 +45,6 @@ public:
 
     private:
         explicit iterator(Table* table) noexcept : table_(table) {}
-        iterator(Table* table, uint32_t page_index) noexcept : table_(table), page_index_(page_index) {
-            cell_index_ = table_->GetLeafNode(page_index).cell_num;
-            if (cell_index_ == LeafNodeType::kMaxCells) {
-                cell_index_ = 0;
-                page_index_++;
-            }
-        }
 
         iterator(Table* table, uint32_t page_index, uint32_t cell_index) noexcept
             : table_(table), page_index_(page_index), cell_index_(cell_index) {}
@@ -62,11 +55,11 @@ public:
         iterator() = default;
 
         iterator& operator++() noexcept {  //++iterator
-            if (cell_index_ + 1 < LeafNodeType::kMaxCells) {
-                cell_index_++;
-            } else {
+            cell_index_++;
+            const auto& leaf_node = table_->GetLeafNode(page_index_);
+            if (cell_index_ == leaf_node.cell_num && leaf_node.next_leaf != 0) {
+                page_index_ = leaf_node.next_leaf;
                 cell_index_ = 0;
-                page_index_++;
             }
             return *this;
         }
@@ -74,22 +67,6 @@ public:
         iterator operator++(int) noexcept {  // iterator++
             auto tmp = *this;
             ++(*this);
-            return tmp;
-        }
-
-        iterator& operator--() noexcept {  //--iterator
-            if (cell_index_ > 0) {
-                cell_index_--;
-            } else {
-                cell_index_ = LeafNodeType::kMaxCells - 1;
-                page_index_--;
-            }
-            return *this;
-        }
-
-        iterator operator--(int) noexcept {  // iterator--
-            auto tmp = *this;
-            --(*this);
             return tmp;
         }
 
@@ -115,13 +92,6 @@ public:
 
     private:
         explicit const_iterator(const Table* table) noexcept : table_(table) {}
-        const_iterator(const Table* table, uint32_t page_index) noexcept : table_(table), page_index_(page_index) {
-            cell_index_ = table_->GetLeafNode(page_index).cell_num;
-            if (cell_index_ == LeafNodeType::kMaxCells) {
-                cell_index_ = 0;
-                page_index_++;
-            }
-        }
 
         const_iterator(const Table* table, uint32_t page_index, uint32_t cell_index) noexcept
             : table_(table), page_index_(page_index), cell_index_(cell_index) {}
@@ -139,11 +109,11 @@ public:
         }
 
         const_iterator& operator++() noexcept {  //++iterator
-            if (cell_index_ + 1 < LeafNodeType::kMaxCells) {
-                cell_index_++;
-            } else {
+            cell_index_++;
+            const auto& leaf_node = table_->GetLeafNode(page_index_);
+            if (cell_index_ == leaf_node.cell_num && leaf_node.next_leaf != 0) {
+                page_index_ = leaf_node.next_leaf;
                 cell_index_ = 0;
-                page_index_++;
             }
             return *this;
         }
@@ -151,22 +121,6 @@ public:
         const_iterator operator++(int) noexcept {  // iterator++
             auto tmp = *this;
             ++(*this);
-            return tmp;
-        }
-
-        const_iterator& operator--() noexcept {  //--iterator
-            if (cell_index_ > 0) {
-                cell_index_--;
-            } else {
-                cell_index_ = LeafNodeType::kMaxCells - 1;
-                page_index_--;
-            }
-            return *this;
-        }
-
-        const_iterator operator--(int) noexcept {  // iterator--
-            auto tmp = *this;
-            --(*this);
             return tmp;
         }
 
@@ -188,34 +142,21 @@ public:
         uint32_t cell_index_{0};
     };
 
-    using reverse_iterator = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
 #pragma region 迭代器
 
-    iterator begin() { return iterator(this); }
+    iterator begin() { return iterator(this, first_leaf_page_index_, 0); }
 
-    iterator end() { return iterator(this, pager_.page_num_ - 1); }
+    iterator end() { return iterator(this, last_leaf_page_index_, GetLeafNode(last_leaf_page_index_).cell_num); }
 
-    const_iterator cbegin() const noexcept { return const_iterator(this); }
+    const_iterator cbegin() const noexcept { return const_iterator(this, first_leaf_page_index_, 0); }
 
-    const_iterator cend() const noexcept { return const_iterator(this, pager_.page_num_ - 1); }
+    const_iterator cend() const noexcept {
+        return const_iterator(this, last_leaf_page_index_, GetLeafNode(last_leaf_page_index_).cell_num);
+    }
 
     const_iterator begin() const noexcept { return cbegin(); }
 
     const_iterator end() const noexcept { return cend(); }
-
-    reverse_iterator rbegin() noexcept { return std::make_reverse_iterator(end()); }
-
-    reverse_iterator rend() noexcept { return std::make_reverse_iterator(begin()); }
-
-    const_reverse_iterator crbegin() const noexcept { return std::make_reverse_iterator(cend()); }
-
-    const_reverse_iterator crend() const noexcept { return std::make_reverse_iterator(cbegin()); }
-
-    const_reverse_iterator rbegin() const noexcept { return crbegin(); }
-
-    const_reverse_iterator rend() const noexcept { return crend(); }
 
 #pragma endregion
 
@@ -252,8 +193,6 @@ public:
 
 #pragma region 查找
 
-    // iterator Find(uint32_t key);
-
     iterator LowerBound(uint32_t key) { return lower_bound(key, root_page_index_); }
 
 #pragma endregion
@@ -271,6 +210,8 @@ private:
 
 private:
     uint32_t root_page_index_ = 0;
+    uint32_t first_leaf_page_index_ = 0;
+    uint32_t last_leaf_page_index_ = 0;
     Pager pager_;
 };
 

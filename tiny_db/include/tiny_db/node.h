@@ -27,9 +27,10 @@ struct LeafNode : public Node {
     };
 
     uint32_t cell_num{0};
+    uint32_t next_leaf{0};
 
     // 计算可以存储的最大cell数量
-    static constexpr uint32_t kHeadSize = sizeof(Node) + sizeof(uint32_t);
+    static constexpr uint32_t kHeadSize = sizeof(Node) + sizeof(cell_num) + sizeof(next_leaf);
     static constexpr uint32_t kCellSize = sizeof(Cell);
     static constexpr uint32_t kMaxCells = (kPageSize - kHeadSize) / kCellSize;
 
