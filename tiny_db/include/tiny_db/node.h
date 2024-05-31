@@ -61,7 +61,7 @@ struct InternalNode : public Node {
     // 计算可以存储的最大 child 数量
     static constexpr uint32_t kHeadSize = sizeof(Node) + sizeof(child_num) + sizeof(right_child);
     static constexpr uint32_t kChildNum = sizeof(Child);
-    static constexpr uint32_t kMaxChildren = (kPageSize - kHeadSize) / kChildNum;
+    static constexpr uint32_t kMaxChildren = 3;
 
     std::array<Child, kMaxChildren> children;
 

@@ -48,58 +48,79 @@ Table::iterator Table::Insert(const_iterator pos, const Row& value) {
     return insert_pos;
 }
 
-void Table::Split(const_iterator pos) {
-    auto& parent = GetNode(pos.page_index_);
+void Table::SplitAndInsert(const_iterator pos, const Row& value) {
+    uint32_t old_node_page_index = pos.page_index_;
+    auto& old_node = GetLeafNode(old_node_page_index);
 
-    // TODO: 暂不实现更新拆分后的父节点
-    if (parent.parent) {
-        fmt::print(stderr, "Need to implement updating parent after split.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    Node old_head = parent;  // 保存旧的头部信息
-
+    // 拆分边界
     constexpr uint32_t kSplitPoint = (LeafNodeType::kMaxCells + 1) / 2;
 
-    // cells 拷贝到新的左子节点
-    int left_child_page_index = pager_.page_num_;
-    auto& left_child = GetLeafNode(left_child_page_index);
-    left_child = LeafNodeType(&parent);
-
-    for (uint32_t i = 0; i < kSplitPoint; i++) {
-        left_child.cells[i] = std::move(reinterpret_cast<LeafNodeType&>(parent).cells[i]);
-        left_child.cell_num++;
-    }
-
     // cells 拷贝到新的右子节点
-    int right_child_page_index = pager_.page_num_;
+    uint32_t right_child_page_index = pager_.page_num_;
     auto& right_child = GetLeafNode(right_child_page_index);
-    right_child = LeafNodeType(&parent);
+    right_child = LeafNodeType();
 
-    for (uint32_t i = kSplitPoint; i < LeafNodeType::kMaxCells; i++) {
-        right_child.cells[i - kSplitPoint] = std::move(reinterpret_cast<LeafNodeType&>(parent).cells[i]);
-        right_child.cell_num++;
+    uint32_t move_count = pos.cell_index_ < kSplitPoint ? kSplitPoint : kSplitPoint - 1;
+    for (uint32_t i = 0; i < move_count; i++) {
+        std::swap(old_node.cells[LeafNodeType::kMaxCells - move_count + i], right_child.cells[i]);
     }
+    old_node.cell_num = LeafNodeType::kMaxCells - move_count;
+    old_node.next_leaf = right_child_page_index;
+    right_child.cell_num = move_count;
 
-    left_child.next_leaf = right_child_page_index;
+    // 插入新节点
+    auto insert_pos = pos.cell_index_ < kSplitPoint
+                          ? pos
+                          : iterator(this, right_child_page_index, pos.cell_index_ - kSplitPoint);
+    Insert(insert_pos, value);
 
     // 更新父节点
-    auto& new_parent = reinterpret_cast<InternalNodeType&>(parent);
-    new_parent = InternalNodeType{};
-    new_parent.type = Node::Type::kInternal;
-    new_parent.is_root = old_head.is_root;
-    new_parent.parent = old_head.parent;
+    if (old_node.parent) {
+        auto parent = reinterpret_cast<InternalNodeType*>(old_node.parent);
+        if (parent->child_num == InternalNodeType::kMaxChildren) {
+            fmt::print(stderr, "Need to implement splitting internal node.\n");
+            exit(EXIT_FAILURE);
+        }
+        if (parent->right_child == old_node_page_index) {
+            parent->children[parent->child_num] = {old_node_page_index, old_node.cells[old_node.cell_num - 1].key};
+            parent->right_child = right_child_page_index;
+            parent->child_num++;
+        } else {
+            auto iter = std::find_if(
+                parent->children.begin(), parent->children.begin() + parent->child_num,
+                [old_node_page_index](const auto& child) { return child.page_index == old_node_page_index; });
+            if (iter == parent->children.begin() + parent->child_num) {
+                fmt::print(stderr, "Error: cannot find old node {} in parent\n", old_node_page_index);
+                exit(EXIT_FAILURE);
+            }
+            iter->max_key = old_node.cells[old_node.cell_num - 1].key;
+            parent->children[parent->child_num] = {right_child_page_index,
+                                                   right_child.cells[right_child.cell_num - 1].key};
+            parent->child_num++;
+        }
 
-    new_parent.child_num = 1;
-    new_parent.children[0].page_index = left_child_page_index;
-    new_parent.children[0].max_key = left_child.cells[left_child.cell_num - 1].key;
-    new_parent.right_child = right_child_page_index;
+        right_child.parent = old_node.parent;
+        if (last_leaf_page_index_ == old_node_page_index) {
+            last_leaf_page_index_ = right_child_page_index;
+        }
 
-    // 更新头尾叶子节点
-    if (first_leaf_page_index_ == pos.page_index_) {
-        first_leaf_page_index_ = left_child_page_index;
-    }
-    if (last_leaf_page_index_ == pos.page_index_) {
+    } else {
+        // 创建新的根节点
+
+        int new_root_page_index = pager_.page_num_;
+        auto& new_root = GetInternalNode(new_root_page_index);
+        new_root.is_root = true;
+        new_root.type = Node::Type::kInternal;
+        new_root.child_num = 1;
+        new_root.children[0].page_index = pos.page_index_;
+        new_root.children[0].max_key = old_node.cells[old_node.cell_num - 1].key;
+        new_root.right_child = right_child_page_index;
+
+        old_node.parent = &new_root;
+        right_child.parent = &new_root;
+
+        root_page_index_ = new_root_page_index;
+        first_leaf_page_index_ = pos.page_index_;
         last_leaf_page_index_ = right_child_page_index;
     }
 }

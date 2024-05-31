@@ -187,7 +187,7 @@ public:
 
     iterator Insert(const_iterator pos, const Row& value);
 
-    void Split(const_iterator pos);
+    void SplitAndInsert(const_iterator pos, const Row& value);
 
 #pragma endregion
 

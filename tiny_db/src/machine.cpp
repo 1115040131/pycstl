@@ -190,11 +190,11 @@ Machine::ExecuteResult Machine::ExecuteInsert(const Statement& statement) {
     }
 
     if (table_->PageFull(insert_pos)) {
-        table_->Split(insert_pos);
-        insert_pos = table_->LowerBound(statement.row_to_insert.id);
+        table_->SplitAndInsert(insert_pos, statement.row_to_insert);
+    } else {
+        table_->Insert(insert_pos, statement.row_to_insert);
     }
 
-    table_->Insert(insert_pos, statement.row_to_insert);
     return ExecuteResult::kSuccess;
 }
 
