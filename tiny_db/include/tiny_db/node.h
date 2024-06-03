@@ -15,8 +15,8 @@ struct Node {
         kLeaf,
     };
     Type type{Type::kInternal};
-    bool is_root{false};
-    Node* parent{nullptr};
+    uint32_t page_index{0};
+    uint32_t parent{0};
 };
 
 template <typename Key, typename Value>
@@ -38,14 +38,6 @@ struct LeafNode : public Node {
 
     explicit LeafNode() : Node(Node::Type::kLeaf) {}
     explicit LeafNode(Node* node) : Node(Node::Type::kLeaf, false, node) {}
-
-public:
-    void Print() const {
-        fmt::println("leaf (size {})", cell_num);
-        for (uint32_t i = 0; i < cell_num; i++) {
-            fmt::println("  - {} : {}", i, cells[i].key);
-        }
-    }
 };
 
 template <typename Key>

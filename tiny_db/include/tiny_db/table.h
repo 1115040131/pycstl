@@ -199,7 +199,7 @@ public:
 
 #pragma region 观察者
 
-    void PrintTree() const { print_tree(root_page_index_, 0); }
+    void PrintTree(bool debug = false) const { print_tree(root_page_index_, 0, debug); }
 
 #pragma endregion
 
@@ -208,7 +208,7 @@ private:
 
     iterator lower_bound(uint32_t key, uint32_t page_index);
 
-    void print_tree(uint32_t page_index, uint32_t indentation_level) const;
+    void print_tree(uint32_t page_index, uint32_t indentation_level, bool debug = false) const;
 
 private:
     uint32_t root_page_index_ = 0;

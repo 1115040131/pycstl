@@ -61,6 +61,10 @@ Machine::MetaCommandResult Machine::DoMetaCommand(std::string_view command) {
         fmt::println("Tree:");
         table_->PrintTree();
         return MetaCommandResult::kSuccess;
+    } else if (command == ".btree debug") {
+        fmt::println("Tree:");
+        table_->PrintTree(true);
+        return MetaCommandResult::kSuccess;
     } else if (command == ".constants") {
         fmt::println("Constants:");
         fmt::println("  kRowSize: {}", kRowSize);

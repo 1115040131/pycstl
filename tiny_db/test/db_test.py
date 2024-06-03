@@ -67,15 +67,16 @@ class TestDatabase(unittest.TestCase):
     def test_prints_error_message_when_table_is_full(self):
         """测试 table 满了之后的错误提示"""
 
-        # TODO: 拆分 internal 节点
+        # TODO: 递归拆分 internal 节点
         script = [
-            f"insert {i} user{i} person{i}@example.com" for i in range(1, 36)]
+            f"insert {i} user{i} person{i}@example.com" for i in range(1, 50)]
+        script.append(".btree debug")
         script.append(".exit")
         result = self.run_script(script)
 
         expected = [
             "db > Executed.",
-            "db > Need to implement splitting internal node."
+            "db > Need to implement splitting internal node recursively."
         ]
         self.assertEqual(result[-2:], expected)
 
@@ -164,9 +165,9 @@ class TestDatabase(unittest.TestCase):
         expected = [
             "db > Constants:",
             "  kRowSize: 296",
-            "  kHeadSize: 24",
+            "  kHeadSize: 20",
             "  kCellSize: 300",
-            "  kSpaceForCells: 4072",
+            "  kSpaceForCells: 4076",
             "  kMaxCells: 13",
             "db > Bye!",
         ]
@@ -568,9 +569,16 @@ class TestDatabase(unittest.TestCase):
             "      - 82",
             "      - 85",
             "      - 86",
-            "db > ",
+            "db > Bye!",
         ]
         self.assertEqual(result[-len(expected_results):], expected_results)
+
+        # 落盘
+        result2 = self.run_script([
+            ".btree",
+            ".exit",
+        ])
+        self.assertEqual(result2[-len(expected_results):], expected_results)
 
 
 if __name__ == '__main__':
