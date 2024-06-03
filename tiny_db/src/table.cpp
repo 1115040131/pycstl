@@ -65,22 +65,21 @@ void Table::SplitAndInsert(const_iterator pos, const Row& value) {
         std::swap(old_node.cells[LeafNodeType::kMaxCells - move_count + i], right_child.cells[i]);
     }
     old_node.cell_num = LeafNodeType::kMaxCells - move_count;
-    old_node.next_leaf = right_child_page_index;
     right_child.cell_num = move_count;
 
-    // 插入新节点
+    // 插入新数据
     auto insert_pos = pos.cell_index_ < kSplitPoint
                           ? pos
                           : iterator(this, right_child_page_index, pos.cell_index_ - kSplitPoint);
     Insert(insert_pos, value);
 
+    // 更新兄弟节点
+    right_child.next_leaf = old_node.next_leaf;
+    old_node.next_leaf = right_child_page_index;
+
     // 更新父节点
     if (old_node.parent) {
         auto parent = reinterpret_cast<InternalNodeType*>(old_node.parent);
-        if (parent->child_num == InternalNodeType::kMaxChildren) {
-            fmt::print(stderr, "Need to implement splitting internal node.\n");
-            exit(EXIT_FAILURE);
-        }
         if (parent->right_child == old_node_page_index) {
             parent->children[parent->child_num] = {old_node_page_index, old_node.cells[old_node.cell_num - 1].key};
             parent->right_child = right_child_page_index;
@@ -93,9 +92,13 @@ void Table::SplitAndInsert(const_iterator pos, const Row& value) {
                 fmt::print(stderr, "Error: cannot find old node {} in parent\n", old_node_page_index);
                 exit(EXIT_FAILURE);
             }
+
+            // 插入新的子节点
             iter->max_key = old_node.cells[old_node.cell_num - 1].key;
-            parent->children[parent->child_num] = {right_child_page_index,
-                                                   right_child.cells[right_child.cell_num - 1].key};
+            for (uint32_t i = parent->child_num; i > iter - parent->children.begin() + 1; i--) {
+                std::swap(parent->children[i], parent->children[i - 1]);
+            }
+            *(++iter) = {right_child_page_index, right_child.cells[right_child.cell_num - 1].key};
             parent->child_num++;
         }
 
@@ -104,6 +107,9 @@ void Table::SplitAndInsert(const_iterator pos, const Row& value) {
             last_leaf_page_index_ = right_child_page_index;
         }
 
+        if (parent->child_num > InternalNodeType::kMaxChildren) {
+            split_internal_node(*parent);
+        }
     } else {
         // 创建新的根节点
 
@@ -123,6 +129,11 @@ void Table::SplitAndInsert(const_iterator pos, const Row& value) {
         first_leaf_page_index_ = pos.page_index_;
         last_leaf_page_index_ = right_child_page_index;
     }
+}
+
+void Table::split_internal_node(InternalNodeType&) {
+    fmt::print(stderr, "Need to implement splitting internal node.\n");
+    exit(EXIT_FAILURE);
 }
 
 Table::iterator Table::lower_bound(uint32_t key, uint32_t page_index) {

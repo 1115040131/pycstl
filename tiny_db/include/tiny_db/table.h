@@ -204,6 +204,8 @@ public:
 #pragma endregion
 
 private:
+    void split_internal_node(InternalNodeType& parent);
+
     iterator lower_bound(uint32_t key, uint32_t page_index);
 
     void print_tree(uint32_t page_index, uint32_t indentation_level) const;
