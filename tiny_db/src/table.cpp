@@ -1,5 +1,7 @@
 #include "tiny_db/table.h"
 
+#include <algorithm>
+
 #include <fmt/core.h>
 
 namespace tiny_db {
