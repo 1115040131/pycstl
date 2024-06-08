@@ -306,7 +306,7 @@ public:
 
 #pragma endregion
 
-#pragma region 元素访问
+#pragma region 迭代器
 
     iterator begin() noexcept { return iterator{dummy_.next_}; }
 

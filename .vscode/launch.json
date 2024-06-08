@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) 启动",
+            "name": "(gdb) 启动 tiny_db",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/tetris/tetris",
-            "args": [],
+            "program": "${workspaceFolder}/bazel-bin/tiny_db/tiny_db",
+            "args": ["test.db"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
