@@ -1,0 +1,14 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
+cc_test(
+    name = "design_pattern_test",
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
+    copts = COPTS,
+    deps = [
+        "@glm",
+        "@googletest//:gtest_main",
+    ],
+)

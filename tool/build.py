@@ -32,9 +32,9 @@ def run_bazel_run(target, args=[]):
     subprocess.run(shlex.split(command))
 
 
-
 def run_valgrind(target, args=[]):
-    command = f'valgrind --leak-check=full --track-origins=yes {target} {' '.join(args)}'
+    command = f'valgrind --leak-check=full --track-origins=yes {
+        target} {' '.join(args)}'
     if len(args) == 0:
         command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
     logger.info(command)
@@ -62,6 +62,10 @@ def main():
         "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args),
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', True, args),
         "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test', args),
+
+        ######################### build for design_pattern #########################
+        "design_pattern": lambda args: run_bazel_build('//design_pattern:design_pattern_test', args),
+        "design_pattern_test": lambda args: run_bazel_test('//design_pattern:design_pattern_test', True, args),
 
         ######################### build for logger #########################
         "logger": lambda args: run_bazel_build('//logger //logger/test/...', args),
