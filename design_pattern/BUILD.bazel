@@ -8,6 +8,7 @@ cc_test(
     ]),
     copts = COPTS,
     deps = [
+        "@glm",
         "@googletest//:gtest_main",
     ],
 )
