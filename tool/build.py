@@ -58,6 +58,13 @@ def main():
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
 
+        ######################### build for coroutine #########################
+        "coroutine": lambda args: run_bazel_build('//coroutine //coroutine/example/... //coroutine/test/...', args),
+        "coroutine_example": lambda args:
+        logger.error("Please give example name") if len(args) < 1 else
+        run_bazel_run(f'//coroutine/example:{args[0]}', args[1:]),
+        "coroutine_test": lambda args: run_bazel_test('//coroutine/test:coroutine_all_test', True, args),
+
         ######################### build for concurrency #########################
         "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args),
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', True, args),

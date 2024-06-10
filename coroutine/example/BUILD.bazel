@@ -2,6 +2,7 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 BINARIES = [
     "exception_handle",
+    "variant_result"
 ]
 
 [cc_binary(
