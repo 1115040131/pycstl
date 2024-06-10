@@ -1,0 +1,12 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
+BINARIES = [
+    "exception_handle",
+]
+
+[cc_binary(
+    name = binary,
+    srcs = ["%s.cpp" % binary],
+    copts = COPTS,
+    deps = ["//coroutine"],
+) for binary in BINARIES]
