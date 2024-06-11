@@ -206,17 +206,17 @@ Task<void> sleep_for(std::chrono::system_clock::duration duration) {
 }
 
 Task<int> hello1() {
-    logger.info("[hello1] 开始睡 1s");
+    logger.info("开始睡 1s");
     co_await sleep_for(1s);
-    logger.info("[hello1] 结束睡觉");
+    logger.info("结束睡觉");
 
     co_return 1;
 }
 
 Task<int> hello2() {
-    logger.info("[hello2] 开始睡 2s");
+    logger.info("开始睡 2s");
     co_await sleep_for(2s);
-    logger.info("[hello2] 结束睡觉");
+    logger.info("结束睡觉");
 
     co_return 2;
 }
@@ -230,9 +230,9 @@ int main() {
     pyc::getLoop().addTask(task2);
     pyc::getLoop().runAll();
 
-    pyc::logger.info("[main] 得到 hello1 的结果: {}", task1.coroutine_.promise().result());
-    pyc::logger.info("[main] 得到 hello2 的结果: {}", task2.coroutine_.promise().result());
-    pyc::logger.info("[main] 执行完成");
+    pyc::logger.info("得到 hello1 的结果: {}", task1.coroutine_.promise().result());
+    pyc::logger.info("得到 hello2 的结果: {}", task2.coroutine_.promise().result());
+    pyc::logger.info("执行完成");
 
     return 0;
 }

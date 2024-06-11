@@ -124,29 +124,29 @@ struct Task {
 };
 
 Task<void> void_task() {
-    logger.debug("[void_task]");
+    logger.debug("");
     co_return;
 }
 
 Task<std::string> string_task() {
-    logger.debug("[string_task]");
+    logger.debug("");
     co_return "aaa";
 }
 
 Task<double> double_task() {
-    logger.debug("[double_task]");
+    logger.debug("");
     co_return 3.14;
 }
 
 Task<int> hello() {
     co_await void_task();
-    logger.info("[hello] 得到 void_task 返回");
+    logger.info("得到 void_task 返回");
 
     auto ret = co_await string_task();
-    logger.info("[hello] 得到 string_task 的结果: {}", ret);
+    logger.info("得到 string_task 的结果: {}", ret);
 
     auto i = static_cast<int>(co_await double_task());
-    logger.info("[hello] 得到 double_task 的结果: {}", i);
+    logger.info("得到 double_task 的结果: {}", i);
 
     co_return i + 1;
 }
@@ -157,10 +157,10 @@ int main() {
     auto task = pyc::hello();
     while (!task.coroutine_.done()) {
         task.coroutine_.resume();
-        logger.info("[main] 得到 hello 结果: {}", task.coroutine_.promise().result());
+        logger.info("得到 hello 结果: {}", task.coroutine_.promise().result());
     }
 
-    logger.info("[main] 执行完成");
+    logger.info("执行完成");
 
     return 0;
 }

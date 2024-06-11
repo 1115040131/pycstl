@@ -100,10 +100,10 @@ int main() {
     auto task = pyc::hello();
     while (!task.coroutine_.done()) {
         task.coroutine_.resume();
-        logger.info("[main] get hello value: {}", task.coroutine_.promise().result());
+        logger.info("get hello value: {}", task.coroutine_.promise().result());
     }
 
-    logger.info("[main] 执行完成");
+    logger.info("执行完成");
 
     return 0;
 }
