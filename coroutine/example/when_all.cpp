@@ -1,6 +1,7 @@
 #include <chrono>
 #include <coroutine>
 #include <queue>
+#include <span>
 #include <thread>
 
 #include <fmt/chrono.h>
@@ -13,9 +14,95 @@ namespace pyc {
 
 inline pyc::Logger logger("Coroutine");
 
-struct PreviousAwaiter {
-    std::coroutine_handle<> previous_ = nullptr;
+template <typename T = void>
+struct NonVoidHelper {
+    using Type = T;
+};
 
+template <>
+struct NonVoidHelper<void> {
+    using Type = NonVoidHelper;
+
+    explicit NonVoidHelper() noexcept = default;
+};
+
+template <typename T>
+struct Uninitialized {
+    union {
+        T value_;
+    };
+
+    Uninitialized() noexcept {}
+    Uninitialized(Uninitialized&&) = delete;
+    ~Uninitialized() noexcept {}
+
+    T moveValue() {
+        T value = std::move(value_);
+        std::destroy_at(&value_);
+        return value;
+    }
+
+    template <typename... Args>
+    void putValue(Args&&... args) {
+        std::construct_at(&value_, std::forward<Args>(args)...);
+    }
+};
+
+template <>
+struct Uninitialized<void> {
+    auto moveValue() { return NonVoidHelper<>(); }
+
+    void putValue(NonVoidHelper<>) {}
+};
+
+template <typename T>
+struct Uninitialized<const T> : Uninitialized<T> {};
+
+template <typename T>
+struct Uninitialized<T&> : Uninitialized<std::reference_wrapper<T>> {};
+
+template <typename T>
+struct Uninitialized<T&&> : Uninitialized<T> {};
+
+template <typename A>
+concept Awaiter = requires(A a, std::coroutine_handle<> h) {
+    { a.await_ready() } -> std::same_as<bool>;
+    { a.await_suspend(h) };
+    { a.await_resume() };
+};
+
+template <typename A>
+concept Awaitable = Awaiter<A> || requires(A a) {
+    { a.operator co_await() } -> Awaiter;
+};
+
+template <typename A>
+struct AwaitableTraits {};
+
+template <Awaiter A>
+struct AwaitableTraits<A> {
+    using RetType = decltype(std::declval<A>().await_resume());
+    using NonVoidRetType = NonVoidHelper<RetType>::Type;
+};
+
+template <typename A>
+    requires(!Awaiter<A> && Awaitable<A>)
+struct AwaitableTraits<A> : AwaitableTraits<decltype(std::declval<A>().operator co_await())> {};
+
+struct RepeatAwaiter {
+    constexpr bool await_ready() const noexcept { return false; }
+
+    std::coroutine_handle<> await_suspend(std::coroutine_handle<> coroutine) const noexcept {
+        if (coroutine.done()) {
+            return std::noop_coroutine();
+        }
+        return coroutine;
+    }
+
+    constexpr void await_resume() const noexcept {}
+};
+
+struct PreviousAwaiter {
     constexpr bool await_ready() const noexcept { return false; }
 
     std::coroutine_handle<> await_suspend(std::coroutine_handle<>) const noexcept {
@@ -26,6 +113,8 @@ struct PreviousAwaiter {
     }
 
     constexpr void await_resume() const noexcept {}
+
+    std::coroutine_handle<> previous_ = nullptr;
 };
 
 template <typename T>
@@ -48,13 +137,14 @@ struct Promise {
         return std::suspend_always();
     }
 
-    void return_value(T value) { std::construct_at(&result_, std::move(value)); }
+    void return_value(const T& value) { result_.putValue(value); }
+    void return_value(T&& value) { result_.putValue(std::move(value)); }
 
     T result() {
         if (exception_) [[unlikely]] {
             std::rethrow_exception(exception_);
         }
-        return std::move(result_);
+        return result_.moveValue();
     }
 
     std::coroutine_handle<Promise> get_return_object() {
@@ -63,10 +153,7 @@ struct Promise {
 
     std::coroutine_handle<> previous_{};
     std::exception_ptr exception_{};
-    // union 成员不会被初始化
-    union {
-        T result_;
-    };
+    Uninitialized<T> result_;
 };
 
 template <>
@@ -123,7 +210,7 @@ struct Task {
         std::coroutine_handle<promise_type> coroutine_;
     };
 
-    auto operator co_await() { return Awaiter(coroutine_); }
+    auto operator co_await() const noexcept { return Awaiter(coroutine_); }
 
     operator std::coroutine_handle<>() const noexcept { return coroutine_; }
 
@@ -205,33 +292,114 @@ Task<void> sleep_for(std::chrono::system_clock::duration duration) {
     co_return;
 }
 
+struct ReturnPreviousPromise {
+    auto initial_suspend() noexcept { return std::suspend_always(); }
+
+    auto final_suspend() noexcept { return PreviousAwaiter(previous_); }
+
+    void unhandled_exception() { throw; }
+
+    void return_value(std::coroutine_handle<> coroutine) noexcept { previous_ = coroutine; }
+
+    auto get_return_object() { return std::coroutine_handle<ReturnPreviousPromise>::from_promise(*this); }
+
+    std::coroutine_handle<> previous_{};
+
+    ReturnPreviousPromise& operator=(ReturnPreviousPromise&&) = delete;
+};
+
+struct ReturnPreviousTask {
+    using promise_type = ReturnPreviousPromise;
+
+    ReturnPreviousTask(std::coroutine_handle<promise_type> coroutine) noexcept : coroutine_(coroutine) {}
+
+    ReturnPreviousTask(ReturnPreviousTask&&) = delete;
+
+    ~ReturnPreviousTask() { coroutine_.destroy(); }
+
+    std::coroutine_handle<promise_type> coroutine_;
+};
+
+struct WhenAllCounterBlock {
+    std::size_t count_;
+    std::coroutine_handle<> previous_;
+};
+
+struct WhenAllAwaiter {
+    constexpr bool await_ready() const noexcept { return false; }
+
+    std::coroutine_handle<> await_suspend(std::coroutine_handle<> coroutine) const {
+        counter_.previous_ = coroutine;
+        for (const auto& task : tasks_.subspan(1)) {
+            getLoop().addTask(task.coroutine_);
+        }
+        return tasks_.front().coroutine_;
+    }
+
+    constexpr void await_resume() const noexcept {}
+
+    WhenAllCounterBlock& counter_;
+    std::span<const ReturnPreviousTask> tasks_;
+};
+
+template <typename T>
+ReturnPreviousTask whenAllHelper(const auto& task, WhenAllCounterBlock& counter, Uninitialized<T>& result) {
+    result.putValue(co_await task);
+    --counter.count_;
+    if (counter.count_ == 0) {
+        co_return counter.previous_;
+    }
+    co_return nullptr;
+}
+
+template <std::size_t... Is, typename... Ts>
+Task<std::tuple<typename AwaitableTraits<Ts>::NonVoidRetType...>> whenAllImpl(std::index_sequence<Is...>,
+                                                                              Ts&&... ts) {
+    WhenAllCounterBlock counter{sizeof...(Ts), nullptr};
+    std::tuple<Uninitialized<typename AwaitableTraits<Ts>::RetType>...> result;
+    ReturnPreviousTask tasks[] = {whenAllHelper(std::forward<Ts>(ts), counter, std::get<Is>(result))...};
+    co_await WhenAllAwaiter(counter, tasks);
+    co_return std::tuple<typename AwaitableTraits<Ts>::NonVoidRetType...>(std::get<Is>(result).moveValue()...);
+}
+
+template <Awaitable... Ts>
+    requires(sizeof...(Ts) > 0)
+auto when_all(Ts&&... ts) {
+    return whenAllImpl(std::index_sequence_for<Ts...>{}, std::forward<Ts>(ts)...);
+}
+
 Task<int> hello1() {
-    logger.info("开始睡 1s");
+    logger.debug("开始睡 1s");
     co_await sleep_for(1s);
-    logger.info("结束睡觉");
+    logger.debug("结束睡觉");
 
     co_return 1;
 }
 
 Task<int> hello2() {
-    logger.info("开始睡 2s");
+    logger.debug("开始睡 2s");
     co_await sleep_for(2s);
-    logger.info("结束睡觉");
+    logger.debug("结束睡觉");
 
     co_return 2;
+}
+
+Task<int> hello() {
+    logger.info("开始等1和2");
+    auto [i, j, k] = co_await when_all(hello1(), hello2(), hello2());
+    logger.info("1和2等完了");
+
+    co_return i + j + k;
 }
 
 }  // namespace pyc
 
 int main() {
-    auto task1 = pyc::hello1();
-    auto task2 = pyc::hello2();
-    pyc::getLoop().addTask(task1);
-    pyc::getLoop().addTask(task2);
+    auto task = pyc::hello();
+    pyc::getLoop().addTask(task.coroutine_);
     pyc::getLoop().runAll();
 
-    pyc::logger.info("得到 hello1 的结果: {}", task1.coroutine_.promise().result());
-    pyc::logger.info("得到 hello2 的结果: {}", task2.coroutine_.promise().result());
+    pyc::logger.info("得到 hello 的结果: {}", task.coroutine_.promise().result());
     pyc::logger.info("执行完成");
 
     return 0;

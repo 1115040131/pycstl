@@ -4,7 +4,9 @@ BINARIES = [
     "exception_handle",
     "variant_result",
     "template_task",
-    "sleep_for"
+    "sleep_for",
+    "simple_when_all",
+    "when_all"
 ]
 
 [cc_binary(
