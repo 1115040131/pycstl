@@ -14,5 +14,5 @@ BINARIES = [
     name = binary,
     srcs = ["%s.cpp" % binary],
     copts = COPTS,
-    deps = ["//coroutine"],
+    deps = ["//co_async"],
 ) for binary in BINARIES]

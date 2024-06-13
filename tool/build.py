@@ -43,7 +43,7 @@ def run_valgrind(target, args=[]):
 
 def main():
     if len(sys.argv) < 2:
-        logger.error("Usage: ./build.py [target] [...args]")
+        logger.error("Usage: ./run_script.py [target] [...args]")
         return
 
     # 第一个参数是目标名称，其余的是传递给bazel命令的参数
@@ -58,12 +58,12 @@ def main():
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
 
-        ######################### build for coroutine #########################
-        "coroutine": lambda args: run_bazel_build('//coroutine //coroutine/example/... //coroutine/test/...', args),
-        "coroutine_example": lambda args:
+        ######################### build for co_async #########################
+        "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...', args),
+        "co_async_example": lambda args:
         logger.error("Please give example name") if len(args) < 1 else
-        run_bazel_run(f'//coroutine/example:{args[0]}', args[1:]),
-        "coroutine_test": lambda args: run_bazel_test('//coroutine/test:coroutine_all_test', True, args),
+        run_bazel_run(f'//co_async/example:{args[0]}', args[1:]),
+        "coroutine_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', True, args),
 
         ######################### build for concurrency #########################
         "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args),

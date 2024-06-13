@@ -7,9 +7,9 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 
 cc_library(
-    name = "coroutine",
+    name = "co_async",
     srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/coroutine/**/*.h"]),
+    hdrs = glob(["include/co_async/**/*.h"]),
     copts = COPTS,
     includes = ["include"],
     deps = [
