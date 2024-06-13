@@ -6,7 +6,8 @@ BINARIES = [
     "template_task",
     "sleep_for",
     "simple_when_all",
-    "when_all"
+    "when_all",
+    "when_any",
 ]
 
 [cc_binary(

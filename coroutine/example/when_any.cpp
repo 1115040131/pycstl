@@ -1,8 +1,10 @@
 #include <chrono>
 #include <coroutine>
-#include <queue>
+#include <map>
 #include <span>
 #include <thread>
+#include <unordered_map>
+#include <variant>
 
 #include <fmt/chrono.h>
 
@@ -89,6 +91,46 @@ template <typename A>
     requires(!Awaiter<A> && Awaitable<A>)
 struct AwaitableTraits<A> : AwaitableTraits<decltype(std::declval<A>().operator co_await())> {};
 
+struct Loop {
+    Loop& operator=(Loop&&) = delete;
+
+    void addTimer(std::chrono::system_clock::time_point expire_time, std::coroutine_handle<> task) {
+        auto [iter, _] = timer_map_.emplace(expire_time, task);
+        search_table_.emplace(task, iter);
+    }
+
+    void deleteTask(std::coroutine_handle<> task) {
+        auto search = search_table_.find(task);
+        if (search != search_table_.end()) {
+            timer_map_.erase(search->second);
+            search_table_.erase(search);
+        }
+    }
+
+    void runAll() {
+        while (!timer_map_.empty()) {
+            auto now_time = std::chrono::system_clock::now();
+            auto [expire_time, task] = *timer_map_.begin();
+            if (now_time >= expire_time) {
+                deleteTask(task);
+                task.resume();
+            } else {
+                logger.debug("No task Loop waiting for {:%S}s", expire_time - now_time);
+                std::this_thread::sleep_until(expire_time);
+            }
+        }
+    }
+
+    using TimerMap = std::map<std::chrono::system_clock::time_point, std::coroutine_handle<>>;
+    TimerMap timer_map_;
+    std::unordered_map<std::coroutine_handle<>, TimerMap::iterator> search_table_;
+};
+
+Loop& getLoop() {
+    static Loop loop;
+    return loop;
+}
+
 struct RepeatAwaiter {
     constexpr bool await_ready() const noexcept { return false; }
 
@@ -132,8 +174,13 @@ struct Promise {
         exception_ = std::current_exception();
     }
 
-    auto yield_value(T value) {
-        std::construct_at(&result_, std::move(value));
+    auto yield_value(const T& value) {
+        result_.putValue(value);
+        return std::suspend_always();
+    }
+
+    auto yield_value(T&& value) {
+        result_.putValue(std::move(value));
         return std::suspend_always();
     }
 
@@ -217,77 +264,29 @@ struct Task {
     std::coroutine_handle<promise_type> coroutine_;
 };
 
-struct Loop {
-    Loop& operator=(Loop&&) = delete;
-
-    void addTask(std::coroutine_handle<> task) { ready_queue_.push(task); }
-
-    void addTimer(std::chrono::system_clock::time_point expire_time, std::coroutine_handle<> task) {
-        timer_table_.emplace(expire_time, task);
-    }
-
-    void runAll() {
-        while (!ready_queue_.empty() || !timer_table_.empty()) {
-            auto now_time = std::chrono::system_clock::now();
-            while (!timer_table_.empty()) {
-                const auto& timer = timer_table_.top();
-                if (now_time >= timer.expire_time_) {
-                    ready_queue_.push(timer.couroutine_);
-                    timer_table_.pop();
-                } else {
-                    break;
-                }
-            }
-
-            while (!ready_queue_.empty()) {
-                auto ready_task = ready_queue_.front();
-                ready_queue_.pop();
-                ready_task.resume();
-            }
-
-            if (!timer_table_.empty() && timer_table_.top().expire_time_ > now_time) {
-                logger.debug("No task Loop waiting for {:%S}s",
-                             timer_table_.top().expire_time_ - std::chrono::system_clock::now());
-                std::this_thread::sleep_until(timer_table_.top().expire_time_);
-            }
-        }
-    }
-
-    struct TimerEntry {
-        std::chrono::system_clock::time_point expire_time_;
-        std::coroutine_handle<> couroutine_;
-
-        bool operator>(const TimerEntry& that) const noexcept { return expire_time_ > that.expire_time_; }
-    };
-
-    std::queue<std::coroutine_handle<>> ready_queue_;
-    std::priority_queue<TimerEntry, std::vector<TimerEntry>, std::greater<TimerEntry>> timer_table_;
-};
-
-Loop& getLoop() {
-    static Loop loop;
-    return loop;
-}
-
 struct SleepAwaiter {
     bool await_ready() const { return std::chrono::system_clock::now() >= expire_time_; }
 
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<> coroutine) const {
-        getLoop().addTimer(expire_time_, coroutine);
-        return std::noop_coroutine();
-    }
+    void await_suspend(std::coroutine_handle<> coroutine) const { getLoop().addTimer(expire_time_, coroutine); }
 
     void await_resume() const noexcept {}
 
     std::chrono::system_clock::time_point expire_time_;
 };
 
-Task<void> sleep_until(std::chrono::system_clock::time_point expire_time) {
+template <typename T>
+struct TimerTask : public Task<T> {
+    using Task<T>::Task;
+
+    ~TimerTask() { getLoop().deleteTask(this->coroutine_); }
+};
+
+TimerTask<void> sleep_until(std::chrono::system_clock::time_point expire_time) {
     co_await SleepAwaiter(expire_time);
     co_return;
 }
 
-Task<void> sleep_for(std::chrono::system_clock::duration duration) {
+TimerTask<void> sleep_for(std::chrono::system_clock::duration duration) {
     co_await SleepAwaiter(std::chrono::system_clock::now() + duration);
     co_return;
 }
@@ -322,32 +321,45 @@ struct ReturnPreviousTask {
 
 struct WhenAllCounterBlock {
     std::size_t count_;
-    std::coroutine_handle<> previous_;
+    std::coroutine_handle<> previous_{nullptr};
+    std::exception_ptr exception_{nullptr};
 };
 
 struct WhenAllAwaiter {
     constexpr bool await_ready() const noexcept { return false; }
 
     std::coroutine_handle<> await_suspend(std::coroutine_handle<> coroutine) const {
-        counter_.previous_ = coroutine;
+        if (tasks_.empty()) {
+            return coroutine;
+        }
+        control_.previous_ = coroutine;
         for (const auto& task : tasks_.subspan(1)) {
             task.coroutine_.resume();
         }
         return tasks_.front().coroutine_;
     }
 
-    constexpr void await_resume() const noexcept {}
+    void await_resume() const {
+        if (control_.exception_) [[unlikely]] {
+            std::rethrow_exception(control_.exception_);
+        }
+    }
 
-    WhenAllCounterBlock& counter_;
+    WhenAllCounterBlock& control_;
     std::span<const ReturnPreviousTask> tasks_;
 };
 
 template <typename T>
-ReturnPreviousTask whenAllHelper(const auto& task, WhenAllCounterBlock& counter, Uninitialized<T>& result) {
-    result.putValue(co_await task);
-    --counter.count_;
-    if (counter.count_ == 0) {
-        co_return counter.previous_;
+ReturnPreviousTask whenAllHelper(const auto& task, WhenAllCounterBlock& control, Uninitialized<T>& result) {
+    try {
+        result.putValue(co_await task);
+    } catch (...) {
+        control.exception_ = std::current_exception();
+        co_return control.previous_;
+    }
+    --control.count_;
+    if (control.count_ == 0) {
+        co_return control.previous_;
     }
     co_return nullptr;
 }
@@ -355,10 +367,10 @@ ReturnPreviousTask whenAllHelper(const auto& task, WhenAllCounterBlock& counter,
 template <std::size_t... Is, typename... Ts>
 Task<std::tuple<typename AwaitableTraits<Ts>::NonVoidRetType...>> whenAllImpl(std::index_sequence<Is...>,
                                                                               Ts&&... ts) {
-    WhenAllCounterBlock counter{sizeof...(Ts), nullptr};
+    WhenAllCounterBlock control{sizeof...(Ts)};
     std::tuple<Uninitialized<typename AwaitableTraits<Ts>::RetType>...> result;
-    ReturnPreviousTask tasks[] = {whenAllHelper(std::forward<Ts>(ts), counter, std::get<Is>(result))...};
-    co_await WhenAllAwaiter(counter, tasks);
+    ReturnPreviousTask tasks[] = {whenAllHelper(std::forward<Ts>(ts), control, std::get<Is>(result))...};
+    co_await WhenAllAwaiter(control, tasks);
     co_return std::tuple<typename AwaitableTraits<Ts>::NonVoidRetType...>(std::get<Is>(result).moveValue()...);
 }
 
@@ -366,6 +378,70 @@ template <Awaitable... Ts>
     requires(sizeof...(Ts) > 0)
 auto when_all(Ts&&... ts) {
     return whenAllImpl(std::index_sequence_for<Ts...>{}, std::forward<Ts>(ts)...);
+}
+
+struct WhenAnyCounterBlock {
+    static constexpr std::size_t kNullIndex = std::size_t(-1);
+
+    std::size_t index_{kNullIndex};
+    std::coroutine_handle<> previous_;
+    std::exception_ptr exception_;
+};
+
+struct WhenAnyAwaiter {
+    constexpr bool await_ready() const noexcept { return false; }
+
+    std::coroutine_handle<> await_suspend(std::coroutine_handle<> coroutine) const {
+        if (tasks_.empty()) {
+            return coroutine;
+        }
+        control_.previous_ = coroutine;
+        for (const auto& task : tasks_.subspan(1)) {
+            task.coroutine_.resume();
+        }
+        return tasks_.front().coroutine_;
+    }
+
+    void await_resume() const {
+        if (control_.exception_) [[unlikely]] {
+            std::rethrow_exception(control_.exception_);
+        }
+    }
+
+    WhenAnyCounterBlock& control_;
+    std::span<const ReturnPreviousTask> tasks_;
+};
+
+template <typename T>
+ReturnPreviousTask whenAnyHelper(const auto& task, WhenAnyCounterBlock& control, Uninitialized<T>& result,
+                                 std::size_t index) {
+    try {
+        result.putValue(co_await task);
+    } catch (...) {
+        control.exception_ = std::current_exception();
+        co_return control.previous_;
+    }
+    control.index_ = index;
+    co_return control.previous_;
+}
+
+template <std::size_t... Is, typename... Ts>
+Task<std::variant<typename AwaitableTraits<Ts>::NonVoidRetType...>> whenAnyImpl(std::index_sequence<Is...>,
+                                                                                Ts&&... ts) {
+    WhenAnyCounterBlock control{};
+    std::tuple<Uninitialized<typename AwaitableTraits<Ts>::RetType>...> result;
+    ReturnPreviousTask tasks[] = {whenAnyHelper(std::forward<Ts>(ts), control, std::get<Is>(result), Is)...};
+    co_await WhenAnyAwaiter(control, tasks);
+    Uninitialized<std::variant<typename AwaitableTraits<Ts>::NonVoidRetType...>> var_result;
+    ((control.index_ == Is && (var_result.putValue(std::in_place_index<Is>, std::get<Is>(result).moveValue()), 0)),
+     ...);
+    co_return var_result.moveValue();
+}
+
+template <Awaitable... Ts>
+    requires(sizeof...(Ts) > 0)
+auto when_any(Ts&&... ts) {
+    return whenAnyImpl(std::index_sequence_for<Ts...>{}, std::forward<Ts>(ts)...);
 }
 
 Task<int> hello1() {
@@ -386,17 +462,23 @@ Task<int> hello2() {
 
 Task<int> hello() {
     logger.info("开始等1和2");
-    auto [i, j, k] = co_await when_all(hello1(), hello2(), hello2());
-    logger.info("1和2等完了");
+    auto var = co_await when_any(hello2(), hello1(), hello2());
+    logger.info("看到 {} 睡醒了", var.index() + 1);
 
-    co_return i + j + k;
+    if (var.index() == 0) {
+        co_return std::get<0>(var);
+    } else if (var.index() == 1) {
+        co_return std::get<1>(var);
+    } else {
+        co_return std::get<2>(var);
+    }
 }
 
 }  // namespace pyc
 
 int main() {
     auto task = pyc::hello();
-    pyc::getLoop().addTask(task.coroutine_);
+    task.coroutine_.resume();
     pyc::getLoop().runAll();
 
     pyc::logger.info("得到 hello 的结果: {}", task.coroutine_.promise().result());
