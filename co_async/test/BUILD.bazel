@@ -7,7 +7,6 @@ cc_test(
         "*.h",
     ]),
     copts = COPTS,
-    includes = ["../"],
     deps = [
         "//co_async",
         "@googletest//:gtest_main",

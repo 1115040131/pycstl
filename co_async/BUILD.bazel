@@ -13,6 +13,7 @@ cc_library(
     copts = COPTS,
     includes = ["include"],
     deps = [
+        "//common",
         "//logger",
     ],
 )

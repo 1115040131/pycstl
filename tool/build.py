@@ -63,7 +63,7 @@ def main():
         "co_async_example": lambda args:
         logger.error("Please give example name") if len(args) < 1 else
         run_bazel_run(f'//co_async/example:{args[0]}', args[1:]),
-        "coroutine_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', True, args),
+        "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', True, args),
 
         ######################### build for concurrency #########################
         "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args),
