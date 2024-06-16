@@ -26,11 +26,31 @@ consteval inline std::string_view ToString(LogLevel level) {
     return "UNKNOWN";
 }
 
+std::string_view ExtractFunctionName(std::string_view full_name) {
+    auto end_pos = full_name.find_last_of('(');
+    if (end_pos != std::string::npos) {
+        auto start_pos = full_name.rfind("::", end_pos);
+        if (start_pos != std::string::npos) {
+            start_pos += 2;
+        } else {
+            start_pos = full_name.rfind(' ', end_pos);
+            if (start_pos != std::string::npos) {
+                start_pos++;
+            } else {
+                return full_name.substr(0, end_pos);
+            }
+        }
+        return full_name.substr(start_pos, end_pos - start_pos);
+    }
+    return full_name;
+}
+
 template <LogLevel level>
 void Logger::log(std::string_view msg, const std::source_location location) const {
     auto log_msg =
-        fmt::format("[{}] [{:5}] [{:5}] [{:%Y-%m-%d %H:%M:%S}] <{}:{}> {}\n", name_, ToString(level),
-                    ShortThreadId(), std::chrono::system_clock::now(), location.file_name(), location.line(), msg);
+        fmt::format("[{}][{:5}][{:0>5}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_, ToString(level),
+                    ShortThreadId(), std::chrono::system_clock::now(), location.file_name(), location.line(),
+                    ExtractFunctionName(location.function_name()), msg);
 
     if constexpr (level == LogLevel::kDebug) {
         fmt::print(fg(fmt::color::cyan), log_msg);

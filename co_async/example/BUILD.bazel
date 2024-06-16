@@ -1,0 +1,18 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+
+BINARIES = [
+    "exception_handle",
+    "variant_result",
+    "template_task",
+    "sleep_for",
+    "simple_when_all",
+    "when_all",
+    "when_any",
+]
+
+[cc_binary(
+    name = binary,
+    srcs = ["%s.cpp" % binary],
+    copts = COPTS,
+    deps = ["//co_async"],
+) for binary in BINARIES]
