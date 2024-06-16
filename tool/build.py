@@ -43,7 +43,7 @@ def run_valgrind(target, args=[]):
 
 def main():
     if len(sys.argv) < 2:
-        logger.error("Usage: ./run_script.py [target] [...args]")
+        logger.error("Usage: ./make [target] [...args]")
         return
 
     # 第一个参数是目标名称，其余的是传递给bazel命令的参数
