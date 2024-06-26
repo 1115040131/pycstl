@@ -45,6 +45,9 @@ public:
     const Matrix& GetHoldField() const { return hold_field_; }
 
 private:
+    Game() = default;
+
+private:
     /// @brief 随机生成一个块
     Piece GeneratePiece();
 

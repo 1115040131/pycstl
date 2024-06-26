@@ -16,6 +16,9 @@ public:
     void Loop();
 
     void Exit();
+
+private:
+    Engine() = default;
 };
 
 }  // namespace tetris

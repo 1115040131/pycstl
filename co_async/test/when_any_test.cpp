@@ -39,7 +39,7 @@ static Task<int> hello1() {
 TEST(WhenAnyTest, Hello1) {
     auto task = hello1();
     task.coroutine_.resume();
-    TimerLoop().GetInstance().runAll();
+    TimerLoop::GetInstance().runAll();
 
     EXPECT_EQ(task.coroutine_.promise().result(), 1);
 }
@@ -56,7 +56,7 @@ static Task<int> hello2() {
 TEST(WhenAnyTest, Hello2) {
     auto task = hello2();
     task.coroutine_.resume();
-    TimerLoop().GetInstance().runAll();
+    TimerLoop::GetInstance().runAll();
 
     EXPECT_EQ(task.coroutine_.promise().result(), 1);
 }

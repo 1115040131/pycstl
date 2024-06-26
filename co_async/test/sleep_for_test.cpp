@@ -34,7 +34,7 @@ TEST(SleepForTest, Basic) {
     task2.coroutine_.resume();
 
     Timer timer;
-    TimerLoop().GetInstance().runAll();
+    TimerLoop::GetInstance().runAll();
     EXPECT_ELAPSED_TIME(timer.elapsed(), 300ms);
 
     EXPECT_EQ(task1.coroutine_.promise().result(), 1);

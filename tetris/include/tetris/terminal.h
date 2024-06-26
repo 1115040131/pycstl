@@ -53,6 +53,9 @@ public:
         os << kCursorVisible;
         return *this;
     }
+
+private:
+    Terminal() = default;
 };
 
 }  // namespace tetris

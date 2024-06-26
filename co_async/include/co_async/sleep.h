@@ -12,7 +12,7 @@ template <typename T>
 struct TimerTask : public Task<T> {
     using Task<T>::Task;
 
-    ~TimerTask() { TimerLoop().GetInstance().deleteTask(this->coroutine_); }
+    ~TimerTask() { TimerLoop::GetInstance().deleteTask(this->coroutine_); }
 };
 
 inline TimerTask<void> sleep_until(std::chrono::system_clock::time_point expire_time) {

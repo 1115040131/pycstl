@@ -13,13 +13,13 @@ os.environ['PATH'] = '/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb
 
 
 def run_bazel_build(target, args=[]):
-    command = f'bazel build {target} {' '.join(args)}'
+    command = f'bazel build {target} {" ".join(args)}'
     logger.info(command)
     subprocess.run(shlex.split(command))
 
 
 def run_bazel_test(target, test_output=False, args=[]):
-    command = f'bazel test {target} {' '.join(args)}'
+    command = f'bazel test {target} {" ".join(args)}'
     if test_output:
         command += ' --test_output=all'
     logger.info(command)
@@ -27,14 +27,13 @@ def run_bazel_test(target, test_output=False, args=[]):
 
 
 def run_bazel_run(target, args=[]):
-    command = f'bazel run {target} {' '.join(args)}'
+    command = f'bazel run {target} {" ".join(args)}'
     logger.info(command)
     subprocess.run(shlex.split(command))
 
 
 def run_valgrind(target, args=[]):
-    command = f'valgrind --leak-check=full --track-origins=yes {
-        target} {' '.join(args)}'
+    command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args)}'
     if len(args) == 0:
         command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
     logger.info(command)
@@ -53,7 +52,7 @@ def main():
     targets = {
         ######################### build for all #########################
         "all": lambda args: run_bazel_build('//...', args),
-        "all_test": lambda args: run_bazel_test('//...', args),
+        "all_test": lambda args: run_bazel_test('//...', args=args),
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),

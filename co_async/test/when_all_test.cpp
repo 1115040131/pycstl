@@ -38,7 +38,7 @@ static Task<int> hello() {
 TEST(WhenAllTest, Basic) {
     auto task = hello();
     task.coroutine_.resume();
-    TimerLoop().GetInstance().runAll();
+    TimerLoop::GetInstance().runAll();
 
     EXPECT_EQ(task.coroutine_.promise().result(), 4);
 }

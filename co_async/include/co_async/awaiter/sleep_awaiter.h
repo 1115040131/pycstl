@@ -11,7 +11,7 @@ struct SleepAwaiter {
     bool await_ready() const { return std::chrono::system_clock::now() >= expire_time_; }
 
     void await_suspend(std::coroutine_handle<> coroutine) const {
-        TimerLoop().GetInstance().addTimer(expire_time_, coroutine);
+        TimerLoop::GetInstance().addTimer(expire_time_, coroutine);
     }
 
     void await_resume() const noexcept {}
