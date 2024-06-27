@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 # asio api
 cc_library(
@@ -7,7 +7,7 @@ cc_library(
         "sync_api.cpp",
         "sync_api.h",
     ],
-    copts = COPTS,
+    copts = STRICT_COPTS,
     includes = ["../"],
     deps = [
         "//common",
@@ -21,7 +21,7 @@ cc_library(
         "async_api.cpp",
         "async_api.h",
     ],
-    copts = COPTS,
+    copts = STRICT_COPTS,
     includes = ["../"],
     deps = [
         "//common",
@@ -57,6 +57,6 @@ BINARIES = [
 [cc_binary(
     name = binary,
     srcs = ["%s.cpp" % binary],
-    copts = COPTS,
+    copts = STRICT_COPTS,
     deps = ["//network"],
 ) for binary in BINARIES]

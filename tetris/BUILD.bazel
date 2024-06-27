@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -12,7 +12,7 @@ cc_binary(
         "src/*.cpp",
         "include/tetris/*.h",
     ]),
-    copts = COPTS,
+    copts = STRICT_COPTS,
     data = glob(["resource/**"]),
     includes = ["include"],
     deps = [

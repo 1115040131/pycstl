@@ -84,7 +84,7 @@ struct Promise {
 
     std::coroutine_handle<> previous_{};
     std::exception_ptr exception_{};
-    Uninitialized<T> result_;
+    Uninitialized<T> result_{};
 };
 
 template <>
@@ -191,8 +191,8 @@ struct Loop {
         bool operator>(const TimerEntry& that) const noexcept { return expire_time_ > that.expire_time_; }
     };
 
-    std::queue<std::coroutine_handle<>> ready_queue_;
-    std::priority_queue<TimerEntry, std::vector<TimerEntry>, std::greater<TimerEntry>> timer_table_;
+    std::queue<std::coroutine_handle<>> ready_queue_{};
+    std::priority_queue<TimerEntry, std::vector<TimerEntry>, std::greater<TimerEntry>> timer_table_{};
 };
 
 Loop& getLoop() {
@@ -263,8 +263,8 @@ struct WhenAllAwaiter {
     constexpr void await_resume() const noexcept {}
 
     struct CounterBlock {
-        std::size_t count_;
-        std::coroutine_handle<> previous_;
+        std::size_t count_{};
+        std::coroutine_handle<> previous_{};
     };
     CounterBlock& counter_;
     const ReturnPreviousTask& task1_;

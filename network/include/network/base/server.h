@@ -30,8 +30,8 @@ protected:
 protected:
     asio::io_context& io_context_;
     tcp::acceptor acceptor_;
-    std::unordered_map<std::string, std::shared_ptr<Session>> sessions_;
-    std::mutex mutex_;
+    std::unordered_map<std::string, std::shared_ptr<Session>> sessions_{};
+    std::mutex mutex_{};
 };
 
 }  // namespace network

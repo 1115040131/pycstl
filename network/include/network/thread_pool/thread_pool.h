@@ -27,9 +27,9 @@ private:
     ~ThreadPool();
 
 private:
-    IOService io_service_;
+    IOService io_service_{};
     std::unique_ptr<Work> work_ = std::make_unique<Work>(io_service_);
-    std::vector<std::thread> threads_;
+    std::vector<std::thread> threads_{};
 };
 
 }  // namespace network

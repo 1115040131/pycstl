@@ -149,8 +149,8 @@ private:
 private:
     tcp::resolver resolver_;
     tcp::socket socket_;
-    asio::streambuf request_;
-    asio::streambuf response_;
+    asio::streambuf request_{};
+    asio::streambuf response_{};
 };
 
 int main() {

@@ -42,10 +42,10 @@ private:
 private:
     asio::io_context& io_context_;
     std::unique_ptr<websocket::stream<beast::tcp_stream>> websocket_;
-    std::string uuid_;
-    beast::flat_buffer recv_buffer_;
-    std::queue<std::string> send_queue_;
-    std::mutex send_mutex_;
+    std::string uuid_{};
+    beast::flat_buffer recv_buffer_{};
+    std::queue<std::string> send_queue_{};
+    std::mutex send_mutex_{};
 };
 
 }  // namespace network

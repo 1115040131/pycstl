@@ -19,8 +19,8 @@ public:
     void PageFlush(uint32_t index);
 
 private:
-    std::fstream file_;
-    std::streampos file_length_;
+    std::fstream file_{};
+    std::streampos file_length_{};
     std::unique_ptr<char[]> pages_[kTableMaxPages];
     uint32_t page_num_{0};
 };

@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,7 +10,7 @@ cc_library(
     name = "logger",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/logger/**/*.h"]),
-    copts = COPTS,
+    copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
         "//common",

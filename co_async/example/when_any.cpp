@@ -134,8 +134,8 @@ struct Loop {
     }
 
     using TimerMap = std::map<std::chrono::system_clock::time_point, std::coroutine_handle<>>;
-    TimerMap timer_map_;
-    std::unordered_map<std::coroutine_handle<>, TimerMap::iterator> search_table_;
+    TimerMap timer_map_{};
+    std::unordered_map<std::coroutine_handle<>, TimerMap::iterator> search_table_{};
 };
 
 Loop& getLoop() {
@@ -212,7 +212,7 @@ struct Promise {
 
     std::coroutine_handle<> previous_{};
     std::exception_ptr exception_{};
-    Uninitialized<T> result_;
+    Uninitialized<T> result_{};
 };
 
 template <>

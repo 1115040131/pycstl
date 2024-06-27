@@ -6,7 +6,11 @@
 #include <grpcpp/create_channel.h>
 
 #include "common/timer.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
 #include "network/proto/greeter.grpc.pb.h"
+#pragma GCC diagnostic pop
 
 using namespace std::literals::chrono_literals;
 

@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 BINARIES = [
     "exception_handle",
@@ -13,6 +13,6 @@ BINARIES = [
 [cc_binary(
     name = binary,
     srcs = ["%s.cpp" % binary],
-    copts = COPTS,
+    copts = STRICT_COPTS,
     deps = ["//co_async"],
 ) for binary in BINARIES]

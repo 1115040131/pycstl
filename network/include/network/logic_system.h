@@ -40,12 +40,12 @@ private:
     void DealFirstMsg();
 
 private:
-    std::queue<std::unique_ptr<LogicNode>> msg_queue_;
-    std::mutex mutex_;
-    std::condition_variable consume_;
-    std::thread work_thread_;
+    std::queue<std::unique_ptr<LogicNode>> msg_queue_{};
+    std::mutex mutex_{};
+    std::condition_variable consume_{};
+    std::thread work_thread_{};
     bool is_stop_{false};
-    std::unordered_map<MsgId, FunCallBack> callback_map_;
+    std::unordered_map<MsgId, FunCallBack> callback_map_{};
 };
 
 }  // namespace network

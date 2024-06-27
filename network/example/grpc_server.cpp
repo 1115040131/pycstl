@@ -5,7 +5,10 @@
 #include <grpcpp/server.h>
 #include <grpcpp/server_builder.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
 #include "network/proto/greeter.grpc.pb.h"
+#pragma GCC diagnostic pop
 
 namespace network {
 

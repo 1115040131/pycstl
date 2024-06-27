@@ -60,17 +60,17 @@ protected:
 protected:
     tcp::socket socket_;
     Server* server_;
-    std::string uuid_;
+    std::string uuid_{};
     std::atomic<bool> is_stop_{false};
 
     char data_[kMaxLength];  // 接收数据缓冲区
 
-    std::queue<std::unique_ptr<SendNode>> send_queue_;  // 发送队列
-    std::mutex send_lock_;                              // 发送队列锁
+    std::queue<std::unique_ptr<SendNode>> send_queue_{};  // 发送队列
+    std::mutex send_lock_{};                              // 发送队列锁
 
     bool is_head_parsed_ = false;  // 是否已经解析出头部
     std::unique_ptr<RecvNode> recv_head_ = std::make_unique<RecvNode>(kHeadLength, MsgId::kMaxId);  // 头部数据
-    std::unique_ptr<RecvNode> recv_msg_;                                                            // 接收数据
+    std::unique_ptr<RecvNode> recv_msg_{};                                                          // 接收数据
 };
 
 }  // namespace network

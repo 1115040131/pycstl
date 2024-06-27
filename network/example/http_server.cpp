@@ -154,8 +154,8 @@ private:
 private:
     tcp::socket socket_;
     beast::flat_buffer buffer_{kBufferSize};
-    http::request<http::dynamic_body> request_;
-    http::response<http::dynamic_body> response_;
+    http::request<http::dynamic_body> request_{};
+    http::response<http::dynamic_body> response_{};
 
     asio::steady_timer deadline_{socket_.get_executor(), 60s};
 };

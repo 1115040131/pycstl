@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,7 +10,7 @@ cc_library(
     name = "concurrency",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/concurrency/**/*.h"]),
-    copts = COPTS,
+    copts = STRICT_COPTS,
     includes = ["include"],
     linkopts = ["-latomic"],
     deps = [

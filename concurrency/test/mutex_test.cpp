@@ -53,8 +53,8 @@ public:
     }
 
 protected:
-    std::stack<T> data_;
-    mutable std::mutex mutex_;
+    std::stack<T> data_{};
+    mutable std::mutex mutex_{};
 };
 
 TEST(DISABLED_MutexTest, UnsafeStackTest) {
@@ -175,7 +175,7 @@ public:
     friend void SafeSwapScope(BigObjectManager& lhs, BigObjectManager& rhs);
 
 private:
-    std::mutex mutex_;
+    std::mutex mutex_{};
     BigObject obj_;
 };
 
@@ -294,7 +294,7 @@ private:
     }
 
 private:
-    std::mutex mutex_;
+    std::mutex mutex_{};
     std::size_t current_hierarchy_value_;                     // 当前层级值
     std::size_t previous_hierarchy_value_{0};                 // 上一层级值
     static thread_local std::size_t thread_hierarchy_value_;  // 当前线程的层级值

@@ -1,7 +1,7 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 cc_binary(
     name = "hello_world",
-    srcs = ["hello_world.cpp"],
-    copts = COPTS,
+    srcs = ["hello_world.cpp","debug.hpp"],
+    copts = STRICT_COPTS,
 )

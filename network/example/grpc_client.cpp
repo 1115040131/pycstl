@@ -4,7 +4,10 @@
 #include <grpcpp/channel.h>
 #include <grpcpp/create_channel.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
 #include "network/proto/greeter.grpc.pb.h"
+#pragma GCC diagnostic pop
 
 namespace network {
 

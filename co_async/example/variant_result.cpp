@@ -54,7 +54,7 @@ struct Promise {
     }
 
     std::coroutine_handle<> previous_ = nullptr;
-    std::variant<std::exception_ptr, int> result_;
+    std::variant<std::exception_ptr, int> result_{};
 };
 
 struct Task {

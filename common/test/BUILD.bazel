@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 cc_test(
     name = "common_all_test",
@@ -6,7 +6,7 @@ cc_test(
         "*_test.cpp",
         "*.h",
     ]),
-    copts = COPTS,
+    copts = STRICT_COPTS,
     includes = ["../"],
     deps = [
         "//common",

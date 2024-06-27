@@ -173,8 +173,8 @@ struct Loop {
         bool operator>(const TimerEntry& that) const noexcept { return expire_time_ > that.expire_time_; }
     };
 
-    std::queue<std::coroutine_handle<>> ready_queue_;
-    std::priority_queue<TimerEntry, std::vector<TimerEntry>, std::greater<TimerEntry>> timer_table_;
+    std::queue<std::coroutine_handle<>> ready_queue_{};
+    std::priority_queue<TimerEntry, std::vector<TimerEntry>, std::greater<TimerEntry>> timer_table_{};
 };
 
 Loop& getLoop() {
