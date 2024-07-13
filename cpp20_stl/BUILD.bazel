@@ -1,0 +1,14 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_test(
+    name = "cpp20_stl_all_test",
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
+    copts = STRICT_COPTS,
+    deps = [
+        "@fmt",
+        "@googletest//:gtest_main",
+    ],
+)
