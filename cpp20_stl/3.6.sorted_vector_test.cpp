@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
 
 namespace pyc {
