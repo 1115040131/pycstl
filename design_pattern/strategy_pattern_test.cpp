@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "common/cin_redirect.h"
 #include "design_pattern/api.h"
 #include "design_pattern/inputer.h"
 
@@ -35,12 +36,8 @@ TEST(DesignPatternTest, MultiStrategyPattern) {
 
     // 创建一个 string stream 对象用于模拟输入
     std::stringstream simulated_input;
+    CinRedirect cin_redirect(simulated_input);
 
-    // 保存并重定向 cin 的缓冲区
-    std::streambuf* origin_cin_buff = std::cin.rdbuf();
-    std::cin.rdbuf(simulated_input.rdbuf());
-
-    // 调用你的函数，它会从 cin 读取数据
     simulated_input << kInputString;
     EXPECT_EQ(reduce(new CinInputerWithStop(), new SumReducer()), std::accumulate(v.begin(), v.end(), 0));
     simulated_input << kInputString;
@@ -50,9 +47,6 @@ TEST(DesignPatternTest, MultiStrategyPattern) {
     EXPECT_EQ(reduce(new CinInputerWithStop(), new MinReducer()), *std::min_element(v.begin(), v.end()));
     simulated_input << kInputString;
     EXPECT_EQ(reduce(new CinInputerWithStop(), new MaxReducer()), *std::max_element(v.begin(), v.end()));
-
-    // 恢复原始的 cin 缓冲区
-    std::cin.rdbuf(origin_cin_buff);
 
     EXPECT_EQ(reduce(new VectorInputer(v), new SumReducer()), std::accumulate(v.begin(), v.end(), 0));
     EXPECT_EQ(reduce(new VectorInputer(v), new ProductReducer()),

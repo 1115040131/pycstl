@@ -8,6 +8,8 @@
 #include <fmt/core.h>
 #include <gtest/gtest.h>
 
+#include "common/cin_redirect.h"
+
 namespace pyc {
 
 class RPN {
@@ -74,26 +76,15 @@ private:
 };
 
 TEST(RPNTest, RPNTest) {
-    constexpr std::string_view kInputString = "9 6 * 2 3 * +";
-
     // 创建一个 string stream 对象用于模拟输入
-    std::stringstream simulated_input;
-
-    // 保存并重定向 cin 的缓冲区
-    std::streambuf* origin_cin_buff = std::cin.rdbuf();
-    std::cin.rdbuf(simulated_input.rdbuf());
-
-    // 调用你的函数，它会从 cin 读取数据
-    simulated_input << kInputString;
+    std::stringstream simulated_input("9 6 * 2 3 * +");
+    CinRedirect cin_redirect(simulated_input);
 
     RPN rpn;
     for (std::string o{}; std::cin >> o;) {
         rpn.op(o);
         fmt::println("stack: {}", rpn.get_stack_string());
     }
-
-    // 恢复原始的 cin 缓冲区
-    std::cin.rdbuf(origin_cin_buff);
 }
 
 }  // namespace pyc
