@@ -5,6 +5,7 @@ cc_test(
         "*.h",
     ]),
     copts = ["-std=c++20"],
+    data = glob(["resource/**"]),
     deps = [
         "//common",
         "@fmt",
