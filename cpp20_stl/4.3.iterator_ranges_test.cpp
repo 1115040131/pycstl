@@ -2,7 +2,6 @@
 #include <iterator>
 #include <ranges>
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
 
 namespace pyc {
@@ -14,7 +13,6 @@ public:
 
     class iterator {
     public:
-        // 兼容 clang
         using iterator_concept = std::forward_iterator_tag;
         using iterator_category = std::forward_iterator_tag;
         using difference_type = std::ptrdiff_t;
