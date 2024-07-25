@@ -56,6 +56,7 @@ def main():
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
+        "common_test": lambda args: run_bazel_test('//common/test:common_all_test', True, args),
 
         ######################### build for co_async #########################
         "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...', args),

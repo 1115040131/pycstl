@@ -12,5 +12,8 @@ cc_library(
     hdrs = glob(["include/common/*.h"]),
     copts = STRICT_COPTS,
     includes = ["include"],
-    deps = ["@fmt"],
+    deps = [
+        "@fmt",
+        "@nlohmann_json//:json",
+    ],
 )
