@@ -1,7 +1,8 @@
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "concurrency/lock_free_queue/lock_free_queue.h"
-#include "test/utils.h"
+#include "concurrency/test/utils.h"
 
 namespace pyc {
 namespace concurrency {
@@ -31,9 +32,7 @@ void PushWhilePop(const std::size_t kDataNum, const std::size_t kThreadNum) {
     EXPECT_FALSE(lock_free_queue.Pop());
 }
 
-TEST(DISABLED_LockFreeQueueTest, LockFreeQueueTest) {
-    PushWhilePop(10000, 16);
-}
+TEST(DISABLED_LockFreeQueueTest, LockFreeQueueTest) { PushWhilePop(10000, 16); }
 
 }  // namespace concurrency
 }  // namespace pyc

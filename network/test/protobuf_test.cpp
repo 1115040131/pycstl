@@ -1,13 +1,14 @@
-#include <fmt/printf.h>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "test/proto/book.pb.h"
+#include "network/test/proto/book.pb.h"
 
 template <>
 struct fmt::formatter<network::Book> : fmt::formatter<std::string> {
     template <typename FormatContext>
-    auto format(const network::Book& book, FormatContext& ctx) -> decltype(ctx.out()) {
-        return format_to(ctx.out(), "{{name: {}, pages: {}, price: {}}}", book.name(), book.pages(), book.price());
+    auto format(const network::Book& book, FormatContext& ctx) const {
+        return fmt::format_to(ctx.out(), "{{name: {}, pages: {}, price: {}}}", book.name(), book.pages(),
+                              book.price());
     }
 };
 

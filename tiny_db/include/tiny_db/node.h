@@ -3,8 +3,6 @@
 #include <array>
 #include <cstdint>
 
-#include <fmt/core.h>
-
 #include "tiny_db/defines.h"
 
 namespace tiny_db {

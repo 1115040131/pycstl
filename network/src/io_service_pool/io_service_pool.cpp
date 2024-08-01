@@ -1,6 +1,6 @@
 #include "network/io_service_pool/io_service_pool.h"
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 namespace network {
 

@@ -1,6 +1,6 @@
 #include "network/websocket/websocket_server.h"
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 #include "network/websocket/connection.h"
 

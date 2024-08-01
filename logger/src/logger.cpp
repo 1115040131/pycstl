@@ -4,13 +4,12 @@
 
 #include <fmt/chrono.h>
 #include <fmt/color.h>
-#include <fmt/core.h>
 
 #include "common/thread_id.h"
 
 namespace pyc {
 
-consteval inline std::string_view ToString(LogLevel level) {
+consteval inline std::string_view ToString(LogLevel level) noexcept {
     switch (level) {
         case LogLevel::kDebug:
             return "DEBUG";
@@ -26,7 +25,23 @@ consteval inline std::string_view ToString(LogLevel level) {
     return "UNKNOWN";
 }
 
-std::string_view ExtractFunctionName(std::string_view full_name) {
+consteval inline fmt::text_style ToTextStyle(LogLevel level) noexcept {
+    switch (level) {
+        case LogLevel::kDebug:
+            return fg(fmt::color::cyan);
+        case LogLevel::kInfo:
+            return fg(fmt::color::green);
+        case LogLevel::kWarn:
+            return fg(fmt::color::yellow);
+        case LogLevel::kError:
+            return fg(fmt::color::red);
+        case LogLevel::kFatal:
+            return fg(fmt::color::dark_orange) | fmt::emphasis::reverse | fmt::emphasis::bold;
+    }
+    return {};
+}
+
+constexpr std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
     auto end_pos = full_name.find_last_of('(');
     if (end_pos != std::string::npos) {
         auto start_pos = full_name.rfind("::", end_pos);
@@ -47,22 +62,9 @@ std::string_view ExtractFunctionName(std::string_view full_name) {
 
 template <LogLevel level>
 void Logger::log(std::string_view msg, const std::source_location location) const {
-    auto log_msg =
-        fmt::format("[{}][{:5}][{:0>5}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_, ToString(level),
-                    ShortThreadId(), std::chrono::system_clock::now(), location.file_name(), location.line(),
-                    ExtractFunctionName(location.function_name()), msg);
-
-    if constexpr (level == LogLevel::kDebug) {
-        fmt::print(fg(fmt::color::cyan), log_msg);
-    } else if constexpr (level == LogLevel::kInfo) {
-        fmt::print(fg(fmt::color::green), log_msg);
-    } else if constexpr (level == LogLevel::kWarn) {
-        fmt::print(fg(fmt::color::yellow), log_msg);
-    } else if constexpr (level == LogLevel::kError) {
-        fmt::print(fg(fmt::color::red), log_msg);
-    } else if constexpr (level == LogLevel::kFatal) {
-        fmt::print(fg(fmt::color::dark_orange) | fmt::emphasis::reverse | fmt::emphasis::bold, log_msg);
-    }
+    fmt::print(ToTextStyle(level), "[{}][{:5}][{:0>5}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
+               ToString(level), ShortThreadId(), std::chrono::system_clock::now(), location.file_name(),
+               location.line(), ExtractFunctionName(location.function_name()), msg);
 }
 
 template void Logger::log<LogLevel::kDebug>(std::string_view msg, const std::source_location location) const;

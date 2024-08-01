@@ -1,4 +1,4 @@
-#include <fmt/printf.h>
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 #include "pycstl/function.h"

@@ -1,7 +1,6 @@
 #include "common/timer.h"
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
 
 #include "common/utils.h"
 

@@ -20,7 +20,7 @@ private:
     friend class ReadAllSession;
 
 public:
-    MsgNode(std::string msg) : msg_(std::move(msg)), total_len_(msg.size()) {}
+    MsgNode(std::string msg) : total_len_(msg.size()), msg_(std::move(msg)) {}
 
     explicit MsgNode(std::size_t total_len) : total_len_(total_len) {}
 

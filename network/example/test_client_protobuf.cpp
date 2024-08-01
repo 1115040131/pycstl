@@ -3,7 +3,7 @@
 #include <thread>
 
 #include <boost/asio.hpp>
-#include <fmt/printf.h>
+#include <fmt/base.h>
 
 #include "network/msg_node.h"
 #include "network/proto/msg.pb.h"

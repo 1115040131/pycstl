@@ -3,7 +3,7 @@
 #include <string>
 
 #include <boost/asio.hpp>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace asio = boost::asio;
 using asio::ip::tcp;

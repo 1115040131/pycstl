@@ -1,7 +1,6 @@
 #pragma once
 
 #include <source_location>
-#include <string>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -12,7 +11,7 @@ enum class LogLevel { kDebug, kInfo, kWarn, kError, kFatal };
 
 class Logger {
 public:
-    Logger(std::string_view name = "DEFAULT") : name_(name) {}
+    constexpr explicit Logger(std::string_view name = "DEFAULT") noexcept : name_(name) {}
 
     template <typename... Args>
     struct FmtWithLocation {
@@ -64,7 +63,7 @@ private:
     void log(std::string_view msg, const std::source_location location) const;
 
 private:
-    const std::string name_;
+    std::string_view name_;
 };
 
 }  // namespace pyc

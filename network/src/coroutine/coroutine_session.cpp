@@ -1,6 +1,6 @@
 #include "network/coroutine/coroutine_session.h"
 
-#include <fmt/printf.h>
+#include <fmt/base.h>
 
 namespace network {
 

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <unordered_map>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "tetris/terminal.h"
 #include "tetris/utils.h"

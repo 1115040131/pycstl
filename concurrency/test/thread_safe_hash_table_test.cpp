@@ -1,9 +1,10 @@
 #include <chrono>
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "concurrency/thread_safe_hash_table/thread_safe_hash_table.h"
-#include "test/utils.h"
+#include "concurrency/test/utils.h"
 
 namespace pyc {
 namespace concurrency {

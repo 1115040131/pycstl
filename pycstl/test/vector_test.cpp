@@ -1,11 +1,11 @@
 
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 
+#include "pycstl/test/utils.h"
 #include "pycstl/vector.h"
-#include "test/utils.h"
 
 TEST(VectorTest, test_construction) {
     pycstl::Vector<int> vec1;

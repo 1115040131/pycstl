@@ -1,6 +1,6 @@
 #include "network/logic_system.h"
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 #include <nlohmann/json.hpp>
 
 #include "network/utils.h"

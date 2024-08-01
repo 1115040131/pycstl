@@ -1,3 +1,4 @@
 common --enable_bzlmod
 
 build --compilation_mode=dbg
+build --cxxopt=-std=c++20

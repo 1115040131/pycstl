@@ -2,7 +2,7 @@
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 #include "network/websocket/connection_manager.h"
 

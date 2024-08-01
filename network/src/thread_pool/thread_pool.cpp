@@ -1,6 +1,6 @@
 #include "network/thread_pool/thread_pool.h"
 
-#include <fmt/printf.h>
+#include <fmt/base.h>
 
 namespace network {
 

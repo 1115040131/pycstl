@@ -52,7 +52,7 @@ def main():
     targets = {
         ######################### build for all #########################
         "all": lambda args: run_bazel_build('//...', args),
-        "all_test": lambda args: run_bazel_test('//...', args=args),
+        "all_test": lambda args: run_bazel_test('//...', args),
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),

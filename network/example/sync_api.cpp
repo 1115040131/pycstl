@@ -1,4 +1,4 @@
-#include "example/sync_api.h"
+#include "network/example/sync_api.h"
 
 #include <iostream>
 #include <memory>
@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <boost/asio.hpp>
-#include <fmt/printf.h>
+#include <fmt/ostream.h>
 
 namespace network {
 
@@ -124,8 +124,8 @@ int bind_acceptor_socket() {
     boost::system::error_code error_code;
     acceptor.bind(endpoint, error_code);
     if (error_code.value() != 0) {
-        fmt::println("Failed to bind the acceptor socket! Error code = {}. Message: {}", error_code.value(),
-                     error_code.message());
+        fmt::println(std::cerr, "Failed to bind the acceptor socket! Error code = {}. Message: {}",
+                     error_code.value(), error_code.message());
         return error_code.value();
     }
 
@@ -149,7 +149,7 @@ int ConnectToEnd() {
         // Step 4. Connecting a socket.
         sock.connect(endpoint);
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -169,7 +169,7 @@ int DnsConnectToEnd() {
         asio::ip::tcp::socket sock(io_context);
         asio::connect(sock, iter);
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -203,7 +203,7 @@ int AcceptNewConnection() {
         // Step 7. Processing the next connection request and connecting the active socket to the client.
         acceptor.accept(sock);
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -272,7 +272,7 @@ int SendDataByWriteSome() {
         sock.connect(endpoint);
         WriteToSocket(sock);
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -303,7 +303,7 @@ int SendDataBySend() {
             return 1;
         }
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -334,7 +334,7 @@ int SendDataByWrite() {
             return 1;
         }
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -367,7 +367,7 @@ int ReadDataByReadSome() {
         sock.connect(endpoint);
         ReadFromSocket(sock);
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -394,7 +394,7 @@ int ReadDataByReceive() {
             return 1;
         }
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }
@@ -421,7 +421,7 @@ int ReadDataByRead() {
             return 1;
         }
     } catch (const boost::system::system_error& e) {
-        std::cerr << fmt::format("Error occured! Error code = {}. Message: {}\n", e.code().value(), e.what());
+        fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
         return e.code().value();
     }

@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "common/json.h"

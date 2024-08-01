@@ -3,7 +3,7 @@
 #include <cstring>
 #include <stdexcept>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace tiny_db {
 

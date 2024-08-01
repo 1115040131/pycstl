@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 
 namespace tiny_db {
 

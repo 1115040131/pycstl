@@ -2,7 +2,6 @@
 #include <list>
 #include <vector>
 
-#include <fmt/core.h>
 #include <fmt/ranges.h>
 #include <gtest/gtest.h>
 

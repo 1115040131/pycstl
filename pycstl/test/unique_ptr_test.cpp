@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <fmt/printf.h>
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 #include "pycstl/unique_ptr.h"

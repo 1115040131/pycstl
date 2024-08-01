@@ -4,7 +4,7 @@
 #include <unordered_set>
 
 #include <boost/asio.hpp>
-#include <fmt/printf.h>
+#include <fmt/ostream.h>
 
 namespace asio = boost::asio;
 
@@ -56,7 +56,7 @@ int main() {
             thread->join();
         }
     } catch (const std::exception& e) {
-        std::cerr << fmt::format("Exception: {}\n", e.what());
+        fmt::println(std::cerr, "Exception: {}", e.what());
     }
 
     return 0;

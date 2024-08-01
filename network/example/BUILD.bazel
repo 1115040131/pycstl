@@ -8,7 +8,6 @@ cc_library(
         "sync_api.h",
     ],
     copts = STRICT_COPTS,
-    includes = ["../"],
     deps = [
         "//common",
         "@boost//:asio",
@@ -22,7 +21,6 @@ cc_library(
         "async_api.h",
     ],
     copts = STRICT_COPTS,
-    includes = ["../"],
     deps = [
         "//common",
         "@boost//:asio",

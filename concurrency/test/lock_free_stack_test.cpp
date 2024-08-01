@@ -1,9 +1,10 @@
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "concurrency/lock_free_stack/hazard_pointer_stack.h"
 #include "concurrency/lock_free_stack/lock_free_stack.h"
 #include "concurrency/lock_free_stack/ref_count_stack.h"
-#include "test/utils.h"
+#include "concurrency/test/utils.h"
 
 namespace pyc {
 namespace concurrency {

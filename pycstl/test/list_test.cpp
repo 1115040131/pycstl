@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "pycstl/list.h"
-#include "test/utils.h"
+#include "pycstl/test/utils.h"
 
 static std::initializer_list<int> init_list{1, 2, 5, 7, 9, 392, 213, 1, -321, 12};
 
@@ -45,11 +45,9 @@ TEST(ListTest, Remove) {
     std::list<int> stl_arr{init_list};
     COMPARE_CONTENT(arr, stl_arr);
 
-    ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) { container.remove(5); }, COMPARE_CONTENT);
+    ACTION_AND_COMPARE(arr, stl_arr, [](auto& container) { container.remove(5); }, COMPARE_CONTENT);
 
-    ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) { container.remove(-99); }, COMPARE_CONTENT);
+    ACTION_AND_COMPARE(arr, stl_arr, [](auto& container) { container.remove(-99); }, COMPARE_CONTENT);
 
     auto remove_condition = [](int value) { return value > 100; };
     ACTION_AND_COMPARE(

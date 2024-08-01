@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/bazel-pycstl/**"
+                "${workspaceFolder}/bazel-*/external/**",
+                "${workspaceFolder}/bazel-out/k8-dbg/bin/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
