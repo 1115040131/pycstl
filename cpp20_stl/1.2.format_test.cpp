@@ -7,7 +7,7 @@
 #include <format>
 #else
 // 如果不存在，引入fmt库作为替代，并定义 std::format
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace std {
 

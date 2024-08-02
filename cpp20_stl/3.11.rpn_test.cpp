@@ -5,7 +5,7 @@
 #include <map>
 #include <string_view>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "common/cin_redirect.h"

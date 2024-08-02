@@ -1,6 +1,6 @@
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 namespace pyc {

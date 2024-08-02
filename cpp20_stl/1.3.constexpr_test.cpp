@@ -35,23 +35,21 @@ TEST(ContexprTest, ContexprTest) {
 }
 #else
 #include <fmt/color.h>
-#include <fmt/core.h>
 
 TEST(ContexprTest, ContexprTest) {
-    fmt::print(fmt::fg(fmt::color::yellow),
-               fmt::format("Your compiler does not support constexpr std::string version: {}\n",
-                           __cpp_lib_constexpr_string));
+    fmt::print(fmt::fg(fmt::color::yellow), "Your compiler does not support constexpr std::string version: {}\n",
+               __cpp_lib_constexpr_string);
 }
+
 #endif
 #else
 #include <fmt/color.h>
-#include <fmt/core.h>
 
 TEST(ContexprTest, ContexprTest) {
-    fmt::print(fmt::fg(fmt::color::yellow),
-               fmt::format("Your compiler does not support constexpr std::string version: {}\n",
-                           __cpp_lib_constexpr_string));
+    fmt::print(fmt::fg(fmt::color::yellow), "Your compiler does not support constexpr std::string version: {}\n",
+               __cpp_lib_constexpr_string);
 }
+
 #endif
 
 // constexpr: https://zh.cppreference.com/w/cpp/language/constexpr
