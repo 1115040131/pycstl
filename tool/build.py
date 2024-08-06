@@ -15,24 +15,24 @@ logger = Logger(LogStyle.NO_DEBUG_INFO)
 os.environ['PATH'] = '/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 
-def run_bazel_build(target, args=[]):
+def run_bazel_build(target, check=True, args=[]):
     command = f'bazel build {target} {" ".join(args)}'
     logger.info(command)
-    subprocess.run(shlex.split(command))
+    subprocess.run(shlex.split(command), check=check)
 
 
-def run_bazel_test(target, test_output=False, args=[]):
+def run_bazel_test(target, test_output=True, check=True, args=[]):
     command = f'bazel test {target} {" ".join(args)}'
     if test_output:
         command += ' --test_output=all'
     logger.info(command)
-    subprocess.run(shlex.split(command))
+    subprocess.run(shlex.split(command), check=check)
 
 
-def run_bazel_run(target, args=[]):
+def run_bazel_run(target, check=True, args=[]):
     command = f'bazel run {target} {" ".join(args)}'
     logger.info(command)
-    subprocess.run(shlex.split(command))
+    subprocess.run(shlex.split(command), check=check)
 
 
 def run_valgrind(target, args=[]):
@@ -61,50 +61,50 @@ def main():
 
     targets = {
         ######################### build for all #########################
-        "all": lambda args: run_bazel_build('//...', args),
-        "all_test": lambda args: run_bazel_test('//...', args),
+        "all": lambda args: run_bazel_build('//...', args=args),
+        "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
-        "common_test": lambda args: run_bazel_test('//common/test:common_all_test', True, args),
+        "common_test": lambda args: run_bazel_test('//common/test:common_all_test', args=args),
 
         ######################### build for co_async #########################
-        "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...', args),
-        "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', True, args),
+        "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...', args=args),
+        "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', args=args),
 
         ######################### build for concurrency #########################
-        "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args),
-        "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', True, args),
-        "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test', args),
+        "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args=args),
+        "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
+        "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test', args=args),
 
         ######################### build for design_pattern #########################
-        "design_pattern": lambda args: run_bazel_build('//design_pattern:design_pattern_test', args),
-        "design_pattern_test": lambda args: run_bazel_test('//design_pattern:design_pattern_test', True, args),
+        "design_pattern": lambda args: run_bazel_build('//design_pattern:design_pattern_test', args=args),
+        "design_pattern_test": lambda args: run_bazel_test('//design_pattern:design_pattern_test', args=args),
 
         ######################### build for logger #########################
-        "logger": lambda args: run_bazel_build('//logger //logger/test/...', args),
-        "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', True, args),
+        "logger": lambda args: run_bazel_build('//logger //logger/test/...', args=args),
+        "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
 
         ######################### build for network #########################
-        "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args),
+        "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args=args),
         "network_run": lambda args: (
             logger.error("Please give config name") if len(args) < 1 else
             run_cmd(f'python3 {tool_path / 'start_server.py'} {args[0]}')
         ),
-        "network_test": lambda args: run_bazel_test('//network/test:network_all_test', True, args),
+        "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
 
         ######################### build for pycstl #########################
-        "pycstl": lambda args: run_bazel_build('//pycstl //pycstl/test/...', args),
-        "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', True, args),
+        "pycstl": lambda args: run_bazel_build('//pycstl //pycstl/test/...', args=args),
+        "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', args=args),
 
         ######################### build for tetris #########################
-        "tetris": lambda args: run_bazel_build('//tetris', args),
-        "tetris_run": lambda args: run_bazel_run('//tetris', args),
+        "tetris": lambda args: run_bazel_build('//tetris', args=args),
+        "tetris_run": lambda args: run_bazel_run('//tetris', args=args),
 
         ######################### build for tiny_db #########################
-        "tiny_db": lambda args: run_bazel_build('//tiny_db', args),
-        "tiny_db_run": lambda args: run_bazel_run('//tiny_db', args),
-        "tiny_db_test": lambda args: run_bazel_test('//tiny_db/test:db_test', True, args),
+        "tiny_db": lambda args: run_bazel_build('//tiny_db', args=args),
+        "tiny_db_run": lambda args: run_bazel_run('//tiny_db', args=args),
+        "tiny_db_test": lambda args: run_bazel_test('//tiny_db/test:db_test', args=args),
 
         # 测试文件, 单独编译
         ######################### build for hello_world #########################
