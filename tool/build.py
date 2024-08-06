@@ -4,6 +4,9 @@ import subprocess
 import os
 import shlex
 import sys
+
+from pathlib import Path
+from cmd_utils import run_cmd, run_tmux
 from logger import Logger, LogStyle
 
 logger = Logger(LogStyle.NO_DEBUG_INFO)
@@ -49,6 +52,13 @@ def main():
     target = sys.argv[1]
     additional_args = sys.argv[2:]
 
+    root_path = Path(__file__).resolve().parent.parent
+    tool_path = root_path / 'tool'  # tool 目录
+
+    if target.startswith('//'):
+        run_bazel_run(target, additional_args)
+        return
+
     targets = {
         ######################### build for all #########################
         "all": lambda args: run_bazel_build('//...', args),
@@ -60,9 +70,6 @@ def main():
 
         ######################### build for co_async #########################
         "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...', args),
-        "co_async_example": lambda args:
-        logger.error("Please give example name") if len(args) < 1 else
-        run_bazel_run(f'//co_async/example:{args[0]}', args[1:]),
         "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', True, args),
 
         ######################### build for concurrency #########################
@@ -80,6 +87,10 @@ def main():
 
         ######################### build for network #########################
         "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args),
+        "network_run": lambda args: (
+            logger.error("Please give config name") if len(args) < 1 else
+            run_cmd(f'python3 {tool_path / 'start_server.py'} {args[0]}')
+        ),
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', True, args),
 
         ######################### build for pycstl #########################
