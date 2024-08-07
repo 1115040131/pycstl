@@ -55,11 +55,21 @@ def main():
     root_path = Path(__file__).resolve().parent.parent
     tool_path = root_path / 'tool'  # tool 目录
 
-    if target.startswith('//'):
-        run_bazel_run(target, additional_args)
-        return
-
     targets = {
+        ######################### basic command #########################
+        "build": lambda args: (
+            logger.error("Please give target name") if len(args) < 1 else
+            run_bazel_build(args[0], args=args[1:])
+        ),
+        "run": lambda args: (
+            logger.error("Please give target name") if len(args) < 1 else
+            run_bazel_run(args[0], args=args[1:])
+        ),
+        "test": lambda args: (
+            logger.error("Please give target name") if len(args) < 1 else
+            run_bazel_test(args[0], args=args[1:])
+        ),
+
         ######################### build for all #########################
         "all": lambda args: run_bazel_build('//...', args=args),
         "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
