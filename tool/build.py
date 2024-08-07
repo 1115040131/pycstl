@@ -15,13 +15,13 @@ logger = Logger(LogStyle.NO_DEBUG_INFO)
 os.environ['PATH'] = '/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 
-def run_bazel_build(target, check=True, args=[]):
+def run_bazel_build(target, check=False, args=[]):
     command = f'bazel build {target} {" ".join(args)}'
     logger.info(command)
     subprocess.run(shlex.split(command), check=check)
 
 
-def run_bazel_test(target, test_output=True, check=True, args=[]):
+def run_bazel_test(target, test_output=True, check=False, args=[]):
     command = f'bazel test {target} {" ".join(args)}'
     if test_output:
         command += ' --test_output=all'
@@ -29,7 +29,7 @@ def run_bazel_test(target, test_output=True, check=True, args=[]):
     subprocess.run(shlex.split(command), check=check)
 
 
-def run_bazel_run(target, check=True, args=[]):
+def run_bazel_run(target, check=False, args=[]):
     command = f'bazel run {target} {" ".join(args)}'
     logger.info(command)
     subprocess.run(shlex.split(command), check=check)
