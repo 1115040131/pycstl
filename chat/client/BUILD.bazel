@@ -1,0 +1,18 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_qt//:qt.bzl", "qt_cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+qt_cc_binary(
+    name = "client",
+    srcs = ["main.cpp"],
+    copts = STRICT_COPTS,
+    data = glob(["res/**"]),
+    deps = [
+        "//chat/client/widgets",
+    ],
+)

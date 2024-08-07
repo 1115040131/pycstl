@@ -1,0 +1,25 @@
+load("@rules_qt//:qt.bzl", "qt_cc_library", "qt_ui_library")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+qt_cc_library(
+    name = "widgets",
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["**/*.h"]),
+    deps = [
+        ":mainwindow_ui",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_ui_library(
+    name = "mainwindow_ui",
+    ui = "mainwindow.ui",
+    deps = [
+        "@rules_qt//:qt_widgets",
+    ],
+)
