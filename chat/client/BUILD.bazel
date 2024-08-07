@@ -1,11 +1,31 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
-load("@rules_qt//:qt.bzl", "qt_cc_binary")
+load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
 exports_files(["LICENSE"])
+
+QT_UIS = [
+    "mainwindow",
+    "login_dialog",
+    "register_dialog",
+]
+
+qt_cc_library(
+    name = "client_lib",
+    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["**/*.h"]),
+    copts = STRICT_COPTS,
+    includes = ["include"],
+    deps = [
+        "//chat/client/widget:%s_ui" % qt_ui
+        for qt_ui in QT_UIS
+    ] + [
+        "@rules_qt//:qt_widgets",
+    ],
+)
 
 qt_cc_binary(
     name = "client",
@@ -16,6 +36,6 @@ qt_cc_binary(
         "style/*",
     ]),
     deps = [
-        "//chat/client/widgets",
+        ":client_lib",
     ],
 )

@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QFile>
 
-#include "chat/client/widgets/mainwindow.h"
+#include "chat/client/widget/mainwindow.h"
 
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);

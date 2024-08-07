@@ -2,8 +2,8 @@
 
 #include <QMainWindow>
 
-#include "chat/client/widgets/login_dialog.h"
-#include "chat/client/widgets/register_dialog.h"
+#include "chat/client/widget/login_dialog.h"
+#include "chat/client/widget/register_dialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

@@ -1,4 +1,4 @@
-load("@rules_qt//:qt.bzl", "qt_cc_library", "qt_ui_library")
+load("@rules_qt//:qt.bzl", "qt_ui_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,15 +17,3 @@ QT_UIS = [
     ui = "%s.ui" % qt_ui,
     deps = ["@rules_qt//:qt_widgets"],
 ) for qt_ui in QT_UIS]
-
-qt_cc_library(
-    name = "widgets",
-    srcs = glob(["**/*.cpp"]),
-    hdrs = glob(["**/*.h"]),
-    deps = [
-        "%s_ui" % qt_ui
-        for qt_ui in QT_UIS
-    ] + [
-        "@rules_qt//:qt_widgets",
-    ],
-)

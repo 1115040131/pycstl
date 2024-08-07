@@ -3,7 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/**/include",
                 "${workspaceFolder}/bazel-*/external/**",
                 "${workspaceFolder}/bazel-out/k8-dbg/bin/**"
             ],
