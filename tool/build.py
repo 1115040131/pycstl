@@ -74,6 +74,10 @@ def main():
         "all": lambda args: run_bazel_build('//...', args=args),
         "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
 
+        ######################### build for chat #########################
+        "chat": lambda args: run_bazel_build('//chat', args),
+        "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
+
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
         "common_test": lambda args: run_bazel_test('//common/test:common_all_test', args=args),

@@ -11,7 +11,10 @@ qt_cc_binary(
     name = "client",
     srcs = ["main.cpp"],
     copts = STRICT_COPTS,
-    data = glob(["res/**"]),
+    data = glob([
+        "res/*",
+        "style/*",
+    ]),
     deps = [
         "//chat/client/widgets",
     ],
