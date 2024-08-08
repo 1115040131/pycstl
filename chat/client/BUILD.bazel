@@ -7,7 +7,7 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
-QT_UIS = [
+WIDGETS = [
     "mainwindow",
     "login_dialog",
     "register_dialog",
@@ -20,9 +20,11 @@ qt_cc_library(
     copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
-        "//chat/client/widget:%s_ui" % qt_ui
-        for qt_ui in QT_UIS
+        "//chat/client/widget:%s_ui" % widget
+        for widget in WIDGETS
     ] + [
+        "//common",
+        "@rules_qt//:qt_network",
         "@rules_qt//:qt_widgets",
     ],
 )
