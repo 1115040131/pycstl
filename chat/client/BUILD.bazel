@@ -15,8 +15,8 @@ WIDGETS = [
 
 qt_cc_library(
     name = "client_lib",
-    srcs = glob(["**/*.cpp"]),
-    hdrs = glob(["**/*.h"]),
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
     copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
