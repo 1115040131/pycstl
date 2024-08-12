@@ -20,6 +20,10 @@ public:
 
     bool HandleGet(std::string_view url, std::shared_ptr<HttpConnection> connection);
 
+    void RegPost(std::string_view url, HttpHandler handler);
+
+    bool HandlePost(std::string_view url, std::shared_ptr<HttpConnection> connection);
+
 private:
     LogicSystem();
 

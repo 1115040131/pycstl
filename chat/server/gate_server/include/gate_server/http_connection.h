@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_map>
 
 #include "gate_server/define.h"
 
@@ -15,6 +16,8 @@ public:
 
     void Start();
 
+    const std::unordered_map<std::string, std::string>& GetParams() const { return get_params_; }
+
 private:
     void HandleRequest();
 
@@ -22,12 +25,17 @@ private:
 
     void CheckDeadline();
 
+    void ParseParams();
+
 private:
     tcp::socket socket_;
     beast::flat_buffer buffer_{8192};
     http::request<http::dynamic_body> request_;
     http::response<http::dynamic_body> response_;
     asio::steady_timer dealine_{socket_.get_executor(), std::chrono::seconds(60)};
+
+    std::string get_url_;
+    std::unordered_map<std::string, std::string> get_params_;
 };
 
 }  // namespace chat

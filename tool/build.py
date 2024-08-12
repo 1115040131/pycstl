@@ -78,19 +78,23 @@ def main():
         "chat": lambda args: run_bazel_build('//chat', args),
         "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
+        "chat_gate_server_test": lambda args: run_bazel_test('//chat/server/gate_server/test:gate_server_test',
+                                                             args=args),
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
         "common_test": lambda args: run_bazel_test('//common/test:common_all_test', args=args),
 
         ######################### build for co_async #########################
-        "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...', args=args),
+        "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...',
+                                                 args=args),
         "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', args=args),
 
         ######################### build for concurrency #########################
         "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args=args),
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
-        "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test', args=args),
+        "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test',
+                                                          args=args),
 
         ######################### build for cpp20_stl #########################
         "cpp20_stl": lambda args: run_bazel_build('//cpp20_stl:cpp20_stl_all_test', args=args),

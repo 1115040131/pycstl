@@ -17,6 +17,7 @@ int main() {
         });
 
         std::make_shared<pyc::chat::CServer>(io_context, port)->Start();
+        fmt::print("Gate Server listening at port {}\n", port);
         io_context.run();
     } catch (const std::exception& e) {
         fmt::print(std::cerr, "{}\n", e.what());
