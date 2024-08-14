@@ -5,6 +5,7 @@
 
 #include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
+#include "chat/client/url_mgr.h"
 #include "chat/client/widget/ui_register_dialog.h"
 
 RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegisterDialog) {
@@ -27,6 +28,10 @@ void RegisterDialog::on_get_code_btn_clicked() {
     bool match = regex.match(email).hasMatch();
     if (match) {
         // 发送验证码
+        QJsonObject root;
+        root["email"] = email;
+        HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/get_varifycode"),
+                                               root, ReqId::kGetVarifyCode, Module::kRegisterMod);
     } else {
         showTip(tr("邮箱地址不正确"), false);
     }
@@ -62,7 +67,7 @@ void RegisterDialog::initHttpHandlers() {
 
         auto email = json["email"].toString();
         this->showTip(tr("验证码已发送至邮箱，请注意查收"), true);
-        qDebug() << "email is " << email;
+        qDebug() << "email is" << email;
     });
     // handlers_.insert(ReqId::kRegUser, [this](const QJsonObject& json) {});
 }

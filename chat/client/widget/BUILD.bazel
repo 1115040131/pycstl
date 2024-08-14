@@ -1,3 +1,4 @@
+load("widgets.bzl", "WIDGETS")
 load("@rules_qt//:qt.bzl", "qt_ui_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -6,14 +7,8 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
-QT_UIS = [
-    "mainwindow",
-    "login_dialog",
-    "register_dialog",
-]
-
 [qt_ui_library(
-    name = "%s_ui" % qt_ui,
-    ui = "%s.ui" % qt_ui,
+    name = "%s_ui" % widget,
+    ui = "%s.ui" % widget,
     deps = ["@rules_qt//:qt_widgets"],
-) for qt_ui in QT_UIS]
+) for widget in WIDGETS]

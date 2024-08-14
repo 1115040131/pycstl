@@ -15,6 +15,8 @@ class HttpMgr : public QObject, public pyc::Singleton<HttpMgr> {
 public:
     ~HttpMgr();
 
+    void PostHttpRequest(const QUrl& url, const QJsonObject& json, ReqId req_id, Module mod);
+
 private slots:
     void slot_http_finish(ReqId req_id, const QString& res, ErrorCode err, Module mod);
 
@@ -24,8 +26,6 @@ signals:
 
 private:
     HttpMgr();
-
-    void PostHttpRequest(const QUrl& url, const QJsonObject& json, ReqId req_id, Module mod);
 
 private:
     QNetworkAccessManager manager_;

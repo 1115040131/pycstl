@@ -1,4 +1,5 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//chat/client/widget:widgets.bzl", "WIDGETS")
 load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -6,12 +7,6 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])
 
 exports_files(["LICENSE"])
-
-WIDGETS = [
-    "mainwindow",
-    "login_dialog",
-    "register_dialog",
-]
 
 qt_cc_library(
     name = "client_lib",
@@ -36,6 +31,7 @@ qt_cc_binary(
     data = glob([
         "res/*",
         "style/*",
+        "config/*",
     ]),
     deps = [
         ":client_lib",
