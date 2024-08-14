@@ -1,0 +1,21 @@
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# verify.grpc
+proto_library(
+    name = "verify_proto",
+    srcs = ["verify.proto"],
+)
+
+cc_proto_library(
+    name = "verify_cc_proto",
+    deps = ["verify_proto"],
+)
+
+cc_grpc_library(
+    name = "verify_cc_grpc_proto",
+    srcs = ["verify_proto"],
+    grpc_only = True,
+    deps = ["verify_cc_proto"],
+)

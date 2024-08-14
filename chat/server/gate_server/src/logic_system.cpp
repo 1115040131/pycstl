@@ -3,6 +3,8 @@
 #include <fmt/base.h>
 #include <nlohmann/json.hpp>
 
+#include "gate_server/verify_grpc_client.h"
+
 namespace pyc {
 namespace chat {
 
@@ -27,8 +29,8 @@ LogicSystem::LogicSystem() {
             return;
         }
 
-        auto email = src_root.find("email");
-        if (email == src_root.end()) {
+        auto email_iter = src_root.find("email");
+        if (email_iter == src_root.end()) {
             fmt::println("Key: email not found");
             nlohmann::json root;
             root["error"] = ErrorCode::kJsonError;
@@ -36,8 +38,11 @@ LogicSystem::LogicSystem() {
             return;
         }
 
+        auto email = email_iter->get<std::string>();
+        auto response = VerifyGrpcClient::GetInstance().GetVerifyCode(email);
+
         nlohmann::json root;
-        root["email"] = email->get<std::string>();
+        root["email"] = email;
         root["error"] = ErrorCode::kSuccess;
         beast::ostream(connection->response_.body()) << root.dump();
     });

@@ -2,11 +2,20 @@
 
 #include <fmt/ostream.h>
 
+#include "gate_server/config_mgr.h"
 #include "gate_server/cserver.h"
 
 int main() {
+    const auto& port_str = pyc::chat::ConfigMgr::GetInstance()["GateServer"]["Port"];
+
+    char* end;
+    unsigned short port = std::strtoul(port_str.c_str(), &end, 10);
+    if (end == port_str.c_str() || *end != '\0') {
+        fmt::println("Config Port: {} Invalid", port_str);
+        return 1;
+    }
+
     try {
-        unsigned short port = 8080;
         boost::asio::io_context io_context;
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
         signals.async_wait([&io_context](const boost::system::error_code& ec, int) {

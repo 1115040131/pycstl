@@ -75,11 +75,16 @@ def main():
         "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
 
         ######################### build for chat #########################
-        "chat": lambda args: run_bazel_build('//chat', args),
+        "chat": lambda args: run_bazel_build('//chat/...', args),
         "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_gate_server_test": lambda args: run_bazel_test('//chat/server/gate_server/test:gate_server_test',
                                                              args=args),
+        "chat_run": lambda args: (
+            run_bazel_build('//chat/...', args),
+            run_tmux(f"python3 {tool_path / 'build.py'} chat_gate_server",
+                     f"python3 {tool_path / 'build.py'} chat_client")
+        ),
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
