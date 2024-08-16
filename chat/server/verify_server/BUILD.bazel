@@ -1,0 +1,28 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+js_library(
+    name = "verify_server_lib",
+    srcs = glob(["src/*.js"]),
+    data = [
+        "config.json",
+        "//chat/server/proto:verify_js_proto",
+    ],
+    deps = [
+        "//:node_modules/@grpc/grpc-js",
+        "//:node_modules/@grpc/proto-loader",
+        "//:node_modules/nodemailer",
+        "//:node_modules/uuid",
+    ],
+)
+
+js_binary(
+    name = "verify_server",
+    data = [":verify_server_lib"],
+    entry_point = "server.js",
+)

@@ -14,7 +14,7 @@ cc_library(
     data = glob(["config/*"]),
     includes = ["include"],
     deps = [
-        "//chat/server/gate_server/proto:verify_cc_grpc_proto",
+        "//chat/server/proto:verify_cc_grpc_proto",
         "//common",
         "@boost//:asio",
         "@boost//:beast",
