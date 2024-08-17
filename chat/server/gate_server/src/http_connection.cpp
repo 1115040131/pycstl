@@ -1,29 +1,25 @@
 #include "gate_server/http_connection.h"
 
-#include <iostream>
-
-#include <fmt/ostream.h>
-
 #include "gate_server/logic_system.h"
 
 namespace pyc {
 namespace chat {
 
-HttpConnection::HttpConnection(tcp::socket socket) : socket_(std::move(socket)) {}
+HttpConnection::HttpConnection(asio::io_context& io_context) : socket_(io_context) {}
 
 void HttpConnection::Start() {
     http::async_read(socket_, buffer_, request_,
                      [self = shared_from_this()](const beast::error_code& ec, std::size_t) {
                          try {
                              if (ec) {
-                                 fmt::println(std::cerr, "{}", ec.what());
+                                 PYC_LOG_ERROR("{}", ec.message());
                                  return;
                              }
 
                              self->HandleRequest();
                              self->CheckDeadline();
                          } catch (const std::exception& e) {
-                             fmt::print(std::cerr, "{}\n", e.what());
+                             PYC_LOG_ERROR("{}", e.what());
                          }
                      });
 }

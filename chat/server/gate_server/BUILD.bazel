@@ -16,18 +16,18 @@ cc_library(
     deps = [
         "//chat/server/proto:verify_cc_grpc_proto",
         "//common",
+        "//logger",
         "@boost//:asio",
         "@boost//:beast",
         "@boost//:property_tree",
         "@com_github_grpc_grpc//:grpc++",
-        "@fmt",
         "@nlohmann_json//:json",
     ],
 )
 
 cc_binary(
     name = "gate_server",
-    srcs = ["main.cpp"],
+    srcs = ["gate_server.cpp"],
     copts = STRICT_COPTS,
     deps = [
         ":gate_server_lib",

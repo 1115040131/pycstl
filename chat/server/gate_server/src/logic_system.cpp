@@ -1,8 +1,8 @@
 #include "gate_server/logic_system.h"
 
-#include <fmt/base.h>
 #include <nlohmann/json.hpp>
 
+#include "gate_server/define.h"
 #include "gate_server/verify_grpc_client.h"
 
 namespace pyc {
@@ -17,12 +17,12 @@ LogicSystem::LogicSystem() {
     });
     RegPost("/get_varifycode", [](std::shared_ptr<HttpConnection> connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
-        fmt::println("body: {}", body_str);
+        PYC_LOG_DEBUG("body: {}", body_str);
         connection->response_.set(http::field::content_type, "text/json");
 
         nlohmann::json src_root = nlohmann::json::parse(body_str, nullptr, false);
         if (src_root.is_discarded()) {
-            fmt::println("Failed to parse Json data");
+            PYC_LOG_ERROR("Failed to parse Json data");
             nlohmann::json root;
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();
@@ -31,7 +31,7 @@ LogicSystem::LogicSystem() {
 
         auto email_iter = src_root.find("email");
         if (email_iter == src_root.end()) {
-            fmt::println("Key: email not found");
+            PYC_LOG_ERROR("Key: email not found");
             nlohmann::json root;
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();

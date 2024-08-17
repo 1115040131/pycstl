@@ -1,17 +1,14 @@
-#include <iostream>
-
-#include <fmt/ostream.h>
-
 #include "gate_server/config_mgr.h"
 #include "gate_server/cserver.h"
+#include "gate_server/define.h"
 
 int main() {
-    const auto& port_str = pyc::chat::ConfigMgr::GetInstance()["GateServer"]["Port"];
+    GET_CONFIG(port_str, "GateServer", "Port");
 
     char* end;
     unsigned short port = std::strtoul(port_str.c_str(), &end, 10);
     if (end == port_str.c_str() || *end != '\0') {
-        fmt::println("Config Port: {} Invalid", port_str);
+        PYC_LOG_ERROR("Config Port: {} Invalid", port_str);
         return 1;
     }
 
@@ -26,10 +23,10 @@ int main() {
         });
 
         std::make_shared<pyc::chat::CServer>(io_context, port)->Start();
-        fmt::print("Gate Server listening at port {}\n", port);
+        PYC_LOG_INFO("Gate Server listening at port {}", port);
         io_context.run();
     } catch (const std::exception& e) {
-        fmt::print(std::cerr, "{}\n", e.what());
+        PYC_LOG_ERROR("{}", e.what());
     }
 
     return 0;

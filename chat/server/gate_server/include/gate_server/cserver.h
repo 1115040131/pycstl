@@ -16,7 +16,6 @@ public:
 private:
     asio::io_context& io_context_;
     tcp::acceptor acceptor_;
-    tcp::socket socket_;
 };
 
 }  // namespace chat

@@ -2,8 +2,11 @@
 
 #include <common/singleton.h>
 
+#include <optional>
 #include <string>
 #include <unordered_map>
+
+#include "gate_server/define.h"
 
 namespace pyc {
 namespace chat {
@@ -11,7 +14,7 @@ namespace chat {
 struct SectionInfo {
     std::unordered_map<std::string, std::string> data;
 
-    const std::string& operator[](const std::string& key) const {
+    std::optional<std::string> operator[](const std::string& key) const {
         auto iter = data.find(key);
         if (iter == data.end()) {
             return {};
@@ -41,3 +44,13 @@ private:
 
 }  // namespace chat
 }  // namespace pyc
+
+#define GET_CONFIG(var, section, key)                                      \
+    std::string var;                                                       \
+    {                                                                      \
+        auto config = ::pyc::chat::ConfigMgr::GetInstance()[section][key]; \
+        if (!config) {                                                     \
+            PYC_LOG_FATAL("Config " section " " key " not found");         \
+        }                                                                  \
+        var = *config;                                                     \
+    }

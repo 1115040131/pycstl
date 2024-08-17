@@ -12,9 +12,11 @@ class HttpConnection : public std::enable_shared_from_this<HttpConnection> {
     friend class LogicSystem;
 
 public:
-    HttpConnection(tcp::socket socket);
+    HttpConnection(asio::io_context& io_context);
 
     void Start();
+
+    tcp::socket& GetSocket() { return socket_; }
 
     const std::unordered_map<std::string, std::string>& GetParams() const { return get_params_; }
 
