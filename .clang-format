@@ -9,7 +9,7 @@ DerivePointerAlignment: false
 IncludeCategories:
   # first, non system headers that are included like <> - these are all
   # local carveouts, and get sorted below c++ but before non grpc "" files
-  - Regex: '^<(boost/|fmt/|gmock/|glm/|grpcpp/|gtest/|nlohmann/|spdlog/|zlib)'
+  - Regex: '^<(boost/|fmt/|gmock/|glm/|grpcpp/|gtest/|hiredis|nlohmann/|spdlog/|zlib)'
     Priority: 30
   # first C system headers - they have a . in the filename
   - Regex: '^<.*\.'
