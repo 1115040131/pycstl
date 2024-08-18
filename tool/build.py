@@ -6,7 +6,7 @@ import shlex
 import sys
 
 from pathlib import Path
-from cmd_utils import run_cmd, run_tmux
+from cmd_utils import run_cmd, run_tmux, run_docker
 from logger import Logger, LogStyle
 
 logger = Logger(LogStyle.NO_DEBUG_INFO)
@@ -80,6 +80,10 @@ def main():
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_gate_server_test": lambda args: run_bazel_test('//chat/server/gate_server/test:gate_server_test',
                                                              args=args),
+        "chat_redis_server": lambda args: run_docker(
+            'llfc-redis',
+            args=shlex.split('-p 6380:6379 redis --requirepass "123456"')
+        ),
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
         "chat_run": lambda args: (
             run_bazel_build('//chat/...', args),

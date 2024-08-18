@@ -1,3 +1,4 @@
+import json
 import subprocess
 import shlex
 
@@ -75,3 +76,36 @@ def run_tmux(*args):
         for i in range(argc):
             run_cmd(f"tmux send-keys -t {session_name}:0.{i} C-c")
         run_cmd(f"tmux kill-session -t {session_name}")
+
+
+def run_docker(container_name, args=[]):
+    try:
+        # 列出所有容器（包括未运行的）
+        output = subprocess.check_output(shlex.split('docker ps -a --format {{.Names}}'))
+        containers = output.decode('utf-8').strip().split('\n')
+
+        command = ''
+        if container_name not in containers:
+            # 容器不存在，根据提供的参数运行新的容器
+            command = f'docker run -d --name {container_name} {" ".join(args)}'
+            logger.info(f"Creating and starting container '{container_name}' with arguments: {' '.join(args)}")
+
+        else:
+            # 检查容器是否处于运行状态
+            inspect_output = subprocess.check_output(['docker', 'inspect', '-f', '{{.State.Running}}', container_name])
+            is_running = json.loads(inspect_output.decode('utf-8').strip().lower())
+
+            if not is_running:
+                # 容器存在但未启动，启动容器
+                command = f'docker start {container_name}'
+                logger.info(f"Starting existing container '{container_name}'...")
+            else:
+                # 容器已经在运行，无需执行任何操作
+                logger.info(f"Container '{container_name}' is already running.")
+
+        if command:
+            logger.debug(command)
+            subprocess.run(shlex.split(command))
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"An error occurred: {e.output.decode('utf-8')}")
