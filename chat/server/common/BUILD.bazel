@@ -1,0 +1,23 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "common",
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
+    copts = STRICT_COPTS,
+    data = glob(["config/*"]),
+    includes = ["include"],
+    deps = [
+        "//common",
+        "//logger",
+        "@boost//:property_tree",
+        "@fmt",
+        "@hiredis",
+    ],
+)

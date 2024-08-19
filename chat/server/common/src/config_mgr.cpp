@@ -1,4 +1,4 @@
-#include "gate_server/config_mgr.h"
+#include "chat/server/common/config_mgr.h"
 
 #include <filesystem>
 
@@ -9,9 +9,9 @@ namespace pyc {
 namespace chat {
 
 ConfigMgr::ConfigMgr() {
-    std::filesystem::path config_path = "chat/server/gate_server/config/config.ini";
+    std::filesystem::path config_path = "chat/server/common/config/config.ini";
     if (!std::filesystem::exists(config_path)) {
-        PYC_LOG_ERROR("{} not exists!", config_path.string());
+        _g_config_mgr_logger.fatal("{} not exists!", config_path.string());
         return;
     }
 
@@ -26,14 +26,14 @@ ConfigMgr::ConfigMgr() {
         data_.emplace(section_name, std::move(section_info));
     }
 
-    fmt::println("========== GateServer Config ==========");
+    fmt::println("========== Server Config ==========");
     for (const auto& [section_name, section_info] : data_) {
         fmt::println("[{}]", section_name);
         for (const auto& [key, value] : section_info.data) {
             fmt::println("{}={}", key, value);
         }
     }
-    fmt::println("=======================================");
+    fmt::println("===================================");
 }
 
 }  // namespace chat

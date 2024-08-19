@@ -1,6 +1,6 @@
 #include "gate_server/verify_grpc_client.h"
 
-#include "gate_server/config_mgr.h"
+#include "chat/server/common/config_mgr.h"
 #include "gate_server/define.h"
 
 namespace pyc {

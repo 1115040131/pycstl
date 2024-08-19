@@ -77,6 +77,10 @@ def main():
         ######################### build for chat #########################
         "chat": lambda args: run_bazel_build('//chat/...', args),
         "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
+        "chat_server_common_test": lambda args: (
+            targets["chat_redis_server"](args=[]),
+            run_bazel_test('//chat/server/common/test:common_test', args=args),
+        ),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_gate_server_test": lambda args: run_bazel_test('//chat/server/gate_server/test:gate_server_test',
                                                              args=args),

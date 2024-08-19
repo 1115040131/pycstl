@@ -1,0 +1,14 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_test(
+    name = "common_test",
+    srcs = glob([
+        "*.cpp",
+        "*.h",
+    ]),
+    copts = STRICT_COPTS,
+    deps = [
+        "//chat/server/common",
+        "@googletest//:gtest_main",
+    ],
+)
