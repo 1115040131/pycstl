@@ -103,7 +103,7 @@ def main():
         "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args=args),
         "network_run": lambda args: (
             logger.error("Please give config name") if len(args) < 1 else
-            run_cmd(f'python3 {tool_path / 'start_server.py'} {args[0]}')
+            run_cmd(f'python3 {tool_path / "start_server.py"} {args[0]}')
         ),
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
 
