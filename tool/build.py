@@ -87,6 +87,10 @@ def main():
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
         "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test', args=args),
 
+        ######################### build for cpp20_stl #########################
+        "cpp20_stl": lambda args: run_bazel_build('//cpp20_stl:cpp20_stl_all_test', args=args),
+        "cpp20_stl_test": lambda args: run_bazel_test('//cpp20_stl:cpp20_stl_all_test', args=args),
+
         ######################### build for design_pattern #########################
         "design_pattern": lambda args: run_bazel_build('//design_pattern:design_pattern_test', args=args),
         "design_pattern_test": lambda args: run_bazel_test('//design_pattern:design_pattern_test', args=args),
@@ -99,7 +103,7 @@ def main():
         "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args=args),
         "network_run": lambda args: (
             logger.error("Please give config name") if len(args) < 1 else
-            run_cmd(f'python3 {tool_path / 'start_server.py'} {args[0]}')
+            run_cmd(f'python3 {tool_path / "start_server.py"} {args[0]}')
         ),
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
 

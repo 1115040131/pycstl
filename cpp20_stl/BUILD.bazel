@@ -1,0 +1,17 @@
+cc_test(
+    name = "cpp20_stl_all_test",
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
+    copts = [
+        "-std=c++23",
+        "-Wno-unknown-pragmas",
+    ],
+    data = glob(["resource/**"]),
+    deps = [
+        "//common",
+        "@fmt",
+        "@googletest//:gtest_main",
+    ],
+)
