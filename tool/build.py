@@ -88,8 +88,8 @@ def main():
         "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test', args=args),
 
         ######################### build for cpp20_stl #########################
-        "cpp20_stl": lambda args: run_bazel_build('//cpp20_stl:cpp20_stl_all_test', args),
-        "cpp20_stl_test": lambda args: run_bazel_test('//cpp20_stl:cpp20_stl_all_test', True, args),
+        "cpp20_stl": lambda args: run_bazel_build('//cpp20_stl:cpp20_stl_all_test', args=args),
+        "cpp20_stl_test": lambda args: run_bazel_test('//cpp20_stl:cpp20_stl_all_test', args=args),
 
         ######################### build for design_pattern #########################
         "design_pattern": lambda args: run_bazel_build('//design_pattern:design_pattern_test', args=args),
