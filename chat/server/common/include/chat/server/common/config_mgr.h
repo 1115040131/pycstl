@@ -1,5 +1,6 @@
 #pragma once
 
+#include <charconv>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -48,4 +49,18 @@ inline Logger _g_config_mgr_logger("ConfigMgr");
             ::pyc::chat::_g_config_mgr_logger.fatal("Config " section " " key " not found"); \
         }                                                                                    \
         var = *config;                                                                       \
+    }
+
+#define GET_CONFIG_INT(var, section, key)                                                                 \
+    int var;                                                                                              \
+    {                                                                                                     \
+        auto config = ::pyc::chat::ConfigMgr::GetInstance()[section][key];                                \
+        if (!config) {                                                                                    \
+            ::pyc::chat::_g_config_mgr_logger.fatal("Config " section " " key " not found");              \
+        }                                                                                                 \
+        auto result = std::from_chars(config->data(), config->data() + config->size(), var);              \
+        if (result.ec != std::errc()) {                                                                   \
+            ::pyc::chat::_g_config_mgr_logger.fatal("Config " section " " key ": {} convert to int fail", \
+                                                    *config);                                             \
+        }                                                                                                 \
     }
