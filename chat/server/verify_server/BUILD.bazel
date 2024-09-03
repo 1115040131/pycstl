@@ -16,6 +16,7 @@ js_library(
     deps = [
         "//:node_modules/@grpc/grpc-js",
         "//:node_modules/@grpc/proto-loader",
+        "//:node_modules/ioredis",
         "//:node_modules/nodemailer",
         "//:node_modules/uuid",
     ],

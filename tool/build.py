@@ -91,6 +91,7 @@ def main():
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
         "chat_run": lambda args: (
             run_bazel_build('//chat/...', args),
+            targets["chat_redis_server"](args=[]),
             run_tmux(f"python3 {tool_path / 'build.py'} chat_gate_server",
                      f"python3 {tool_path / 'build.py'} chat_verify_server",
                      f"python3 {tool_path / 'build.py'} chat_client")

@@ -11,6 +11,7 @@
     "dependencies": {
         "@grpc/grpc-js": "latest",
         "@grpc/proto-loader": "latest",
+        "ioredis": "latest",
         "nodemailer": "latest",
         "uuid": "latest"
     },
