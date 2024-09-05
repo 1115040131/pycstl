@@ -18,6 +18,7 @@ qt_cc_library(
         "//chat/client/widget:%s_ui" % widget
         for widget in WIDGETS
     ] + [
+        "//chat/common",
         "//common",
         "@rules_qt//:qt_network",
         "@rules_qt//:qt_widgets",

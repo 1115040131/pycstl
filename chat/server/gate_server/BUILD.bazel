@@ -13,6 +13,7 @@ cc_library(
     copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
+        "//chat/common",
         "//chat/server/common",
         "//chat/server/proto:verify_cc_grpc_proto",
         "//common",

@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
+#include "chat/common/error_code.h"
 #include "logger/logger.h"
 
 namespace pyc {
@@ -12,13 +13,6 @@ namespace beast = boost::beast;
 namespace http = beast::http;
 namespace asio = boost::asio;
 using tcp = asio::ip::tcp;
-
-enum class ErrorCode {
-    kSuccess,
-    kJsonError,     // json 解析失败
-    kRpcFailed,     // rpc 调用失败
-    kNetworkError,  // 网络错误
-};
 
 inline Logger g_logger("GateServer");
 
