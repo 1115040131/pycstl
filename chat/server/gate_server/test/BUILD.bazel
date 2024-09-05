@@ -1,5 +1,8 @@
+load("@pycstl_deps//:requirements.bzl", "requirement")
+
 py_test(
     name = "gate_server_test",
     srcs = ["gate_server_test.py"],
     data = ["//chat/server/gate_server"],
+    deps = [requirement("redis")],
 )
