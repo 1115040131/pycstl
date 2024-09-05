@@ -10,7 +10,7 @@ class UrlMgr : public pyc::Singleton<UrlMgr> {
 public:
     ~UrlMgr() = default;
 
-    QString GateUrlPrefix() const { return gate_url_prefix_; }
+    const QString& GateUrlPrefix() const { return gate_url_prefix_; }
 
 private:
     UrlMgr();

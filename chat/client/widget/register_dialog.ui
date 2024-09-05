@@ -193,7 +193,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QLabel" name="repeat_label">
+            <widget class="QLabel" name="confirm_label">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -212,7 +212,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="repeat_edit">
+            <widget class="QLineEdit" name="confirm_edit">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -232,7 +232,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QLabel" name="varify_label">
+            <widget class="QLabel" name="verify_label">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -251,7 +251,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="varify_label_2">
+            <widget class="QLineEdit" name="verify_edit">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -303,7 +303,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
-            <widget class="QPushButton" name="confirm_btn">
+            <widget class="QPushButton" name="sure_btn">
              <property name="minimumSize">
               <size>
                <width>0</width>

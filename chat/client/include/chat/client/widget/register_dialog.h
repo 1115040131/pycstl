@@ -22,13 +22,20 @@ public:
     ~RegisterDialog();
 
 private slots:
+    // 注册按钮点击
     void on_get_code_btn_clicked();
 
+    // 确认按钮点击
+    void on_sure_btn_clicked();
+
+    // http 请求完成
     void slot_reg_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
 
 private:
+    // 初始化 http 回复处理
     void initHttpHandlers();
 
+    // 显示提示
     void showTip(const QString& str, bool normal);
 
 private:

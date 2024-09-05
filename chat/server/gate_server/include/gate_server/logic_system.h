@@ -12,17 +12,17 @@ class LogicSystem : public Singleton<LogicSystem> {
     friend class Singleton<LogicSystem>;
 
 public:
-    using HttpHandler = std::function<void(std::shared_ptr<HttpConnection>)>;
+    using HttpHandler = std::function<void(const std::shared_ptr<HttpConnection>&)>;
 
     ~LogicSystem() = default;
 
     void RegGet(std::string_view url, HttpHandler handler);
 
-    bool HandleGet(std::string_view url, std::shared_ptr<HttpConnection> connection);
+    bool HandleGet(std::string_view url, const std::shared_ptr<HttpConnection>& connection);
 
     void RegPost(std::string_view url, HttpHandler handler);
 
-    bool HandlePost(std::string_view url, std::shared_ptr<HttpConnection> connection);
+    bool HandlePost(std::string_view url, const std::shared_ptr<HttpConnection>& connection);
 
 private:
     LogicSystem();
