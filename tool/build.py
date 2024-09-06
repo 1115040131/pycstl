@@ -76,21 +76,36 @@ def main():
 
         ######################### build for chat #########################
         "chat": lambda args: run_bazel_build('//chat/...', args),
-        "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
+
+        # chat server
+        "chat_redis_server": lambda args: run_docker(
+            'pyc-redis',
+            args=shlex.split('-p 6380:6379 redis --requirepass "123456"')
+        ),
+        "chat_mysql_server": lambda args: run_docker(
+            'pyc-mysql',
+            args=shlex.split(f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf') +
+            shlex.split(f'-v {root_path}/chat/server/mysql/data:/var/lib/mysql') +
+            shlex.split(f'-v {root_path}/chat/server/mysql/logs:/logs') +
+            shlex.split('--restart=on-failure:3 -p 6306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:8.0')
+        ),
+        "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
+        "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
+
+        # chat server test
         "chat_server_common_test": lambda args: (
             targets["chat_redis_server"](args=[]),
             run_bazel_test('//chat/server/common/test:common_test', args=args),
         ),
-        "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_gate_server_test": lambda args: (
             targets["chat_redis_server"](args=[]),
-            run_bazel_test('//chat/server/gate_server/test:gate_server_test',args=args)
+            run_bazel_test('//chat/server/gate_server/test:gate_server_test', args=args)
         ),
-        "chat_redis_server": lambda args: run_docker(
-            'llfc-redis',
-            args=shlex.split('-p 6380:6379 redis --requirepass "123456"')
-        ),
-        "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
+
+        # chat client
+        "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
+
+        # chat run
         "chat_run": lambda args: (
             run_bazel_build('//chat/...', args),
             targets["chat_redis_server"](args=[]),
