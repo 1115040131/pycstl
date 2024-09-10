@@ -8,6 +8,7 @@ logger = Logger()
 
 
 def run_cmd(cmd, check=True):
+    logger.info(cmd)
     subprocess.run(shlex.split(cmd), check=check)
 
 

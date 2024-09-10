@@ -56,6 +56,10 @@ def main():
     root_path = Path(__file__).resolve().parent.parent
     tool_path = root_path / 'tool'  # tool 目录
 
+    # 获取当前用户的 UID 和 GID
+    uid = os.getuid()
+    gid = os.getgid()
+
     targets = {
         ######################### basic command #########################
         "build": lambda args: (
@@ -82,15 +86,18 @@ def main():
         "chat_redis_server": lambda args: run_docker(
             image='redis --requirepass "123456"',
             container_name='pyc-redis',
-            args=shlex.split('-p 6380:6379')
+            args=['-p 6380:6379']
         ),
-        "chat_mysql_server": lambda args: run_docker(
-            image='mysql:8.0',
-            container_name='pyc-mysql',
-            args=shlex.split(f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf') +
-            shlex.split(f'-v {root_path}/chat/server/mysql/data:/var/lib/mysql') +
-            shlex.split(f'-v {root_path}/chat/server/mysql/logs:/logs') +
-            shlex.split('--restart=on-failure:3 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456')
+        "chat_mysql_server": lambda args: (
+            run_docker(
+                image='mysql:8.0',
+                container_name='pyc-mysql',
+                args=[f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf',
+                      f'-v {root_path}/chat/server/mysql/data:/var/lib/mysql',
+                      f'-v {root_path}/chat/server/mysql/logs:/logs',
+                      '--restart=on-failure:3 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456']
+            ),
+            run_cmd(f'sudo chown -R {uid}:{gid} {root_path}/chat/server/mysql')
         ),
         "chat_prepare": lambda args: (
             targets["chat_redis_server"](args=[]),
