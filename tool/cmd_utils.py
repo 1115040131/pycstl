@@ -78,7 +78,7 @@ def run_tmux(*args):
         run_cmd(f"tmux kill-session -t {session_name}")
 
 
-def run_docker(container_name, args=[]):
+def run_docker(image, container_name, args=[]):
     try:
         # 列出所有容器（包括未运行的）
         output = subprocess.check_output(shlex.split('docker ps -a --format {{.Names}}'))
@@ -87,7 +87,7 @@ def run_docker(container_name, args=[]):
         command = ''
         if container_name not in containers:
             # 容器不存在，根据提供的参数运行新的容器
-            command = f'docker run -d --name {container_name} {" ".join(args)}'
+            command = f'docker run -d --name {container_name} {" ".join(args)} {image}'
             logger.info(f"Creating and starting container '{container_name}' with arguments: {' '.join(args)}")
 
         else:

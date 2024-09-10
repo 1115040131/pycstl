@@ -88,7 +88,7 @@ constexpr unsigned char FromHex(unsigned char x) {
     return 0;
 }
 
-constexpr std::string UrlEncode(std::string_view str) {
+std::string UrlEncode(std::string_view str) {
     std::string result;
     for (char c : str) {
         if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
@@ -106,7 +106,7 @@ constexpr std::string UrlEncode(std::string_view str) {
 }
 
 // 解析 url 请求
-constexpr std::string UrlDecode(std::string_view str) {
+std::string UrlDecode(std::string_view str) {
     std::string result;
     for (size_t i = 0; i < str.size(); i++) {
         if (str[i] == '+') {

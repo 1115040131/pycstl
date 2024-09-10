@@ -4,6 +4,7 @@ import subprocess
 import os
 import shlex
 import sys
+import time
 
 from pathlib import Path
 from cmd_utils import run_cmd, run_tmux, run_docker
@@ -75,30 +76,37 @@ def main():
         "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
 
         ######################### build for chat #########################
-        "chat": lambda args: run_bazel_build('//chat/...', args),
+        "chat": lambda args: run_bazel_build('//chat/...', args=args),
 
         # chat server
         "chat_redis_server": lambda args: run_docker(
-            'pyc-redis',
-            args=shlex.split('-p 6380:6379 redis --requirepass "123456"')
+            image='redis --requirepass "123456"',
+            container_name='pyc-redis',
+            args=shlex.split('-p 6380:6379')
         ),
         "chat_mysql_server": lambda args: run_docker(
-            'pyc-mysql',
+            image='mysql:8.0',
+            container_name='pyc-mysql',
             args=shlex.split(f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf') +
             shlex.split(f'-v {root_path}/chat/server/mysql/data:/var/lib/mysql') +
             shlex.split(f'-v {root_path}/chat/server/mysql/logs:/logs') +
-            shlex.split('--restart=on-failure:3 -p 6306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:8.0')
+            shlex.split('--restart=on-failure:3 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456')
+        ),
+        "chat_prepare": lambda args: (
+            targets["chat_redis_server"](args=[]),
+            targets["chat_mysql_server"](args=[]),
+            time.sleep(1)
         ),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
 
         # chat server test
         "chat_server_common_test": lambda args: (
-            targets["chat_redis_server"](args=[]),
+            targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/server/common/test:common_test', args=args),
         ),
         "chat_gate_server_test": lambda args: (
-            targets["chat_redis_server"](args=[]),
+            targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/server/gate_server/test:gate_server_test', args=args)
         ),
 
@@ -108,7 +116,7 @@ def main():
         # chat run
         "chat_run": lambda args: (
             run_bazel_build('//chat/...', args),
-            targets["chat_redis_server"](args=[]),
+            targets["chat_prepare"](args=[]),
             run_tmux(f"python3 {tool_path / 'build.py'} chat_gate_server",
                      f"python3 {tool_path / 'build.py'} chat_verify_server",
                      f"python3 {tool_path / 'build.py'} chat_client")
@@ -164,7 +172,7 @@ def main():
 
         # 测试文件, 单独编译
         ######################### build for hello_world #########################
-        "hello_world": lambda args: run_bazel_run('//hello_world', args),
+        "hello_world": lambda args: run_bazel_run('//hello_world', args=args),
     }
 
     if target not in targets:

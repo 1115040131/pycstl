@@ -19,5 +19,6 @@ cc_library(
         "@boost//:property_tree",
         "@fmt",
         "@hiredis",
+        "@mysql-connector-cpp",
     ],
 )

@@ -1,6 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
-
 #-------------------------------------------------------------------------------------
 # Qt6
 #-------------------------------------------------------------------------------------
@@ -25,7 +24,17 @@ register_qt_toolchains()
 
 new_git_repository(
     name = "hiredis",
-    build_file = "@//external/hiredis:BUILD.bazel",
+    build_file = "//external/hiredis:BUILD.bazel",
     commit = "0c63e3f396fc1b0a8375f859df66814021cefc9d",
     remote = "https://github.com/redis/hiredis.git",
+)
+
+#-------------------------------------------------------------------------------------
+# mysql-connector-cpp
+#-------------------------------------------------------------------------------------
+
+new_local_repository(
+    name = "mysql-connector-cpp",
+    build_file = "//external/mysql-connector-cpp:BUILD.bazel",
+    path = "external/mysql-connector-cpp",
 )
