@@ -1,6 +1,11 @@
 import json
+import os
 import subprocess
 import shlex
+import time
+
+import mysql.connector
+from mysql.connector import Error
 
 from logger import Logger
 
@@ -10,6 +15,16 @@ logger = Logger()
 def run_cmd(cmd, check=True):
     logger.info(cmd)
     subprocess.run(shlex.split(cmd), check=check)
+
+
+# 创建目录并设置权限的函数
+def setup_directory(path):
+    if not os.path.exists(path):
+        # 获取当前用户的 UID
+        uid = os.getuid()
+        run_cmd(f'mkdir -p {path}')
+        run_cmd(f'sudo setfacl -m d:u:{uid}:rwx {path}')
+        run_cmd(f'sudo setfacl -m u:{uid}:rwx {path}')
 
 
 def tmux_send_keys(keys, session=None, window=None, pane=None, enter=True):
@@ -89,7 +104,7 @@ def run_docker(image, container_name, args=[]):
         if container_name not in containers:
             # 容器不存在，根据提供的参数运行新的容器
             command = f'docker run -d --name {container_name} {" ".join(args)} {image}'
-            logger.info(f"Creating and starting container '{container_name}' with arguments: {' '.join(args)}")
+            logger.info(f"Creating and starting container '{container_name}'")
 
         else:
             # 检查容器是否处于运行状态
@@ -110,3 +125,59 @@ def run_docker(image, container_name, args=[]):
 
     except subprocess.CalledProcessError as e:
         logger.error(f"An error occurred: {e.output.decode('utf-8')}")
+
+
+def wait_until(condition_func, msg, interval=0.5):
+    """等待直到condition_func返回True，在此期间以interval秒为间隔重复检查。
+
+    Args:
+        condition_func (function): 一个无参数的函数，返回布尔值。
+        interval (float): 轮询条件函数的时间间隔，单位为秒。
+    """
+    try_cnt = 1
+    while not condition_func():
+        logger.info(f"Waiting for {msg} try {try_cnt}")
+        try_cnt = try_cnt + 1
+        time.sleep(interval)
+    logger.info(f"{msg} satisfied!")
+
+
+def mysql_service_is_ready(user, password, host, port):
+    """尝试连接到MySQL服务器并执行一个基本查询，以验证服务是否就绪。
+
+    Args:
+        user (str): 数据库用户名称。
+        password (str): 数据库用户密码。
+        host (str): MySQL服务器主机名或IP地址。
+        port (int): MySQL服务器端口号。
+
+    Returns:
+        bool: 如果成功执行查询，则表示MySQL服务就绪，返回True。
+    """
+    conn = None  # 初始化conn为None，确保即使数据库连接失败也能进入finally块
+    try:
+        # 尝试创建数据库连接
+        conn = mysql.connector.connect(
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
+
+        # 创建一个cursor对象
+        cursor = conn.cursor()
+        cursor.execute("SHOW VARIABLES LIKE 'version';")
+
+        # 确认我们得到了响应
+        if cursor.fetchone():
+            return True
+        else:
+            return False
+
+    except Error as e:
+        logger.warn(f"Error connecting to MySQL: {e}")
+        return False
+    finally:
+        if conn is not None and conn.is_connected():  # 在尝试关闭前检查conn是否已创建并连接
+            cursor.close()
+            conn.close()

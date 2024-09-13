@@ -32,6 +32,24 @@ sudo apt update && sudo apt install gc
 wsl 下建议使用 docker desktop \
 在 ubuntu 中安装 docker 请访问 https://docs.docker.com/engine/install/ubuntu/
 
+在宿主机上，可以将用户添加到 docker 组。这样，这个用户就能够运行 Docker 命令来管理和运行容器，包括以 root 权限运行容器。
+
+```bash
+sudo usermod -aG docker your_username
+```
+
+安装 acl 工具, 用户管理让 mysql 创建的所有文件当前用户都有读写权限
+```bash
+sudo apt update && sudo apt install acl
+```
+
+### python
+
+确保拥有 python 环境, 并确保安装 make 脚本中用到的以下依赖：
+```bash
+pip install mysql-connector-python --break-system-packages
+```
+
 ## 使用
 
 ### 编译/运行/测试项目

@@ -7,7 +7,7 @@ import sys
 import time
 
 from pathlib import Path
-from cmd_utils import run_cmd, run_tmux, run_docker
+from cmd_utils import *
 from logger import Logger, LogStyle
 
 logger = Logger(LogStyle.NO_DEBUG_INFO)
@@ -56,9 +56,9 @@ def main():
     root_path = Path(__file__).resolve().parent.parent
     tool_path = root_path / 'tool'  # tool 目录
 
-    # 获取当前用户的 UID 和 GID
-    uid = os.getuid()
-    gid = os.getgid()
+    # chat 相关数据
+    data_direction = f'{root_path}/chat/server/mysql/data'
+    log_direction = f'{root_path}/chat/server/mysql/logs'
 
     targets = {
         ######################### basic command #########################
@@ -89,23 +89,34 @@ def main():
             args=['-p 6380:6379']
         ),
         "chat_mysql_server": lambda args: (
+            # 创建目录并设置访问权限
+            setup_directory(data_direction),
+            setup_directory(log_direction),
+
+            # 运行容器
             run_docker(
                 image='mysql:8.0',
                 container_name='pyc-mysql',
                 args=[f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf',
-                      f'-v {root_path}/chat/server/mysql/data:/var/lib/mysql',
-                      f'-v {root_path}/chat/server/mysql/logs:/logs',
-                      '--restart=on-failure:3 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456']
-            ),
-            run_cmd(f'sudo chown -R {uid}:{gid} {root_path}/chat/server/mysql')
-        ),
-        "chat_prepare": lambda args: (
-            targets["chat_redis_server"](args=[]),
-            targets["chat_mysql_server"](args=[]),
-            time.sleep(1)
+                      f'-v {data_direction}:/var/lib/mysql',
+                      f'-v {log_direction}:/logs',
+                      '--restart=on-failure:3 -p 6306:3306 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456']
+            )
         ),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
+        "chat_prepare": lambda args: (
+            targets["chat_redis_server"](args=[]),
+            targets["chat_mysql_server"](args=[]),
+            wait_until(lambda: mysql_service_is_ready('root', '123456', 'localhost', 6306),
+                       'mysql_service_is_ready', interval=1),
+        ),
+        "chat_clear": lambda args: (
+            run_cmd('docker stop pyc-mysql', check=False),
+            run_cmd('docker rm -v pyc-mysql', check=False),
+            run_cmd(f'sudo rm -rf {data_direction}'),
+            run_cmd(f'sudo rm -rf {log_direction}'),
+        ),
 
         # chat server test
         "chat_server_common_test": lambda args: (

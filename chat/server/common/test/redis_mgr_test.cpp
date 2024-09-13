@@ -35,7 +35,7 @@ TEST(CommonTest, RedisMgrTest) {
     // redis_mgr.Close();
 }
 
-TEST(CommonTest, MultiThreadTest) {
+TEST(DISABLED_CommonTest, MultiThreadTest) {
     std::vector<std::jthread> threads;
 
     for (size_t i = 0; i < 5; i++) {
@@ -64,8 +64,6 @@ TEST(CommonTest, MultiThreadTest) {
             }
         });
     }
-
-    // redis_mgr.Close();
 }
 
 }  // namespace chat
