@@ -32,10 +32,10 @@ std::optional<int> MysqlMgr::RegUser(std::string_view name, std::string_view ema
 
     try {
         connection->session_.sql("CALL reg_user(?, ?, ?, @result)")
-       .bind(name.data())
-       .bind(email.data())
-       .bind(password.data())
-       .execute();
+            .bind(name.data())
+            .bind(email.data())
+            .bind(password.data())
+            .execute();
 
         mysqlx::Row row = connection->session_.sql("SELECT @result").execute().fetchOne();
 

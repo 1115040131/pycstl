@@ -123,8 +123,8 @@ END
 
         check_thread_ = std::thread([this]() {
             while (!stop_) {
-                CheckConnection();
                 std::this_thread::sleep_for(60s);
+                CheckConnection();
             }
         });
 
@@ -160,24 +160,30 @@ void MysqlPool::CheckConnection() {
     size_t size = connections_.size();
     auto now = std::chrono::system_clock::now();
 
+    size_t active = 0;
+    size_t inactive = 0;
+
     for (size_t i = 0; i < size; i++) {
         auto connection = std::move(connections_.front());
         connections_.pop();
         Defer defer([this, &connection]() { this->connections_.push(std::move(connection)); });
 
         if (now - connection.last_use_time_ < 60s) {
+            active++;
             continue;
         }
 
         try {
             connection.session_.sql("SELECT 1").execute();
             connection.last_use_time_ = now;
-            g_logger.debug("execute timer alive query, cur is", now);
+            inactive++;
         } catch (const std::exception& e) {
             g_logger.warn("Error keeping connection alive: ", e.what());
             connections_.push(CreateConnection());
         }
     }
+    g_logger.debug("cur is {}, total/alive/active/inactive: {}/{}/{}/{}", now, size, active + inactive, active,
+                   inactive);
 }
 
 }  // namespace chat

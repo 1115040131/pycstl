@@ -1,3 +1,4 @@
+#include <fmt/chrono.h>
 #include <gtest/gtest.h>
 #include <mysqlx/xdevapi.h>
 
@@ -85,10 +86,18 @@ TEST(MysqlMgrTest, ConnectionTest) {
 TEST(MysqlMgrTest, RegUser) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
-    EXPECT_EQ(mysql_mgr.RegUser("test1", "test1@test.com", "test1"), 1);
-    EXPECT_EQ(mysql_mgr.RegUser("test1", "test1@test.com", "test1"), 0);
-    EXPECT_EQ(mysql_mgr.RegUser("test2", "test1@test.com", "test2"), 0);
-    EXPECT_EQ(mysql_mgr.RegUser("test2", "test2@test.com", "test2"), 2);
+    // 根据当前时间戳生成用户和邮箱用于测试
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now().time_since_epoch().count());
+    auto email1 = fmt::format("{}@test.com", user1);
+    auto user2 = fmt::format("pycstl_{}", std::chrono::system_clock::now().time_since_epoch().count());
+    auto email2 = fmt::format("{}@test.com", user2);
+
+    EXPECT_TRUE(mysql_mgr.RegUser(user1, email1, "123") > 0);
+    EXPECT_EQ(mysql_mgr.RegUser(user1, email1, "123"), 0);
+    EXPECT_EQ(mysql_mgr.RegUser(user2, email1, "123"), 0);
+    EXPECT_TRUE(mysql_mgr.RegUser(user2, email2, "123") > 0);
+
+    // TODO: 删除测试数据
 }
 
 }  // namespace chat

@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "chat/server/common/mysql_mgr.h"
 #include "chat/server/common/redis_mgr.h"
 #include "gate_server/define.h"
 #include "gate_server/verify_grpc_client.h"
@@ -10,6 +11,11 @@ namespace pyc {
 namespace chat {
 
 LogicSystem::LogicSystem() {
+    g_logger.info("LogicSystem init start");
+
+    RedisMgr::GetInstance();
+    MysqlMgr::GetInstance();
+
     RegGet("/get_test", [](const std::shared_ptr<HttpConnection>& connection) {
         beast::ostream(connection->response_.body()) << "receive get_test req\n";
         for (const auto& [key, value] : connection->GetParams()) {
@@ -90,16 +96,32 @@ LogicSystem::LogicSystem() {
             return;
         }
 
-        // TODO: 查找数据库判断用户是否已经注册
+        // 查找数据库判断用户是否已经注册
+        auto reg_result = MysqlMgr::GetInstance().RegUser(user, email, password);
+        if (!reg_result) {
+            PYC_LOG_WARN("RegUser({} {} {}) fail", user, email, password);
+            root["error"] = ErrorCode::kNetworkError;
+            beast::ostream(connection->response_.body()) << root.dump();
+            return;
+        }
+        if (reg_result.value() == 0) {
+            PYC_LOG_WARN("User or email already exist: {} {}", user, email);
+            root["error"] = ErrorCode::kUserExist;
+            beast::ostream(connection->response_.body()) << root.dump();
+            return;
+        }
 
         root["error"] = ErrorCode::kSuccess;
         root["user"] = user;
         root["email"] = email;
+        root["uid"] = reg_result.value();
         root["password"] = password;
         root["confirm"] = confirm;
         root["verify_code"] = verify_code;
         beast::ostream(connection->response_.body()) << root.dump();
     });
+
+    g_logger.info("LogicSystem init finish");
 }
 
 void LogicSystem::RegGet(std::string_view url, HttpHandler handler) { get_handlers_.emplace(url, handler); }

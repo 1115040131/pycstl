@@ -150,14 +150,54 @@ class GateServerTest(unittest.TestCase):
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kVerifyCodeError.value)
 
-        # 注册成功
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'email': email,
+        # 测试账户
+        user1 = f'pycstl_{time.time()}'
+        email1 = f'{user1}@test.com'
+        user2 = f'pycstl_{time.time()}'
+        email2 = f'{user2}@test.com'
+        self.redis.set("code_" + email1, verify_code)
+        self.redis.set("code_" + email2, verify_code)
+
+        # user1 注册成功
+        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user1,
+                                                                                'email': email1,
                                                                                 'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
-        self.assertEqual(json_response['email'], email)
+        self.assertTrue(json_response['uid'] > 0)
+        self.assertEqual(json_response['email'], email1)
+        self.assertEqual(json_response['verify_code'], verify_code)
+
+        # 用户已存在
+        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user1,
+                                                                                'email': email1,
+                                                                                'verify_code': verify_code})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'text/json')
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kUserExist.value)
+
+        # 邮箱已存在
+        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user2,
+                                                                                'email': email1,
+                                                                                'verify_code': verify_code})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'text/json')
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kUserExist.value)
+
+        # user2 注册成功
+        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user2,
+                                                                                'email': email2,
+                                                                                'verify_code': verify_code})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'text/json')
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+        self.assertTrue(json_response['uid'] > 0)
+        self.assertEqual(json_response['email'], email2)
         self.assertEqual(json_response['verify_code'], verify_code)
 
 
