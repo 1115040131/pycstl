@@ -6,7 +6,7 @@
 /**
  * @brief 刷新 qss
  */
-void Repolish(QWidget* w);
+void repolish(QWidget* w);
 
 /**
  * @brief 简单的字符串加密

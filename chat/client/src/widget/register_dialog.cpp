@@ -13,7 +13,7 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     ui->password_edit->setEchoMode(QLineEdit::Password);
     ui->confirm_edit->setEchoMode(QLineEdit::Password);
     ui->err_tip->setProperty("state", "normal");
-    Repolish(ui->err_tip);
+    repolish(ui->err_tip);
 
     connect(&HttpMgr::GetInstance(), &HttpMgr::sig_reg_mod_finish, this, &RegisterDialog::slot_reg_mod_finish);
 
@@ -26,6 +26,28 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     connect(ui->password_edit, &QLineEdit::editingFinished, this, [this]() { checkPasswordValid(); });
     connect(ui->confirm_edit, &QLineEdit::editingFinished, this, [this]() { checkConfirmValid(); });
     connect(ui->verify_edit, &QLineEdit::editingFinished, this, [this]() { checkVerifyValid(); });
+
+    // 密码显示
+    ui->password_visible->setCursor(Qt::PointingHandCursor);
+    ui->confirm_visible->setCursor(Qt::PointingHandCursor);
+    ui->password_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
+    ui->confirm_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
+    connect(ui->password_visible, &ClickedLabel::clicked, this,[this](){
+        auto state = ui->password_visible->getState();
+        if (state == ClickedLabel::State::kNormal) {
+            ui->password_edit->setEchoMode(QLineEdit::Password);
+        } else {
+            ui->password_edit->setEchoMode(QLineEdit::Normal);
+        }
+    });
+    connect(ui->confirm_visible, &ClickedLabel::clicked, this,[this](){
+        auto state = ui->confirm_visible->getState();
+        if (state == ClickedLabel::State::kNormal) {
+            ui->password_edit->setEchoMode(QLineEdit::Password);
+        } else {
+            ui->password_edit->setEchoMode(QLineEdit::Normal);
+        }
+    });
 }
 
 RegisterDialog::~RegisterDialog() { delete ui; }
@@ -134,7 +156,7 @@ void RegisterDialog::showTip(const QString& str, bool normal) {
     } else {
         ui->err_tip->setProperty("state", "err");
     }
-    Repolish(ui->err_tip);
+    repolish(ui->err_tip);
 }
 
 void RegisterDialog::addTipErr(TipErr tip_err, QString msg) {
@@ -174,8 +196,6 @@ void RegisterDialog::checkEmailValid() {
 }
 
 void RegisterDialog::checkPasswordValid() {
-    qDebug() << "checkPasswordValid";
-
     auto password = ui->password_edit->text();
     if (password.length() < 6 || password.length() > 15) {
         addTipErr(TipErr::kPasswordErr, tr("密码长度应为6-15"));
