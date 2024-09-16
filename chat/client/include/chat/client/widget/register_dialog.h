@@ -2,8 +2,8 @@
 
 #include <QDialog>
 #include <QJsonObject>
-#include <QMap>
 #include <functional>
+#include <map>
 
 #include "chat/client/define.h"
 
@@ -38,7 +38,20 @@ private:
     // 显示提示
     void showTip(const QString& str, bool normal);
 
+    // 输入框错误提示
+    void addTipErr(TipErr tip_err, QString msg);
+    void delTipErr(TipErr tip_err);
+    void checkUserValid();
+    void checkEmailValid();
+    void checkPasswordValid();
+    void checkConfirmValid();
+    void checkVerifyValid();
+
 private:
+    static constexpr std::string_view kEmailRegex{R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)"};
+    static constexpr std::string_view kPasswordRegex{R"(^[a-zA-Z0-9!@#$%^&*]{6,15}$)"};
+
     Ui::RegisterDialog* ui;
-    QMap<ReqId, std::function<void(const QJsonObject&)>> handlers_;
+    std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
+    std::map<TipErr, QString> tip_errs_;
 };

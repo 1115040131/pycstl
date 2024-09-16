@@ -10,3 +10,13 @@ enum class ReqId {
 enum class Module {
     kRegisterMod = 0,
 };
+
+enum class TipErr {
+    kSuccess = 0,
+    kEmailErr,
+    kPasswordErr,
+    kConfirmErr,
+    kPasswordConfirm,
+    kVerifyErr,
+    kUserErr,
+};

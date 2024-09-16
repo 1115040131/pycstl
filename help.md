@@ -71,3 +71,11 @@ bazel clean --expunge
 ```bash
 bazel run -- @pnpm --dir $PWD install --lockfile-only
 ```
+
+## Tips
+
+### QT Designer
+
+```bash
+sudo apt install qttools5-dev-tools
+```
