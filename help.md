@@ -22,7 +22,7 @@ sudo apt update && sudo apt full-upgrade  # 升级 bazel 版本
 ### 编译器
 
 ```bash
-sudo apt update && sudo apt install gc
+sudo apt update && sudo apt install gcc
 ```
 
 ### docker
