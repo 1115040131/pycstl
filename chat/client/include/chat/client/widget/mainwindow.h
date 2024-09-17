@@ -2,14 +2,14 @@
 
 #include <QMainWindow>
 
-#include "chat/client/widget/login_dialog.h"
-#include "chat/client/widget/register_dialog.h"
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
 }
 QT_END_NAMESPACE
+
+class LoginDialog;
+class RegisterDialog;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -20,6 +20,8 @@ public:
 
 public slots:
     void SlotSwitchRegister();
+
+    void SlotSwitchLogin();
 
 private:
     Ui::MainWindow* ui;

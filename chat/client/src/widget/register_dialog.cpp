@@ -32,7 +32,7 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     ui->confirm_visible->setCursor(Qt::PointingHandCursor);
     ui->password_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
     ui->confirm_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
-    connect(ui->password_visible, &ClickedLabel::clicked, this,[this](){
+    connect(ui->password_visible, &ClickedLabel::clicked, this, [this]() {
         auto state = ui->password_visible->getState();
         if (state == ClickedLabel::State::kNormal) {
             ui->password_edit->setEchoMode(QLineEdit::Password);
@@ -40,13 +40,25 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
             ui->password_edit->setEchoMode(QLineEdit::Normal);
         }
     });
-    connect(ui->confirm_visible, &ClickedLabel::clicked, this,[this](){
+    connect(ui->confirm_visible, &ClickedLabel::clicked, this, [this]() {
         auto state = ui->confirm_visible->getState();
         if (state == ClickedLabel::State::kNormal) {
-            ui->password_edit->setEchoMode(QLineEdit::Password);
+            ui->confirm_edit->setEchoMode(QLineEdit::Password);
         } else {
-            ui->password_edit->setEchoMode(QLineEdit::Normal);
+            ui->confirm_edit->setEchoMode(QLineEdit::Normal);
         }
+    });
+
+    countdown_timer_ = new QTimer(this);
+    connect(countdown_timer_, &QTimer::timeout, [this]() {
+        if (countdown_ == 0) {
+            countdown_timer_->stop();
+            emit switchLogin();
+            return;
+        }
+        countdown_--;
+        auto str = QString("注册成功，%1s后返回登录").arg(countdown_);
+        ui->tip_label->setText(str);
     });
 }
 
@@ -103,6 +115,13 @@ void RegisterDialog::on_sure_btn_clicked() {
                                            ReqId::kRegUser, Module::kRegisterMod);
 }
 
+void RegisterDialog::on_cancel_btn_clicked() { emit switchLogin(); }
+
+void RegisterDialog::on_return_btn_clicked() {
+    countdown_timer_->stop();
+    emit switchLogin();
+}
+
 void RegisterDialog::slot_reg_mod_finish(ReqId req_id, const QString& res, ErrorCode err) {
     if (err != ErrorCode::kSuccess) {
         showTip(tr("网络请求错误"), false);
@@ -146,6 +165,8 @@ void RegisterDialog::initHttpHandlers() {
         this->showTip(tr("用户注册成功"), true);
         qDebug() << "email is" << email;
         qDebug() << "user uid is" << json["uid"].toInt();
+
+        changeTipPage();
     });
 }
 
@@ -232,4 +253,10 @@ void RegisterDialog::checkVerifyValid() {
     }
 
     delTipErr(TipErr::kUserErr);
+}
+
+void RegisterDialog::changeTipPage() {
+    countdown_timer_->stop();
+    ui->stackedWidget->setCurrentWidget(ui->page_2);
+    countdown_timer_->start(1000);
 }

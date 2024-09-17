@@ -2,6 +2,7 @@
 
 #include <QDialog>
 #include <QJsonObject>
+#include <QTimer>
 #include <functional>
 #include <map>
 
@@ -21,12 +22,21 @@ public:
 
     ~RegisterDialog();
 
+signals:
+    void switchLogin();
+
 private slots:
-    // 注册按钮点击
+    // 获取验证码按钮点击
     void on_get_code_btn_clicked();
 
-    // 确认按钮点击
+    // 确认注册按钮点击
     void on_sure_btn_clicked();
+
+    // 取消注册按钮点击
+    void on_cancel_btn_clicked();
+
+    // 返回登录按钮点击
+    void on_return_btn_clicked();
 
     // http 请求完成
     void slot_reg_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
@@ -47,6 +57,9 @@ private:
     void checkConfirmValid();
     void checkVerifyValid();
 
+    // 切换页面
+    void changeTipPage();
+
 private:
     static constexpr std::string_view kEmailRegex{R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)"};
     static constexpr std::string_view kPasswordRegex{R"(^[a-zA-Z0-9!@#$%^&*]{6,15}$)"};
@@ -54,4 +67,7 @@ private:
     Ui::RegisterDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
     std::map<TipErr, QString> tip_errs_;
+
+    QTimer* countdown_timer_;
+    int countdown_{5};
 };
