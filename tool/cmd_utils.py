@@ -2,10 +2,8 @@ import json
 import os
 import subprocess
 import shlex
+import shutil
 import time
-
-import mysql.connector
-from mysql.connector import Error
 
 from logger import Logger
 
@@ -23,8 +21,15 @@ def setup_directory(path):
         # 获取当前用户的 UID
         uid = os.getuid()
         run_cmd(f'mkdir -p {path}')
-        run_cmd(f'sudo setfacl -m d:u:{uid}:rwx {path}')
-        run_cmd(f'sudo setfacl -m u:{uid}:rwx {path}')
+        if shutil.which('setfacl') is not None:
+            # 存在 setfacl 命令
+            run_cmd(f'sudo setfacl -m d:u:{uid}:rwx {path}')
+            run_cmd(f'sudo setfacl -m u:{uid}:rwx {path}')
+        else:
+            # 不存在 setfacl 命令
+            logger.warn(f"setfacl: command not found, skip sudo setfacl -m d:u:{uid}:rwx {path}")
+            logger.warn(f"setfacl: command not found, skip sudo setfacl -m u:{uid}:rwx {path}")
+
 
 
 def tmux_send_keys(keys, session=None, window=None, pane=None, enter=True):
@@ -154,30 +159,40 @@ def mysql_service_is_ready(user, password, host, port):
     Returns:
         bool: 如果成功执行查询，则表示MySQL服务就绪，返回True。
     """
-    conn = None  # 初始化conn为None，确保即使数据库连接失败也能进入finally块
+
     try:
-        # 尝试创建数据库连接
-        conn = mysql.connector.connect(
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
+        import mysql.connector
+        from mysql.connector import Error
 
-        # 创建一个cursor对象
-        cursor = conn.cursor()
-        cursor.execute("SHOW VARIABLES LIKE 'version';")
+        conn = None  # 初始化conn为None，确保即使数据库连接失败也能进入finally块
+        try:
+            # 尝试创建数据库连接
+            conn = mysql.connector.connect(
+                user=user,
+                password=password,
+                host=host,
+                port=port
+            )
 
-        # 确认我们得到了响应
-        if cursor.fetchone():
-            return True
-        else:
+            # 创建一个cursor对象
+            cursor = conn.cursor()
+            cursor.execute("SHOW VARIABLES LIKE 'version';")
+
+            # 确认我们得到了响应
+            if cursor.fetchone():
+                return True
+            else:
+                return False
+
+        except Error as e:
+            logger.warn(f"Error connecting to MySQL: {e}")
             return False
+        finally:
+            if conn is not None and conn.is_connected():  # 在尝试关闭前检查conn是否已创建并连接
+                cursor.close()
+                conn.close()
 
-    except Error as e:
-        logger.warn(f"Error connecting to MySQL: {e}")
-        return False
-    finally:
-        if conn is not None and conn.is_connected():  # 在尝试关闭前检查conn是否已创建并连接
-            cursor.close()
-            conn.close()
+    except ImportError:
+        logger.warn("mysql-connector-python not installed, check MySQL by sleep 10s...")
+        time.sleep(10)
+        return True

@@ -38,17 +38,9 @@ wsl 下建议使用 docker desktop \
 sudo usermod -aG docker your_username
 ```
 
-安装 acl 工具, 用户管理让 mysql 创建的所有文件当前用户都有读写权限
-```bash
-sudo apt update && sudo apt install acl
-```
-
 ### python
 
-确保拥有 python 环境, 并确保安装 make 脚本中用到的以下依赖：
-```bash
-pip install mysql-connector-python --break-system-packages
-```
+确保拥有 python 环境, 执行 ./make 命令
 
 ## 使用
 
@@ -72,7 +64,23 @@ bazel clean --expunge
 bazel run -- @pnpm --dir $PWD install --lockfile-only
 ```
 
-## Tips
+## Optional
+
+### mysql-connector-python
+
+安装 mysql-connector-python 包, 用以检测 mysql 容器是否已经 ready
+
+```bash
+pip install mysql-connector-python --break-system-packages
+```
+
+### acl 工具
+
+安装 acl 工具, 用户管理让 mysql 创建的所有文件当前用户都有读写权限
+
+```bash
+sudo apt update && sudo apt install acl
+```
 
 ### QT Designer
 
