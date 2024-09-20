@@ -2,6 +2,7 @@
 
 #include "chat/client/widget/login_dialog.h"
 #include "chat/client/widget/register_dialog.h"
+#include "chat/client/widget/reset_dialog.h"
 #include "chat/client/widget/ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -30,4 +31,17 @@ void MainWindow::SlotSwitchLogin() {
 
     // 登录界面点击注册
     connect(login_dialog_, &LoginDialog::switchRegister, this, &MainWindow::SlotSwitchRegister);
+
+    // 连接登陆界面忘记密码信号
+    connect(login_dialog_, &LoginDialog::switchReset, this, &MainWindow::SlotSwitchReset);
+}
+
+void MainWindow::SlotSwitchReset() {
+    reset_dialog_ = new ResetDialog(this);
+    reset_dialog_->setWindowFlags(Qt::CustomizeWindowHint | Qt::FramelessWindowHint);
+
+    setCentralWidget(reset_dialog_);
+
+    // 重置界面返回登录
+    connect(reset_dialog_, &ResetDialog::switchLogin, this, &MainWindow::SlotSwitchLogin);
 }

@@ -4,7 +4,9 @@
 
 #include "chat/client/api.h"
 
-ClickedLabel::ClickedLabel(QWidget* parent) : QLabel(parent), state_(State::kNormal) {}
+ClickedLabel::ClickedLabel(QWidget* parent) : QLabel(parent), state_(State::kNormal) {
+    setCursor(Qt::PointingHandCursor);
+}
 
 void ClickedLabel::setState(const QString& normal, const QString& hover, const QString& press,
                             const QString& select, const QString& select_hover, const QString& select_press) {

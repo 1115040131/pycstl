@@ -12,24 +12,28 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     ui->setupUi(this);
     ui->password_edit->setEchoMode(QLineEdit::Password);
     ui->confirm_edit->setEchoMode(QLineEdit::Password);
-    ui->err_tip->setProperty("state", "normal");
-    repolish(ui->err_tip);
 
+    // 连接 http 请求完成信号
+    initHttpHandlers();
     connect(&HttpMgr::GetInstance(), &HttpMgr::sig_reg_mod_finish, this, &RegisterDialog::slot_reg_mod_finish);
 
-    initHttpHandlers();
-
     // 连接输入框的错误信号
+    ui->err_tip->setProperty("state", "normal");
+    repolish(ui->err_tip);
     ui->err_tip->clear();
-    connect(ui->user_edit, &QLineEdit::editingFinished, this, [this]() { checkUserValid(); });
-    connect(ui->email_edit, &QLineEdit::editingFinished, this, [this]() { checkEmailValid(); });
-    connect(ui->password_edit, &QLineEdit::editingFinished, this, [this]() { checkPasswordValid(); });
-    connect(ui->confirm_edit, &QLineEdit::editingFinished, this, [this]() { checkConfirmValid(); });
-    connect(ui->verify_edit, &QLineEdit::editingFinished, this, [this]() { checkVerifyValid(); });
+    connect(ui->user_edit, &QLineEdit::editingFinished, this,
+            [this]() { showErrTip(input_check_.checkUserValid(ui->user_edit->text())); });
+    connect(ui->email_edit, &QLineEdit::editingFinished, this,
+            [this]() { showErrTip(input_check_.checkEmailValid(ui->email_edit->text())); });
+    connect(ui->password_edit, &QLineEdit::editingFinished, this,
+            [this]() { showErrTip(input_check_.checkPasswordValid(ui->password_edit->text())); });
+    connect(ui->confirm_edit, &QLineEdit::editingFinished, this, [this]() {
+        showErrTip(input_check_.checkConfirmValid(ui->password_edit->text(), ui->confirm_edit->text()));
+    });
+    connect(ui->verify_edit, &QLineEdit::editingFinished, this,
+            [this]() { showErrTip(input_check_.checkVerifyValid(ui->verify_edit->text())); });
 
     // 密码显示
-    ui->password_visible->setCursor(Qt::PointingHandCursor);
-    ui->confirm_visible->setCursor(Qt::PointingHandCursor);
     ui->password_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
     ui->confirm_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
     connect(ui->password_visible, &ClickedLabel::clicked, this, [this]() {
@@ -49,6 +53,7 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
         }
     });
 
+    // 注册成功, 倒计时返回登录
     countdown_timer_ = new QTimer(this);
     connect(countdown_timer_, &QTimer::timeout, [this]() {
         if (countdown_ == 0) {
@@ -60,6 +65,10 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
         auto str = QString("注册成功，%1s后返回登录").arg(countdown_);
         ui->tip_label->setText(str);
     });
+
+    // 连接 http 请求完成信号
+    initHttpHandlers();
+    connect(&HttpMgr::GetInstance(), &HttpMgr::sig_reg_mod_finish, this, &RegisterDialog::slot_reg_mod_finish);
 }
 
 RegisterDialog::~RegisterDialog() { delete ui; }
@@ -180,79 +189,12 @@ void RegisterDialog::showTip(const QString& str, bool normal) {
     repolish(ui->err_tip);
 }
 
-void RegisterDialog::addTipErr(TipErr tip_err, QString msg) {
-    tip_errs_[tip_err] = msg;
-    showTip(msg, false);
-}
-
-void RegisterDialog::delTipErr(TipErr tip_err) {
-    tip_errs_.erase(tip_err);
-    if (tip_errs_.empty()) {
+void RegisterDialog::showErrTip(std::optional<std::string_view> str) {
+    if (str) {
+        showTip(tr(str->data()), false);
+    } else {
         ui->err_tip->clear();
-        return;
     }
-    showTip(tip_errs_.begin()->second, false);
-}
-
-void RegisterDialog::checkUserValid() {
-    if (ui->user_edit->text() == "") {
-        addTipErr(TipErr::kUserErr, tr("用户名不能为空"));
-        return;
-    }
-
-    delTipErr(TipErr::kUserErr);
-}
-
-void RegisterDialog::checkEmailValid() {
-    auto email = ui->email_edit->text();
-
-    QRegularExpression regex(kEmailRegex.data());
-    bool match = regex.match(email).hasMatch();
-    if (!match) {
-        addTipErr(TipErr::kEmailErr, tr("邮箱地址不正确"));
-        return;
-    }
-
-    delTipErr(TipErr::kEmailErr);
-}
-
-void RegisterDialog::checkPasswordValid() {
-    auto password = ui->password_edit->text();
-    if (password.length() < 6 || password.length() > 15) {
-        addTipErr(TipErr::kPasswordErr, tr("密码长度应为6-15"));
-        return;
-    }
-
-    QRegularExpression regex(kPasswordRegex.data());
-    bool match = regex.match(password).hasMatch();
-    if (!match) {
-        addTipErr(TipErr::kPasswordErr, tr("不能包含非法字符"));
-        return;
-    }
-
-    delTipErr(TipErr::kPasswordErr);
-
-    checkConfirmValid();
-}
-
-void RegisterDialog::checkConfirmValid() {
-    auto password = ui->password_edit->text();
-    auto confirm = ui->confirm_edit->text();
-    if (password != confirm) {
-        addTipErr(TipErr::kPasswordConfirm, tr("密码和确认密码不匹配"));
-        return;
-    }
-
-    delTipErr(TipErr::kPasswordConfirm);
-}
-
-void RegisterDialog::checkVerifyValid() {
-    if (ui->verify_edit->text() == "") {
-        addTipErr(TipErr::kVerifyErr, tr("验证码不能为空"));
-        return;
-    }
-
-    delTipErr(TipErr::kUserErr);
 }
 
 void RegisterDialog::changeTipPage() {

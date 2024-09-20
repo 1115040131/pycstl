@@ -17,6 +17,11 @@ public:
 
 signals:
     void switchRegister();
+    void switchReset();
+
+private slots:
+    // 忘记密码
+    void slot_forget_password();
 
 private:
     Ui::LoginDialog* ui;

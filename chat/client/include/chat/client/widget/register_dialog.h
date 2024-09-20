@@ -7,6 +7,7 @@
 #include <map>
 
 #include "chat/client/define.h"
+#include "chat/client/util/input_check.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -47,15 +48,7 @@ private:
 
     // 显示提示
     void showTip(const QString& str, bool normal);
-
-    // 输入框错误提示
-    void addTipErr(TipErr tip_err, QString msg);
-    void delTipErr(TipErr tip_err);
-    void checkUserValid();
-    void checkEmailValid();
-    void checkPasswordValid();
-    void checkConfirmValid();
-    void checkVerifyValid();
+    void showErrTip(std::optional<std::string_view> str);
 
     // 切换页面
     void changeTipPage();
@@ -66,7 +59,7 @@ private:
 
     Ui::RegisterDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
-    std::map<TipErr, QString> tip_errs_;
+    InputCheck input_check_;
 
     QTimer* countdown_timer_;
     int countdown_{5};
