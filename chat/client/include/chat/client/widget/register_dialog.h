@@ -3,11 +3,9 @@
 #include <QDialog>
 #include <QTimer>
 #include <functional>
-#include <map>
 #include <memory>
 
 #include "chat/client/define.h"
-#include "chat/client/util/input_check.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -46,17 +44,12 @@ private:
     // 初始化 http 回复处理
     void initHttpHandlers();
 
-    // 显示提示
-    void showTip(const QString& str, bool normal);
-    void showErrTip(std::optional<std::string_view> str);
-
     // 切换页面
     void changeTipPage();
 
 private:
     Ui::RegisterDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
-    InputCheck input_check_;
 
     std::unique_ptr<QTimer> countdown_timer_;
     int countdown_{5};

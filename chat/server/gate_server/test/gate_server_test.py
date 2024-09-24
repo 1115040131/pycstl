@@ -284,7 +284,17 @@ class GateServerTest(unittest.TestCase):
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kEmailNotMatch.value)
 
-        # 更新密码
+        # 密码相同, 更新失败
+        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': user,
+                                                                            'email': email,
+                                                                            'password': password1,
+                                                                            'verify_code': verify_code})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'text/json')
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kPasswordUpdateFail.value)
+
+        # 密码不同, 更新成功
         response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': user,
                                                                             'email': email,
                                                                             'password': password2,

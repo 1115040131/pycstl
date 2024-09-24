@@ -1,5 +1,6 @@
 #include "chat/client/util/err_tip.h"
 
+#include <QJsonDocument>
 #include <QRegularExpression>
 
 #include "chat/client/api.h"
@@ -86,4 +87,23 @@ bool ErrTip::checkVerifyValid(const QString& verify) {
     }
 
     return delTipErr(TipErr::kVerifyErr);
+}
+
+std::optional<QJsonDocument> ErrTip::checkHttpResponse(const QString& res, ErrorCode err) {
+    if (err != ErrorCode::kSuccess) {
+        showTip(tr("网络请求错误"), false);
+        return std::nullopt;
+    }
+
+    QJsonDocument json_doc = QJsonDocument::fromJson(res.toUtf8());
+    if (json_doc.isEmpty()) {
+        showTip(tr("json解析失败"), false);
+        return std::nullopt;
+    }
+    if (!json_doc.isObject()) {
+        showTip(tr("json解析失败"), false);
+        return std::nullopt;
+    }
+
+    return json_doc;
 }

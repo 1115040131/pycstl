@@ -2,10 +2,8 @@
 
 #include <QDialog>
 #include <QJsonObject>
-#include <map>
 
 #include "chat/client/define.h"
-#include "chat/client/util/input_check.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -37,15 +35,10 @@ private slots:
     void slot_reset_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
 
 private:
-    // 显示提示
-    void showTip(const QString& str, bool normal);
-    void showErrTip(std::optional<std::string_view> str);
-
     // 初始化 http 回复处理
     void initHttpHandlers();
 
 private:
     Ui::ResetDialog* ui;
-    InputCheck input_check_;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
 };

@@ -52,7 +52,7 @@
           <widget class="QWidget" name="widget" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="QLabel" name="err_tip">
+             <widget class="ErrTip" name="err_tip">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -426,7 +426,7 @@
          <item>
           <widget class="QLabel" name="tip2_label">
            <property name="text">
-            <string>可点击返回按钮直接返回登录界面</string>
+            <string>可点击返回按钮直接返回登录界面</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -528,6 +528,11 @@
    <class>ClickedLabel</class>
    <extends>QLabel</extends>
    <header>chat/client/util/clicked_label.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ErrTip</class>
+   <extends>QLabel</extends>
+   <header>chat/client/util/err_tip.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

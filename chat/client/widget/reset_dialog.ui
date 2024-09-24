@@ -43,7 +43,7 @@
     <widget class="QWidget" name="widget_6" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
-       <widget class="QLabel" name="err_tip">
+       <widget class="ErrTip" name="err_tip">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -248,6 +248,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ErrTip</class>
+   <extends>QLabel</extends>
+   <header>chat/client/util/err_tip.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

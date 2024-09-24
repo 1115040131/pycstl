@@ -131,8 +131,10 @@ TEST(MysqlMgrTest, UpdatePassword) {
 
     EXPECT_TRUE(mysql_mgr.RegUser(user1, email1, password1) > 0);
 
-    EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password1));
-    EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password2));
+    // 密码相同, 更新失败
+    EXPECT_FALSE(mysql_mgr.UpdatePassword(user1, password1).value());
+    // 密码不同, 更新成功
+    EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password2).value());
 
     // TODO: 删除测试数据
 }
