@@ -23,6 +23,16 @@ private slots:
     // 忘记密码
     void slot_forget_password();
 
+    // 登录按钮点击
+    void on_login_btn_clicked();
+
+    // 注册按钮点击
+    void on_reg_btn_clicked();
+
+private:
+    // 初始化头像
+    void initHead();
+
 private:
     Ui::LoginDialog* ui;
 };

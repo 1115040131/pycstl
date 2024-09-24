@@ -44,15 +44,52 @@
       <number>5</number>
      </property>
      <item>
+      <widget class="QWidget" name="widget_2" native="true">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="ErrTip" name="err_tip">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>错误提示</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
       <widget class="QWidget" name="widget" native="true">
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="head_label">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>200</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap>chat/client/res/ice.png</pixmap>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -81,7 +118,7 @@
         <number>7</number>
        </property>
        <item>
-        <widget class="QLabel" name="user_label">
+        <widget class="QLabel" name="email_label">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -95,12 +132,12 @@
           </size>
          </property>
          <property name="text">
-          <string>用户：</string>
+          <string>邮箱：</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="user_edit">
+        <widget class="QLineEdit" name="email_edit">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -326,9 +363,12 @@
    <extends>QLabel</extends>
    <header>chat/client/util/clicked_label.h</header>
   </customwidget>
+  <customwidget>
+   <class>ErrTip</class>
+   <extends>QLabel</extends>
+   <header>chat/client/util/err_tip.h</header>
+  </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

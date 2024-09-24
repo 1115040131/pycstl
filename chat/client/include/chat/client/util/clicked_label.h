@@ -4,6 +4,7 @@
 
 class ClickedLabel : public QLabel {
     Q_OBJECT
+
 public:
     ClickedLabel(QWidget* parent = nullptr);
 
