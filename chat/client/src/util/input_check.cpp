@@ -2,6 +2,13 @@
 
 #include <QRegularExpression>
 
+std::optional<std::string_view> InputCheck::getLastError() {
+    if (tip_errs_.empty()) {
+        return std::nullopt;
+    }
+    return tip_errs_.begin()->second;
+}
+
 std::string_view InputCheck::addTipErr(TipErr tip_err, std::string_view msg) {
     tip_errs_[tip_err] = msg;
     return msg;

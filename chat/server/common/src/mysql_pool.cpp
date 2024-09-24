@@ -41,12 +41,11 @@ MysqlPool::MysqlPool(const std::string& url, int port, const std::string& user, 
             session
                 .sql(R"(
                     CREATE TABLE IF NOT EXISTS user (
-                        id INT NOT NULL AUTO_INCREMENT,
+                        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                         uid INT NOT NULL,
                         name VARCHAR(255) NOT NULL,
                         email VARCHAR(255) NOT NULL,
-                        pwd VARCHAR(255) NOT NULL,
-                        PRIMARY KEY (id)
+                        pwd VARCHAR(255) NOT NULL
                     )
                 )")
                 .execute();
@@ -129,14 +128,8 @@ END
         });
 
         check_thread_.detach();
-
-    } catch (const mysqlx::Error& err) {
-        g_logger.fatal("ERROR: {}", err.what());
-    } catch (std::exception& ex) {
-        g_logger.fatal("STD EXCEPTION: {}", ex.what());
-    } catch (const char* ex) {
-        g_logger.fatal("EXCEPTION: {}", ex);
     }
+    MYSQL_CATCH(g_logger)
 }
 
 SqlConnection MysqlPool::CreateConnection() {

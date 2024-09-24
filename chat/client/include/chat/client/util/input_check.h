@@ -9,6 +9,9 @@
 
 class InputCheck {
 public:
+    // 获取最后一次错误信息
+    std::optional<std::string_view> getLastError();
+
     std::optional<std::string_view> checkUserValid(const QString& user);
 
     std::optional<std::string_view> checkEmailValid(const QString& email);

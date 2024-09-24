@@ -1,7 +1,6 @@
 #include "chat/client/widget/register_dialog.h"
 
 #include <QJsonDocument>
-#include <QRegularExpression>
 
 #include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
@@ -54,8 +53,8 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
     });
 
     // 注册成功, 倒计时返回登录
-    countdown_timer_ = new QTimer(this);
-    connect(countdown_timer_, &QTimer::timeout, [this]() {
+    countdown_timer_ = std::make_unique<QTimer>(this);
+    connect(countdown_timer_.get(), &QTimer::timeout, [this]() {
         if (countdown_ == 0) {
             countdown_timer_->stop();
             emit switchLogin();
@@ -75,42 +74,26 @@ RegisterDialog::~RegisterDialog() { delete ui; }
 
 void RegisterDialog::on_get_code_btn_clicked() {
     auto email = ui->email_edit->text();
-    QRegularExpression regex(kEmailRegex.data());
-    bool match = regex.match(email).hasMatch();
-    if (match) {
-        // 发送验证码
-        QJsonObject root;
-        root["email"] = email;
-        HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/get_verifycode"),
-                                               root, ReqId::kGetVarifyCode, Module::kRegisterMod);
-    } else {
-        showTip(tr("邮箱地址不正确"), false);
+    auto check = input_check_.checkEmailValid(email);
+    if (check) {
+        showTip(tr(check->data()), false);
+        return;
     }
+
+    // 发送验证码
+    QJsonObject root;
+    root["email"] = email;
+    HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/get_verifycode"), root,
+                                           ReqId::kGetVerifyCode, Module::kRegisterMod);
 }
 
 void RegisterDialog::on_sure_btn_clicked() {
-    if (ui->user_edit->text() == "") {
-        showTip(tr("用户名不能为空"), false);
-        return;
-    }
-    if (ui->email_edit->text() == "") {
-        showTip(tr("邮箱不能为空"), false);
-        return;
-    }
-    if (ui->password_edit->text() == "") {
-        showTip(tr("密码不能为空"), false);
-        return;
-    }
-    if (ui->confirm_edit->text() == "") {
-        showTip(tr("确认密码不能为空"), false);
-        return;
-    }
-    if (ui->confirm_edit->text() != ui->password_edit->text()) {
-        showTip(tr("密码和确认密码不匹配"), false);
-        return;
-    }
-    if (ui->verify_edit->text() == "") {
-        showTip(tr("验证码不能为空"), false);
+    if (input_check_.checkUserValid(ui->user_edit->text()) ||
+        input_check_.checkEmailValid(ui->email_edit->text()) ||
+        input_check_.checkPasswordValid(ui->password_edit->text()) ||
+        input_check_.checkConfirmValid(ui->password_edit->text(), ui->confirm_edit->text()) ||
+        input_check_.checkVerifyValid(ui->verify_edit->text())) {
+        showErrTip(input_check_.getLastError());
         return;
     }
 
@@ -152,7 +135,7 @@ void RegisterDialog::slot_reg_mod_finish(ReqId req_id, const QString& res, Error
 }
 
 void RegisterDialog::initHttpHandlers() {
-    handlers_.emplace(ReqId::kGetVarifyCode, [this](const QJsonObject& json) {
+    handlers_.emplace(ReqId::kGetVerifyCode, [this](const QJsonObject& json) {
         auto error = static_cast<ErrorCode>(json["error"].toInt());
         if (error != ErrorCode::kSuccess) {
             this->showTip(tr("参数错误"), false);

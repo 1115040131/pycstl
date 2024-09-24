@@ -33,5 +33,7 @@ void HttpMgr::PostHttpRequest(const QUrl& url, const QJsonObject& json, ReqId re
 void HttpMgr::slot_http_finish(ReqId req_id, const QString& res, ErrorCode err, Module mod) {
     if (mod == Module::kRegisterMod) {
         emit sig_reg_mod_finish(req_id, res, err);
+    } else if (mod == Module::kResetMod) {
+        emit sig_reset_mod_finish(req_id, res, err);
     }
 }

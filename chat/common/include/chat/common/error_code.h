@@ -9,8 +9,8 @@ enum class ErrorCode {
     kVerifyCodeError = 1004,      // 验证码错误
     kUserExist = 1005,            // 用户已存在
     kPasswordError = 1006,        // 密码错误
-    kEmailNotExist = 1007,        // 邮箱不存在
-    kPasswordUpdateFaile = 1008,  // 密码更新失败
+    kEmailNotMatch = 1007,        // 邮箱不匹配
+    kPasswordUpdateFail = 1008,  // 密码更新失败
     kPasswordInvalid = 1009,      // 密码不合法
 
     kNetworkError = 1010,  // 网络错误

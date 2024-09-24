@@ -47,14 +47,57 @@ std::optional<int> MysqlMgr::RegUser(std::string_view name, std::string_view ema
         int reg_result = row[0].get<int>();
         g_logger.info("Stored procedure returned: {}", reg_result);
         return reg_result;
-
-    } catch (const mysqlx::Error& err) {
-        g_logger.error("ERROR: {}", err.what());
-    } catch (std::exception& ex) {
-        g_logger.error("STD EXCEPTION: {}", ex.what());
-    } catch (const char* ex) {
-        g_logger.error("EXCEPTION: {}", ex);
     }
+    MYSQL_CATCH(g_logger)
+
+    return std::nullopt;
+}
+
+std::optional<bool> MysqlMgr::CheckEmail(std::string_view name, std::string_view email) {
+    auto connection = pool_->GetConnection();
+    if (!connection) {
+        return std::nullopt;
+    }
+    Defer defer([this, &connection]() {
+        connection->last_use_time_ = std::chrono::system_clock::now();
+        this->pool_->ReturnConnection(std::move(*connection));
+    });
+
+    try {
+        auto result =
+            connection->session_.sql("SELECT email FROM user WHERE name = ?").bind(name.data()).execute();
+        if (result.count() == 0) {
+            return false;
+        }
+        return result.fetchOne()[0].get<std::string>() == email;
+    }
+    MYSQL_CATCH(g_logger)
+
+    return std::nullopt;
+}
+
+std::optional<bool> MysqlMgr::UpdatePassword(std::string_view name, std::string_view password) {
+    auto connection = pool_->GetConnection();
+    if (!connection) {
+        return std::nullopt;
+    }
+    Defer defer([this, &connection]() {
+        connection->last_use_time_ = std::chrono::system_clock::now();
+        this->pool_->ReturnConnection(std::move(*connection));
+    });
+
+    try {
+        // auto result = connection->session_.sql("UPDATE user SET pwd = ? WHERE name = ?")
+        //                   .bind(password.data())
+        //                   .bind(name.data())
+        //                   .execute();
+        auto schema = connection->session_.getSchema("pyc_chat");
+        auto table = schema.getTable("user");
+        auto result =
+            table.update().set("pwd", password.data()).where("name = :name").bind("name", name.data()).execute();
+        return result.getAffectedItemsCount() == 1;
+    }
+    MYSQL_CATCH(g_logger)
 
     return std::nullopt;
 }

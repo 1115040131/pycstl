@@ -43,3 +43,14 @@ private:
 
 }  // namespace chat
 }  // namespace pyc
+
+#define MYSQL_CATCH(g_logger)                           \
+    catch (const mysqlx::Error& err) {                  \
+        g_logger.error("ERROR: {}", err.what());        \
+    }                                                   \
+    catch (std::exception & ex) {                       \
+        g_logger.error("STD EXCEPTION: {}", ex.what()); \
+    }                                                   \
+    catch (const char* ex) {                            \
+        g_logger.error("EXCEPTION: {}", ex);            \
+    }

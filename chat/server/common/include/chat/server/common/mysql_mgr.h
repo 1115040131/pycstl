@@ -22,13 +22,17 @@ class MysqlPool;  // 前置声明
 class MysqlMgr : public Singleton<MysqlMgr> {
     friend class Singleton<MysqlMgr>;
 
+private:
+    MysqlMgr();
+
 public:
     ~MysqlMgr();
 
     std::optional<int> RegUser(std::string_view name, std::string_view email, std::string_view password);
 
-private:
-    MysqlMgr();
+    std::optional<bool> CheckEmail(std::string_view name, std::string_view email);
+
+    std::optional<bool> UpdatePassword(std::string_view name, std::string_view password);
 
 private:
     std::unique_ptr<MysqlPool> pool_;

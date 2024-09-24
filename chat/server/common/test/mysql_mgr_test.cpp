@@ -87,15 +87,52 @@ TEST(MysqlMgrTest, RegUser) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试
-    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now().time_since_epoch().count());
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
     auto email1 = fmt::format("{}@test.com", user1);
-    auto user2 = fmt::format("pycstl_{}", std::chrono::system_clock::now().time_since_epoch().count());
+    auto user2 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
     auto email2 = fmt::format("{}@test.com", user2);
 
     EXPECT_TRUE(mysql_mgr.RegUser(user1, email1, "123") > 0);
     EXPECT_EQ(mysql_mgr.RegUser(user1, email1, "123"), 0);
     EXPECT_EQ(mysql_mgr.RegUser(user2, email1, "123"), 0);
     EXPECT_TRUE(mysql_mgr.RegUser(user2, email2, "123") > 0);
+
+    // TODO: 删除测试数据
+}
+
+TEST(MysqlMgrTest, CheckEmail) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    // 根据当前时间戳生成用户和邮箱用于测试
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
+    auto email1 = fmt::format("{}@test.com", user1);
+    auto user2 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
+    auto email2 = fmt::format("{}@test.com", user2);
+
+    EXPECT_TRUE(mysql_mgr.RegUser(user1, email1, "123") > 0);
+    EXPECT_TRUE(mysql_mgr.RegUser(user2, email2, "123") > 0);
+
+    EXPECT_TRUE(*mysql_mgr.CheckEmail(user1, email1));
+    EXPECT_FALSE(*mysql_mgr.CheckEmail(user1, email2));
+    EXPECT_TRUE(*mysql_mgr.CheckEmail(user2, email2));
+    EXPECT_FALSE(*mysql_mgr.CheckEmail(user2, email1));
+
+    // TODO: 删除测试数据
+}
+
+TEST(MysqlMgrTest, UpdatePassword) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    // 根据当前时间戳生成用户和邮箱用于测试
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
+    auto email1 = fmt::format("{}@test.com", user1);
+    auto password1 = "123";
+    auto password2 = "456";
+
+    EXPECT_TRUE(mysql_mgr.RegUser(user1, email1, password1) > 0);
+
+    EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password1));
+    EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password2));
 
     // TODO: 删除测试数据
 }

@@ -12,6 +12,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent* e) override;
 
 private:
+    static constexpr int kCounter = 3;
+
     QTimer* timer_;
-    int counter_{10};
+    int counter_{kCounter};
 };

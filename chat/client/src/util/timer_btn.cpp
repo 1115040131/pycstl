@@ -9,7 +9,7 @@ TimerBtn::TimerBtn(QWidget* parent) : QPushButton(parent) {
         counter_--;
         if (counter_ <= 0) {
             timer_->stop();
-            counter_ = 10;
+            counter_ = kCounter;
             this->setText("获取");
             this->setEnabled(true);
             return;

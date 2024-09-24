@@ -1,10 +1,10 @@
 #pragma once
 
 #include <QDialog>
-#include <QJsonObject>
 #include <QTimer>
 #include <functional>
 #include <map>
+#include <memory>
 
 #include "chat/client/define.h"
 #include "chat/client/util/input_check.h"
@@ -54,13 +54,10 @@ private:
     void changeTipPage();
 
 private:
-    static constexpr std::string_view kEmailRegex{R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)"};
-    static constexpr std::string_view kPasswordRegex{R"(^[a-zA-Z0-9!@#$%^&*]{6,15}$)"};
-
     Ui::RegisterDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
     InputCheck input_check_;
 
-    QTimer* countdown_timer_;
+    std::unique_ptr<QTimer> countdown_timer_;
     int countdown_{5};
 };
