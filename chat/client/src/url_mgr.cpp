@@ -1,6 +1,5 @@
 #include "chat/client/url_mgr.h"
 
-#include <QFile>
 #include <QSettings>
 
 UrlMgr::UrlMgr() {

@@ -4,17 +4,13 @@
 
 #include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
-#include "chat/client/url_mgr.h"
+// #include "chat/client/url_mgr.h"
 #include "chat/client/widget/ui_register_dialog.h"
 
 RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegisterDialog) {
     ui->setupUi(this);
     ui->password_edit->setEchoMode(QLineEdit::Password);
     ui->confirm_edit->setEchoMode(QLineEdit::Password);
-
-    // 连接 http 请求完成信号
-    initHttpHandlers();
-    connect(&HttpMgr::GetInstance(), &HttpMgr::sig_reg_mod_finish, this, &RegisterDialog::slot_reg_mod_finish);
 
     // 连接输入框的错误信号
     ui->err_tip->clear();
@@ -75,8 +71,7 @@ void RegisterDialog::on_get_code_btn_clicked() {
         // 发送验证码
         QJsonObject root;
         root["email"] = email;
-        HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/get_verifycode"),
-                                               root, ReqId::kGetVerifyCode, Module::kRegisterMod);
+        HttpMgr::GetInstance().PostHttpRequest(kModule, ReqId::kGetVerifyCode, root);
     }
 }
 
@@ -92,8 +87,7 @@ void RegisterDialog::on_sure_btn_clicked() {
         root["password"] = xorString(ui->password_edit->text());
         root["confirm"] = xorString(ui->confirm_edit->text());
         root["verify_code"] = ui->verify_edit->text();
-        HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/user_register"),
-                                               root, ReqId::kRegUser, Module::kRegisterMod);
+        HttpMgr::GetInstance().PostHttpRequest(kModule, ReqId::kRegUser, root);
     }
 }
 

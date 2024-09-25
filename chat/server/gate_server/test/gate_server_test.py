@@ -25,6 +25,22 @@ class ErrorCode(Enum):
     kNetworkError = 1010
 
 
+class ReqId(Enum):
+    kGetVerifyCode = 1001
+    kRegUser = 1002
+    kResetPassword = 1003
+    kLogin = 1004
+    kChatLogin = 1005
+    kChatLoginRes = 1006
+
+
+Url_Map = {
+    ReqId.kGetVerifyCode: '/get_verifycode',
+    ReqId.kRegUser: '/user_register',
+    ReqId.kResetPassword: '/reset_password',
+}
+
+
 class GateServerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -90,20 +106,22 @@ class GateServerTest(unittest.TestCase):
         incorrect_json = "{'this is not': 'a valid json'}"  # 错误：属性名没有使用双引号
         # 设置请求头来指明发送的是JSON数据
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(f'{self.gate_server_url}/get_verifycode', data=incorrect_json, headers=headers)
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kGetVerifyCode],
+                                 data=incorrect_json, headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
 
         # email key 不存在
-        response = requests.post(f'{self.gate_server_url}/get_verifycode', json='')
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kGetVerifyCode], json='')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
 
-        response = requests.post(f'{self.gate_server_url}/get_verifycode', json={'email': 'test_email@pyc.com'})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kGetVerifyCode],
+                                 json={'email': 'test_email@pyc.com'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -115,7 +133,8 @@ class GateServerTest(unittest.TestCase):
         incorrect_json = "{'this is not': 'a valid json'}"  # 错误：属性名没有使用双引号
         # 设置请求头来指明发送的是JSON数据
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(f'{self.gate_server_url}/user_register', data=incorrect_json, headers=headers)
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 data=incorrect_json, headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -125,9 +144,10 @@ class GateServerTest(unittest.TestCase):
         email = 'pyc@stl.test'
 
         # 确认密码不一致
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'email': email,
-                                                                                'password': '123',
-                                                                                "confirm": '456'})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'email': email,
+                                       'password': '123',
+                                       "confirm": '456'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -135,7 +155,7 @@ class GateServerTest(unittest.TestCase):
 
         # 验证码不存在或超时
         self.redis.delete("code_" + email)
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'email': email})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser], json={'email': email})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -144,7 +164,7 @@ class GateServerTest(unittest.TestCase):
         # 验证码错误
         verify_code = "qwer"
         self.redis.set("code_" + email, verify_code)
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'email': email})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser], json={'email': email})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -159,9 +179,10 @@ class GateServerTest(unittest.TestCase):
         self.redis.set("code_" + email2, verify_code)
 
         # user1 注册成功
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user1,
-                                                                                'email': email1,
-                                                                                'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'user': user1,
+                                       'email': email1,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -172,27 +193,30 @@ class GateServerTest(unittest.TestCase):
         self.assertEqual(json_response['verify_code'], verify_code)
 
         # 用户已存在
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user1,
-                                                                                'email': email1,
-                                                                                'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'user': user1,
+                                       'email': email1,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kUserExist.value)
 
         # 邮箱已存在
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user2,
-                                                                                'email': email1,
-                                                                                'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'user': user2,
+                                       'email': email1,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kUserExist.value)
 
         # user2 注册成功
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user2,
-                                                                                'email': email2,
-                                                                                'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'user': user2,
+                                       'email': email2,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -207,7 +231,8 @@ class GateServerTest(unittest.TestCase):
         incorrect_json = "{'this is not': 'a valid json'}"  # 错误：属性名没有使用双引号
         # 设置请求头来指明发送的是JSON数据
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', data=incorrect_json, headers=headers)
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword],
+                                 data=incorrect_json, headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -221,7 +246,7 @@ class GateServerTest(unittest.TestCase):
 
         # 验证码不存在或超时
         self.redis.delete("code_" + email)
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'email': email})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword], json={'email': email})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -230,7 +255,7 @@ class GateServerTest(unittest.TestCase):
         # 验证码错误
         verify_code = "qwer"
         self.redis.set("code_" + email, verify_code)
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'email': email})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword], json={'email': email})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -239,20 +264,22 @@ class GateServerTest(unittest.TestCase):
         self.redis.set("code_" + email, verify_code)
 
         # 用户名和邮箱不匹配 (用户不存在)
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': user,
-                                                                            'email': email,
-                                                                            'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword],
+                                 json={'user': user,
+                                       'email': email,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kEmailNotMatch.value)
 
         # 注册账号
-        response = requests.post(f'{self.gate_server_url}/user_register', json={'user': user,
-                                                                                'email': email,
-                                                                                'password': password1,
-                                                                                'confirm': password1,
-                                                                                'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'user': user,
+                                       'email': email,
+                                       'password': password1,
+                                       'confirm': password1,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -265,9 +292,10 @@ class GateServerTest(unittest.TestCase):
         self.assertEqual(json_response['verify_code'], verify_code)
 
         # 用户名和邮箱不匹配
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': 'wrong_user',
-                                                                            'email': email,
-                                                                            'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword],
+                                 json={'user': 'wrong_user',
+                                       'email': email,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
@@ -276,29 +304,32 @@ class GateServerTest(unittest.TestCase):
         # 用户名和邮箱不匹配
         wrong_email = 'wrong_email'
         self.redis.set("code_" + wrong_email, verify_code)
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': user,
-                                                                            'email': wrong_email,
-                                                                            'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword],
+                                 json={'user': user,
+                                       'email': wrong_email,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kEmailNotMatch.value)
 
         # 密码相同, 更新失败
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': user,
-                                                                            'email': email,
-                                                                            'password': password1,
-                                                                            'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword],
+                                 json={'user': user,
+                                       'email': email,
+                                       'password': password1,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()
         self.assertEqual(json_response['error'], ErrorCode.kPasswordUpdateFail.value)
 
         # 密码不同, 更新成功
-        response = requests.post(f'{self.gate_server_url}/reset_pwd', json={'user': user,
-                                                                            'email': email,
-                                                                            'password': password2,
-                                                                            'verify_code': verify_code})
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kResetPassword],
+                                 json={'user': user,
+                                       'email': email,
+                                       'password': password2,
+                                       'verify_code': verify_code})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers['Content-Type'], 'text/json')
         json_response = response.json()

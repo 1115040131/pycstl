@@ -39,6 +39,8 @@ private:
     void initHttpHandlers();
 
 private:
+    static constexpr Module kModule{Module::kResetMod};
+
     Ui::ResetDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
 };

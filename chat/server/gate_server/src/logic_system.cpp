@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "chat/common/method_url.h"
 #include "chat/server/common/mysql_mgr.h"
 #include "chat/server/common/redis_mgr.h"
 #include "gate_server/define.h"
@@ -22,7 +23,7 @@ LogicSystem::LogicSystem() {
             beast::ostream(connection->response_.body()) << key << ": " << value << "\n";
         }
     });
-    RegPost("/get_verifycode", [](const std::shared_ptr<HttpConnection>& connection) {
+    RegPost(ToUrl(ReqId::kGetVerifyCode), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         PYC_LOG_DEBUG("body: {}", body_str);
         connection->response_.set(http::field::content_type, "text/json");
@@ -51,7 +52,7 @@ LogicSystem::LogicSystem() {
         root["error"] = ErrorCode::kSuccess;
         beast::ostream(connection->response_.body()) << root.dump();
     });
-    RegPost("/user_register", [](const std::shared_ptr<HttpConnection>& connection) {
+    RegPost(ToUrl(ReqId::kRegUser), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         PYC_LOG_DEBUG("body: {}", body_str);
 
@@ -121,7 +122,7 @@ LogicSystem::LogicSystem() {
         root["verify_code"] = verify_code;
         beast::ostream(connection->response_.body()) << root.dump();
     });
-    RegPost("/reset_pwd", [](const std::shared_ptr<HttpConnection>& connection) {
+    RegPost(ToUrl(ReqId::kResetPassword), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
         PYC_LOG_DEBUG("body: {}", body_str);
 

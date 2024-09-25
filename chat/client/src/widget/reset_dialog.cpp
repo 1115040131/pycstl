@@ -34,8 +34,7 @@ void ResetDialog::on_verify_btn_clicked() {
         // 发送验证码
         QJsonObject root;
         root["email"] = email;
-        HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/get_verifycode"),
-                                               root, ReqId::kGetVerifyCode, Module::kResetMod);
+        HttpMgr::GetInstance().PostHttpRequest(kModule, ReqId::kGetVerifyCode, root);
     }
 }
 
@@ -49,8 +48,7 @@ void ResetDialog::on_sure_btn_clicked() {
         root["email"] = ui->email_edit->text();
         root["password"] = xorString(ui->password_edit->text());
         root["verify_code"] = ui->verify_edit->text();
-        HttpMgr::GetInstance().PostHttpRequest(QUrl(UrlMgr::GetInstance().GateUrlPrefix() + "/reset_pwd"), root,
-                                               ReqId::kRestPassword, Module::kResetMod);
+        HttpMgr::GetInstance().PostHttpRequest(kModule, ReqId::kResetPassword, root);
     }
 }
 
@@ -75,7 +73,7 @@ void ResetDialog::initHttpHandlers() {
         ui->err_tip->showTip(tr("验证码已发送至邮箱，请注意查收"), true);
         qDebug() << "email is" << email;
     });
-    handlers_.emplace(ReqId::kRestPassword, [this](const QJsonObject& json) {
+    handlers_.emplace(ReqId::kResetPassword, [this](const QJsonObject& json) {
         auto error = static_cast<ErrorCode>(json["error"].toInt());
         if (error != ErrorCode::kSuccess) {
             ui->err_tip->showTip(tr("参数错误"), false);

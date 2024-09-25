@@ -48,6 +48,8 @@ private:
     void changeTipPage();
 
 private:
+    static constexpr Module kModule{Module::kRegisterMod};
+
     Ui::RegisterDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
 
