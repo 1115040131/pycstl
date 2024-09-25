@@ -6,6 +6,7 @@
 enum class Module {
     kRegisterMod = 0,
     kResetMod,
+    kLogin,
 };
 
 enum class TipErr {

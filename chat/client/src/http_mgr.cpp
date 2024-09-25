@@ -4,7 +4,6 @@
 #include <QNetworkReply>
 #include <QSettings>
 #include <QUrl>
-#include <unordered_map>
 
 #include "chat/common/method_url.h"
 

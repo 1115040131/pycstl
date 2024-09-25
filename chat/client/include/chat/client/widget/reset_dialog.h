@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <map>
+
 #include <QDialog>
 #include <QJsonObject>
 

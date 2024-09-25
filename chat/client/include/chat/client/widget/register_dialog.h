@@ -1,9 +1,12 @@
 #pragma once
 
-#include <QDialog>
-#include <QTimer>
 #include <functional>
+#include <map>
 #include <memory>
+
+#include <QDialog>
+#include <QJsonObject>
+#include <QTimer>
 
 #include "chat/client/define.h"
 

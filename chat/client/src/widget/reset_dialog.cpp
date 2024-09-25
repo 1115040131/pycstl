@@ -1,10 +1,7 @@
 #include "chat/client/widget/reset_dialog.h"
 
-#include <QJsonDocument>
-
 #include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
-#include "chat/client/url_mgr.h"
 #include "chat/client/widget/ui_reset_dialog.h"
 
 ResetDialog::ResetDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ResetDialog) {

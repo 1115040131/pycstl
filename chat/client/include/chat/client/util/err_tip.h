@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QJsonDocument>
-#include <QLabel>
 #include <map>
 #include <optional>
+
+#include <QJsonDocument>
+#include <QLabel>
 
 #include "chat/client/define.h"
 

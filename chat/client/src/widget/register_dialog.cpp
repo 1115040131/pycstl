@@ -1,10 +1,7 @@
 #include "chat/client/widget/register_dialog.h"
 
-#include <QJsonDocument>
-
 #include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
-// #include "chat/client/url_mgr.h"
 #include "chat/client/widget/ui_register_dialog.h"
 
 RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::RegisterDialog) {
