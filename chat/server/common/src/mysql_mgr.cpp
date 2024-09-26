@@ -87,15 +87,43 @@ std::optional<bool> MysqlMgr::UpdatePassword(std::string_view name, std::string_
     });
 
     try {
-        // auto result = connection->session_.sql("UPDATE user SET pwd = ? WHERE name = ?")
-        //                   .bind(password.data())
-        //                   .bind(name.data())
-        //                   .execute();
-        auto schema = connection->session_.getSchema("pyc_chat");
-        auto table = schema.getTable("user");
-        auto result =
-            table.update().set("pwd", password.data()).where("name = :name").bind("name", name.data()).execute();
+        auto result = connection->session_.sql("UPDATE user SET pwd = ? WHERE name = ? AND pwd <> ?")
+                          .bind(password.data())
+                          .bind(name.data())
+                          .bind(password.data())
+                          .execute();
         return result.getAffectedItemsCount() == 1;
+    }
+    MYSQL_CATCH(g_logger)
+
+    return std::nullopt;
+}
+
+std::optional<UserInfo> MysqlMgr::CheckPassword(std::string_view email, std::string_view password) {
+    auto connection = pool_->GetConnection();
+    if (!connection) {
+        return std::nullopt;
+    }
+    Defer defer([this, &connection]() {
+        connection->last_use_time_ = std::chrono::system_clock::now();
+        this->pool_->ReturnConnection(std::move(*connection));
+    });
+
+    try {
+        auto result = connection->session_.sql("SELECT * FROM user WHERE email = ?").bind(email.data()).execute();
+        const auto& row = result.fetchOne();
+        if (row.isNull() || row[4].get<std::string>() != password) {
+            return std::nullopt;
+        }
+
+        UserInfo user_info {
+            .uid = row[1].get<int>(),
+            .name = row[2].get<std::string>(),
+            .passward = std::string(password),
+            .email = std::string(email),
+        };
+
+        return user_info;
     }
     MYSQL_CATCH(g_logger)
 

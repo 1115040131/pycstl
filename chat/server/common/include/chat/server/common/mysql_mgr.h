@@ -34,6 +34,8 @@ public:
 
     std::optional<bool> UpdatePassword(std::string_view name, std::string_view password);
 
+    std::optional<UserInfo> CheckPassword(std::string_view email, std::string_view password);
+
 private:
     std::unique_ptr<MysqlPool> pool_;
 };

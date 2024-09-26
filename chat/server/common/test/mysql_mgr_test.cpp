@@ -139,5 +139,31 @@ TEST(MysqlMgrTest, UpdatePassword) {
     // TODO: 删除测试数据
 }
 
+constexpr bool operator==(const UserInfo& lhs, const UserInfo& rhs) {
+    return lhs.uid == rhs.uid && lhs.name == rhs.name && lhs.passward == rhs.passward && lhs.email == rhs.email;
+}
+
+TEST(MysqlMgrTest, CheckPassword) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    // 根据当前时间戳生成用户和邮箱用于测试
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
+    auto email1 = fmt::format("{}@test.com", user1);
+    auto password1 = "123";
+    auto password2 = "456";
+
+    auto uid = mysql_mgr.RegUser(user1, email1, password1).value();
+    EXPECT_TRUE(uid > 0);
+    EXPECT_EQ(mysql_mgr.CheckPassword(email1, password1).value(), (UserInfo{uid, user1, password1, email1}));
+    EXPECT_FALSE(mysql_mgr.CheckPassword(email1, password2));
+
+    // 更新密码
+    EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password2).value());
+    EXPECT_FALSE(mysql_mgr.CheckPassword(email1, password1));
+    EXPECT_EQ(mysql_mgr.CheckPassword(email1, password2).value(), (UserInfo{uid, user1, password2, email1}));
+
+    // TODO: 删除测试数据
+}
+
 }  // namespace chat
 }  // namespace pyc
