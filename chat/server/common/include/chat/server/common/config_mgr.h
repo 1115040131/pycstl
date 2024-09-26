@@ -41,26 +41,26 @@ inline Logger _g_config_mgr_logger("ConfigMgr");
 }  // namespace chat
 }  // namespace pyc
 
-#define GET_CONFIG(var, section, key)                                                        \
-    std::string var;                                                                         \
-    {                                                                                        \
-        auto config = ::pyc::chat::ConfigMgr::GetInstance()[section][key];                   \
-        if (!config) {                                                                       \
-            ::pyc::chat::_g_config_mgr_logger.fatal("Config " section " " key " not found"); \
-        }                                                                                    \
-        var = *config;                                                                       \
+#define GET_CONFIG(var, section, key)                                                                  \
+    std::string var;                                                                                   \
+    {                                                                                                  \
+        auto config = ::pyc::chat::ConfigMgr::GetInstance()[section][key];                             \
+        if (!config) {                                                                                 \
+            ::pyc::chat::_g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"] not found", section, key); \
+        }                                                                                              \
+        var = *config;                                                                                 \
     }
 
-#define GET_CONFIG_INT(var, section, key)                                                                 \
-    int var;                                                                                              \
-    {                                                                                                     \
-        auto config = ::pyc::chat::ConfigMgr::GetInstance()[section][key];                                \
-        if (!config) {                                                                                    \
-            ::pyc::chat::_g_config_mgr_logger.fatal("Config " section " " key " not found");              \
-        }                                                                                                 \
-        auto result = std::from_chars(config->data(), config->data() + config->size(), var);              \
-        if (result.ec != std::errc()) {                                                                   \
-            ::pyc::chat::_g_config_mgr_logger.fatal("Config " section " " key ": {} convert to int fail", \
-                                                    *config);                                             \
-        }                                                                                                 \
+#define GET_CONFIG_INT(var, section, key)                                                                      \
+    int var;                                                                                                   \
+    {                                                                                                          \
+        auto config = ::pyc::chat::ConfigMgr::GetInstance()[section][key];                                     \
+        if (!config) {                                                                                         \
+            ::pyc::chat::_g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"] not found", section, key);         \
+        }                                                                                                      \
+        auto result = std::from_chars(config->data(), config->data() + config->size(), var);                   \
+        if (result.ec != std::errc()) {                                                                        \
+            ::pyc::chat::_g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"]: {} convert to int fail", section, \
+                                                    key, *config);                                             \
+        }                                                                                                      \
     }

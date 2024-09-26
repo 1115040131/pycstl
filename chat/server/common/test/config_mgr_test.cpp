@@ -19,6 +19,20 @@ TEST(CommonTest, ConfigMgrTest) {
     EXPECT_EQ(status_server_host, "127.0.0.1");
     EXPECT_EQ(status_server_port, "50052");
 
+    GET_CONFIG(chat_server1_name, "ChatServer1", "Name");
+    GET_CONFIG(chat_server1_host, "ChatServer1", "Host");
+    GET_CONFIG(chat_server1_port, "ChatServer1", "Port");
+    EXPECT_EQ(chat_server1_name, "ChatServer1");
+    EXPECT_EQ(chat_server1_host, "127.0.0.1");
+    EXPECT_EQ(chat_server1_port, "8090");
+
+    GET_CONFIG(chat_server2_name, "ChatServer2", "Name");
+    GET_CONFIG(chat_server2_host, "ChatServer2", "Host");
+    GET_CONFIG(chat_server2_port, "ChatServer2", "Port");
+    EXPECT_EQ(chat_server2_name, "ChatServer2");
+    EXPECT_EQ(chat_server2_host, "127.0.0.1");
+    EXPECT_EQ(chat_server2_port, "8091");
+
     GET_CONFIG(redis_host, "Redis", "Host");
     GET_CONFIG_INT(redis_port, "Redis", "Port");
     GET_CONFIG(redis_password, "Redis", "Password");

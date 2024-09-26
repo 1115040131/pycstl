@@ -104,6 +104,7 @@ def main():
         ),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
+        "chat_status_server": lambda args: run_bazel_run('//chat/server/status_server', args=args),
         "chat_prepare": lambda args: (
             targets["chat_redis_server"](args=[]),
             targets["chat_mysql_server"](args=[]),
@@ -136,6 +137,7 @@ def main():
             targets["chat_prepare"](args=[]),
             run_tmux(f"python3 {tool_path / 'build.py'} chat_gate_server",
                      f"python3 {tool_path / 'build.py'} chat_verify_server",
+                     f"python3 {tool_path / 'build.py'} chat_status_server",
                      f"python3 {tool_path / 'build.py'} chat_client")
         ),
 

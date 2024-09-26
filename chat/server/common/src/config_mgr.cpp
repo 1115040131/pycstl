@@ -30,7 +30,7 @@ ConfigMgr::ConfigMgr() {
     for (const auto& [section_name, section_info] : data_) {
         fmt::println("[{}]", section_name);
         for (const auto& [key, value] : section_info.data) {
-            fmt::println("{}={}", key, value);
+            fmt::println("  {} = {}", key, value);
         }
     }
     fmt::println("===================================");
