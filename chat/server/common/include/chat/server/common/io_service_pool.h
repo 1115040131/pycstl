@@ -4,8 +4,9 @@
 #include <thread>
 #include <vector>
 
+#include <boost/asio.hpp>
+
 #include "common/singleton.h"
-#include "gate_server/define.h"
 
 namespace pyc {
 namespace chat {
@@ -14,8 +15,8 @@ class IOServicePool : public pyc::Singleton<IOServicePool> {
     friend class pyc::Singleton<IOServicePool>;
 
 public:
-    using IOService = asio::io_context;
-    using Work = asio::io_context::work;
+    using IOService = boost::asio::io_context;
+    using Work = boost::asio::io_context::work;
     using WorkPtr = std::unique_ptr<Work>;
 
     /// @brief 使用 round-robin 返回一个 io_context

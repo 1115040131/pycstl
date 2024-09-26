@@ -16,6 +16,7 @@ cc_library(
     deps = [
         "//common",
         "//logger",
+        "@boost//:asio",
         "@boost//:property_tree",
         "@fmt",
         "@hiredis",

@@ -1,10 +1,14 @@
-#include "gate_server/io_service_pool.h"
+#include "chat/server/common/io_service_pool.h"
+
+#include "logger/logger.h"
 
 namespace pyc {
 namespace chat {
 
+static Logger g_logger("IOServicePool");
+
 IOServicePool::IOServicePool(std::size_t size) : io_services_(size) {
-    PYC_LOG_INFO("Create {} io_context.", size);
+    g_logger.info("Create {} io_context.", size);
 
     works_.reserve(size);
     for (std::size_t i = 0; i < size; ++i) {
@@ -19,7 +23,7 @@ IOServicePool::IOServicePool(std::size_t size) : io_services_(size) {
 
 IOServicePool::~IOServicePool() {
     Stop();
-    PYC_LOG_INFO("IOServicePool Exit.");
+    g_logger.info("IOServicePool Exit.");
 }
 
 IOServicePool::IOService& IOServicePool::GetIOService() {
