@@ -25,3 +25,21 @@ js_library(
     name = "verify_js_proto",
     data = ["verify.proto"],
 )
+
+# status.grpc
+proto_library(
+    name = "status_proto",
+    srcs = ["status.proto"],
+)
+
+cc_proto_library(
+    name = "status_cc_proto",
+    deps = ["status_proto"],
+)
+
+cc_grpc_library(
+    name = "status_cc_grpc_proto",
+    srcs = ["status_proto"],
+    grpc_only = True,
+    deps = ["status_cc_proto"],
+)

@@ -14,6 +14,11 @@ TEST(CommonTest, ConfigMgrTest) {
     EXPECT_EQ(verify_server_host, "127.0.0.1");
     EXPECT_EQ(verify_server_port, "50051");
 
+    GET_CONFIG(status_server_host, "StatusServer", "Host");
+    GET_CONFIG(status_server_port, "StatusServer", "Port");
+    EXPECT_EQ(status_server_host, "127.0.0.1");
+    EXPECT_EQ(status_server_port, "50052");
+
     GET_CONFIG(redis_host, "Redis", "Host");
     GET_CONFIG_INT(redis_port, "Redis", "Port");
     GET_CONFIG(redis_password, "Redis", "Password");
