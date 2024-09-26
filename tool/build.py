@@ -125,7 +125,7 @@ def main():
         ),
         "chat_gate_server_test": lambda args: (
             targets["chat_prepare"](args=[]),
-            run_bazel_test('//chat/server/gate_server/test:gate_server_test', args=args)
+            run_bazel_test('//chat/server/test:gate_server_test', args=args)
         ),
 
         # chat client
