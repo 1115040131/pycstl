@@ -36,7 +36,7 @@ public:
 private:
     void addTipErr(TipErr tip_err, const QString& msg);
 
-    bool delTipErr(TipErr tip_err);
+    void delTipErr(TipErr tip_err);
 
 private:
     static constexpr std::string_view kEmailRegex{R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)"};

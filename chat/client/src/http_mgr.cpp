@@ -48,5 +48,7 @@ void HttpMgr::slot_http_finish(Module mod, ReqId req_id, const QString& res, Err
         emit sig_reg_mod_finish(req_id, res, err);
     } else if (mod == Module::kResetMod) {
         emit sig_reset_mod_finish(req_id, res, err);
+    } else if (mod == Module::kLogin) {
+        emit sig_login_mod_finish(req_id, res, err);
     }
 }

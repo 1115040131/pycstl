@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QString>
+
 #include "chat/common/error_code.h"
 #include "chat/common/method.h"
 
@@ -17,4 +19,11 @@ enum class TipErr {
     kPasswordConfirm,
     kVerifyErr,
     kUserErr,
+};
+
+struct ServerInfo {
+    int uid;
+    QString host;
+    QString port;
+    QString token;
 };

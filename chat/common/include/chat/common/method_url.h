@@ -10,6 +10,8 @@ inline constexpr const char* ToUrl(ReqId req_id) {
             return "/user_register";
         case ReqId::kResetPassword:
             return "/reset_password";
+        case ReqId::kLogin:
+            return "/user_login";
         default:
             break;
     }

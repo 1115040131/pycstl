@@ -15,6 +15,7 @@ cc_library(
     deps = [
         "//chat/common",
         "//chat/server/common",
+        "//chat/server/proto:status_cc_grpc_proto",
         "//chat/server/proto:verify_cc_grpc_proto",
         "//common",
         "//logger",

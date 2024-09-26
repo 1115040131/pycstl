@@ -112,7 +112,7 @@ void RegisterDialog::initHttpHandlers() {
 
         auto email = json["email"].toString();
         ui->err_tip->showTip(tr("验证码已发送至邮箱，请注意查收"), true);
-        qDebug() << "email is" << email;
+        qDebug() << "kGetVerifyCode finish: email: " << email;
     });
     handlers_.emplace(ReqId::kRegUser, [this](const QJsonObject& json) {
         auto error = static_cast<ErrorCode>(json["error"].toInt());
@@ -123,8 +123,7 @@ void RegisterDialog::initHttpHandlers() {
 
         auto email = json["email"].toString();
         ui->err_tip->showTip(tr("用户注册成功"), true);
-        qDebug() << "email is" << email;
-        qDebug() << "user uid is" << json["uid"].toInt();
+        qDebug() << "kRegUser finish: email: " << email << " user uid: " << json["uid"].toInt();
 
         changeTipPage();
     });

@@ -6,6 +6,7 @@
 #include "chat/server/common/mysql_mgr.h"
 #include "chat/server/common/redis_mgr.h"
 #include "gate_server/define.h"
+#include "gate_server/status_grpc_client.h"
 #include "gate_server/verify_grpc_client.h"
 
 namespace pyc {
@@ -47,6 +48,12 @@ LogicSystem::LogicSystem() {
 
         auto email = email_iter->get<std::string>();
         auto response = VerifyGrpcClient::GetInstance().GetVerifyCode(email);
+        if (response.error()) {
+            PYC_LOG_ERROR("grpc GetVerifyCode fail, error is {}", response.error());
+            root["error"] = ErrorCode::kRpcFailed;
+            beast::ostream(connection->response_.body()) << root.dump();
+            return;
+        }
 
         root["email"] = email;
         root["error"] = ErrorCode::kSuccess;
@@ -194,6 +201,50 @@ LogicSystem::LogicSystem() {
         root["email"] = email;
         root["password"] = password;
         root["verify_code"] = verify_code;
+        beast::ostream(connection->response_.body()) << root.dump();
+    });
+    RegPost(ToUrl(ReqId::kLogin), [](const std::shared_ptr<HttpConnection>& connection) {
+        auto body_str = beast::buffers_to_string(connection->request_.body().data());
+        PYC_LOG_DEBUG("body: {}", body_str);
+
+        connection->response_.set(http::field::content_type, "text/json");
+        nlohmann::json src_root = nlohmann::json::parse(body_str, nullptr, false);
+        nlohmann::json root;
+        if (src_root.is_discarded()) {
+            PYC_LOG_ERROR("Failed to parse Json data");
+            root["error"] = ErrorCode::kJsonError;
+            beast::ostream(connection->response_.body()) << root.dump();
+            return;
+        }
+        std::string email = src_root.value("email", "");
+        std::string password = src_root.value("password", "");
+
+        // 验证用户名和密码
+        auto user_info = MysqlMgr::GetInstance().CheckPassword(email, password);
+        if (!user_info) {
+            PYC_LOG_WARN("CheckPassword({} {}) fail", email, password);
+            root["error"] = ErrorCode::kPasswordError;
+            beast::ostream(connection->response_.body()) << root.dump();
+            return;
+        }
+
+        // 查询找到合适的连接
+        auto response = StatusGrpcClient::GetInstance().GetChatServer(user_info->uid);
+        if (response.error()) {
+            PYC_LOG_ERROR("grpc GetChatServer fail, error is {}", response.error());
+            root["error"] = ErrorCode::kRpcFailed;
+            beast::ostream(connection->response_.body()) << root.dump();
+            return;
+        }
+
+        PYC_LOG_INFO("Succeed to load userinfo uid: {}, get chat server: host: {}, port: {}, token: {}",
+                     user_info->uid, response.host(), response.port(), response.token());
+        root["error"] = ErrorCode::kSuccess;
+        root["uid"] = user_info->uid;
+        root["user"] = user_info->name;
+        root["host"] = response.host();
+        root["port"] = response.port();
+        root["token"] = response.token();
         beast::ostream(connection->response_.body()) << root.dump();
     });
 

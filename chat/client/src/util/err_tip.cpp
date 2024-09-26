@@ -25,14 +25,13 @@ void ErrTip::addTipErr(TipErr tip_err, const QString& msg) {
     showTip(msg, false);
 }
 
-bool ErrTip::delTipErr(TipErr tip_err) {
+void ErrTip::delTipErr(TipErr tip_err) {
     tip_errs_.erase(tip_err);
     if (tip_errs_.empty()) {
         clear();
-        return true;
+    } else {
+        showTip(tip_errs_.begin()->second, false);
     }
-    showTip(tip_errs_.begin()->second, false);
-    return false;
 }
 
 bool ErrTip::checkUserValid(const QString& user) {
@@ -41,7 +40,8 @@ bool ErrTip::checkUserValid(const QString& user) {
         return false;
     }
 
-    return delTipErr(TipErr::kUserErr);
+    delTipErr(TipErr::kUserErr);
+    return true;
 }
 
 bool ErrTip::checkEmailValid(const QString& email) {
@@ -52,7 +52,8 @@ bool ErrTip::checkEmailValid(const QString& email) {
         return false;
     }
 
-    return delTipErr(TipErr::kEmailErr);
+    delTipErr(TipErr::kEmailErr);
+    return true;
 }
 
 bool ErrTip::checkPasswordValid(const QString& password) {
@@ -68,7 +69,8 @@ bool ErrTip::checkPasswordValid(const QString& password) {
         return false;
     }
 
-    return delTipErr(TipErr::kPasswordErr);
+    delTipErr(TipErr::kPasswordErr);
+    return true;
 }
 
 bool ErrTip::checkConfirmValid(const QString& password, const QString& confirm) {
@@ -77,7 +79,8 @@ bool ErrTip::checkConfirmValid(const QString& password, const QString& confirm) 
         return false;
     }
 
-    return delTipErr(TipErr::kPasswordConfirm);
+    delTipErr(TipErr::kPasswordConfirm);
+    return true;
 }
 
 bool ErrTip::checkVerifyValid(const QString& verify) {
@@ -86,7 +89,8 @@ bool ErrTip::checkVerifyValid(const QString& verify) {
         return false;
     }
 
-    return delTipErr(TipErr::kVerifyErr);
+    delTipErr(TipErr::kVerifyErr);
+    return true;
 }
 
 std::optional<QJsonDocument> ErrTip::checkHttpResponse(const QString& res, ErrorCode err) {

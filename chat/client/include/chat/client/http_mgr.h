@@ -27,6 +27,7 @@ signals:
     void sig_http_finish(Module mod, ReqId req_id, const QString& res, ErrorCode err);
     void sig_reg_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
     void sig_reset_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
+    void sig_login_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
 
 private:
     QNetworkAccessManager manager_;
