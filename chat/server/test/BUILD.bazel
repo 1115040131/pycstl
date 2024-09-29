@@ -1,11 +1,43 @@
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_grpc_library", "py_proto_library")
 load("@pycstl_deps//:requirements.bzl", "requirement")
 
+# proto
+py_proto_library(
+    name = "status_py_proto",
+    deps = ["//chat/server/proto:status_proto"],
+)
+
+py_grpc_library(
+    name = "status_py_grpc",
+    srcs = ["//chat/server/proto:status_proto"],
+    deps = [":status_py_proto"],
+)
+
+# test lib
+py_library(
+    name = "chat_server_test_lib",
+    srcs = ["test_define.py"],
+    data = [
+        "//chat/server/gate_server",
+        "//chat/server/status_server",
+    ],
+    deps = [requirement("redis")],
+)
+
+# test
 py_test(
     name = "gate_server_test",
     srcs = ["gate_server_test.py"],
-    data = [
-        "//chat/server/gate_server",
-        "//chat/server/verify_server",
+    imports = ["."],
+    deps = [":chat_server_test_lib"],
+)
+
+py_test(
+    name = "status_server_test",
+    srcs = ["status_server_test.py"],
+    imports = ["."],
+    deps = [
+        ":chat_server_test_lib",
+        ":status_py_grpc",
     ],
-    deps = [requirement("redis")],
 )

@@ -49,9 +49,9 @@ grpc::Status StatusServiceImpl::GetChatServer(grpc::ServerContext*, const pyc::c
     if (!server) {
         response->set_error(static_cast<int>(ErrorCode::kNetworkError));
     } else {
+        response->set_error(static_cast<int>(ErrorCode::kSuccess));
         response->set_host(server->host);
         response->set_port(server->port);
-        response->set_error(static_cast<int>(ErrorCode::kSuccess));
         response->set_token(generateUniqueString());
         {
             // TODO: 用 redis

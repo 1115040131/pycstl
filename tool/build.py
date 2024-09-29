@@ -127,6 +127,10 @@ def main():
             targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/server/test:gate_server_test', args=args)
         ),
+        "chat_status_server_test": lambda args: (
+            targets["chat_prepare"](args=[]),
+            run_bazel_test('//chat/server/test:status_server_test', args=args)
+        ),
 
         # chat client
         "chat_client": lambda args: run_bazel_run('//chat/client', args=args),

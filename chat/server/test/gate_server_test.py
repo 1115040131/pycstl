@@ -1,81 +1,38 @@
 # gate_server_test.py
-import configparser
-import redis
+
 import requests
-import subprocess
 import time
 import unittest
 
-from enum import Enum
-
-
-class ErrorCode(Enum):
-    kSuccess = 0
-
-    kJsonError = 1001
-    kRpcFailed = 1002
-    kVerifyExpired = 1003
-    kVerifyCodeError = 1004
-    kUserExist = 1005
-    kPasswordError = 1006
-    kEmailNotMatch = 1007
-    kPasswordUpdateFail = 1008
-    kPasswordInvalid = 1009
-
-    kNetworkError = 1010
-
-
-class ReqId(Enum):
-    kGetVerifyCode = 1001
-    kRegUser = 1002
-    kResetPassword = 1003
-    kLogin = 1004
-    kChatLogin = 1005
-    kChatLoginRes = 1006
-
-
-Url_Map = {
-    ReqId.kGetVerifyCode: '/get_verifycode',
-    ReqId.kRegUser: '/user_register',
-    ReqId.kResetPassword: '/reset_password',
-}
+from test_define import *
 
 
 class GateServerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # 启动服务器
-        gate_server_process = subprocess.Popen(['chat/server/gate_server/gate_server'])
-        # 防止邮件过多, 不启动验证服务器
-        # verify_server_process = subprocess.Popen(['chat/server/verify_server/verify_server_/verify_server'])
-        cls.server_process = [
-            gate_server_process,
-            # verify_server_process
-        ]
+        cls.processes = start_server([
+            Server.kGateServer,
+            # 防止邮件过多, 不启动验证服务器
+            # Server.kVerifyServer,
+            Server.kStatusServer
+        ])
 
         # 初始化配置解析器
-        cls.config = configparser.ConfigParser()
-        # 读取 ini 文件
-        cls.config.read('chat/server/common/config/config.ini')
+        cls.config: configparser.ConfigParser = read_config()
 
         gate_server_port = cls.config['GateServer']['Port']
         cls.gate_server_url = f'http://localhost:{gate_server_port}'
 
         # 创建 redis 连接
-        cls.redis = redis.Redis(
-            host=cls.config['Redis']['Host'],
-            port=cls.config['Redis']['Port'],
-            password=cls.config['Redis']['Password'],
-        )
+        cls.redis: redis.Redis = connect_redis(cls.config)
 
         time.sleep(1)  # 给服务器足够时间启动
 
     @classmethod
     def tearDownClass(cls):
         # 停止服务器
-        for process in cls.server_process:
-            process.terminate()
-            process.wait()
+        terminate_server(cls.processes)
 
     def test_not_found(self):
         # 不存在的 url

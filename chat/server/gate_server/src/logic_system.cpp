@@ -107,7 +107,7 @@ LogicSystem::LogicSystem() {
         // 查找数据库判断用户是否已经注册
         auto reg_result = MysqlMgr::GetInstance().RegUser(user, email, password);
         if (!reg_result) {
-            PYC_LOG_WARN("RegUser({} {} {}) fail", user, email, password);
+            PYC_LOG_WARN("RegUser({}, {}, {}) fail", user, email, password);
             root["error"] = ErrorCode::kNetworkError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -119,7 +119,7 @@ LogicSystem::LogicSystem() {
             return;
         }
 
-        PYC_LOG_INFO("RegUser({} {} {}) success, uid: {}", user, email, password, reg_result.value());
+        PYC_LOG_INFO("RegUser({}, {}, {}) success, uid: {}", user, email, password, reg_result.value());
         root["error"] = ErrorCode::kSuccess;
         root["user"] = user;
         root["email"] = email;
