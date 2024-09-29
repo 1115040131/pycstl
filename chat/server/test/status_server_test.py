@@ -21,9 +21,8 @@ class StatusServerTest(unittest.TestCase):
         # 初始化配置解析器
         cls.config: configparser.ConfigParser = read_config()
 
-        cls.chat_servers = []
-        for chat_server_name in ['ChatServer1', 'ChatServer2']:
-            cls.chat_servers.append([cls.config[chat_server_name]['Host'], cls.config[chat_server_name]['Port']])
+        # 读取所有聊天服务器地址
+        cls.chat_servers = get_chat_servers(cls.config)
 
         # 初始化 grpc 客户端
         status_server_host = cls.config['StatusServer']['Host']
@@ -31,7 +30,8 @@ class StatusServerTest(unittest.TestCase):
         channel = grpc.insecure_channel(f'{status_server_host}:{status_server_port}')
         cls.client = StatusServiceStub(channel)
 
-        time.sleep(1)  # 给服务器足够时间启动
+        # 给服务器足够时间启动
+        time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):

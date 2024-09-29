@@ -35,6 +35,7 @@ Url_Map = {
     ReqId.kGetVerifyCode: '/get_verifycode',
     ReqId.kRegUser: '/user_register',
     ReqId.kResetPassword: '/reset_password',
+    ReqId.kLogin: '/user_login',
 }
 
 
@@ -45,6 +46,10 @@ class Server(Enum):
 
 
 def start_server(servers: list[Server]) -> list[subprocess.Popen]:
+    """
+    启动服务器进程
+    """
+
     server_map = {
         Server.kGateServer: 'chat/server/gate_server/gate_server',
         Server.kStatusServer: 'chat/server/verify_server/verify_server_/verify_server',
@@ -60,12 +65,20 @@ def start_server(servers: list[Server]) -> list[subprocess.Popen]:
 
 
 def terminate_server(servers: list[subprocess.Popen]):
+    """
+    结束服务器进程
+    """
+
     for server in servers:
         server.terminate()
         server.wait()
 
 
 def read_config() -> configparser.ConfigParser:
+    """
+    读取配置
+    """
+
     # 初始化配置解析器
     config = configparser.ConfigParser()
     # 读取 ini 文件
@@ -74,7 +87,22 @@ def read_config() -> configparser.ConfigParser:
     return config
 
 
+def get_chat_servers(config: configparser.ConfigParser):
+    """
+    读取所有聊天服务器地址
+    """
+
+    chat_servers = []
+    for chat_server_name in ['ChatServer1', 'ChatServer2']:
+        chat_servers.append([config[chat_server_name]['Host'], config[chat_server_name]['Port']])
+    return chat_servers
+
+
 def connect_redis(config: configparser.ConfigParser) -> redis.Redis:
+    """
+    连接 redis 服务器
+    """
+
     return redis.Redis(
         host=config['Redis']['Host'],
         port=config['Redis']['Port'],

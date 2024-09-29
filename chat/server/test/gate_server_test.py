@@ -21,6 +21,10 @@ class GateServerTest(unittest.TestCase):
         # 初始化配置解析器
         cls.config: configparser.ConfigParser = read_config()
 
+        # 读取所有聊天服务器地址
+        cls.chat_servers = get_chat_servers(cls.config)
+
+        # 读取 gate server 地址
         gate_server_port = cls.config['GateServer']['Port']
         cls.gate_server_url = f'http://localhost:{gate_server_port}'
 
@@ -302,6 +306,65 @@ class GateServerTest(unittest.TestCase):
         self.assertEqual(json_response['email'], email)
         self.assertEqual(json_response['password'], password2)
         self.assertEqual(json_response['verify_code'], verify_code)
+
+    def test_login(self):
+        # json 解析错误
+        incorrect_json = "{'this is not': 'a valid json'}"  # 错误：属性名没有使用双引号
+        # 设置请求头来指明发送的是JSON数据
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kLogin],
+                                 data=incorrect_json, headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'text/json')
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
+
+        # 测试账户
+        # TODO: 添加多个用户进行测试
+        user1 = f'pycstl_{time.time()}'
+        email1 = f'{user1}@test.com'
+        password1 = '123'
+        password1 = '456'
+        verify_code = "qwer"
+        self.redis.set("code_" + email1, verify_code)
+
+        # 账号密码错误
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kLogin],
+                                 json={'user': user1,
+                                       'email': email1,
+                                       'password': password1})
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kPasswordError.value)
+
+        # 注册账号
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kRegUser],
+                                 json={'user': user1,
+                                       'email': email1,
+                                       'password': password1,
+                                       'confirm': password1,
+                                       'verify_code': verify_code})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'], 'text/json')
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+        self.assertEqual(json_response['user'], user1)
+        user1_uid = json_response['uid']
+        self.assertTrue(user1_uid > 0)
+        self.assertEqual(json_response['email'], email1)
+        self.assertEqual(json_response['password'], password1)
+        self.assertEqual(json_response['confirm'], password1)
+        self.assertEqual(json_response['verify_code'], verify_code)
+
+        # 获取连接成功
+        response = requests.post(self.gate_server_url + Url_Map[ReqId.kLogin],
+                                 json={'email': email1,
+                                       'password': password1})
+        json_response = response.json()
+        self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+        self.assertEqual(json_response['uid'], user1_uid)
+        self.assertEqual(json_response['user'], user1)
+        self.assertIn([json_response['host'], json_response['port']], self.chat_servers)
+        print(json_response['token'])
 
 
 if __name__ == '__main__':
