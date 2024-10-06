@@ -15,3 +15,5 @@ enum class ErrorCode {
 
     kNetworkError = 1010,  // 网络错误
 };
+
+const char* ToString(ErrorCode err) noexcept;

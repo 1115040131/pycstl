@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "chat/common/method_url.h"
+#include "chat/common/method.h"
 #include "chat/server/common/mysql_mgr.h"
 #include "chat/server/common/redis_mgr.h"
 #include "chat/server/gate_server/define.h"

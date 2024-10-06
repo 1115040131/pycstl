@@ -5,7 +5,7 @@
 #include <QSettings>
 #include <QUrl>
 
-#include "chat/common/method_url.h"
+#include "chat/common/method.h"
 
 HttpMgr::HttpMgr() {
     QSettings settings("chat/client/config/config.ini", QSettings::IniFormat);
