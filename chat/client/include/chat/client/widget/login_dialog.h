@@ -21,6 +21,16 @@ public:
     explicit LoginDialog(QWidget* parent = nullptr);
     ~LoginDialog();
 
+private:
+    // 初始化头像
+    void initHead();
+
+    // 设置按钮是否可用
+    void enableButton(bool enable);
+
+    // 初始化 http 回复处理
+    void initHttpHandlers();
+
 signals:
     void switchRegister();
     void switchReset();
@@ -39,19 +49,18 @@ private slots:
     // http 请求完成
     void slot_login_mod_finish(ReqId req_id, const QString& res, ErrorCode err);
 
-private:
-    // 初始化头像
-    void initHead();
+    // tcp 连接完成
+    void slot_tcp_connect_finish(bool success);
 
-    // 设置按钮是否可用
-    void enableButton(bool enable);
-
-    // 初始化 http 回复处理
-    void initHttpHandlers();
+    // 登录失败
+    void slot_login_failed(ErrorCode err);
 
 private:
     static constexpr Module kModule{Module::kLogin};
 
     Ui::LoginDialog* ui;
     std::map<ReqId, std::function<void(const QJsonObject&)>> handlers_;
+
+    int uid_;
+    QString token_;
 };
