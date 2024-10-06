@@ -1,13 +1,13 @@
-#include "gate_server/logic_system.h"
+#include "chat/server/gate_server/logic_system.h"
 
 #include <nlohmann/json.hpp>
 
 #include "chat/common/method_url.h"
 #include "chat/server/common/mysql_mgr.h"
 #include "chat/server/common/redis_mgr.h"
-#include "gate_server/define.h"
-#include "gate_server/status_grpc_client.h"
-#include "gate_server/verify_grpc_client.h"
+#include "chat/server/gate_server/define.h"
+#include "chat/server/gate_server/status_grpc_client.h"
+#include "chat/server/gate_server/verify_grpc_client.h"
 
 namespace pyc {
 namespace chat {

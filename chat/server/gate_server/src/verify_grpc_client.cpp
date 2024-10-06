@@ -1,11 +1,11 @@
-#include "gate_server/verify_grpc_client.h"
+#include "chat/server/gate_server/verify_grpc_client.h"
 
 #include <grpcpp/create_channel.h>
 
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
+#include "chat/server/gate_server/define.h"
 #include "common/connection_pool.h"
-#include "gate_server/define.h"
 
 namespace pyc {
 namespace chat {

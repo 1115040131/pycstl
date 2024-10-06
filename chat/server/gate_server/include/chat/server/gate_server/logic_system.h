@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
+#include "chat/server/gate_server/http_connection.h"
 #include "common/singleton.h"
-#include "gate_server/http_connection.h"
 
 namespace pyc {
 namespace chat {

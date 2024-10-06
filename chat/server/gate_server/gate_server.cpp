@@ -1,6 +1,6 @@
 #include "chat/server/common/config_mgr.h"
-#include "gate_server/cserver.h"
-#include "gate_server/define.h"
+#include "chat/server/gate_server/cserver.h"
+#include "chat/server/gate_server/define.h"
 
 int main() {
     GET_CONFIG(port_str, "GateServer", "Port");

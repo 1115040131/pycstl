@@ -1,6 +1,6 @@
-#include "gate_server/http_connection.h"
+#include "chat/server/gate_server/http_connection.h"
 
-#include "gate_server/logic_system.h"
+#include "chat/server/gate_server/logic_system.h"
 
 namespace pyc {
 namespace chat {

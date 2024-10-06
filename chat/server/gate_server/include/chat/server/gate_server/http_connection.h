@@ -3,7 +3,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "gate_server/define.h"
+#include "chat/server/gate_server/define.h"
 
 namespace pyc {
 namespace chat {

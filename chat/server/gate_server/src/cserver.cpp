@@ -1,7 +1,7 @@
-#include "gate_server/cserver.h"
+#include "chat/server/gate_server/cserver.h"
 
 #include "chat/server/common/io_service_pool.h"
-#include "gate_server/http_connection.h"
+#include "chat/server/gate_server/http_connection.h"
 
 namespace pyc {
 namespace chat {
