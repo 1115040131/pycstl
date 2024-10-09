@@ -2,19 +2,12 @@
 
 #include <algorithm>
 
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
 #include "chat/server/common/config_mgr.h"
+#include "chat/server/common/utils.h"
 #include "chat/server/status_server/define.h"
 
 namespace pyc {
 namespace chat {
-
-static std::string generateUniqueString() {
-    boost::uuids::uuid uuid = boost::uuids::random_generator()();
-    return boost::uuids::to_string(uuid);
-};
 
 StatusServiceImpl::StatusServiceImpl() {
     for (const auto& server_name : std::vector{"ChatServer1", "ChatServer2"}) {

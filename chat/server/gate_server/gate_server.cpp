@@ -16,7 +16,7 @@ int main() {
         });
 
         std::make_shared<pyc::chat::CServer>(io_context, port)->Start();
-        PYC_LOG_INFO("Gate Server listening at port {}", port);
+        PYC_LOG_INFO("Gate Server listening on port {}", port);
         io_context.run();
     } catch (const std::exception& e) {
         PYC_LOG_ERROR("{}", e.what());

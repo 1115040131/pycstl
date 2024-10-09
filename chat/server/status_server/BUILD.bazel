@@ -18,8 +18,6 @@ cc_library(
         "//chat/server/proto:status_cc_grpc_proto",
         "//common",
         "//logger",
-        "@boost//:asio",
-        "@boost//:uuid",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
