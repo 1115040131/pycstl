@@ -3,14 +3,7 @@
 #include "chat/server/gate_server/define.h"
 
 int main() {
-    GET_CONFIG(port_str, "GateServer", "Port");
-
-    char* end;
-    unsigned short port = std::strtoul(port_str.c_str(), &end, 10);
-    if (end == port_str.c_str() || *end != '\0') {
-        PYC_LOG_ERROR("Config Port: {} Invalid", port_str);
-        return 1;
-    }
+    GET_CONFIG_INT(port, "GateServer", "Port");
 
     try {
         boost::asio::io_context io_context;
