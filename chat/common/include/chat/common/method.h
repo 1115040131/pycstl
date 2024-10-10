@@ -1,6 +1,10 @@
 #pragma once
 
-enum class ReqId {
+#include <cstdint>
+
+enum class ReqId : uint16_t {
+    kInvalid = 0,           // 无效请求
+
     kGetVerifyCode = 1001,  // 获取验证码
     kRegUser = 1002,        // 注册用户
     kResetPassword = 1003,  // 重置密码

@@ -105,6 +105,7 @@ def main():
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
         "chat_status_server": lambda args: run_bazel_run('//chat/server/status_server', args=args),
+        "chat_chat_server": lambda args: run_bazel_run('//chat/server/chat_server', args=args),
         "chat_prepare": lambda args: (
             targets["chat_redis_server"](args=[]),
             targets["chat_mysql_server"](args=[]),
@@ -118,7 +119,7 @@ def main():
             run_cmd(f'sudo rm -rf {log_direction}'),
         ),
 
-        # chat server test
+        # chat test
         "chat_server_common_test": lambda args: (
             targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/server/common/test:common_test', args=args),
@@ -130,6 +131,10 @@ def main():
         "chat_status_server_test": lambda args: (
             targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/server/test:status_server_test', args=args)
+        ),
+        "chat_test": lambda args: (
+            targets["chat_prepare"](args=[]),
+            run_bazel_test('//chat/...', args=args),
         ),
 
         # chat client
