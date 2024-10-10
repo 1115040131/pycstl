@@ -165,5 +165,23 @@ TEST(MysqlMgrTest, CheckPassword) {
     // TODO: 删除测试数据
 }
 
+TEST(MysqlMgrTest, GetUser) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    // 根据当前时间戳生成用户和邮箱用于测试
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
+    auto email1 = fmt::format("{}@test.com", user1);
+    auto password1 = "123";
+
+    // 注册用户并查询
+    auto uid = mysql_mgr.RegUser(user1, email1, password1).value();
+    EXPECT_TRUE(uid > 0);
+    EXPECT_EQ(mysql_mgr.GetUser(uid).value(), (UserInfo{uid, user1, password1, email1}));
+    // 查询不存在的账户
+    EXPECT_FALSE(mysql_mgr.GetUser(uid + 1));
+
+    // TODO: 删除测试数据
+}
+
 }  // namespace chat
 }  // namespace pyc
