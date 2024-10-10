@@ -5,8 +5,8 @@
 #include "chat/common/method.h"
 #include "chat/server/common/mysql_mgr.h"
 #include "chat/server/common/redis_mgr.h"
+#include "chat/server/common/status_grpc_client.h"
 #include "chat/server/gate_server/define.h"
-#include "chat/server/gate_server/status_grpc_client.h"
 #include "chat/server/gate_server/verify_grpc_client.h"
 
 namespace pyc {

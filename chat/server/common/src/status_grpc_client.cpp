@@ -1,10 +1,10 @@
-#include "chat/server/gate_server/status_grpc_client.h"
+#include "chat/server/common/status_grpc_client.h"
 
 #include <grpcpp/create_channel.h>
 
+#include "chat/common/error_code.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
-#include "chat/server/gate_server/define.h"
 #include "common/connection_pool.h"
 
 namespace pyc {

@@ -13,14 +13,11 @@ cc_library(
     copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
-        "//chat/common",
         "//chat/server/common",
-        "//chat/server/proto:status_cc_grpc_proto",
         "//chat/server/proto:verify_cc_grpc_proto",
         "//common",
         "//logger",
         "@boost//:beast",
-        "@com_github_grpc_grpc//:grpc++",
         "@nlohmann_json//:json",
     ],
 )
