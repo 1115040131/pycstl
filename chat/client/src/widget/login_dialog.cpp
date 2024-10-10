@@ -122,7 +122,7 @@ void LoginDialog::slot_tcp_connect_finish(bool success) {
 
         // 发送登录信息给 chat server 进行逻辑意义上的登录
         QJsonDocument doc(root);
-        TcpMgr::GetInstance().sig_send_data(ReqId::kChatLogin, doc.toJson(QJsonDocument::Indented));
+        emit TcpMgr::GetInstance().sig_send_data(ReqId::kChatLogin, doc.toJson(QJsonDocument::Indented));
     } else {
         ui->err_tip->showTip("网络异常", false);
         enableButton(true);

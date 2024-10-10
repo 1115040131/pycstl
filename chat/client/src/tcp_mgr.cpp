@@ -87,7 +87,7 @@ void TcpMgr::initHttpHandlers() {
 
         auto error = static_cast<ErrorCode>(json["error"].toInt());
         if (error != ErrorCode::kSuccess) {
-            qDebug() << "Login Failed, err is" << static_cast<int>(error);
+            qDebug() << "Login Failed, err is" << ToString(error);
             emit sig_login_failed(error);
             return;
         }
