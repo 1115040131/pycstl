@@ -17,30 +17,26 @@ os.environ['PATH'] = '/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sb
 
 def run_bazel_build(target, check=False, args=[]):
     command = f'bazel build {target} {" ".join(args)}'
-    logger.info(command)
-    subprocess.run(shlex.split(command), check=check)
+    run_cmd(command, check)
 
 
 def run_bazel_test(target, test_output=True, check=False, args=[]):
     command = f'bazel test {target} {" ".join(args)}'
     if test_output:
         command += ' --test_output=all'
-    logger.info(command)
-    subprocess.run(shlex.split(command), check=check)
+    run_cmd(command, check)
 
 
 def run_bazel_run(target, check=False, args=[]):
     command = f'bazel run {target} {" ".join(args)}'
-    logger.info(command)
-    subprocess.run(shlex.split(command), check=check)
+    run_cmd(command, check)
 
 
 def run_valgrind(target, args=[]):
     command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args)}'
     if len(args) == 0:
         command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
-    logger.info(command)
-    subprocess.run(shlex.split(command))
+    run_cmd(command, check)
 
 
 def main():

@@ -12,7 +12,14 @@ logger = Logger()
 
 def run_cmd(cmd, check=True):
     logger.info(cmd)
-    subprocess.run(shlex.split(cmd), check=check)
+    try:
+        subprocess.run(shlex.split(cmd), check=check)
+    except subprocess.CalledProcessError as e:
+        logger.warn(f"Command '{e.cmd}' returned non-zero exit status {e.returncode}.")
+    except KeyboardInterrupt:
+        logger.warn("Keyboard interrupt received, stopping.")
+    except Exception as e:
+        logger.warn(f"An unexpected error occurred: {e}")
 
 
 # 创建目录并设置权限的函数
