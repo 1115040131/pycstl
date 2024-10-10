@@ -4,7 +4,7 @@ import time
 import unittest
 
 import grpc
-from status_pb2 import GetChatServerReq
+from status_pb2 import GetChatServerReq, LoginReq
 from status_pb2_grpc import StatusServiceStub
 
 from test_define import *
@@ -47,6 +47,32 @@ class StatusServerTest(unittest.TestCase):
 
         response = self.client.GetChatServer(request)
         print(response.token)
+
+    def test_Login(self):
+        # 无效的 uid
+        uid = 1234567
+        request = LoginReq(uid=uid, token='token')
+        response = self.client.Login(request)
+        self.assertEqual(response.error, ErrorCode.kUidInvalid.value)
+
+        # 分配聊天服务器获取 token
+        request = GetChatServerReq(uid=uid)
+        response = self.client.GetChatServer(request)
+        self.assertEqual(response.error, ErrorCode.kSuccess.value)
+        self.assertIn([response.host, response.port], self.chat_servers)
+        token = response.token
+
+        # 无效的 token
+        request = LoginReq(uid=uid, token='token')
+        response = self.client.Login(request)
+        self.assertEqual(response.error, ErrorCode.kTokenInvalid.value)
+
+        # 登录成功
+        request = LoginReq(uid=uid, token=token)
+        response = self.client.Login(request)
+        self.assertEqual(response.error, ErrorCode.kSuccess.value)
+        self.assertEqual(response.uid, uid)
+        self.assertEqual(response.token, token)
 
 
 if __name__ == '__main__':

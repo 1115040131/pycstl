@@ -36,7 +36,7 @@ def run_valgrind(target, args=[]):
     command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args)}'
     if len(args) == 0:
         command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
-    run_cmd(command, check)
+    run_cmd(command)
 
 
 def main():

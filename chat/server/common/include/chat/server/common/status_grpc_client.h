@@ -19,6 +19,8 @@ public:
 
     GetChatServerRsp GetChatServer(int uid);
 
+    LoginRsp Login(int uid, const std::string& token);
+
 private:
     std::unique_ptr<StatusConnectionPool> pool_;
 };

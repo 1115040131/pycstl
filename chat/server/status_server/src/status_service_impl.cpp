@@ -55,5 +55,27 @@ grpc::Status StatusServiceImpl::GetChatServer(grpc::ServerContext*, const pyc::c
     return grpc::Status::OK;
 }
 
+grpc::Status StatusServiceImpl::Login(grpc::ServerContext*, const pyc::chat::LoginReq* request,
+                                      pyc::chat::LoginRsp* response) {
+    auto uid = request->uid();
+    auto token = request->token();
+
+    std::lock_guard<std::mutex> lock(mtx_);
+    auto iter = tokens_.find(uid);
+    if (iter == tokens_.end()) {
+        response->set_error(static_cast<int>(ErrorCode::kUidInvalid));
+        return grpc::Status::OK;
+    }
+    if (iter->second != token) {
+        response->set_error(static_cast<int>(ErrorCode::kTokenInvalid));
+        return grpc::Status::OK;
+    }
+    response->set_error(static_cast<int>(ErrorCode::kSuccess));
+    response->set_uid(uid);
+    response->set_token(token);
+
+    return grpc::Status::OK;
+}
+
 }  // namespace chat
 }  // namespace pyc

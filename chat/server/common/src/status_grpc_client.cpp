@@ -50,5 +50,27 @@ GetChatServerRsp StatusGrpcClient::GetChatServer(int uid) {
     return response;
 }
 
+LoginRsp StatusGrpcClient::Login(int uid, const std::string& token) {
+    auto connection = pool_->GetConnection();
+    if (!connection) {
+        return {};
+    }
+    Defer defer([this, &connection]() { this->pool_->ReturnConnection(std::move(*connection)); });
+
+    grpc::ClientContext context;
+    LoginReq request;
+    request.set_uid(uid);
+    request.set_token(token);
+
+    LoginRsp response;
+    auto status = connection.value()->Login(&context, request, &response);
+    if (status.ok()) {
+        return response;
+    }
+
+    response.set_error(static_cast<int32_t>(ErrorCode::kRpcFailed));
+    return response;
+}
+
 }  // namespace chat
 }  // namespace pyc

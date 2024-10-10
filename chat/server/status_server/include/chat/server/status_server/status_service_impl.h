@@ -26,6 +26,9 @@ public:
     virtual grpc::Status GetChatServer(grpc::ServerContext* context, const pyc::chat::GetChatServerReq* request,
                                        pyc::chat::GetChatServerRsp* response) override;
 
+    virtual grpc::Status Login(grpc::ServerContext* context, const pyc::chat::LoginReq* request,
+                               pyc::chat::LoginRsp* response) override;
+
 private:
     std::optional<ChatServer> selectChatServer();
 
