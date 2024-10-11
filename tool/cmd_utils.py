@@ -38,7 +38,6 @@ def setup_directory(path):
             logger.warn(f"setfacl: command not found, skip sudo setfacl -m u:{uid}:rwx {path}")
 
 
-
 def tmux_send_keys(keys, session=None, window=None, pane=None, enter=True):
     """
     Send keys to a specific tmux session, window, or pane.
@@ -74,35 +73,48 @@ def tmux_send_keys(keys, session=None, window=None, pane=None, enter=True):
     run_cmd(cmd)
 
 
-def run_tmux(*args):
-    argc = len(args)
-    if argc < 1:
-        logger.error("At least one arg")
+def run_tmux(windows_commands_dict: dict):
+    if not windows_commands_dict:
+        logger.error("The commands dictionary must not be empty.")
         return
-
-    for arg in args:
-        logger.debug(arg)
 
     session_name = "run_tmux"
     run_cmd(f"tmux kill-session -t {session_name}", check=False)
-    run_cmd(f"tmux new-session -d -s {session_name}")
+    run_cmd(f"tmux new-session -d -s {session_name} -n {list(windows_commands_dict.keys())[0]}")
+    # 启用鼠标控制
+    run_cmd("tmux set -g mouse on")
 
-    # 均分成 n 个窗口
-    for i in range(argc - 1):
-        run_cmd('tmux split-window -h')
-    run_cmd('tmux select-layout even-horizontal')
+    first_window = True
+    for window_name, pane_commands in windows_commands_dict.items():
+        if not first_window:
+            # 从第二个窗口开始，需要先创建新窗口
+            run_cmd(f'tmux new-window -t {session_name} -n {window_name}')
+        else:
+            first_window = False
 
-    # 分别在每一个窗口中执行对应命令
-    for i, sub_command in enumerate(args):
-        run_cmd(f'tmux select-pane -t {i}')
-        tmux_send_keys(sub_command)
+        for pane_index, command in enumerate(pane_commands):
+            if pane_index > 0:
+                # 在当前窗口中水平分割出新面板
+                run_cmd('tmux split-window -h')
+            # 在新面板中发送命令
+            tmux_send_keys(command)
+
+            # 均衡分配面板空间
+            run_cmd('tmux select-layout even-horizontal')
+
+        # 切换到第一个面板
+        run_cmd('tmux select-pane -t 0')
 
     try:
         # 附加到tmux会话以查看输出
         run_cmd(f"tmux attach-session -t {session_name}")
     finally:
-        for i in range(argc):
-            run_cmd(f"tmux send-keys -t {session_name}:0.{i} C-c")
+        # 清理：发送 Ctrl+C 到所有面板，并最终杀死会话
+        for window_index, window_name in enumerate(windows_commands_dict.keys()):
+            pane_count = len(windows_commands_dict[window_name])
+            for pane_index in range(pane_count):
+                run_cmd(f"tmux send-keys -t {session_name}:{window_index}.{pane_index} C-c")
+            run_cmd(f"tmux kill-window -t {session_name}:{window_index}")
         run_cmd(f"tmux kill-session -t {session_name}")
 
 

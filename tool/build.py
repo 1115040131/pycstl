@@ -140,11 +140,17 @@ def main():
         "chat_run": lambda args: (
             run_bazel_build('//chat/...', args),
             targets["chat_prepare"](args=[]),
-            run_tmux(f"python3 {tool_path / 'build.py'} chat_gate_server",
-                     f"python3 {tool_path / 'build.py'} chat_verify_server",
-                     f"python3 {tool_path / 'build.py'} chat_status_server",
-                     f"python3 {tool_path / 'build.py'} chat_chat_server",
-                     f"python3 {tool_path / 'build.py'} chat_client")
+            run_tmux({
+                "GateServer": [
+                    f"python3 {tool_path / 'build.py'} chat_gate_server",
+                    f"python3 {tool_path / 'build.py'} chat_verify_server",
+                    f"python3 {tool_path / 'build.py'} chat_status_server",
+                ],
+                "ChatServer": [
+                    f"python3 {tool_path / 'build.py'} chat_chat_server",
+                    f"python3 {tool_path / 'build.py'} chat_client"
+                ],
+            })
         ),
 
         ######################### build for common #########################
