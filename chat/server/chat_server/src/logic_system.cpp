@@ -62,7 +62,7 @@ void LogicSystem::DealMsg() {
 void LogicSystem::DealFirstMsg() {
     auto& msg_node = msg_queue_.front();
     auto msg_id = msg_node->recv_node_->GetReqId();
-    PYC_LOG_DEBUG("recv msg id = {}", static_cast<int>(msg_id));
+    PYC_LOG_DEBUG("recv msg id: {}", ToString(msg_id));
     auto iter = callback_map_.find(msg_id);
     if (iter != callback_map_.end()) {
         iter->second(msg_node->session_, std::string(msg_node->recv_node_->Data(), msg_node->recv_node_->Size()));
@@ -71,6 +71,8 @@ void LogicSystem::DealFirstMsg() {
 }
 
 void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
+    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetUuid(), msg_data);
+
     nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
     int uid = src_root.value("uid", 0);
 
