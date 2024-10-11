@@ -1,5 +1,12 @@
 #include "chat/server/chat_server/logic_system.h"
 
+#include <nlohmann/json.hpp>
+
+#include "chat/common/error_code.h"
+#include "chat/server/common/defer.h"
+#include "chat/server/common/mysql_mgr.h"
+#include "chat/server/common/status_grpc_client.h"
+
 namespace pyc {
 namespace chat {
 
@@ -55,7 +62,7 @@ void LogicSystem::DealMsg() {
 void LogicSystem::DealFirstMsg() {
     auto& msg_node = msg_queue_.front();
     auto msg_id = msg_node->recv_node_->GetReqId();
-    fmt::println("recv msg id = {}", static_cast<int>(msg_id));
+    PYC_LOG_DEBUG("recv msg id = {}", static_cast<int>(msg_id));
     auto iter = callback_map_.find(msg_id);
     if (iter != callback_map_.end()) {
         iter->second(msg_node->session_, std::string(msg_node->recv_node_->Data(), msg_node->recv_node_->Size()));
@@ -64,8 +71,31 @@ void LogicSystem::DealFirstMsg() {
 }
 
 void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    (void)session;
-    (void)msg_data;
+    nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
+    int uid = src_root.value("uid", 0);
+
+    // 从状态服务器查询 token 是否正确
+    auto response = StatusGrpcClient::GetInstance().Login(uid, src_root.value("token", ""));
+    nlohmann::json root;
+    Defer defer([this, &session, &root]() { session->Send(root.dump(), ReqId::kChatLoginRes); });
+
+    root["error"] = response.error();
+    if (response.error()) {
+        PYC_LOG_ERROR("grpc Login fail, error is {}", response.error());
+        return;
+    }
+
+    // 内存中查询用户信息
+    // TODO: 对数据库查询结果进行缓存
+    auto user_info = MysqlMgr::GetInstance().GetUser(uid);
+    if (!user_info) {
+        root["error"] = static_cast<int>(ErrorCode::kUidInvalid);
+        return;
+    }
+
+    root["uid"] = user_info->uid;
+    root["token"] = response.token();
+    root["name"] = user_info->name;
 }
 
 }  // namespace chat

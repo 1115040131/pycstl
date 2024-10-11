@@ -13,7 +13,7 @@ int main() {
             io_context.stop();
         });
 
-        GET_CONFIG_INT(port, "ChatServer1", "Port");
+        GET_CONFIG_INT(port, "ChatServer2", "Port");
         pyc::chat::CServer server(io_context, port);
         io_context.run();
     } catch (const std::exception& e) {

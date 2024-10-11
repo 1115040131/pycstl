@@ -33,7 +33,7 @@ private:
     std::optional<ChatServer> selectChatServer();
 
 private:
-    int server_index_ = 0;
+    // int server_index_ = 0;
     std::unordered_map<std::string, ChatServer> servers_;
     std::unordered_map<int, std::string> tokens_;
     std::mutex mtx_;

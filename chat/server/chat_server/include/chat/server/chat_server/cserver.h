@@ -23,6 +23,8 @@ public:
 private:
     void StartAccept();
 
+    void printSessions();
+
 private:
     boost::asio::io_context& io_context_;
     tcp::acceptor acceptor_;

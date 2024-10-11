@@ -92,6 +92,7 @@ void TcpMgr::initHttpHandlers() {
             return;
         }
 
+        qDebug() << "Login Success!";
         emit sig_switch_chatdlg();
     });
 }

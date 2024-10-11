@@ -17,6 +17,8 @@ CServer::~CServer() { PYC_LOG_INFO("Chat Server destruct"); }
 void CServer::ClearSession(const std::string& uuid) {
     std::lock_guard<std::mutex> lock(mutex_);
     sessions_.erase(uuid);
+
+    printSessions();  // debug
 }
 
 void CServer::StartAccept() {
@@ -28,6 +30,8 @@ void CServer::StartAccept() {
                 session->Start();
                 std::lock_guard<std::mutex> lock(mutex_);
                 sessions_.emplace(session->GetUuid(), session);
+
+                printSessions();  // debug
             } else {
                 PYC_LOG_ERROR("{}", ec.message());
             }
@@ -36,6 +40,14 @@ void CServer::StartAccept() {
             PYC_LOG_ERROR("{}", e.what());
         }
     });
+}
+
+void CServer::printSessions() {
+    PYC_LOG_DEBUG("========== Sessions ==========");
+    for (const auto& [uuid, session] : sessions_) {
+        PYC_LOG_DEBUG("uuid: {}", uuid);
+    }
+    PYC_LOG_DEBUG("==============================");
 }
 
 }  // namespace chat

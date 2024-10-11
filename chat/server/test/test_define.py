@@ -57,7 +57,7 @@ def start_server(servers: list[Server]) -> list[subprocess.Popen]:
 
     server_map = {
         Server.kGateServer: 'chat/server/gate_server/gate_server',
-        Server.kStatusServer: 'chat/server/verify_server/verify_server_/verify_server',
+        Server.kVerifyServer: 'chat/server/verify_server/verify_server_/verify_server',
         Server.kStatusServer: 'chat/server/status_server/status_server'
     }
 

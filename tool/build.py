@@ -143,6 +143,7 @@ def main():
             run_tmux(f"python3 {tool_path / 'build.py'} chat_gate_server",
                      f"python3 {tool_path / 'build.py'} chat_verify_server",
                      f"python3 {tool_path / 'build.py'} chat_status_server",
+                     f"python3 {tool_path / 'build.py'} chat_chat_server",
                      f"python3 {tool_path / 'build.py'} chat_client")
         ),
 
