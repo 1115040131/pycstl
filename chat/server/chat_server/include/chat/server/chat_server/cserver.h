@@ -14,7 +14,7 @@ class CSession;
 
 class CServer {
 public:
-    CServer(boost::asio::io_context& io_context, unsigned short port);
+    CServer(boost::asio::io_context& io_context, const std::string& name, unsigned short port);
 
     ~CServer();
 
@@ -27,6 +27,7 @@ private:
 
 private:
     boost::asio::io_context& io_context_;
+    std::string name_; // 服务器名称
     tcp::acceptor acceptor_;
     std::map<std::string, std::shared_ptr<CSession>> sessions_;
     std::mutex mutex_;

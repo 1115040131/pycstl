@@ -7,14 +7,15 @@
 namespace pyc {
 namespace chat {
 
-CServer::CServer(boost::asio::io_context& io_context, unsigned short port)
-    : io_context_(io_context), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
-    PYC_LOG_INFO("Chat Server listening on port {}", port);
-    StatusGrpcClient::GetInstance(); // 初始化 grpc 客户端
+CServer::CServer(boost::asio::io_context& io_context, const std::string& name, unsigned short port)
+    : io_context_(io_context), name_(name), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
+    StatusGrpcClient::GetInstance();  // 初始化 grpc 客户端
     StartAccept();
+
+    PYC_LOG_INFO("{} listening on port {}", name_, port);
 }
 
-CServer::~CServer() { PYC_LOG_INFO("Chat Server destruct"); }
+CServer::~CServer() { PYC_LOG_INFO("{} destruct", name_); }
 
 void CServer::ClearSession(const std::string& uuid) {
     std::lock_guard<std::mutex> lock(mutex_);

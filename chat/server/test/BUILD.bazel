@@ -18,6 +18,7 @@ py_library(
     name = "chat_server_test_lib",
     srcs = ["test_define.py"],
     data = [
+        "//chat/server/chat_server",
         "//chat/server/gate_server",
         "//chat/server/status_server",
     ],
@@ -40,4 +41,11 @@ py_test(
         ":chat_server_test_lib",
         ":status_py_grpc",
     ],
+)
+
+py_test(
+    name = "chat_server_test",
+    srcs = ["chat_server_test.py"],
+    imports = ["."],
+    deps = [":chat_server_test_lib"],
 )

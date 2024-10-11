@@ -128,6 +128,10 @@ def main():
             targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/server/test:status_server_test', args=args)
         ),
+        "chat_chat_server_test": lambda args: (
+            targets["chat_prepare"](args=[]),
+            run_bazel_test('//chat/server/test:chat_server_test', args=args)
+        ),
         "chat_test": lambda args: (
             targets["chat_prepare"](args=[]),
             run_bazel_test('//chat/...', args=args),
@@ -147,7 +151,8 @@ def main():
                     f"python3 {tool_path / 'build.py'} chat_status_server",
                 ],
                 "ChatServer": [
-                    f"python3 {tool_path / 'build.py'} chat_chat_server",
+                    f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer1",
+                    f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer2",
                     f"python3 {tool_path / 'build.py'} chat_client"
                 ],
             })

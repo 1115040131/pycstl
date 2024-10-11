@@ -74,15 +74,22 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetUuid(), msg_data);
 
     nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
+    nlohmann::json root;
+    Defer defer([this, &session, &root]() { session->Send(root.dump(), ReqId::kChatLoginRes); });
+
+    if (src_root.is_discarded()) {
+        PYC_LOG_ERROR("Failed to parse Json data");
+        root["error"] = ErrorCode::kJsonError;
+        return;
+    }
+
     int uid = src_root.value("uid", 0);
 
     // 从状态服务器查询 token 是否正确
     auto response = StatusGrpcClient::GetInstance().Login(uid, src_root.value("token", ""));
-    nlohmann::json root;
-    Defer defer([this, &session, &root]() { session->Send(root.dump(), ReqId::kChatLoginRes); });
 
-    root["error"] = response.error();
     if (response.error()) {
+        root["error"] = response.error();
         PYC_LOG_ERROR("grpc Login fail, error is {}", response.error());
         return;
     }
@@ -95,6 +102,7 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
         return;
     }
 
+    root["error"] = static_cast<int>(ErrorCode::kSuccess);
     root["uid"] = user_info->uid;
     root["token"] = response.token();
     root["name"] = user_info->name;

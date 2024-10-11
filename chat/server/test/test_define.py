@@ -1,5 +1,6 @@
 import configparser
 import redis
+import shlex
 import subprocess
 
 
@@ -48,6 +49,8 @@ class Server(Enum):
     kGateServer = 1
     kVerifyServer = 2
     kStatusServer = 3
+    kChatServer1 = 4
+    kChatServer2 = 5
 
 
 def start_server(servers: list[Server]) -> list[subprocess.Popen]:
@@ -58,12 +61,14 @@ def start_server(servers: list[Server]) -> list[subprocess.Popen]:
     server_map = {
         Server.kGateServer: 'chat/server/gate_server/gate_server',
         Server.kVerifyServer: 'chat/server/verify_server/verify_server_/verify_server',
-        Server.kStatusServer: 'chat/server/status_server/status_server'
+        Server.kStatusServer: 'chat/server/status_server/status_server',
+        Server.kChatServer1: 'chat/server/chat_server/chat_server ChatServer1',
+        Server.kChatServer2: 'chat/server/chat_server/chat_server ChatServer2',
     }
 
     processes = []
     for server in servers:
-        process = subprocess.Popen(server_map[server])
+        process = subprocess.Popen(shlex.split(server_map[server]))
         processes.append(process)
 
     return processes
