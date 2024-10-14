@@ -13,11 +13,6 @@ from test_define import *
 class StatusServerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # 启动服务器
-        cls.processes = start_server([
-            Server.kStatusServer
-        ])
-
         # 初始化配置解析器
         cls.config: configparser.ConfigParser = read_config()
 
@@ -30,13 +25,9 @@ class StatusServerTest(unittest.TestCase):
         channel = grpc.insecure_channel(f'{status_server_host}:{status_server_port}')
         cls.client = StatusServiceStub(channel)
 
-        # 给服务器足够时间启动
-        time.sleep(1)
-
     @classmethod
     def tearDownClass(cls):
-        # 停止服务器
-        terminate_server(cls.processes)
+        pass
 
     def test_GetChatServer(self):
         request = GetChatServerReq(uid=12345)

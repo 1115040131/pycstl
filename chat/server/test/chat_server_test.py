@@ -68,14 +68,6 @@ class Message:
 class ChatServerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # 启动服务器
-        cls.processes = start_server([
-            Server.kGateServer,
-            Server.kStatusServer,
-            Server.kChatServer1,
-            Server.kChatServer2,
-        ])
-
         # 初始化配置解析器
         cls.config: configparser.ConfigParser = read_config()
 
@@ -89,12 +81,11 @@ class ChatServerTest(unittest.TestCase):
         # 创建 redis 连接
         cls.redis: redis.Redis = connect_redis(cls.config)
 
-        time.sleep(1)  # 给服务器足够时间启动
-
     @classmethod
     def tearDownClass(cls):
-        # 停止服务器
-        terminate_server(cls.processes)
+        # 关闭服务器连接
+        if cls.client_socket:
+            cls.client_socket.close()
 
     def test_pack(self):
         """
@@ -188,8 +179,8 @@ class ChatServerTest(unittest.TestCase):
         token = json_response['token']
 
         # 连接服务器
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((host, port))
+        ChatServerTest.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ChatServerTest.client_socket.connect((host, port))
 
         # json 错误
         response = Message.send_and_receive(self.client_socket, Message(ReqId.kChatLogin, 'hello'))

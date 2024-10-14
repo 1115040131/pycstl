@@ -10,14 +10,6 @@ from test_define import *
 class GateServerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # 启动服务器
-        cls.processes = start_server([
-            Server.kGateServer,
-            # 防止邮件过多, 不启动验证服务器
-            # Server.kVerifyServer,
-            Server.kStatusServer
-        ])
-
         # 初始化配置解析器
         cls.config: configparser.ConfigParser = read_config()
 
@@ -31,12 +23,9 @@ class GateServerTest(unittest.TestCase):
         # 创建 redis 连接
         cls.redis: redis.Redis = connect_redis(cls.config)
 
-        time.sleep(1)  # 给服务器足够时间启动
-
     @classmethod
     def tearDownClass(cls):
-        # 停止服务器
-        terminate_server(cls.processes)
+        pass
 
     def test_not_found(self):
         # 不存在的 url

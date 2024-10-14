@@ -1,4 +1,5 @@
 import configparser
+import os
 import redis
 import shlex
 import subprocess
@@ -53,7 +54,7 @@ class Server(Enum):
     kChatServer2 = 5
 
 
-def start_server(servers: list[Server]) -> list[subprocess.Popen]:
+def start_server(servers: list[Server], log_dir='stdout') -> list[subprocess.Popen]:
     """
     启动服务器进程
     """
@@ -66,10 +67,29 @@ def start_server(servers: list[Server]) -> list[subprocess.Popen]:
         Server.kChatServer2: 'chat/server/chat_server/chat_server ChatServer2',
     }
 
+    if log_dir != 'stdout':
+        # 确保日志目录存在
+        os.makedirs(log_dir, exist_ok=True)
+
     processes = []
     for server in servers:
-        process = subprocess.Popen(shlex.split(server_map[server]))
-        processes.append(process)
+        if log_dir != 'stdout':
+            # 定义日志文件路径
+            log_file_path = os.path.join(log_dir, f'{server.name}.log')
+            # print(os.path.abspath(log_file_path))
+
+            # 打开日志文件
+            with open(log_file_path, 'a') as log_file:
+                # 启动进程并重定向 stdout 和 stderr 到日志文件
+                process = subprocess.Popen(
+                    shlex.split(server_map[server]),
+                    stdout=log_file,
+                    stderr=subprocess.STDOUT
+                )
+                processes.append(process)
+        else:
+            process = subprocess.Popen(shlex.split(server_map[server]))
+            processes.append(process)
 
     return processes
 

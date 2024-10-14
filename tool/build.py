@@ -122,15 +122,19 @@ def main():
         ),
         "chat_gate_server_test": lambda args: (
             targets["chat_prepare"](args=[]),
-            run_bazel_test('//chat/server/test:gate_server_test', args=args)
+            run_bazel_test('//chat/server/test:run_all_test --test_arg=-k --test_arg=GateServerTest', args=args)
         ),
         "chat_status_server_test": lambda args: (
             targets["chat_prepare"](args=[]),
-            run_bazel_test('//chat/server/test:status_server_test', args=args)
+            run_bazel_test('//chat/server/test:run_all_test --test_arg=-k --test_arg=StatusServerTest', args=args)
         ),
         "chat_chat_server_test": lambda args: (
             targets["chat_prepare"](args=[]),
-            run_bazel_test('//chat/server/test:chat_server_test', args=args)
+            run_bazel_test('//chat/server/test:run_all_test --test_arg=-k --test_arg=ChatServerTest', args=args)
+        ),
+        "chat_server_test": lambda args: (
+            targets["chat_prepare"](args=[]),
+            run_bazel_test('//chat/server/test:run_all_test --test_arg=--log_dir --test_arg=logs', args=args)
         ),
         "chat_test": lambda args: (
             targets["chat_prepare"](args=[]),

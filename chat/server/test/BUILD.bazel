@@ -13,39 +13,24 @@ py_grpc_library(
     deps = [":status_py_proto"],
 )
 
-# test lib
-py_library(
-    name = "chat_server_test_lib",
-    srcs = ["test_define.py"],
+# test
+py_test(
+    name = "run_all_test",
+    srcs = [
+        "chat_server_test.py",
+        "gate_server_test.py",
+        "run_all_test.py",
+        "status_server_test.py",
+        "test_define.py",
+    ],
     data = [
         "//chat/server/chat_server",
         "//chat/server/gate_server",
         "//chat/server/status_server",
     ],
-    deps = [requirement("redis")],
-)
-
-# test
-py_test(
-    name = "gate_server_test",
-    srcs = ["gate_server_test.py"],
-    imports = ["."],
-    deps = [":chat_server_test_lib"],
-)
-
-py_test(
-    name = "status_server_test",
-    srcs = ["status_server_test.py"],
     imports = ["."],
     deps = [
-        ":chat_server_test_lib",
+        requirement("redis"),
         ":status_py_grpc",
     ],
-)
-
-py_test(
-    name = "chat_server_test",
-    srcs = ["chat_server_test.py"],
-    imports = ["."],
-    deps = [":chat_server_test_lib"],
 )
