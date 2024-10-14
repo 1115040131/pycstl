@@ -3,6 +3,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include "chat/client/user_mgr.h"
+
 TcpMgr::TcpMgr() {
     QObject::connect(&socket_, &QTcpSocket::connected, [this]() {
         qDebug() << "Connected to server!";
@@ -93,6 +95,9 @@ void TcpMgr::initHttpHandlers() {
         }
 
         qDebug() << "Login Success!";
+        UserMgr::GetInstance().SetUid(json["uid"].toInt());
+        UserMgr::GetInstance().SetName(json["name"].toString());
+        UserMgr::GetInstance().SetToken(json["token"].toString());
         emit sig_switch_chatdlg();
     });
 }

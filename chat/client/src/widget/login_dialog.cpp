@@ -65,6 +65,12 @@ void LoginDialog::enableButton(bool enable) {
 void LoginDialog::initHttpHandlers() {
     handlers_.emplace(ReqId::kLogin, [this](const QJsonObject& json) {
         auto error = static_cast<ErrorCode>(json["error"].toInt());
+        if (error == ErrorCode::kPasswordError) {
+            ui->err_tip->showTip(tr("用户名或密码错误"), false);
+            enableButton(true);
+            return;
+        }
+
         if (error != ErrorCode::kSuccess) {
             ui->err_tip->showTip(tr("参数错误"), false);
             enableButton(true);
