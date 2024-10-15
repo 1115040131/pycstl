@@ -8,6 +8,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+class ChatDialog;
 class LoginDialog;
 class RegisterDialog;
 class ResetDialog;
@@ -29,8 +30,12 @@ private slots:
     // 切换到忘记密码界面
     void SlotSwitchReset();
 
+    // 切换到聊天界面
+    void SlotSwitchChat();
+
 private:
     Ui::MainWindow* ui;
+    ChatDialog* chat_dialog_;
     LoginDialog* login_dialog_;
     RegisterDialog* register_dialog_;
     ResetDialog* reset_dialog_;

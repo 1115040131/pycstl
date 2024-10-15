@@ -91,8 +91,6 @@ void LoginDialog::initHttpHandlers() {
         qDebug() << "kLogin finish: uid:" << server_info.uid << "host:" << server_info.host
                  << "port:" << server_info.port << "token:" << server_info.token;
         emit sig_connect_tcp(server_info);
-        // TODO: for debug
-        enableButton(true);
     });
 }
 
