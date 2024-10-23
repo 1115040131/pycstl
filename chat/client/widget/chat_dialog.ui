@@ -205,7 +205,7 @@
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLineEdit" name="search_edit">
+          <widget class="CustomizeEdit" name="search_edit">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -253,10 +253,13 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="chat_user_list"/>
+       <widget class="ChatUserList" name="chat_user_list"/>
       </item>
       <item>
        <widget class="QListWidget" name="search_list"/>
+      </item>
+      <item>
+       <widget class="QListWidget" name="con_user_list"/>
       </item>
      </layout>
     </widget>
@@ -553,6 +556,16 @@
    <class>ClickedBtn</class>
    <extends>QPushButton</extends>
    <header>chat/client/util/clicked_btn.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomizeEdit</class>
+   <extends>QLineEdit</extends>
+   <header>chat/client/util/customize_edit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ChatUserList</class>
+   <extends>QListWidget</extends>
+   <header>chat/client/util/chat_user_list.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
