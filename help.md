@@ -50,6 +50,12 @@ sudo usermod -aG docker your_username
 ./make xxx
 ```
 
+### 导出 compile_commands.json
+
+```bash
+./make refresh
+```
+
 ### 清除 bazel 缓存
 
 ```bash

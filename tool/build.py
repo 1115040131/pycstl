@@ -71,8 +71,8 @@ def main():
         ),
 
         ######################### build for all #########################
-        "all": lambda args: run_bazel_build('//...', args=args),
-        "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
+        "all": lambda args: run_bazel_build('//... -- -//hello_world', args=args),
+        "all_test": lambda args: run_bazel_test('//... -- -//hello_world', test_output=False, args=args),
 
         ######################### build for chat #########################
         "chat": lambda args: run_bazel_build('//chat/...', args=args),
@@ -213,6 +213,10 @@ def main():
         # 测试文件, 单独编译
         ######################### build for hello_world #########################
         "hello_world": lambda args: run_bazel_run('//hello_world', args=args),
+
+        # 更新 compile_commands.json 文件
+        "refresh_all": lambda args: run_bazel_run('@hedron_compile_commands//:refresh_all', args=args),
+        "refresh": lambda args: run_bazel_run('//:refresh_compile_commands', args=args),
     }
 
     if target not in targets:

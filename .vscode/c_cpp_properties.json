@@ -3,14 +3,15 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**/include",
-                "${workspaceFolder}/bazel-*/external/**",
-                "${workspaceFolder}/bazel-out/k8-dbg/bin/**"
+                // "${workspaceFolder}/**/include",
+                // "${workspaceFolder}/bazel-*/external/**",
+                // "${workspaceFolder}/bazel-out/k8-dbg/bin"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c23",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": "compile_commands.json"
         }
     ],
     "version": 4
