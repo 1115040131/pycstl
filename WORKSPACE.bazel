@@ -24,7 +24,7 @@ register_qt_toolchains()
 
 new_git_repository(
     name = "hiredis",
-    build_file = "//external/hiredis:BUILD.bazel",
+    build_file = "//third_party/hiredis:hiredis.BUILD",
     commit = "0c63e3f396fc1b0a8375f859df66814021cefc9d",
     remote = "https://github.com/redis/hiredis.git",
 )
@@ -35,6 +35,6 @@ new_git_repository(
 
 new_local_repository(
     name = "mysql-connector-cpp",
-    build_file = "//external/mysql-connector-cpp:BUILD.bazel",
-    path = "external/mysql-connector-cpp",
+    build_file = "//third_party/mysql-connector-cpp:mysql-connector-cpp.BUILD",
+    path = "third_party/mysql-connector-cpp",
 )
