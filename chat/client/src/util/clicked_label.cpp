@@ -53,17 +53,34 @@ void ClickedLabel::leaveEvent(QEvent* event) {
 void ClickedLabel::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         if (state_ == State::kNormal) {
-            qDebug() << "clicked, changed to select hover: " << select_hover_;
+            qDebug() << "clicked, changed to normal press:" << press_;
+            setProperty("state", press_);
+        } else {
+            qDebug() << "clicked, changed to select press:" << select_press_;
+            setProperty("state", select_press_);
+        }
+        repolish(this);
+        update();
+        return;
+    }
+    QLabel::mousePressEvent(event);
+}
+
+void ClickedLabel::mouseReleaseEvent(QMouseEvent* event) {
+    if (event->button() == Qt::LeftButton) {
+        if (state_ == State::kNormal) {
+            qDebug() << "release, changed to select hover:" << select_hover_;
             state_ = State::kSelected;
             setProperty("state", select_hover_);
         } else {
-            qDebug() << "clicked, changed to normal hover: " << hover_;
+            qDebug() << "release, changed to normal hover:" << hover_;
             state_ = State::kNormal;
             setProperty("state", hover_);
         }
         repolish(this);
         update();
         emit clicked();
+        return;
     }
-    QLabel::mousePressEvent(event);
+    QLabel::mouseReleaseEvent(event);
 }

@@ -23,8 +23,10 @@ RegisterDialog::RegisterDialog(QWidget* parent) : QDialog(parent), ui(new Ui::Re
             [this]() { ui->err_tip->checkVerifyValid(ui->verify_edit->text()); });
 
     // 密码显示
-    ui->password_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
-    ui->confirm_visible->setState("unvisible", "unvisible_hover", "", "visible", "visible_hover", "");
+    ui->password_visible->setState("unvisible", "unvisible_hover", "unvisible_hover", "visible", "visible_hover",
+                                   "visible_hover");
+    ui->confirm_visible->setState("unvisible", "unvisible_hover", "unvisible_hover", "visible", "visible_hover",
+                                  "visible_hover");
     connect(ui->password_visible, &ClickedLabel::clicked, this, [this]() {
         auto state = ui->password_visible->getState();
         if (state == ClickedLabel::State::kNormal) {

@@ -14,7 +14,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent), ui(new Ui::LoginDia
     ui->err_tip->clear();
 
     // 忘记密码
-    ui->forget_label->setState("normal", "hover", "", "selected", "selected_hover", "");
+    ui->forget_label->setState("normal", "hover", "hover", "selected", "selected_hover", "selected_hover");
     connect(ui->forget_label, &ClickedLabel::clicked, this, &LoginDialog::slot_forget_password);
 
     // 初始化头像
