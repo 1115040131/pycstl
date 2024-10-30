@@ -2,8 +2,10 @@
 
 #include <QAction>
 #include <QRandomGenerator>
+#include <QTimer>
 
 #include "chat/client/widget/chat_user_widget.h"
+#include "chat/client/widget/loading_dialog.h"
 #include "chat/client/widget/ui_chat_dialog.h"
 
 ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog) {
@@ -34,6 +36,9 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
     });
 
     ShowSearch(false);
+
+    // 连接动态加载信号
+    connect(ui->chat_user_list, &ChatUserList::sig_loading_chat_user, this, &ChatDialog::slot_loading_chat_user);
 
     addChatUserList();  // TODO: 测试函数, 添加用户列表
 }
@@ -81,4 +86,21 @@ void ChatDialog::addChatUserList() {
         ui->chat_user_list->addItem(item);
         ui->chat_user_list->setItemWidget(item, chat_user_widget);
     }
+}
+
+void ChatDialog::slot_loading_chat_user() {
+    if (is_loading_) {
+        return;
+    }
+
+    is_loading_ = true;
+
+    LoadingDialog* loading_dialog = new LoadingDialog(this);          // 将当前对话框设置为父对象
+    loading_dialog->setAttribute(Qt::WA_DeleteOnClose);               // 对话框关闭时自动删除
+    loading_dialog->show();                                           // 显示悬浮对话框
+    QTimer::singleShot(500, loading_dialog, &LoadingDialog::accept);  // TODO: for debug
+    addChatUserList();
+    // loading_dialog->deleteLater();  // 加载完成后关闭对话框
+
+    is_loading_ = false;
 }

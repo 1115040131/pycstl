@@ -2,8 +2,6 @@
 
 #include <QDialog>
 
-#include "chat/client/define.h"
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class ChatDialog;
@@ -22,6 +20,9 @@ private:
 
     // 测试函数, 添加用户列表
     void addChatUserList();
+
+private slots:
+    void slot_loading_chat_user();
 
 private:
     Ui::ChatDialog* ui;
