@@ -93,3 +93,10 @@ sudo apt update && sudo apt install acl
 ```bash
 sudo apt install qttools5-dev-tools
 ```
+
+### 切换 Wayland 与 x11
+
+```bash
+export QT_QPA_PLATFORM=wayland
+export QT_QPA_PLATFORM=xcb
+```

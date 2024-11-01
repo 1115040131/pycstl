@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QPixmap>
 #include <QString>
 
 #include "chat/common/error_code.h"
@@ -19,6 +20,22 @@ enum class TipErr {
     kPasswordConfirm,
     kVerifyErr,
     kUserErr,
+};
+
+enum class ChatRole {
+    kSelf,
+    kOther,
+};
+
+struct MsgInfo {
+    enum class Type {
+        kText,
+        kImage,
+        kFile,
+    };
+    Type type;
+    QString content;
+    QPixmap pixmap;
 };
 
 struct ServerInfo {
