@@ -176,11 +176,15 @@ LoadingDialog {
 
 /* ChatPage */
 
+/* chat_widget */
+
 #title_label {
    font-size: 18px;
    font-weight: normal;
    font-family: "Microsoft YaHei";
 }
+
+/* chat_edit */
 
 #chat_edit {
    background: #ffffff;
@@ -276,3 +280,16 @@ LoadingDialog {
    border-radius: 20px; /* 设置圆角 */
 }
 
+/* chat_data_list */
+
+#chat_data_list {
+   background: #f0f0f0;
+}
+
+#chat_background {
+   background: #f0f0f0;
+}
+
+#chat_area {
+   border: none;
+}

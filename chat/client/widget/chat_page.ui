@@ -103,7 +103,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QWidget" name="chat_data_list" native="true"/>
+       <widget class="ChatView" name="chat_data_list" native="true"/>
       </item>
       <item>
        <widget class="QWidget" name="tool_widget" native="true">
@@ -365,6 +365,12 @@
    <class>ClickedBtn</class>
    <extends>QPushButton</extends>
    <header>chat/client/util/clicked_btn.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ChatView</class>
+   <extends>QWidget</extends>
+   <header>chat/client/util/chat_view.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
