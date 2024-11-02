@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 
 #include "chat/client/define.h"
+#include "chat/client/search_info.h"
 #include "common/singleton.h"
 
 class TcpMgr : public QObject, public pyc::Singleton<TcpMgr> {
@@ -34,6 +35,9 @@ signals:
 
     // 切换到聊天界面
     void sig_switch_chatdlg();
+
+    // 搜索用户
+    void sig_user_search(const SearchInfo& search_info);
 
 public slots:
     // 连接到聊天服务器

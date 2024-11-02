@@ -113,7 +113,6 @@ void ChatDialog::clearLabelState(StateWidget* select_label) {
 }
 
 void ChatDialog::slot_search_text_changed(const QString& text) {
-    qDebug() << text <<text.isEmpty();
     if (text.isEmpty()) {
         clear_action_->setIcon(QIcon("chat/client/res/close_transparent.png"));
     } else {

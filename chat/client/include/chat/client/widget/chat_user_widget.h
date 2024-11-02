@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QWidget>
-
 #include "chat/client/util/list_item_base.h"
 
 QT_BEGIN_NAMESPACE
@@ -11,8 +9,6 @@ class ChatUserWidget;
 QT_END_NAMESPACE
 
 class ChatUserWidget : public ListItemBase {
-    Q_OBJECT
-
 public:
     explicit ChatUserWidget(QWidget* parent = nullptr);
     ~ChatUserWidget();

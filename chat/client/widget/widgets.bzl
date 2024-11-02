@@ -2,6 +2,7 @@
 
 WIDGETS = [
     "mainwindow",
+    "add_user_item",
     "chat_dialog",
     "chat_page",
     "chat_user_widget",

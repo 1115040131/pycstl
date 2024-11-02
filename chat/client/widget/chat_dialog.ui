@@ -262,7 +262,7 @@
        <widget class="ChatUserList" name="chat_user_list"/>
       </item>
       <item>
-       <widget class="QListWidget" name="search_list"/>
+       <widget class="SearchList" name="search_list"/>
       </item>
       <item>
        <widget class="QListWidget" name="con_user_list"/>
@@ -304,6 +304,11 @@
    <class>StateWidget</class>
    <extends>QLabel</extends>
    <header>chat/client/util/state_widget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SearchList</class>
+   <extends>QListWidget</extends>
+   <header>chat/client/util/search_list.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -50,8 +50,8 @@ private:
     UIMode state_ = UIMode::kChatMode;
     UIMode mode_ = UIMode::kChatMode;
 
-    QAction* search_action_;  // 搜索图标
-    QAction* clear_action_;   // 清楚图标
+    QAction* search_action_ = nullptr;  // 搜索图标
+    QAction* clear_action_ = nullptr;   // 清楚图标
 
     bool is_loading_ = false;
 

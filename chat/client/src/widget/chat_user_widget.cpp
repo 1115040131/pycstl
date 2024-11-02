@@ -4,6 +4,7 @@
 
 ChatUserWidget::ChatUserWidget(QWidget* parent) : ListItemBase(parent), ui(new Ui::ChatUserWidget) {
     ui->setupUi(this);
+    SetItemType(Type::kChatUserItem);
 }
 
 ChatUserWidget::~ChatUserWidget() { delete ui; }
