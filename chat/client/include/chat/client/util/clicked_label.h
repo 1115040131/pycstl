@@ -17,6 +17,7 @@ public:
     };
 
     State getState() const { return state_; }
+    void setSelected(State state);
 
 protected:
     void enterEvent(QEnterEvent* event) override;
@@ -27,7 +28,7 @@ protected:
 signals:
     void clicked(void);
 
-private:
+protected:
     QString normal_;
     QString hover_;
     QString press_;

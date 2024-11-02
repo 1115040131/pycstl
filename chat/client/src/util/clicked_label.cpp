@@ -22,6 +22,17 @@ void ClickedLabel::setState(const QString& normal, const QString& hover, const Q
     repolish(this);
 }
 
+void ClickedLabel::setSelected(State state) {
+    state_ = state;
+    if (state == State::kSelected) {
+        setProperty("state", select_);
+    } else {
+        setProperty("state", normal_);
+    }
+    repolish(this);
+    update();
+}
+
 void ClickedLabel::enterEvent(QEnterEvent* event) {
     if (state_ == State::kNormal) {
         qDebug() << "enter, changed to normal hover: " << hover_;

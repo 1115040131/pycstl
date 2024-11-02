@@ -1,6 +1,5 @@
 #include "chat/client/widget/chat_dialog.h"
 
-#include <QAction>
 #include <QRandomGenerator>
 #include <QTimer>
 
@@ -12,35 +11,48 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
     ui->setupUi(this);
 
     // 创建一个搜索图标
-    QAction* search_action = new QAction(ui->search_edit);
-    search_action->setIcon(QIcon("chat/client/res/search.png"));
-    ui->search_edit->addAction(search_action, QLineEdit::LeadingPosition);
+    search_action_ = new QAction(ui->search_edit);
+    search_action_->setIcon(QIcon("chat/client/res/search.png"));
+    ui->search_edit->addAction(search_action_, QLineEdit::LeadingPosition);
     ui->search_edit->setPlaceholderText(tr("搜索"));
 
     // 创建一个清除图标
-    QAction* clear_action = new QAction(ui->search_edit);
-    clear_action->setIcon(QIcon("chat/client/res/close_transparent.png"));
-    ui->search_edit->addAction(clear_action, QLineEdit::TrailingPosition);
-    // 有输入时显示清除图标
-    connect(ui->search_edit, &QLineEdit::textChanged, [clear_action](const QString& text) {
-        if (text.isEmpty()) {
-            clear_action->setIcon(QIcon("chat/client/res/close_transparent.png"));
-        } else {
-            clear_action->setIcon(QIcon("chat/client/res/close_search.png"));
-        }
-    });
+    clear_action_ = new QAction(ui->search_edit);
+    clear_action_->setIcon(QIcon("chat/client/res/close_transparent.png"));
+    ui->search_edit->addAction(clear_action_, QLineEdit::TrailingPosition);
+    // 链接搜索框输入变化
+    connect(ui->search_edit, &QLineEdit::textChanged, this, &ChatDialog::slot_search_text_changed);
     // 点击清除图标清空输入框
-    connect(clear_action, &QAction::triggered, [this]() {
+    connect(clear_action_, &QAction::triggered, [this]() {
         ui->search_edit->clear();
         ShowSearch(false);
     });
 
+    ui->search_edit->setMaxLength(15);
     ShowSearch(false);
 
     // 连接动态加载信号
     connect(ui->chat_user_list, &ChatUserList::sig_loading_chat_user, this, &ChatDialog::slot_loading_chat_user);
-
     addChatUserList();  // TODO: 测试函数, 添加用户列表
+
+    // 侧边栏
+    QPixmap pixmap("chat/client/res/head_1.jpg");
+    ui->side_head_label->setPixmap(pixmap);
+    ui->side_head_label->setScaledContents(true);  // 自动缩放图片内容以适应
+    // QPixmap scaled_pixmap = pixmap.scaled(ui->side_head_label->size(), Qt::KeepAspectRatio);
+    // ui->side_head_label->setPixmap(scaled_pixmap);
+
+    ui->side_chat_label->setState("normal", "hover", "pressed", "selected_normal", "selected_hover",
+                                  "selected_pressed");
+    ui->side_chat_label->setSelected(ClickedLabel::State::kSelected);
+    ui->side_contact_label->setState("normal", "hover", "pressed", "selected_normal", "selected_hover",
+                                     "selected_pressed");
+
+    addLabelGroup(ui->side_chat_label);
+    addLabelGroup(ui->side_contact_label);
+
+    connect(ui->side_chat_label, &StateWidget::clicked, this, &ChatDialog::slot_side_chat);
+    connect(ui->side_contact_label, &StateWidget::clicked, this, &ChatDialog::slot_side_contact);
 }
 
 ChatDialog::~ChatDialog() { delete ui; }
@@ -88,6 +100,28 @@ void ChatDialog::addChatUserList() {
     }
 }
 
+void ChatDialog::addLabelGroup(StateWidget* label) { labels_.push_back(label); }
+
+void ChatDialog::clearLabelState(StateWidget* select_label) {
+    for (const auto& label : labels_) {
+        if (label != select_label) {
+            label->setSelected(ClickedLabel::State::kNormal);
+        } else {
+            label->setSelected(ClickedLabel::State::kSelected);
+        }
+    }
+}
+
+void ChatDialog::slot_search_text_changed(const QString& text) {
+    qDebug() << text <<text.isEmpty();
+    if (text.isEmpty()) {
+        clear_action_->setIcon(QIcon("chat/client/res/close_transparent.png"));
+    } else {
+        clear_action_->setIcon(QIcon("chat/client/res/close_search.png"));
+        ShowSearch(true);
+    }
+}
+
 void ChatDialog::slot_loading_chat_user() {
     if (is_loading_) {
         return;
@@ -103,4 +137,20 @@ void ChatDialog::slot_loading_chat_user() {
     // loading_dialog->deleteLater();  // 加载完成后关闭对话框
 
     is_loading_ = false;
+}
+
+void ChatDialog::slot_side_chat() {
+    qDebug() << "receive side chat clicked";
+    clearLabelState(ui->side_chat_label);
+    ui->stackedWidget->setCurrentWidget(ui->chat_page);
+    state_ = UIMode::kChatMode;
+    ShowSearch(false);
+}
+
+void ChatDialog::slot_side_contact() {
+    qDebug() << "receive side contact clicked";
+    clearLabelState(ui->side_contact_label);
+    ui->stackedWidget->setCurrentWidget(ui->friend_apply_page);
+    state_ = UIMode::kContactMode;
+    ShowSearch(false);
 }

@@ -90,7 +90,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="side_chat_label">
+          <widget class="StateWidget" name="side_head_label">
            <property name="minimumSize">
             <size>
              <width>30</width>
@@ -109,7 +109,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="side_contact_label">
+          <widget class="StateWidget" name="side_chat_label">
            <property name="minimumSize">
             <size>
              <width>30</width>
@@ -128,7 +128,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="side_head_label">
+          <widget class="StateWidget" name="side_contact_label">
            <property name="minimumSize">
             <size>
              <width>30</width>
@@ -299,6 +299,11 @@
    <extends>QWidget</extends>
    <header>chat/client/widget/chat_page.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>StateWidget</class>
+   <extends>QLabel</extends>
+   <header>chat/client/util/state_widget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

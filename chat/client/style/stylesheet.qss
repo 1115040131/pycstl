@@ -293,3 +293,59 @@ LoadingDialog {
 #chat_area {
    border: none;
 }
+
+#chat_user_name {
+   color: rgb(153, 153, 153);
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+/* side_bar */
+
+#side_chat_label[state='normal']{
+   border-image: url(chat/client/res/chat_icon.png);
+}
+
+#side_chat_label[state='hover']{
+   border-image: url(chat/client/res/chat_icon_hover.png);
+}
+
+#side_chat_label[state='pressed']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_chat_label[state='selected_normal']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_chat_label[state='selected_hover']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_chat_label[state='selected_pressed']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_contact_label[state='normal']{
+   border-image: url(chat/client/res/contact_list.png);
+}
+
+#side_contact_label[state='hover']{
+   border-image: url(chat/client/res/contact_list_hover.png);
+}
+
+#side_contact_label[state='pressed']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+#side_contact_label[state='selected_normal']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+#side_contact_label[state='selected_hover']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+#side_contact_label[state='selected_pressed']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
