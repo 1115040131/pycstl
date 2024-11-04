@@ -6,6 +6,7 @@
 
 #include "chat/client/tcp_mgr.h"
 #include "chat/client/widget/add_user_item.h"
+#include "chat/client/widget/find_success_dialog.h"
 
 SearchList::SearchList(QWidget* parent) : QListWidget(parent) {
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -75,6 +76,46 @@ void SearchList::addTipItem() {
     }
 }
 
-void SearchList::slot_item_clicked(QListWidgetItem* item) { (void)item; }
+void SearchList::CloseFindDialog() {
+    if (find_dialog_) {
+        find_dialog_.reset();
+    }
+}
+
+void SearchList::slot_item_clicked(QListWidgetItem* item) {
+    qDebug() << "slot item clicked";
+
+    auto widget = this->itemWidget(item);  // 获取自定义 widget 对象
+    if (!widget) {
+        qDebug() << "widget is nullptr";
+        return;
+    }
+
+    auto custom_item = qobject_cast<ListItemBase*>(widget);
+    if (!custom_item) {
+        qDebug() << "widget is not ListItemBase*";
+        return;
+    }
+
+    auto item_type = custom_item->GetItemType();
+    if (item_type == ListItemBase::Type::kInvalidItem) {
+        qDebug() << "slot invalid item clicked";
+        return;
+    }
+
+    if (item_type == ListItemBase::Type::kAddUserTipItem) {
+        // TODO: 先直接弹出一个 FindSuccessDialog
+        find_dialog_ = std::make_unique<FindSuccessDialog>(this);
+
+        auto search_info = std::make_shared<SearchInfo>(0, 0, "PYC_Chat");
+        static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
+
+        find_dialog_->show();
+        return;
+    }
+
+    // 清除弹出框
+    CloseFindDialog();
+}
 
 void SearchList::slot_user_search(const SearchInfo& search_info) { (void)search_info; }

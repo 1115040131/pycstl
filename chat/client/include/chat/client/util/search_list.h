@@ -1,9 +1,10 @@
 #pragma once
 
+#include <QDialog>
 #include <QListWidget>
+#include <memory>
 
 #include "chat/client/search_info.h"
-
 
 class SearchList : public QListWidget {
     Q_OBJECT
@@ -23,6 +24,9 @@ private:
 
     void addTipItem();
 
+    // 清除弹出框
+    void CloseFindDialog();
+
 private slots:
     void slot_item_clicked(QListWidgetItem* item);
 
@@ -30,4 +34,5 @@ private slots:
 
 private:
     bool send_pending_ = false;
+    std::unique_ptr<QDialog> find_dialog_;
 };

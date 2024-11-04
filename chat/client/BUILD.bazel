@@ -30,9 +30,10 @@ qt_cc_binary(
     srcs = ["main.cpp"],
     copts = STRICT_COPTS,
     data = glob([
-        "res/*",
-        "style/*",
         "config/*",
+        "res/*",
+        "static/*",
+        "style/*",
     ]),
     deps = [
         ":client_lib",

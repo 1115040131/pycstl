@@ -18,6 +18,9 @@ public:
     explicit ChatDialog(QWidget* parent = nullptr);
     ~ChatDialog();
 
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
     void ShowSearch(bool is_search);
 
@@ -29,6 +32,9 @@ private:
 
     // 设置联动标签状态
     void clearLabelState(StateWidget* select_label);
+
+    // 处理全局鼠标点击事件, 判断是否需要清空搜索框
+    void handleGlobalMousePress(QMouseEvent* event);
 
 private slots:
     void slot_search_text_changed(const QString& text);

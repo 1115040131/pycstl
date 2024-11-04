@@ -1,5 +1,7 @@
 #include "chat/client/widget/chat_dialog.h"
 
+#include <QEvent>
+#include <QMouseEvent>
 #include <QRandomGenerator>
 #include <QTimer>
 
@@ -53,9 +55,20 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
 
     connect(ui->side_chat_label, &StateWidget::clicked, this, &ChatDialog::slot_side_chat);
     connect(ui->side_contact_label, &StateWidget::clicked, this, &ChatDialog::slot_side_contact);
+
+    // 检测点击鼠标位置是否需要清空搜索框
+    this->installEventFilter(this);
 }
 
 ChatDialog::~ChatDialog() { delete ui; }
+
+bool ChatDialog::eventFilter(QObject* watched, QEvent* event) {
+    if (event->type() == QEvent::MouseButtonPress) {
+        auto mouse_event = static_cast<QMouseEvent*>(event);
+        handleGlobalMousePress(mouse_event);
+    }
+    return QDialog::eventFilter(watched, event);
+}
 
 void ChatDialog::ShowSearch(bool is_search) {
     if (is_search) {
@@ -109,6 +122,20 @@ void ChatDialog::clearLabelState(StateWidget* select_label) {
         } else {
             label->setSelected(ClickedLabel::State::kSelected);
         }
+    }
+}
+
+void ChatDialog::handleGlobalMousePress(QMouseEvent* event) {
+    // 判断是否处于搜索模式
+    if (mode_ != UIMode::kSearchMode) {
+        return;
+    }
+
+    // 判断鼠标点击位置是否在搜索列表外
+    QPoint position = ui->search_list->mapFromGlobal(event->globalPosition().toPoint());
+    if (!ui->search_list->rect().contains(position)) {
+        ui->search_edit->clear();
+        ShowSearch(false);
     }
 }
 
