@@ -2,6 +2,7 @@
 
 #include <QDir>
 
+#include "chat/client/widget/apply_friend_dialog.h"
 #include "chat/client/widget/ui_find_success_dialog.h"
 
 FindSuccessDialog::FindSuccessDialog(QWidget* parent) : QDialog(parent), ui(new Ui::FindSuccessDialog) {
@@ -18,7 +19,6 @@ FindSuccessDialog::FindSuccessDialog(QWidget* parent) : QDialog(parent), ui(new 
     ui->head_label->setPixmap(head_pix);
     ui->head_label->setScaledContents(true);
 
-    // ui->add_friend_btn->
     // this->setModal(true);
     setWindowModality(Qt::WindowModal);
 }
@@ -30,4 +30,9 @@ void FindSuccessDialog::setSearchInfo(const std::shared_ptr<SearchInfo>& search_
     search_info_ = search_info;
 }
 
-void FindSuccessDialog::on_add_friend_btn_clicked() {}
+void FindSuccessDialog::on_add_friend_btn_clicked() {
+    auto apply_friend_dialog = new ApplyFriendDialog(static_cast<QWidget*>(this->parent()));
+    apply_friend_dialog->setSearchInfo(search_info_);
+    apply_friend_dialog->setModal(true);
+    apply_friend_dialog->show();
+}

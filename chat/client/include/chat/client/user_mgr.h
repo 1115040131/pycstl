@@ -12,6 +12,10 @@ public:
     void SetName(const QString& name) { name_ = name; }
     void SetToken(const QString& token) { token_ = token; }
 
+    int GetUid() const { return uid_; }
+    const QString& GetName() const { return name_; }
+    const QString& GetToken() const { return token_; }
+
 private:
     int uid_;
     QString name_;

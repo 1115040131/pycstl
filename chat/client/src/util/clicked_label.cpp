@@ -6,6 +6,7 @@
 
 ClickedLabel::ClickedLabel(QWidget* parent) : QLabel(parent), state_(State::kNormal) {
     setCursor(Qt::PointingHandCursor);
+    setFocusPolicy(Qt::NoFocus);
 }
 
 void ClickedLabel::setState(const QString& normal, const QString& hover, const QString& press,
