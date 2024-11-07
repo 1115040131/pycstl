@@ -26,7 +26,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 signals:
-    void clicked(void);
+    void clicked(const QString& text, State state);
 
 protected:
     QString normal_;

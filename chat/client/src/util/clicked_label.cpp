@@ -91,7 +91,7 @@ void ClickedLabel::mouseReleaseEvent(QMouseEvent* event) {
         }
         repolish(this);
         update();
-        emit clicked();
+        emit clicked(this->text(), state_);
         return;
     }
     QLabel::mouseReleaseEvent(event);

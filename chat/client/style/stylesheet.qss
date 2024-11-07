@@ -430,3 +430,92 @@ LoadingDialog {
    font-family: "Microsoft YaHei"; /* 设置字体 */
    border-radius: 20px; /* 设置圆角 */
 }
+
+/* ApplyFriendDialog */
+#ApplyFriendDialog{
+   border: 2px solid #f1f1f1;
+   font-size: 14px;
+   background: #f7f7f8;
+}
+
+/* scrollArea */
+#scrollArea{
+   background: #f7f7f8;
+   border: none;
+}
+
+#scrollcontent{
+   background: #f7f7f8;
+}
+
+#scrollcontent #apply_label{
+   font-family: "Microsoft YaHei";
+   font-size: 16px;
+   font-weight: normal;
+}
+
+/* apply_widget */
+#apply_widget QLabel{
+   color:rgb(140,140,140);
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+   height: 25px;
+}
+
+#apply_widget #name_edit, #apply_widget #back_edit{
+   border: 1px solid #f7f7f8;
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#apply_widget #label_edit {
+   border: none;
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#apply_widget #more_label{
+   border-image: url(chat/client/res/arowdown.png);
+}
+
+#apply_widget #tipslb[state='normal'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #1e1e1e;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='hover'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #1e1e1e;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='pressed'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='selected_normal'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='selected_hover'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='selected_pressed'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #1e1e1e;
+   border-radius: 10px;
+}

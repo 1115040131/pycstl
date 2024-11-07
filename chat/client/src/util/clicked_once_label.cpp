@@ -6,7 +6,7 @@ ClickedOnceLabel::ClickedOnceLabel(QWidget* parent) : QLabel(parent) { setCursor
 
 void ClickedOnceLabel::mouseReleaseEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
-        emit clicked();
+        emit clicked(this->text());
         return;
     }
     QLabel::mouseReleaseEvent(event);

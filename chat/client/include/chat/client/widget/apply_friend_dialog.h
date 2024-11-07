@@ -30,8 +30,8 @@ protected:
 private:
     void initTipLabels();
 
-    void addTipLabel(ClickedLabel* tip_label, const QPoint& cur_point, const QPoint& next_point, int text_width,
-                     int text_height);
+    // 添加备选标签显示并返回下一个位置
+    QPoint addTipLabel(ClickedLabel* tip_label, const QPoint& cur_point, int text_width, int text_height);
 
     void resetLabels();
 
@@ -71,7 +71,7 @@ private:
 
     // 已经创建的标签
     std::map<QString, ClickedLabel*> add_labels_;
-    // std::vector<QString> add_label_keys;
+    std::vector<QString> add_label_keys;  // 记录加入时的顺序
     QPoint label_point_;
 
     // 在输入框显示添加新好友标签

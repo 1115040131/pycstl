@@ -83,8 +83,6 @@ void SearchList::CloseFindDialog() {
 }
 
 void SearchList::slot_item_clicked(QListWidgetItem* item) {
-    qDebug() << "slot item clicked";
-
     auto widget = this->itemWidget(item);  // 获取自定义 widget 对象
     if (!widget) {
         qDebug() << "widget is nullptr";
