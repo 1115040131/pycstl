@@ -36,10 +36,10 @@ void ClickedLabel::setSelected(State state) {
 
 void ClickedLabel::enterEvent(QEnterEvent* event) {
     if (state_ == State::kNormal) {
-        qDebug() << "enter, changed to normal hover: " << hover_;
+        // qDebug() << "enter, changed to normal hover: " << hover_;
         setProperty("state", hover_);
     } else {
-        qDebug() << "enter, changed to select hover: " << select_hover_;
+        // qDebug() << "enter, changed to select hover: " << select_hover_;
         setProperty("state", select_hover_);
     }
     repolish(this);
@@ -50,10 +50,10 @@ void ClickedLabel::enterEvent(QEnterEvent* event) {
 
 void ClickedLabel::leaveEvent(QEvent* event) {
     if (state_ == State::kNormal) {
-        qDebug() << "leave, changed to normal: " << normal_;
+        // qDebug() << "leave, changed to normal: " << normal_;
         setProperty("state", normal_);
     } else {
-        qDebug() << "leave, changed to select: " << select_;
+        // qDebug() << "leave, changed to select: " << select_;
         setProperty("state", select_);
     }
     repolish(this);
@@ -65,10 +65,10 @@ void ClickedLabel::leaveEvent(QEvent* event) {
 void ClickedLabel::mousePressEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         if (state_ == State::kNormal) {
-            qDebug() << "clicked, changed to normal press:" << press_;
+            // qDebug() << "clicked, changed to normal press:" << press_;
             setProperty("state", press_);
         } else {
-            qDebug() << "clicked, changed to select press:" << select_press_;
+            // qDebug() << "clicked, changed to select press:" << select_press_;
             setProperty("state", select_press_);
         }
         repolish(this);
@@ -81,11 +81,11 @@ void ClickedLabel::mousePressEvent(QMouseEvent* event) {
 void ClickedLabel::mouseReleaseEvent(QMouseEvent* event) {
     if (event->button() == Qt::LeftButton) {
         if (state_ == State::kNormal) {
-            qDebug() << "release, changed to select hover:" << select_hover_;
+            // qDebug() << "release, changed to select hover:" << select_hover_;
             state_ = State::kSelected;
             setProperty("state", select_hover_);
         } else {
-            qDebug() << "release, changed to normal hover:" << hover_;
+            // qDebug() << "release, changed to normal hover:" << hover_;
             state_ = State::kNormal;
             setProperty("state", hover_);
         }
