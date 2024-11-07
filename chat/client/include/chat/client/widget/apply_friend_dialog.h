@@ -28,6 +28,15 @@ protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
+    // 创建一个新标签
+    struct TipLabelInfo {
+        ClickedLabel* label;
+        int text_width;
+        int text_height;
+    };
+    TipLabelInfo makeNewTipLabel(const QString& text, QWidget* parent = nullptr);
+
+    // 初始化已有的标签
     void initTipLabels();
 
     // 添加备选标签显示并返回下一个位置
@@ -69,16 +78,18 @@ private slots:
 private:
     Ui::ApplyFriendDialog* ui;
 
+    static constexpr int kTipOffset = 10;
+
     // 已经创建的标签
     std::map<QString, ClickedLabel*> add_labels_;
     std::vector<QString> add_label_keys;  // 记录加入时的顺序
-    QPoint label_point_;
+    QPoint label_point_{2, 6};
 
     // 在输入框显示添加新好友标签
     std::map<QString, FriendLabel*> friend_labels_;
-    // std::vector<QString> friend_label_keys_;
+    std::vector<QString> friend_label_keys_;
     std::vector<QString> tip_data_;
-    QPoint tip_cur_point_;
+    QPoint tip_cur_point_{kTipOffset, 5};
 
     std::shared_ptr<SearchInfo> search_info_ = nullptr;
 };

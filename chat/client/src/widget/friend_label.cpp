@@ -22,10 +22,7 @@ void FriendLabel::setText(const QString& text) {
     auto text_height = font_metrics.height();  // 获取文本高度
 
     this->setFixedWidth(ui->tip_label->width() + ui->close_label->width() + 5);
-    this->setFixedHeight(text_height + 2);
-
-    width_ = this->width();
-    height_ = this->height();
+    this->setFixedHeight(text_height + 5);
 }
 
 void FriendLabel::slot_close() { emit sig_close(text_); }

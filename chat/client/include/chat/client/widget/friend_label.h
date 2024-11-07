@@ -17,10 +17,6 @@ public:
 
     void setText(const QString& text);
 
-    const QString& text() const { return text_; }
-    int width() const { return width_; }
-    int height() const { return height_; }
-
 signals:
     void sig_close(const QString&);
 
@@ -30,6 +26,4 @@ private slots:
 private:
     Ui::FriendLabel* ui;
     QString text_;
-    int width_;
-    int height_;
 };

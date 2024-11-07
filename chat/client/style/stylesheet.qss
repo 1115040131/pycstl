@@ -519,3 +519,97 @@ LoadingDialog {
    color: #1e1e1e;
    border-radius: 10px;
 }
+
+/* label_group_widget */
+#grid_widget{
+   background: #fdfdfd;
+}
+
+#input_tip_widget {
+   background: #d3eaf8;
+}
+
+#apply_widget #FriendLabel {
+   background: #daf6e7;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tip_label {
+   padding-left: 2px;
+   color:rgb(153,153,153);
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#close_label[state='normal'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='hover'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='pressed'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='select_normal'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='select_hover'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='select_pressed'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#apply_sure_widget #sure_btn[state='normal']  {
+   background: #f0f0f0;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #sure_btn[state='hover'] {
+   background: #d2d2d2;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #sure_btn[state='press'] {
+   background: #c6c6c6;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #cancel_btn[state='normal']  {
+   background: #f0f0f0;
+   color: #2e2f30;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #cancel_btn[state='hover'] {
+   background: #d2d2d2;
+   color: #2e2f30;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #cancel_btn[state='press'] {
+   background: #c6c6c6;
+   color: #2e2f30;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}

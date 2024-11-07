@@ -5,7 +5,7 @@
 #include "chat/client/user_mgr.h"
 #include "chat/client/widget/ui_apply_friend_dialog.h"
 
-inline constexpr int kTipOffset = 10;
+inline constexpr int kMinApplyLbaelEditLength = 40;  // 申请好友标签输入框最低长度
 
 ApplyFriendDialog::ApplyFriendDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ApplyFriendDialog) {
     ui->setupUi(this);
@@ -66,25 +66,30 @@ bool ApplyFriendDialog::eventFilter(QObject* watched, QEvent* event) {
     return QDialog::eventFilter(watched, event);
 }
 
+ApplyFriendDialog::TipLabelInfo ApplyFriendDialog::makeNewTipLabel(const QString& text, QWidget* parent) {
+    auto label = new ClickedLabel(parent);
+    label->setState("normal", "hover", "pressed", "selected_normal", "selected_hover", "selected_pressed");
+    label->setObjectName("tipslb");
+    label->setText(text);
+    connect(label, &ClickedLabel::clicked, this, &ApplyFriendDialog::slot_change_friend_label_by_tip);
+
+    QFontMetrics fontMetrics(label->font());                        // 获取QLabel控件的字体信息
+    int text_width = fontMetrics.horizontalAdvance(label->text());  // 获取文本的宽度
+    int text_height = fontMetrics.height();                         // 获取文本的高度
+
+    return {label, text_width, text_height};
+}
+
 void ApplyFriendDialog::initTipLabels() {
     // 模拟创建多个标签展示
     tip_data_ = {"同学",          "家人",           "菜鸟教程",       "C++ Primer",
                  "Rust 程序设计", "父与子学Python", "nodejs开发指南", "go 语言开发指南",
                  "游戏伙伴",      "金融投资",       "微信读书",       "拼多多拼友"};
 
-    tip_cur_point_ = QPoint(kTipOffset, 5);
     int lines = 1;
 
     for (const auto& tip : tip_data_) {
-        auto label = new ClickedLabel(ui->label_list);
-        label->setState("normal", "hover", "pressed", "selected_normal", "selected_hover", "selected_pressed");
-        label->setObjectName("tipslb");
-        label->setText(tip);
-        connect(label, &ClickedLabel::clicked, this, &ApplyFriendDialog::slot_change_friend_label_by_tip);
-
-        QFontMetrics fontMetrics(label->font());                        // 获取QLabel控件的字体信息
-        int text_width = fontMetrics.horizontalAdvance(label->text());  // 获取文本的宽度
-        int text_height = fontMetrics.height();                         // 获取文本的高度
+        auto [label, text_width, text_height] = makeNewTipLabel(tip, ui->label_list);
 
         if (tip_cur_point_.x() + text_width + kTipOffset > ui->label_list->width()) {
             lines++;
@@ -113,7 +118,36 @@ QPoint ApplyFriendDialog::addTipLabel(ClickedLabel* tip_label, const QPoint& cur
     return next_point;
 }
 
-void ApplyFriendDialog::resetLabels() {}
+void ApplyFriendDialog::resetLabels() {
+    if (friend_labels_.empty()) {
+        ui->label_edit->move(label_point_);
+        return;
+    }
+
+    auto max_width = ui->grid_widget->width();
+    auto label_height = 0;
+
+    for (const auto& friend_label_key : friend_label_keys_) {
+        auto friend_label = friend_labels_[friend_label_key];
+        if (label_point_.x() + friend_label->width() > max_width) {
+            label_point_.setX(2);
+            label_point_.setY(label_point_.y() + friend_label->height() + 6);
+        }
+
+        friend_label->move(label_point_);
+        friend_label->show();
+
+        label_point_.setX(label_point_.x() + friend_label->width() + 2);
+        label_point_.setY(label_point_.y());
+        label_height = friend_label->height();
+    }
+
+    if (label_point_.x() + kMinApplyLbaelEditLength > ui->grid_widget->width()) {
+        ui->label_edit->move(2, label_point_.y() + label_height + 6);
+    } else {
+        ui->label_edit->move(label_point_);
+    }
+}
 
 void ApplyFriendDialog::addLabel(const QString& name) {
     if (friend_labels_.count(name) > 0) {
@@ -127,30 +161,32 @@ void ApplyFriendDialog::addLabel(const QString& name) {
     auto max_width = ui->grid_widget->width();
     // friend_label 换行
     if (label_point_.x() + friend_label->width() > max_width) {
-        label_point_.setY(label_point_.y() + friend_label->height() + 6);
         label_point_.setX(2);
+        label_point_.setY(label_point_.y() + friend_label->height() + 6);
     }
     friend_label->move(label_point_);
     friend_label->show();
     friend_labels_[name] = friend_label;
+    friend_label_keys_.push_back(name);
 
     connect(friend_label, &FriendLabel::sig_close, this, &ApplyFriendDialog::slot_remove_friend_label);
 
     // 将 edit 移动到添加的标签后面
     label_point_.setX(label_point_.x() + friend_label->width() + 2);
 
-    constexpr int kMinApplyLbaelEditLength = 40;  // 申请好友标签输入框最低长度
     if (label_point_.x() + kMinApplyLbaelEditLength > ui->grid_widget->width()) {
-        ui->label_edit->move(2, label_point_.y() + friend_label->height() + 2);
-    } else {
-        ui->label_edit->move(label_point_);
+        label_point_.setX(2);
+        label_point_.setY(label_point_.y() + friend_label->height() + 2);
     }
 
+    ui->label_edit->move(label_point_);
     ui->label_edit->clear();
 
     // grid_widget 换行
-    if (ui->grid_widget->height() < label_point_.y() + friend_label->height() + 2) {
-        ui->grid_widget->setFixedHeight(label_point_.y() + friend_label->height() * 2 + 2);
+    if (ui->grid_widget->height() < label_point_.y() + friend_label->height() + 13) {
+        int diff_height = label_point_.y() + friend_label->height() + 13 - ui->grid_widget->height();
+        ui->grid_widget->setFixedHeight(label_point_.y() + friend_label->height() + 13);
+        ui->scrollcontent->setFixedHeight(ui->scrollcontent->height() + diff_height);
     }
 }
 
@@ -184,15 +220,10 @@ void ApplyFriendDialog::slot_show_more_label() {
             continue;
         }
 
-        auto label = new ClickedLabel(ui->label_list);
-        label->setState("normal", "hover", "pressed", "selected_normal", "selected_hover", "selected_pressed");
-        label->setObjectName("tipslb");
-        label->setText(tip);
-        connect(label, &ClickedLabel::clicked, this, &ApplyFriendDialog::slot_change_friend_label_by_tip);
-
-        QFontMetrics fontMetrics(label->font());                    // 获取QLabel控件的字体信息
-        text_width = fontMetrics.horizontalAdvance(label->text());  // 获取文本的宽度
-        text_height = fontMetrics.height();                         // 获取文本的高度
+        auto label_info = makeNewTipLabel(tip, ui->label_list);
+        auto label = label_info.label;
+        text_width = label_info.text_width;
+        text_height = label_info.text_height;
 
         if (tip_cur_point_.x() + text_width + kTipOffset > ui->label_list->width()) {
             tip_cur_point_.setX(kTipOffset);
@@ -204,8 +235,6 @@ void ApplyFriendDialog::slot_show_more_label() {
 
     int diff_height = tip_cur_point_.y() + text_height + 15 - ui->label_list->height();
     ui->label_list->setFixedHeight(tip_cur_point_.y() + text_height + 15);
-
-    // qDebug()<<"after resize ui->lb_list size is " <<  ui->lb_list->size();
     ui->scrollcontent->setFixedHeight(ui->scrollcontent->height() + diff_height);
 }
 
@@ -214,16 +243,71 @@ void ApplyFriendDialog::slot_label_enter() {
         return;
     }
 
-    addLabel(ui->label->text());
+    auto text = ui->label->text();
+    addLabel(text);
 
     ui->input_tip_widget->hide();
+
+    if (std::find(tip_data_.begin(), tip_data_.end(), text) == tip_data_.end()) {
+        tip_data_.push_back(text);
+    }
+
+    // 判断标签展示栏是否有该标签
+    auto iter = add_labels_.find(text);
+    if (iter != add_labels_.end()) {
+        iter->second->setSelected(ClickedLabel::State::kSelected);
+        return;
+    }
+
+    // 标签展示栏也增加一个标签, 并设置绿色选中
+    auto [label, text_width, text_height] = makeNewTipLabel(text, ui->label_list);
+    label->setSelected(ClickedLabel::State::kSelected);
+
+    if (tip_cur_point_.x() + text_width + kTipOffset > ui->label_list->width()) {
+        tip_cur_point_.setX(kTipOffset);
+        tip_cur_point_.setY(tip_cur_point_.y() + text_height + 15);
+    }
+
+    tip_cur_point_ = addTipLabel(label, tip_cur_point_, text_width, text_height);
+
+    int diff_height = tip_cur_point_.y() + text_height + 15 - ui->label_list->height();
+    ui->label_list->setFixedHeight(tip_cur_point_.y() + text_height + 15);
+    ui->scrollcontent->setFixedHeight(ui->scrollcontent->height() + diff_height);
 }
 
-void ApplyFriendDialog::slot_remove_friend_label(const QString& name) { (void)name; }
+void ApplyFriendDialog::slot_remove_friend_label(const QString& name) {
+    label_point_.setX(2);
+    label_point_.setY(6);
+
+    if (auto iter = friend_labels_.find(name); iter == friend_labels_.end()) {
+        return;
+    } else {
+        friend_labels_.erase(iter);
+        delete iter->second;
+    }
+
+    std::erase_if(friend_label_keys_, [&](const QString& text) { return text == name; });
+
+    resetLabels();
+
+    if (auto iter = add_labels_.find(name); iter == add_labels_.end()) {
+        return;
+    } else {
+        iter->second->setSelected(ClickedLabel::State::kNormal);
+    }
+}
 
 void ApplyFriendDialog::slot_change_friend_label_by_tip(const QString& name, ClickedLabel::State state) {
-    (void)name;
-    (void)state;
+    auto iter = add_labels_.find(name);
+    if (iter == add_labels_.end()) {
+        return;
+    }
+
+    if (state == ClickedLabel::State::kSelected) {
+        addLabel(name);
+    } else {
+        slot_remove_friend_label(name);
+    }
 }
 
 void ApplyFriendDialog::slot_label_text_change(const QString& text) { (void)text; }
