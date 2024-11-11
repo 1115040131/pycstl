@@ -73,29 +73,23 @@ bool ChatDialog::eventFilter(QObject* watched, QEvent* event) {
 void ChatDialog::ShowSearch(bool is_search) {
     if (is_search) {
         ui->chat_user_list->hide();
-        ui->con_user_list->hide();
+        ui->contact_user_list->hide();
         ui->search_list->show();
         mode_ = UIMode::kSearchMode;
     } else if (state_ == UIMode::kChatMode) {
         ui->chat_user_list->show();
-        ui->con_user_list->hide();
+        ui->contact_user_list->hide();
         ui->search_list->hide();
         mode_ = UIMode::kChatMode;
     } else if (state_ == UIMode::kContactMode) {
         ui->chat_user_list->hide();
-        ui->con_user_list->show();
+        ui->contact_user_list->show();
         ui->search_list->hide();
         mode_ = UIMode::kContactMode;
     }
 }
 
-static const std::vector<QString> strs = {"hello world !", "nice to meet u", "New year, new life",
-                                          "You have to love yourself",
-                                          "My love is written in the wind ever since the whole world is you"};
-static const std::vector<QString> heads = {"chat/client/res/head_1.jpg", "chat/client/res/head_2.jpg",
-                                           "chat/client/res/head_3.jpg", "chat/client/res/head_4.jpg",
-                                           "chat/client/res/head_5.jpg"};
-static const std::vector<QString> names = {"llfc", "zack", "golang", "cpp", "java", "nodejs", "python", "rust"};
+
 
 void ChatDialog::addChatUserList() {
     for (int i = 0; i < 13; i++) {

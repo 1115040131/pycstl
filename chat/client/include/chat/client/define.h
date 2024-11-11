@@ -44,3 +44,11 @@ struct ServerInfo {
     QString port;
     QString token;
 };
+
+static const std::vector<QString> strs = {"hello world !", "nice to meet u", "New year, new life",
+                                          "You have to love yourself",
+                                          "My love is written in the wind ever since the whole world is you"};
+static const std::vector<QString> heads = {"chat/client/res/head_1.jpg", "chat/client/res/head_2.jpg",
+                                           "chat/client/res/head_3.jpg", "chat/client/res/head_4.jpg",
+                                           "chat/client/res/head_5.jpg"};
+static const std::vector<QString> names = {"llfc", "zack", "golang", "cpp", "java", "nodejs", "python", "rust"};
