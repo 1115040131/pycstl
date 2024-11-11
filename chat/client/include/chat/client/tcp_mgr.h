@@ -4,7 +4,7 @@
 #include <QTcpSocket>
 
 #include "chat/client/define.h"
-#include "chat/client/search_info.h"
+#include "chat/client/user_data.h"
 #include "common/singleton.h"
 
 class TcpMgr : public QObject, public pyc::Singleton<TcpMgr> {

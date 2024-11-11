@@ -4,7 +4,7 @@
 #include <QListWidget>
 #include <memory>
 
-#include "chat/client/search_info.h"
+#include "chat/client/user_data.h"
 
 class SearchList : public QListWidget {
     Q_OBJECT

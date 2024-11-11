@@ -5,7 +5,7 @@
 #include <memory>
 #include <queue>
 
-#include "chat/client/search_info.h"
+#include "chat/client/user_data.h"
 #include "chat/client/util/clicked_label.h"
 #include "chat/client/widget/friend_label.h"
 

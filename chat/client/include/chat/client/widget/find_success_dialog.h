@@ -3,7 +3,7 @@
 #include <QDialog>
 #include <memory>
 
-#include "chat/client/search_info.h"
+#include "chat/client/user_data.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
