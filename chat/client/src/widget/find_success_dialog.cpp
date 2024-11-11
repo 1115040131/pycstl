@@ -31,6 +31,9 @@ void FindSuccessDialog::setSearchInfo(const std::shared_ptr<SearchInfo>& search_
 }
 
 void FindSuccessDialog::on_add_friend_btn_clicked() {
+    this->hide();
+
+    // 弹出添加好友界面
     auto apply_friend_dialog = new ApplyFriendDialog(static_cast<QWidget*>(this->parent()));
     apply_friend_dialog->setSearchInfo(search_info_);
     apply_friend_dialog->setModal(true);

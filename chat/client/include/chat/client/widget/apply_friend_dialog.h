@@ -44,7 +44,7 @@ private:
 
     void resetLabels();
 
-    // 添加标签
+    // 给好友添加标签
     void addLabel(const QString& name);
 
 private slots:

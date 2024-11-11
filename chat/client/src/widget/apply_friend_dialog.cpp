@@ -7,6 +7,8 @@
 
 inline constexpr int kMinApplyLbaelEditLength = 40;  // 申请好友标签输入框最低长度
 
+inline constexpr std::string_view kAddPrefix = "添加标签";
+
 ApplyFriendDialog::ApplyFriendDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ApplyFriendDialog) {
     ui->setupUi(this);
 
@@ -239,11 +241,11 @@ void ApplyFriendDialog::slot_show_more_label() {
 }
 
 void ApplyFriendDialog::slot_label_enter() {
-    if (ui->label_edit->text().isEmpty()) {
+    auto text = ui->label_edit->text();
+    if (text.isEmpty()) {
         return;
     }
 
-    auto text = ui->label->text();
     addLabel(text);
 
     ui->input_tip_widget->hide();
@@ -310,11 +312,24 @@ void ApplyFriendDialog::slot_change_friend_label_by_tip(const QString& name, Cli
     }
 }
 
-void ApplyFriendDialog::slot_label_text_change(const QString& text) { (void)text; }
+void ApplyFriendDialog::slot_label_text_change(const QString& text) {
+    if (text.isEmpty()) {
+        ui->input_tip_widget->hide();
+        return;
+    }
 
-void ApplyFriendDialog::slot_label_edit_finished() {}
+    auto iter = std::find(tip_data_.begin(), tip_data_.end(), text);
+    if (iter == tip_data_.end()) {
+        ui->tip_label->setText(kAddPrefix.data() + text);
+    } else {
+        ui->tip_label->setText(*iter);
+    }
+    ui->input_tip_widget->show();
+}
 
-void ApplyFriendDialog::slot_add_friend_label_by_click_tip(const QString& text) { (void)text; }
+void ApplyFriendDialog::slot_label_edit_finished() { ui->input_tip_widget->hide(); }
+
+void ApplyFriendDialog::slot_add_friend_label_by_click_tip(const QString&) { slot_label_enter(); }
 
 void ApplyFriendDialog::slot_apply_sure() {
     qDebug() << "Slot Apply Sure";

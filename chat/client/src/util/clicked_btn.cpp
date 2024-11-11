@@ -6,6 +6,7 @@
 
 ClickedBtn::ClickedBtn(QWidget* parent) : QPushButton(parent) {
     setCursor(Qt::PointingHandCursor);
+    setFocusPolicy(Qt::NoFocus);  // 不会被回车优先触发
     setState("normal", "hover", "press");
 }
 
