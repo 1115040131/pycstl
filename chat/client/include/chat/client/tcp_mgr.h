@@ -39,6 +39,15 @@ signals:
     // 搜索用户
     void sig_user_search(const SearchInfo& search_info);
 
+    // 添加好友
+    void sig_friend_apply(const AddFriendApply& apply);
+
+    // 对方同意添加好友
+    void sig_add_auth_friend(const AuthInfo& auth_info);
+
+    // 同意好友申请
+    void sig_auth_rsp(const AuthRsp& auth_rsp);
+
 public slots:
     // 连接到聊天服务器
     void slot_connect_tcp(const ServerInfo& server_info);

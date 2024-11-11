@@ -11,6 +11,25 @@ struct SearchInfo {
     QString desc;
 };
 
+struct AddFriendApply {
+    int uid;
+    int sex;
+    QString name;
+    QString nick;
+    QString icon;
+    QString desc;
+};
+
+struct ApplyInfo {
+    int uid;
+    int sex;
+    QString name;
+    QString nick;
+    QString icon;
+    QString desc;
+    int status;
+};
+
 struct AuthInfo {
     int uid;
     int sex;

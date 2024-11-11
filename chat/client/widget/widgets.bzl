@@ -4,6 +4,8 @@ WIDGETS = [
     "mainwindow",
     "add_user_item",
     "apply_friend_dialog",
+    "apply_friend_item",
+    "apply_friend_page",
     "chat_dialog",
     "chat_page",
     "chat_user_widget",

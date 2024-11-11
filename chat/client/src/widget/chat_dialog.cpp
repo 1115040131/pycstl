@@ -89,8 +89,6 @@ void ChatDialog::ShowSearch(bool is_search) {
     }
 }
 
-
-
 void ChatDialog::addChatUserList() {
     for (int i = 0; i < 13; i++) {
         int random_value = QRandomGenerator::global()->bounded(100);

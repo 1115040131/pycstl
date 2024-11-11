@@ -23,6 +23,9 @@ public:
 
     Type GetItemType() const { return type_; }
 
+protected:
+    void paintEvent(QPaintEvent* event);
+
 private:
     Type type_;
 };

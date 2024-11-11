@@ -18,12 +18,12 @@ ChatPage::ChatPage(QWidget* parent) : QDialog(parent), ui(new Ui::ChatPage) {
 
 ChatPage::~ChatPage() { delete ui; }
 
-// void ChatPage::paintEvent(QPaintEvent*) {
-//     QStyleOption opt;
-//     opt.initFrom(this);
-//     QPainter painter(this);
-//     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
-// }
+void ChatPage::paintEvent(QPaintEvent*) {
+    QStyleOption opt;
+    opt.initFrom(this);
+    QPainter painter(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+}
 
 void ChatPage::on_send_btn_clicked() {
     auto chat_edit = ui->chat_edit;
