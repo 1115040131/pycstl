@@ -43,7 +43,7 @@ bool ConfigMgr::SetSection(const std::string& section) {
         return false;
     }
     section_ = section;
-    _g_config_mgr_logger.info("Section \"{}\" set", section);
+    _g_config_mgr_logger.debug("Section \"{}\" set", section);
     return true;
 }
 

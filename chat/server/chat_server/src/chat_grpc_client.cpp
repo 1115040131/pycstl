@@ -1,0 +1,86 @@
+#include "chat/server/chat_server/chat_grpc_client.h"
+
+#include <grpcpp/create_channel.h>
+
+#include "chat/server/chat_server/define.h"
+#include "chat/server/common/config_mgr.h"
+#include "chat/server/common/defer.h"
+#include "common/connection_pool.h"
+
+namespace pyc {
+namespace chat {
+
+// TODO: remove
+template <typename... Targs>
+void DUMMY_CODE(Targs&&... /* unused */) {}
+
+class ChatConnectionPool : public ConnectionPool<std::unique_ptr<ChatService::Stub>> {
+public:
+    ChatConnectionPool(std::string_view host, std::string_view port, size_t size) {
+        auto target = fmt::format("{}:{}", host, port);
+        for (std::size_t i = 0; i < size; ++i) {
+            connections_.push(
+                ChatService::NewStub(grpc::CreateChannel(target, grpc::InsecureChannelCredentials())));
+        }
+    }
+};
+
+ChatGrpcClient::ChatGrpcClient() {
+    fmt::println("========== ChatGrpcClient setup ==========");
+
+    GET_SECTION_CONFIG(peer_servers, "PeerServers");
+
+    std::unordered_set<std::string> servers;
+
+    {
+        std::stringstream ss(peer_servers);
+        std::string server;
+
+        while (std::getline(ss, server, ',')) {
+            if (servers.count(server) > 0) {
+                PYC_LOG_ERROR("Same peer server {}!", server);
+            } else {
+                servers.insert(server);
+            }
+        }
+    }
+
+    if (servers.empty()) {
+        PYC_LOG_WARN("No peer server found!");
+    }
+    for (const auto& server : servers) {
+        GET_CONFIG(host, server, "Host");
+        GET_CONFIG(port, server, "RpcPort");
+        pools_[server] = std::make_unique<ChatConnectionPool>(host, port, 5);
+        PYC_LOG_INFO("Peer Server {} at {}:{} connect", server, host, port);
+    }
+
+    fmt::println("==========================================");
+}
+
+ChatGrpcClient::~ChatGrpcClient() {
+    for (auto& pool : pools_) {
+        pool.second->Close();
+    }
+}
+
+AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_ip, const AddFriendReq request) {
+    DUMMY_CODE(server_ip, request);
+    return {};
+}
+
+AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_ip, const AuthFriendReq request) {
+    DUMMY_CODE(server_ip, request);
+    return {};
+}
+
+TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_ip, const TextChatMsgReq& request,
+                                                 const nlohmann::json& return_value) {
+    DUMMY_CODE(server_ip, request, return_value);
+    return {};
+}
+
+bool GetBaseInfo(const std::string& base_key, int uid, const UserInfo& user_info);
+
+}  // namespace chat
+}  // namespace pyc

@@ -1,5 +1,6 @@
 #include "chat/server/chat_server/cserver.h"
 
+#include "chat/server/chat_server/chat_grpc_client.h"
 #include "chat/server/chat_server/csession.h"
 #include "chat/server/common/io_service_pool.h"
 #include "chat/server/common/status_grpc_client.h"
@@ -9,7 +10,10 @@ namespace chat {
 
 CServer::CServer(boost::asio::io_context& io_context, const std::string& name, unsigned short port)
     : io_context_(io_context), name_(name), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
-    StatusGrpcClient::GetInstance();  // 初始化 grpc 客户端
+    // 初始化 grpc 客户端
+    StatusGrpcClient::GetInstance();
+    ChatGrpcClient::GetInstance();
+
     StartAccept();
 
     PYC_LOG_INFO("{} listening on port {}", name_, port);

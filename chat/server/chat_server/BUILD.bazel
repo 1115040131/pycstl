@@ -15,10 +15,12 @@ cc_library(
     deps = [
         "//chat/common",
         "//chat/server/common",
+        "//chat/server/proto:chat_cc_grpc_proto",
         "//common",
         "//logger",
         "@boost//:asio",
         "@boost//:uuid",
+        "@com_github_grpc_grpc//:grpc++",
         "@nlohmann_json//:json",
     ],
 )

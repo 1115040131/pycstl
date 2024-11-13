@@ -19,7 +19,8 @@ int main(int argc, char const* argv[]) {
         });
 
         std::string chat_server_name = argv[1];
-        GET_CONFIG_INT(port, chat_server_name, "Port");
+        SET_SECTION(chat_server_name);
+        GET_SECTION_CONFIG_INT(port, "Port");
         pyc::chat::CServer server(io_context, chat_server_name, port);
         io_context.run();
     } catch (const std::exception& e) {

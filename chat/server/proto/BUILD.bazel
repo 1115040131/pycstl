@@ -43,3 +43,21 @@ cc_grpc_library(
     grpc_only = True,
     deps = ["status_cc_proto"],
 )
+
+# chat.grpc
+proto_library(
+    name = "chat_proto",
+    srcs = ["chat.proto"],
+)
+
+cc_proto_library(
+    name = "chat_cc_proto",
+    deps = ["chat_proto"],
+)
+
+cc_grpc_library(
+    name = "chat_cc_grpc_proto",
+    srcs = ["chat_proto"],
+    grpc_only = True,
+    deps = ["chat_cc_proto"],
+)
