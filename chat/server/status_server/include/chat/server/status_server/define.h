@@ -4,8 +4,6 @@
 namespace pyc {
 namespace chat {
 
-constexpr inline std::string_view kUserTokenPrefix = "utoken_";
-
 inline Logger g_logger("StatusServer");
 
 }  // namespace chat

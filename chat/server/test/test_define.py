@@ -54,6 +54,11 @@ class Server(Enum):
     kChatServer2 = 5
 
 
+class RedisKey(Enum):
+    kLoginCount = 'login_count'
+    kUserTokenPrefix = 'utoken_'
+
+
 def start_server(servers: list[Server], log_dir='stdout') -> list[subprocess.Popen]:
     """
     启动服务器进程
@@ -124,7 +129,8 @@ def get_chat_servers(config: configparser.ConfigParser):
 
     chat_servers = []
     for chat_server_name in ['ChatServer1', 'ChatServer2']:
-        chat_servers.append([config[chat_server_name]['Host'], config[chat_server_name]['Port']])
+        chat_servers.append(
+            [config[chat_server_name]['Host'], config[chat_server_name]['Port']])
     return chat_servers
 
 

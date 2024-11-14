@@ -5,17 +5,11 @@
 #include <string>
 #include <string_view>
 
+#include "chat/server/common/data.h"
 #include "common/singleton.h"
 
 namespace pyc {
 namespace chat {
-
-struct UserInfo {
-    int uid;
-    std::string name;
-    std::string passward;
-    std::string email;
-};
 
 class MysqlPool;  // 前置声明
 

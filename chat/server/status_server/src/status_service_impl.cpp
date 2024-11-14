@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "chat/server/common/config_mgr.h"
+#include "chat/server/common/redis_mgr.h"
 #include "chat/server/common/utils.h"
 #include "chat/server/status_server/define.h"
 
@@ -27,6 +28,17 @@ StatusServiceImpl::StatusServiceImpl() {
 
 std::optional<ChatServer> StatusServiceImpl::selectChatServer() {
     std::lock_guard<std::mutex> lock(mtx_);
+
+    for (auto& [_, server] : servers_) {
+        auto count_str = RedisMgr::GetInstance().HGet(kLoginCount, server.name);
+        if (!count_str) {
+            PYC_LOG_WARN("Get [{}] login count fail", server.name);
+            server.connection_count = std::numeric_limits<int>::max();
+        } else {
+            server.connection_count = std::stoi(*count_str);
+        }
+    }
+
     auto iter = std::ranges::min_element(servers_, [](const auto& lhs, const auto& rhs) {
         return lhs.second.connection_count < rhs.second.connection_count;
     });
@@ -42,15 +54,17 @@ grpc::Status StatusServiceImpl::GetChatServer(grpc::ServerContext*, const pyc::c
     if (!server) {
         response->set_error(static_cast<int>(ErrorCode::kNetworkError));
     } else {
+        auto token = generateUniqueString();
+        auto token_key = fmt::format("{}{}", kUserTokenPrefix, request->uid());
+        auto result = RedisMgr::GetInstance().Set(token_key, token);
+        if (!result) {
+            response->set_error(static_cast<int>(ErrorCode::kNetworkError));
+        }
+
         response->set_error(static_cast<int>(ErrorCode::kSuccess));
         response->set_host(server->host);
         response->set_port(server->port);
-        response->set_token(generateUniqueString());
-        {
-            // TODO: 用 redis
-            std::lock_guard<std::mutex> lock(mtx_);
-            tokens_[request->uid()] = response->token();
-        }
+        response->set_token(token);
     }
     return grpc::Status::OK;
 }
@@ -61,12 +75,15 @@ grpc::Status StatusServiceImpl::Login(grpc::ServerContext*, const pyc::chat::Log
     auto token = request->token();
 
     std::lock_guard<std::mutex> lock(mtx_);
-    auto iter = tokens_.find(uid);
-    if (iter == tokens_.end()) {
+
+    auto token_key = fmt::format("{}{}", kUserTokenPrefix, uid);
+    auto token_value = RedisMgr::GetInstance().Get(token_key);
+    if (!token_value) {
         response->set_error(static_cast<int>(ErrorCode::kUidInvalid));
         return grpc::Status::OK;
     }
-    if (iter->second != token) {
+
+    if (token_value != token) {
         response->set_error(static_cast<int>(ErrorCode::kTokenInvalid));
         return grpc::Status::OK;
     }

@@ -154,13 +154,15 @@ TEST(MysqlMgrTest, CheckPassword) {
 
     auto uid = mysql_mgr.RegUser(user1, email1, password1).value();
     EXPECT_TRUE(uid > 0);
-    EXPECT_EQ(mysql_mgr.CheckPassword(email1, password1).value(), (UserInfo{uid, user1, password1, email1}));
+    EXPECT_EQ(mysql_mgr.CheckPassword(email1, password1).value(),
+              (UserInfo{uid, user1, email1, password1, {}, {}, {}, {}, {}}));
     EXPECT_FALSE(mysql_mgr.CheckPassword(email1, password2));
 
     // 更新密码
     EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password2).value());
     EXPECT_FALSE(mysql_mgr.CheckPassword(email1, password1));
-    EXPECT_EQ(mysql_mgr.CheckPassword(email1, password2).value(), (UserInfo{uid, user1, password2, email1}));
+    EXPECT_EQ(mysql_mgr.CheckPassword(email1, password2).value(),
+              (UserInfo{uid, user1, email1, password2, {}, {}, {}, {}, {}}));
 
     // TODO: 删除测试数据
 }
@@ -176,7 +178,7 @@ TEST(MysqlMgrTest, GetUser) {
     // 注册用户并查询
     auto uid = mysql_mgr.RegUser(user1, email1, password1).value();
     EXPECT_TRUE(uid > 0);
-    EXPECT_EQ(mysql_mgr.GetUser(uid).value(), (UserInfo{uid, user1, password1, email1}));
+    EXPECT_EQ(mysql_mgr.GetUser(uid).value(), (UserInfo{uid, user1, email1, password1, {}, {}, {}, {}, {}}));
     // 查询不存在的账户
     EXPECT_FALSE(mysql_mgr.GetUser(uid + 1));
 

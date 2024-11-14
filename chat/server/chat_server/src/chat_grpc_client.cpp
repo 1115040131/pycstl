@@ -80,7 +80,5 @@ TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_ip, c
     return {};
 }
 
-bool GetBaseInfo(const std::string& base_key, int uid, const UserInfo& user_info);
-
 }  // namespace chat
 }  // namespace pyc

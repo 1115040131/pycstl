@@ -22,8 +22,12 @@ class StatusServerTest(unittest.TestCase):
         # 初始化 grpc 客户端
         status_server_host = cls.config['StatusServer']['Host']
         status_server_port = cls.config['StatusServer']['Port']
-        channel = grpc.insecure_channel(f'{status_server_host}:{status_server_port}')
+        channel = grpc.insecure_channel(
+            f'{status_server_host}:{status_server_port}')
         cls.client = StatusServiceStub(channel)
+
+        # 创建 redis 连接
+        cls.redis: redis.Redis = connect_redis(cls.config)
 
     @classmethod
     def tearDownClass(cls):
@@ -42,6 +46,10 @@ class StatusServerTest(unittest.TestCase):
     def test_Login(self):
         # 无效的 uid
         uid = 1234567
+
+        # 清理 redis 数据
+        self.redis.delete(f'{RedisKey.kUserTokenPrefix.value}{uid}')
+
         request = LoginReq(uid=uid, token='token')
         response = self.client.Login(request)
         self.assertEqual(response.error, ErrorCode.kUidInvalid.value)

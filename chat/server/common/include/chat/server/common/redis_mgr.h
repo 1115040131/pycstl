@@ -10,6 +10,10 @@
 namespace pyc {
 namespace chat {
 
+// redis key 定义
+constexpr inline std::string_view kLoginCount = "login_count";
+constexpr inline std::string_view kUserTokenPrefix = "utoken_";
+
 class RedisConnectionPool;
 
 class RedisMgr : public Singleton<RedisMgr> {

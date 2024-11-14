@@ -6,10 +6,10 @@ namespace pyc {
 namespace chat {
 
 struct UserInfo {
-    std::string name;
-    std::string pwd;
     int uid;
+    std::string name;
     std::string email;
+    std::string passward;
     std::string nick;
     std::string desc;
     int sex;

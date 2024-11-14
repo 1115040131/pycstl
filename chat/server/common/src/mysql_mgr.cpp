@@ -91,12 +91,11 @@ std::optional<UserInfo> MysqlMgr::CheckPassword(std::string_view email, std::str
             return std::nullopt;
         }
 
-        UserInfo user_info{
-            .uid = row[1].get<int>(),
-            .name = row[2].get<std::string>(),
-            .passward = std::string(password),
-            .email = std::string(email),
-        };
+        UserInfo user_info{};
+        user_info.uid = row[1].get<int>();
+        user_info.name = row[2].get<std::string>();
+        user_info.email = email;
+        user_info.passward = password;
 
         return user_info;
     });
@@ -110,12 +109,11 @@ std::optional<UserInfo> MysqlMgr::GetUser(int uid) {
             return std::nullopt;
         }
 
-        UserInfo user_info{
-            .uid = row[1].get<int>(),
-            .name = row[2].get<std::string>(),
-            .passward = row[4].get<std::string>(),
-            .email = row[3].get<std::string>(),
-        };
+        UserInfo user_info{};
+        user_info.uid = row[1].get<int>();
+        user_info.name = row[2].get<std::string>();
+        user_info.email = row[3].get<std::string>();
+        user_info.passward = row[4].get<std::string>();
 
         return user_info;
     });

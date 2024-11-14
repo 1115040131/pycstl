@@ -5,7 +5,7 @@
 #include "chat/common/error_code.h"
 #include "chat/server/common/defer.h"
 #include "chat/server/common/mysql_mgr.h"
-#include "chat/server/common/status_grpc_client.h"
+#include "chat/server/common/redis_mgr.h"
 
 namespace pyc {
 namespace chat {
@@ -84,13 +84,17 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     }
 
     int uid = src_root.value("uid", 0);
+    auto token = src_root.value("token", "");
 
-    // 从状态服务器查询 token 是否正确
-    auto response = StatusGrpcClient::GetInstance().Login(uid, src_root.value("token", ""));
-
-    if (response.error()) {
-        root["error"] = response.error();
-        PYC_LOG_ERROR("grpc Login fail, error is {}", response.error());
+    // 从 redis 中查询 token 是否正确
+    auto token_key = fmt::format("{}{}", kUserTokenPrefix, uid);
+    auto token_value = RedisMgr::GetInstance().Get(token_key);
+    if (!token_value) {
+        root["error"] = static_cast<int>(ErrorCode::kUidInvalid);
+        return;
+    }
+    if (token_value != token) {
+        root["error"] = static_cast<int>(ErrorCode::kTokenInvalid);
         return;
     }
 
@@ -104,7 +108,7 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
 
     root["error"] = static_cast<int>(ErrorCode::kSuccess);
     root["uid"] = user_info->uid;
-    root["token"] = response.token();
+    root["token"] = token;
     root["name"] = user_info->name;
 }
 
