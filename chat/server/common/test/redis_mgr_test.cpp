@@ -19,6 +19,12 @@ TEST(CommonTest, RedisMgrTest) {
 
     EXPECT_TRUE(redis_mgr.HSet("bloginfo", "blogwebsite", "llfc.club"));
     EXPECT_EQ(redis_mgr.HGet("bloginfo", "blogwebsite"), "llfc.club");
+    EXPECT_FALSE(redis_mgr.HIncrBy("bloginfo", "blogwebsite", 5));
+    EXPECT_TRUE(redis_mgr.HSet("bloginfo", "count", "0"));
+    EXPECT_EQ(redis_mgr.HIncrBy("bloginfo", "count", 5), 5);
+    EXPECT_EQ(redis_mgr.HIncrBy("bloginfo", "count", -3), 2);
+    EXPECT_EQ(redis_mgr.HGet("bloginfo", "count"), "2");
+
     EXPECT_TRUE(redis_mgr.Exists("bloginfo"));
     EXPECT_TRUE(redis_mgr.Del("bloginfo"));
     EXPECT_FALSE(redis_mgr.Del("bloginfo"));

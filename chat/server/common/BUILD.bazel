@@ -25,5 +25,6 @@ cc_library(
         "@fmt",
         "@hiredis",
         "@mysql-connector-cpp",
+        "@nlohmann_json//:json",
     ],
 )

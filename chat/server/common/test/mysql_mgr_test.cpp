@@ -139,9 +139,6 @@ TEST(MysqlMgrTest, UpdatePassword) {
     // TODO: 删除测试数据
 }
 
-constexpr bool operator==(const UserInfo& lhs, const UserInfo& rhs) {
-    return lhs.uid == rhs.uid && lhs.name == rhs.name && lhs.passward == rhs.passward && lhs.email == rhs.email;
-}
 
 TEST(MysqlMgrTest, CheckPassword) {
     auto& mysql_mgr = MysqlMgr::GetInstance();

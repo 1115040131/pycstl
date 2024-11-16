@@ -173,7 +173,7 @@ class ChatServerTest(unittest.TestCase):
         self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
         self.assertEqual(json_response['uid'], user1_uid)
         self.assertEqual(json_response['user'], user1)
-        self.assertIn([json_response['host'], json_response['port']], self.chat_servers)
+        self.assertIn([json_response['host'], json_response['port']], self.chat_servers.values())
         host = json_response['host']
         port = int(json_response['port'])
         token = json_response['token']
@@ -208,9 +208,35 @@ class ChatServerTest(unittest.TestCase):
         self.assertEqual(response.message_id, ReqId.kChatLoginRes)
         json_response = json.loads(response.message_body)
         self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
-        self.assertEqual(json_response['uid'], user1_uid)
         self.assertEqual(json_response['token'], token)
-        self.assertEqual(json_response['name'], user1)
+        self.assertEqual(json_response['base_info']['uid'], user1_uid)
+        self.assertEqual(json_response['base_info']['name'], user1)
+
+        # 登录人数变化
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
+
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((self.config["ChatServer1"]["Host"], int(self.config["ChatServer1"]["Port"])))
+
+            response = Message.send_and_receive(client_socket, Message(
+                ReqId.kChatLogin, json.dumps({'uid': user1_uid,
+                                            "token": token})))
+            self.assertEqual(response.message_id, ReqId.kChatLoginRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1").decode('utf-8')), 1)
+            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2").decode('utf-8')), 0)
+
+            # TODO: 重复登录
+            response = Message.send_and_receive(client_socket, Message(
+                ReqId.kChatLogin, json.dumps({'uid': user1_uid,
+                                            "token": token})))
+            self.assertEqual(response.message_id, ReqId.kChatLoginRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1").decode('utf-8')), 2)
+            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2").decode('utf-8')), 0)
 
 
 if __name__ == '__main__':

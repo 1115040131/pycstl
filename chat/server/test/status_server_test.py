@@ -34,22 +34,41 @@ class StatusServerTest(unittest.TestCase):
         pass
 
     def test_GetChatServer(self):
-        request = GetChatServerReq(uid=12345)
+        uid = 12345
+
+        # 清理 token 数据
+        self.redis.delete(f'{RedisKey.kUserTokenPrefix.value}{uid}')
+
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
+
+        request = GetChatServerReq(uid=uid)
         response = self.client.GetChatServer(request)
         self.assertEqual(response.error, ErrorCode.kSuccess.value)
-        self.assertIn([response.host, response.port], self.chat_servers)
-        print(response.token)
+        self.assertIn([response.host, response.port], self.chat_servers.values())
+        self.assertEqual(response.token, self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}').decode('utf-8'))
 
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 1)
         response = self.client.GetChatServer(request)
-        print(response.token)
+        self.assertEqual(response.error, ErrorCode.kSuccess.value)
+        self.assertEqual([response.host, response.port], self.chat_servers["ChatServer1"])
+        self.assertEqual(response.token, self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}').decode('utf-8'))
+
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 1)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
+        response = self.client.GetChatServer(request)
+        self.assertEqual(response.error, ErrorCode.kSuccess.value)
+        self.assertEqual([response.host, response.port], self.chat_servers["ChatServer2"])
+        self.assertEqual(response.token, self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}').decode('utf-8'))
 
     def test_Login(self):
-        # 无效的 uid
         uid = 1234567
 
         # 清理 redis 数据
         self.redis.delete(f'{RedisKey.kUserTokenPrefix.value}{uid}')
 
+        # 无效的 uid
         request = LoginReq(uid=uid, token='token')
         response = self.client.Login(request)
         self.assertEqual(response.error, ErrorCode.kUidInvalid.value)
@@ -58,7 +77,7 @@ class StatusServerTest(unittest.TestCase):
         request = GetChatServerReq(uid=uid)
         response = self.client.GetChatServer(request)
         self.assertEqual(response.error, ErrorCode.kSuccess.value)
-        self.assertIn([response.host, response.port], self.chat_servers)
+        self.assertIn([response.host, response.port], self.chat_servers.values())
         token = response.token
 
         # 无效的 token
@@ -70,8 +89,8 @@ class StatusServerTest(unittest.TestCase):
         request = LoginReq(uid=uid, token=token)
         response = self.client.Login(request)
         self.assertEqual(response.error, ErrorCode.kSuccess.value)
-        self.assertEqual(response.uid, uid)
         self.assertEqual(response.token, token)
+        self.assertEqual(response.uid, uid)
 
 
 if __name__ == '__main__':

@@ -43,8 +43,10 @@ std::optional<ChatServer> StatusServiceImpl::selectChatServer() {
         return lhs.second.connection_count < rhs.second.connection_count;
     });
     if (iter == servers_.end()) {
+        PYC_LOG_INFO("No server can be selected");
         return std::nullopt;
     }
+    PYC_LOG_INFO("Select {}", iter->second.name);
     return iter->second;
 }
 

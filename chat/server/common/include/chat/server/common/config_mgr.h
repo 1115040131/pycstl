@@ -43,6 +43,8 @@ inline Logger _g_config_mgr_logger("ConfigMgr");
         ::pyc::chat::_g_config_mgr_logger.fatal("Config[\"{}\"] not found", section); \
     }
 
+#define GET_SECTION() ::pyc::chat::ConfigMgr::GetInstance().GetSection()
+
 #define GET_CONFIG(var, section, key)                                                                  \
     std::string var;                                                                                   \
     {                                                                                                  \

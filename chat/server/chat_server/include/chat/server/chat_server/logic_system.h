@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <thread>
 #include <unordered_map>
@@ -39,9 +40,11 @@ private:
     // 处理队列中的第一个消息
     void DealFirstMsg();
 
+    // 处理登录逻辑
     void LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data);
 
-    bool GetBaseInfo(const std::string& base_key, int uid, const UserInfo& user_info);
+    // 获取用户基本信息
+    std::optional<UserInfo> GetBaseInfo(int uid);
 
 private:
     std::queue<std::unique_ptr<LogicNode>> msg_queue_{};

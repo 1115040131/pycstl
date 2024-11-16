@@ -127,10 +127,10 @@ def get_chat_servers(config: configparser.ConfigParser):
     读取所有聊天服务器地址
     """
 
-    chat_servers = []
+    chat_servers = {}
     for chat_server_name in ['ChatServer1', 'ChatServer2']:
-        chat_servers.append(
-            [config[chat_server_name]['Host'], config[chat_server_name]['Port']])
+        chat_servers[chat_server_name] = [config[chat_server_name]
+                                          ['Host'], config[chat_server_name]['Port']]
     return chat_servers
 
 

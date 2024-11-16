@@ -13,6 +13,7 @@ namespace chat {
 // redis key 定义
 constexpr inline std::string_view kLoginCount = "login_count";
 constexpr inline std::string_view kUserTokenPrefix = "utoken_";
+constexpr inline std::string_view kUserBaseInfo = "ubaseinfo_";
 
 class RedisConnectionPool;
 
@@ -35,6 +36,7 @@ public:
 
     bool HSet(std::string_view key, std::string_view field, std::string_view value);
     std::optional<std::string> HGet(std::string_view key, std::string_view field);
+    std::optional<int64_t> HIncrBy(std::string_view key, std::string_view field, int64_t increment);
 
     bool Del(std::string_view key);
 

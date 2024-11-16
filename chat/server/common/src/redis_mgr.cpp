@@ -199,6 +199,30 @@ std::optional<std::string> RedisMgr::HGet(std::string_view key, std::string_view
     return value;
 }
 
+std::optional<int64_t> RedisMgr::HIncrBy(std::string_view key, std::string_view field, int64_t increment) {
+    auto connection = pool_->GetConnection();
+    if (!connection) {
+        _g_redis_mgr_logger.error("Get connection failed");
+        return std::nullopt;
+    }
+
+    auto command = fmt::format("HINCRBY {} {} {}", key, field, increment);
+    auto guard = RedisReplyGuard(connection->Get(), command);
+
+    if (!guard.reply_) {
+        _g_redis_mgr_logger.error("[{}] failed", command);
+        return std::nullopt;
+    }
+    if (guard.reply_->type != REDIS_REPLY_INTEGER) {
+        _g_redis_mgr_logger.error("[{}] failed, type: {}", command, guard.reply_->type);
+        return std::nullopt;
+    }
+
+    auto value = guard.reply_->integer;
+    _g_redis_mgr_logger.debug("[{}] success, value: {}", command, value);
+    return value;
+}
+
 bool RedisMgr::Del(std::string_view key) {
     auto connection = pool_->GetConnection();
     if (!connection) {
