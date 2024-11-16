@@ -2,6 +2,7 @@
 
 #include "chat/server/chat_server/chat_grpc_client.h"
 #include "chat/server/chat_server/csession.h"
+#include "chat/server/chat_server/user_mgr.h"
 #include "chat/server/common/io_service_pool.h"
 #include "chat/server/common/status_grpc_client.h"
 
@@ -21,9 +22,14 @@ CServer::CServer(boost::asio::io_context& io_context, const std::string& name, u
 
 CServer::~CServer() { PYC_LOG_INFO("{} destruct", name_); }
 
-void CServer::ClearSession(const std::string& uuid) {
+void CServer::ClearSession(const std::string& session_id) {
+    auto iter = sessions_.find(session_id);
+    if (iter != sessions_.end()) {
+        UserMgr::GetInstance().RemoveUserSeesion(iter->second->GetUserId());
+    }
+
     std::lock_guard<std::mutex> lock(mutex_);
-    sessions_.erase(uuid);
+    sessions_.erase(session_id);
 
     printSessions();  // debug
 }
@@ -36,7 +42,7 @@ void CServer::StartAccept() {
             if (!ec) {
                 session->Start();
                 std::lock_guard<std::mutex> lock(mutex_);
-                sessions_.emplace(session->GetUuid(), session);
+                sessions_.emplace(session->GetSessionId(), session);
 
                 printSessions();  // debug
             } else {

@@ -8,7 +8,7 @@ namespace pyc {
 namespace chat {
 
 CSession::CSession(boost::asio::io_context& io_context, CServer* server)
-    : socket_(io_context), server_(server), uuid_(generateUniqueString()) {}
+    : socket_(io_context), server_(server), session_id_(generateUniqueString()) {}
 
 void CSession::Start() { AsyncReadHead(kHeadLength); }
 
@@ -21,7 +21,7 @@ void CSession::Close() {
     boost::system::error_code ec;
     socket_.shutdown(tcp::socket::shutdown_both, ec);
     socket_.close(ec);
-    server_->ClearSession(uuid_);
+    server_->ClearSession(session_id_);
 }
 
 void CSession::asyncReadFull(size_t max_length,

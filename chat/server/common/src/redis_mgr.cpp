@@ -152,6 +152,30 @@ std::optional<std::string> RedisMgr::RPop(std::string_view key) {
     return value;
 }
 
+bool RedisMgr::HDel(std::string_view key, std::string_view field) {
+    auto connection = pool_->GetConnection();
+    if (!connection) {
+        _g_redis_mgr_logger.error("Get connection failed");
+        return false;
+    }
+
+    auto command = fmt::format("HDEL {} {}", key, field);
+    auto guard = RedisReplyGuard(connection->Get(), command);
+
+    if (!guard.reply_) {
+        _g_redis_mgr_logger.error("[{}] failed", command);
+        return false;
+    }
+    if (guard.reply_->type != REDIS_REPLY_INTEGER) {
+        _g_redis_mgr_logger.error("[{}] failed, type: {}", command, guard.reply_->type);
+        return false;
+    }
+
+    bool del = guard.reply_->integer == 1;
+    _g_redis_mgr_logger.debug("[{}] success, del: {}", command, del);
+    return del;
+}
+
 bool RedisMgr::HSet(std::string_view key, std::string_view field, std::string_view value) {
     auto connection = pool_->GetConnection();
     if (!connection) {

@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include "chat/common/error_code.h"
+#include "chat/server/chat_server/user_mgr.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
 #include "chat/server/common/mysql_mgr.h"
@@ -72,7 +73,7 @@ void LogicSystem::DealFirstMsg() {
 }
 
 void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetUuid(), msg_data);
+    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json root;
@@ -116,6 +117,15 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
 
     auto server_name = GET_SECTION();
     RedisMgr::GetInstance().HIncrBy(kLoginCount, server_name, 1);
+
+    // session 绑定用户 id
+    session->SetUserId(base_info->uid);
+
+    // 为用户设置登录 ip server 的名字
+    RedisMgr::GetInstance().Set(fmt::format("{}{}", kUserIpPrefix, uid), server_name);
+
+    // uid 和 session 绑定, 方便以后踢人操作
+    UserMgr::GetInstance().SetUserSession(uid, session);
 }
 
 std::optional<UserInfo> LogicSystem::GetBaseInfo(int uid) {

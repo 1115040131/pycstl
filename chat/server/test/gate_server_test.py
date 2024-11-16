@@ -309,7 +309,6 @@ class GateServerTest(unittest.TestCase):
         self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
 
         # 测试账户
-        # TODO: 添加多个用户进行测试
         user1 = f'pycstl_{time.time()}'
         email1 = f'{user1}@test.com'
         password1 = '123'

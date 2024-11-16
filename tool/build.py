@@ -38,6 +38,40 @@ def run_valgrind(target, args=[]):
         command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
     run_cmd(command)
 
+# 路径定义
+root_path = Path(__file__).resolve().parent.parent
+tool_path = root_path / 'tool'  # tool 目录
+
+def chat_run(targets, args):
+    run_bazel_build('//chat/...', args)
+    targets["chat_prepare"](args=[])
+    if len(args) > 0 and int(args[0]) > 1:
+        client_num = int(args[0])
+        run_tmux({
+            "GateServer": [
+                f"python3 {tool_path / 'build.py'} chat_gate_server",
+                f"python3 {tool_path / 'build.py'} chat_verify_server",
+                f"python3 {tool_path / 'build.py'} chat_status_server",
+            ],
+            "ChatServer": [
+                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer1",
+                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer2"
+            ],
+            "Client": [f"python3 {tool_path / 'build.py'} chat_client"] * client_num
+        })
+    else:
+        run_tmux({
+            "GateServer": [
+                f"python3 {tool_path / 'build.py'} chat_gate_server",
+                f"python3 {tool_path / 'build.py'} chat_verify_server",
+                f"python3 {tool_path / 'build.py'} chat_status_server",
+            ],
+            "ChatServer": [
+                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer1",
+                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer2",
+                f"python3 {tool_path / 'build.py'} chat_client"
+            ]
+        })
 
 def main():
     if len(sys.argv) < 2:
@@ -47,9 +81,6 @@ def main():
     # 第一个参数是目标名称，其余的是传递给bazel命令的参数
     target = sys.argv[1]
     additional_args = sys.argv[2:]
-
-    root_path = Path(__file__).resolve().parent.parent
-    tool_path = root_path / 'tool'  # tool 目录
 
     # chat 相关数据
     data_direction = f'{root_path}/chat/server/mysql/data'
@@ -145,22 +176,7 @@ def main():
         "chat_client": lambda args: run_bazel_run('//chat/client', args=args),
 
         # chat run
-        "chat_run": lambda args: (
-            run_bazel_build('//chat/...', args),
-            targets["chat_prepare"](args=[]),
-            run_tmux({
-                "GateServer": [
-                    f"python3 {tool_path / 'build.py'} chat_gate_server",
-                    f"python3 {tool_path / 'build.py'} chat_verify_server",
-                    f"python3 {tool_path / 'build.py'} chat_status_server",
-                ],
-                "ChatServer": [
-                    f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer1",
-                    f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer2",
-                    f"python3 {tool_path / 'build.py'} chat_client"
-                ],
-            })
-        ),
+        "chat_run": lambda args: chat_run(targets, args),
 
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),

@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_switch_chatdlg, this, &MainWindow::SlotSwitchChat);
 
     // TODO: debug
-    emit TcpMgr::GetInstance().sig_switch_chatdlg();
+    // emit TcpMgr::GetInstance().sig_switch_chatdlg();
 }
 
 MainWindow::~MainWindow() { delete ui; }

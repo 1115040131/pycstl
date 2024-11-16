@@ -211,6 +211,8 @@ class ChatServerTest(unittest.TestCase):
         self.assertEqual(json_response['token'], token)
         self.assertEqual(json_response['base_info']['uid'], user1_uid)
         self.assertEqual(json_response['base_info']['name'], user1)
+        server_name = self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user1_uid}').decode('utf-8')
+        self.assertIn(server_name, self.chat_servers.keys())
 
         # 登录人数变化
         self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)

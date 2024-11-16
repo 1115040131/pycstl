@@ -59,6 +59,8 @@ class Server(Enum):
 class RedisKey(Enum):
     kLoginCount = 'login_count'
     kUserTokenPrefix = 'utoken_'
+    kUserBaseInfo = "ubaseinfo_"
+    kUserIpPrefix = "uip_"
 
 
 def start_server(servers: list[Server], log_dir='stdout') -> list[subprocess.Popen]:

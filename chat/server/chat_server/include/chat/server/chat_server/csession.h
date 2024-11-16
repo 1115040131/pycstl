@@ -2,7 +2,6 @@
 
 #include <memory>
 #include <mutex>
-
 #include <queue>
 
 #include "chat/server/chat_server/define.h"
@@ -19,7 +18,11 @@ public:
 
     tcp::socket& GetSocket() { return socket_; }
 
-    const std::string& GetUuid() const { return uuid_; }
+    const std::string& GetSessionId() const { return session_id_; }
+
+    int GetUserId() const { return user_id_; }
+
+    void SetUserId(int user_id) { user_id_ = user_id; }
 
     // 开始异步读取数据
     void Start();
@@ -51,8 +54,9 @@ private:
 private:
     tcp::socket socket_;
     CServer* server_;
-    std::string uuid_;
+    std::string session_id_;
     bool is_closed_ = false;
+    int user_id_;
 
     char data_[kMaxLength];                // 接收数据缓冲区
     std::unique_ptr<RecvNode> recv_node_;  // 接收数据节点
