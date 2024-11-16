@@ -30,6 +30,7 @@ py_test(
     ],
     imports = ["."],
     deps = [
+        requirement("mysql-connector-python"),
         requirement("redis"),
         ":status_py_grpc",
     ],

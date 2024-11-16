@@ -4,8 +4,10 @@ import redis
 import shlex
 import subprocess
 
-
 from enum import Enum
+
+import mysql.connector
+from mysql.connector import Error
 
 
 class ErrorCode(Enum):
@@ -144,3 +146,38 @@ def connect_redis(config: configparser.ConfigParser) -> redis.Redis:
         port=config['Redis']['Port'],
         password=config['Redis']['Password'],
     )
+
+
+class Database:
+    def __init__(self, config: configparser.ConfigParser):
+        # 初始化数据库连接
+        self.connection = None
+        try:
+            self.connection = mysql.connector.connect(
+                host=config['Mysql']['Host'],
+                port=6306,
+                user=config['Mysql']['User'],
+                password=config['Mysql']['Password'],
+                database=config['Mysql']['Schema'])
+        except Error as e:
+            print(f"Error connecting to MySQL: {e}")
+
+    def query(self, sql):
+        # 执行SQL查询并返回结果
+        cursor = self.connection.cursor()
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        cursor.close()
+        return result
+
+    def del_user(self, email):
+        self.query(f'DELETE FROM user WHERE email = "{email}"')
+
+    def close(self):
+        # 关闭数据库连接
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+
+    def __del__(self):
+        # 确保在对象被销毁时关闭连接
+        self.close()

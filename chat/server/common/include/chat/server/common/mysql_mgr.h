@@ -32,6 +32,9 @@ public:
 
     std::optional<UserInfo> GetUser(int uid);
 
+    // 测试接口
+    std::optional<bool> DeleteUser(std::string_view email);
+
 private:
     std::unique_ptr<MysqlPool> pool_;
 };

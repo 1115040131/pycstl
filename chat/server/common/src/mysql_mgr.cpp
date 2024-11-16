@@ -119,5 +119,12 @@ std::optional<UserInfo> MysqlMgr::GetUser(int uid) {
     });
 }
 
+std::optional<bool> MysqlMgr::DeleteUser(std::string_view email) {
+    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
+        auto result = connection->session_.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();
+        return result.getAffectedItemsCount() > 0;
+    });
+}
+
 }  // namespace chat
 }  // namespace pyc

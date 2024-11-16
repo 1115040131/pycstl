@@ -97,7 +97,9 @@ TEST(MysqlMgrTest, RegUser) {
     EXPECT_EQ(mysql_mgr.RegUser(user2, email1, "123"), 0);
     EXPECT_TRUE(mysql_mgr.RegUser(user2, email2, "123") > 0);
 
-    // TODO: 删除测试数据
+    // 删除测试数据
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email2));
 }
 
 TEST(MysqlMgrTest, CheckEmail) {
@@ -117,7 +119,9 @@ TEST(MysqlMgrTest, CheckEmail) {
     EXPECT_TRUE(*mysql_mgr.CheckEmail(user2, email2));
     EXPECT_FALSE(*mysql_mgr.CheckEmail(user2, email1));
 
-    // TODO: 删除测试数据
+    // 删除测试数据
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email2));
 }
 
 TEST(MysqlMgrTest, UpdatePassword) {
@@ -136,9 +140,9 @@ TEST(MysqlMgrTest, UpdatePassword) {
     // 密码不同, 更新成功
     EXPECT_TRUE(mysql_mgr.UpdatePassword(user1, password2).value());
 
-    // TODO: 删除测试数据
+    // 删除测试数据
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
 }
-
 
 TEST(MysqlMgrTest, CheckPassword) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
@@ -161,7 +165,8 @@ TEST(MysqlMgrTest, CheckPassword) {
     EXPECT_EQ(mysql_mgr.CheckPassword(email1, password2).value(),
               (UserInfo{uid, user1, email1, password2, {}, {}, {}, {}, {}}));
 
-    // TODO: 删除测试数据
+    // 删除测试数据
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
 }
 
 TEST(MysqlMgrTest, GetUser) {
@@ -179,7 +184,27 @@ TEST(MysqlMgrTest, GetUser) {
     // 查询不存在的账户
     EXPECT_FALSE(mysql_mgr.GetUser(uid + 1));
 
-    // TODO: 删除测试数据
+    // 删除测试数据
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
+}
+
+TEST(MysqlMgrTest, DeleteUser) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    // 根据当前时间戳生成用户和邮箱用于测试
+    auto user1 = fmt::format("pycstl_{}", std::chrono::system_clock::now());
+    auto email1 = fmt::format("{}@test.com", user1);
+    auto password1 = "123";
+
+    // 删除不存在的用户
+    EXPECT_FALSE(mysql_mgr.DeleteUser(email1).value());
+
+    // 注册用户
+    EXPECT_TRUE(mysql_mgr.RegUser(user1, email1, password1) > 0);
+
+    // 成功删除
+    EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
+
 }
 
 }  // namespace chat

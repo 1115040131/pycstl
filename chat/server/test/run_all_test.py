@@ -32,8 +32,22 @@ if __name__ == '__main__':
 
     time.sleep(1)  # 给服务器足够时间启动
 
-    # 利用剩余的 argv 运行 unittest
-    unittest.main(argv=sys.argv[:1] + remaining_argv)
+    try:
+        # 利用剩余的 argv 运行 unittest
+        unittest.main(argv=sys.argv[:1] + remaining_argv)
 
-    # 关闭服务器
-    terminate_server(server_processes)
+    except Error as err:
+        print("Error: ", err)
+
+    finally:
+        # 关闭服务器
+        terminate_server(server_processes)
+
+        # 删除数据库中的测试用户
+        config: configparser.ConfigParser = read_config()
+        db = Database(config)
+        cursor = db.connection.cursor()
+        delete_query =  'DELETE FROM user WHERE email LIKE "pycstl_%@test.com"'
+        cursor.execute(delete_query)
+        db.connection.commit()  # 确认更改
+        print("Deleted", cursor.rowcount, "emails.")
