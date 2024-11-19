@@ -79,26 +79,74 @@ void TcpMgr::initHttpHandlers() {
             return;
         }
 
-        QJsonObject json = json_doc.object();
+        QJsonObject root = json_doc.object();
 
-        if (!json.contains("error")) {
+        if (!root.contains("error")) {
             qDebug() << "Login Failed, err is ErrorCode::kJsonError";
             emit sig_login_failed(ErrorCode::kJsonError);
             return;
         }
 
-        auto error = static_cast<ErrorCode>(json["error"].toInt());
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
         if (error != ErrorCode::kSuccess) {
             qDebug() << "Login Failed, err is" << ToString(error);
             emit sig_login_failed(error);
             return;
         }
 
+        if (!root.contains("base_info") || !root.value("base_info").isObject()) {
+            qDebug() << "Login Failed, base_info is not object";
+            emit sig_login_failed(error);
+            return;
+        }
+
         qDebug() << "Login Success!";
-        UserMgr::GetInstance().SetUid(json["uid"].toInt());
-        UserMgr::GetInstance().SetName(json["name"].toString());
-        UserMgr::GetInstance().SetToken(json["token"].toString());
+
+        auto base_info = root["base_info"].toObject();
+        UserMgr::GetInstance().SetUid(base_info["uid"].toInt());
+        UserMgr::GetInstance().SetName(base_info["name"].toString());
+        UserMgr::GetInstance().SetToken(base_info["token"].toString());
+
         emit sig_switch_chatdlg();
+    });
+    handlers_.emplace(ReqId::kSearchUserRes, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "Search user failed, err is ErrorCode::kJsonError";
+            emit sig_user_search(nullptr);
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "Search user failed, err is" << ToString(error);
+            emit sig_user_search(nullptr);
+            return;
+        }
+
+        if (!root.contains("search_info") || !root.value("search_info").isObject()) {
+            qDebug() << "Search user Failed, base_info is not object";
+            emit sig_login_failed(error);
+            return;
+        }
+
+        qDebug() << "Search user Success!";
+
+        auto search_info_json = root["search_info"].toObject();
+        auto search_info =
+            std::make_shared<SearchInfo>(search_info_json["uid"].toInt(), search_info_json["sex"].toInt(),
+                                         search_info_json["name"].toString(), search_info_json["nick"].toString(),
+                                         search_info_json["icon"].toString(), search_info_json["desc"].toString());
+
+        emit sig_user_search(search_info);
     });
 }
 
@@ -118,11 +166,8 @@ void TcpMgr::slot_connect_tcp(const ServerInfo& server_info) {
     socket_.connectToHost(host_, port_);
 }
 
-void TcpMgr::slot_send_data(ReqId req_id, const QString& data) {
+void TcpMgr::slot_send_data(ReqId req_id, const QByteArray& data) {
     uint16_t message_id = static_cast<uint16_t>(req_id);
-
-    // 将字符串转为 UTF-8 编码的字节数组
-    QByteArray data_bytes = data.toUtf8();
     uint16_t message_len = data.size();
 
     // 创建一个存储所有发送数据的字节数组
@@ -133,7 +178,7 @@ void TcpMgr::slot_send_data(ReqId req_id, const QString& data) {
     out.setByteOrder(QDataStream::BigEndian);
 
     out << message_id << message_len;
-    block.append(data_bytes);
+    block.append(data);
 
     // 发送数据
     socket_.write(block);

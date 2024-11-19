@@ -10,6 +10,7 @@ WIDGETS = [
     "chat_page",
     "chat_user_widget",
     "contact_user_item",
+    "find_fail_dialog",
     "find_success_dialog",
     "friend_label",
     "group_tip_item",

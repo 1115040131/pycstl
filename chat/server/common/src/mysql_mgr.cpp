@@ -119,6 +119,24 @@ std::optional<UserInfo> MysqlMgr::GetUser(int uid) {
     });
 }
 
+std::optional<UserInfo> MysqlMgr::GetUser(std::string_view name) {
+    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<UserInfo> {
+        auto result = connection->session_.sql("SELECT * FROM user WHERE name = ?").bind(name.data()).execute();
+        const auto& row = result.fetchOne();
+        if (row.isNull()) {
+            return std::nullopt;
+        }
+
+        UserInfo user_info{};
+        user_info.uid = row[1].get<int>();
+        user_info.name = row[2].get<std::string>();
+        user_info.email = row[3].get<std::string>();
+        user_info.password = row[4].get<std::string>();
+
+        return user_info;
+    });
+}
+
 std::optional<bool> MysqlMgr::DeleteUser(std::string_view email) {
     return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
         auto result = connection->session_.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();

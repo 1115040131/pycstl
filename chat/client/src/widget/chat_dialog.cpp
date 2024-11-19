@@ -33,6 +33,9 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
     ui->search_edit->setMaxLength(15);
     ShowSearch(false);
 
+    // 为searchlist 设置search edit
+    ui->search_list->setSearchEdit(ui->search_edit);
+
     // 连接动态加载信号
     connect(ui->chat_user_list, &ChatUserList::sig_loading_chat_user, this, &ChatDialog::slot_loading_chat_user);
     addChatUserList();  // TODO: 测试函数, 添加用户列表

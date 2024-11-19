@@ -28,7 +28,7 @@ signals:
     void sig_tcp_connect_finish(bool success);
 
     // 发送消息
-    void sig_send_data(ReqId req_id, const QString& data);
+    void sig_send_data(ReqId req_id, const QByteArray& data);
 
     // 登录失败
     void sig_login_failed(ErrorCode err);
@@ -37,7 +37,7 @@ signals:
     void sig_switch_chatdlg();
 
     // 搜索用户
-    void sig_user_search(const SearchInfo& search_info);
+    void sig_user_search(const std::shared_ptr<SearchInfo>& search_info);
 
     // 添加好友
     void sig_friend_apply(const AddFriendApply& apply);
@@ -54,7 +54,7 @@ public slots:
 
 private slots:
     // 发送消息
-    void slot_send_data(ReqId req_id, const QString& data);
+    void slot_send_data(ReqId req_id, const QByteArray& data);
 
 private:
     QTcpSocket socket_;

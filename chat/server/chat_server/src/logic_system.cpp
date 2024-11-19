@@ -1,5 +1,7 @@
 #include "chat/server/chat_server/logic_system.h"
 
+#include <ranges>
+
 #include <nlohmann/json.hpp>
 
 #include "chat/common/error_code.h"
@@ -36,6 +38,10 @@ void LogicSystem::PostMsgToQueue(std::unique_ptr<LogicNode> msg) {
 void LogicSystem::RegisterCallBack() {
     callback_map_[ReqId::kChatLogin] = [this](const std::shared_ptr<CSession>& session,
                                               const std::string& msg_data) { LoginHandler(session, msg_data); };
+    callback_map_[ReqId::kSearchUserReq] = [this](const std::shared_ptr<CSession>& session,
+                                                  const std::string& msg_data) {
+        SearchInfoHandler(session, msg_data);
+    };
 }
 
 void LogicSystem::DealMsg() {
@@ -72,12 +78,74 @@ void LogicSystem::DealFirstMsg() {
     msg_queue_.pop();
 }
 
+std::optional<UserInfo> LogicSystem::GetBaseInfo(int uid) {
+    auto key = fmt::format("{}{}", kUserBaseInfo, uid);
+
+    // 优先 redis 中查询
+    auto info_str = RedisMgr::GetInstance().Get(key);
+    if (info_str) {
+        auto j = nlohmann::json::parse(info_str.value(), nullptr, false);
+        if (j.is_discarded()) {
+            PYC_LOG_ERROR("Failed to parse Json data: {}", info_str.value());
+            return std::nullopt;
+        }
+
+        return j.get<UserInfo>();
+    }
+
+    // redis 中没有则查询 mysql
+    auto user_info = MysqlMgr::GetInstance().GetUser(uid);
+    if (!user_info) {
+        return std::nullopt;
+    }
+
+    // 将数据写入 redis 缓存中
+    nlohmann::json j = user_info.value();
+    auto result = RedisMgr::GetInstance().Set(key, j.dump());
+    if (!result) {
+        PYC_LOG_ERROR("Redis set {} {} error", key, j.dump());
+    }
+
+    return user_info.value();
+}
+
+std::optional<UserInfo> LogicSystem::GetBaseInfo(const std::string& name) {
+    auto key = fmt::format("{}{}", kNameInfo, name);
+
+    // 优先 redis 中查询
+    auto info_str = RedisMgr::GetInstance().Get(key);
+    if (info_str) {
+        auto j = nlohmann::json::parse(info_str.value(), nullptr, false);
+        if (j.is_discarded()) {
+            PYC_LOG_ERROR("Failed to parse Json data: {}", info_str.value());
+            return std::nullopt;
+        }
+
+        return j.get<UserInfo>();
+    }
+
+    // redis 中没有则查询 mysql
+    auto user_info = MysqlMgr::GetInstance().GetUser(name);
+    if (!user_info) {
+        return std::nullopt;
+    }
+
+    // 将数据写入 redis 缓存中
+    nlohmann::json j = user_info.value();
+    auto result = RedisMgr::GetInstance().Set(key, j.dump());
+    if (!result) {
+        PYC_LOG_ERROR("Redis set {} {} error", key, j.dump());
+    }
+
+    return user_info.value();
+}
+
 void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
     PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json root;
-    Defer defer([this, &session, &root]() { session->Send(root.dump(), ReqId::kChatLoginRes); });
+    Defer defer([&session, &root]() { session->Send(root.dump(), ReqId::kChatLoginRes); });
 
     if (src_root.is_discarded()) {
         PYC_LOG_ERROR("Failed to parse Json data");
@@ -128,35 +196,44 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     UserMgr::GetInstance().SetUserSession(uid, session);
 }
 
-std::optional<UserInfo> LogicSystem::GetBaseInfo(int uid) {
-    auto key = fmt::format("{}{}", kUserBaseInfo, uid);
+void LogicSystem::SearchInfoHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
+    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
-    // 优先 redis 中查询
-    auto info_str = RedisMgr::GetInstance().Get(key);
-    if (info_str) {
-        auto j = nlohmann::json::parse(info_str.value(), nullptr, false);
-        if (j.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data: {}", info_str.value());
-            return std::nullopt;
-        }
+    nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
+    nlohmann::json root;
+    Defer defer([&session, &root]() { session->Send(root.dump(), ReqId::kSearchUserRes); });
 
-        return j.get<UserInfo>();
+    if (src_root.is_discarded()) {
+        PYC_LOG_ERROR("Failed to parse Json data");
+        root["error"] = ErrorCode::kJsonError;
+        return;
     }
 
-    // redis 中没有则查询 mysql
-    auto user_info = MysqlMgr::GetInstance().GetUser(uid);
-    if (!user_info) {
-        return std::nullopt;
+    auto uid_str = src_root.value("uid", "");
+    if (uid_str == "") {
+        root["error"] = ErrorCode::kUidInvalid;
+        return;
     }
 
-    // 将数据写入 redis 缓存中
-    nlohmann::json j = user_info.value();
-    auto result = RedisMgr::GetInstance().Set(key, j.dump());
-    if (!result) {
-        PYC_LOG_ERROR("Redis set {} {} error", key, j.dump());
+    std::optional<UserInfo> search_info;
+
+    // 优先按照 id 找
+    if (std::ranges::find_if(uid_str, [](char c) { return !std::isdigit(c); }) == uid_str.end()) {
+        search_info = GetBaseInfo(std::stoi(uid_str));
     }
 
-    return user_info.value();
+    // 再按照 name 找
+    if (!search_info) {
+        search_info = GetBaseInfo(uid_str);
+    }
+
+    if (!search_info) {
+        root["error"] = ErrorCode::kUidInvalid;
+        return;
+    }
+
+    root["error"] = ErrorCode::kSuccess;
+    root["search_info"] = search_info.value();
 }
 
 }  // namespace chat

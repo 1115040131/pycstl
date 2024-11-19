@@ -40,11 +40,18 @@ private:
     // 处理队列中的第一个消息
     void DealFirstMsg();
 
+    // 根据 uid 获取用户基本信息
+    std::optional<UserInfo> GetBaseInfo(int uid);
+
+    // 根据 name 获取用户信息
+    std::optional<UserInfo> GetBaseInfo(const std::string& name);
+
+    // Handler
     // 处理登录逻辑
     void LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data);
 
-    // 获取用户基本信息
-    std::optional<UserInfo> GetBaseInfo(int uid);
+    // 处理搜索逻辑
+    void SearchInfoHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data);
 
 private:
     std::queue<std::unique_ptr<LogicNode>> msg_queue_{};

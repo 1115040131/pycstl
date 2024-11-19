@@ -1,7 +1,5 @@
 #include "chat/client/widget/find_success_dialog.h"
 
-#include <QDir>
-
 #include "chat/client/widget/apply_friend_dialog.h"
 #include "chat/client/widget/ui_find_success_dialog.h"
 

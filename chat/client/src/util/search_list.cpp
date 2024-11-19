@@ -1,12 +1,17 @@
 #include "chat/client/util/search_list.h"
 
 #include <QEvent>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QScrollBar>
 #include <QWheelEvent>
 
 #include "chat/client/tcp_mgr.h"
+#include "chat/client/util/customize_edit.h"
 #include "chat/client/widget/add_user_item.h"
+#include "chat/client/widget/find_fail_dialog.h"
 #include "chat/client/widget/find_success_dialog.h"
+#include "chat/client/widget/loading_dialog.h"
 
 SearchList::SearchList(QWidget* parent) : QListWidget(parent) {
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -25,9 +30,7 @@ SearchList::SearchList(QWidget* parent) : QListWidget(parent) {
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_user_search, this, &SearchList::slot_user_search);
 }
 
-void SearchList::closeFindDialog() {}
-
-void SearchList::setSearchEdit(QWidget* edit) { (void)edit; }
+void SearchList::setSearchEdit(CustomizeEdit* edit) { search_edit_ = edit; }
 
 bool SearchList::eventFilter(QObject* watched, QEvent* event) {
     if (watched == this->viewport()) {
@@ -55,7 +58,17 @@ bool SearchList::eventFilter(QObject* watched, QEvent* event) {
     return QListWidget::eventFilter(watched, event);
 }
 
-void SearchList::waitPending(bool pending) { (void)pending; }
+void SearchList::waitPending(bool pending) {
+    if (pending) {
+        loading_dialog_ = new LoadingDialog(this);            // 将当前对话框设置为父对象
+        loading_dialog_->setAttribute(Qt::WA_DeleteOnClose);  // 对话框关闭时自动删除
+        loading_dialog_->show();                              // 显示悬浮对话框
+        send_pending_ = true;
+    } else {
+        loading_dialog_->deleteLater();  // 加载完成后关闭对话框
+        send_pending_ = false;
+    }
+}
 
 void SearchList::addTipItem() {
     {
@@ -76,7 +89,7 @@ void SearchList::addTipItem() {
     }
 }
 
-void SearchList::CloseFindDialog() {
+void SearchList::closeFindDialog() {
     if (find_dialog_) {
         find_dialog_.reset();
     }
@@ -102,18 +115,40 @@ void SearchList::slot_item_clicked(QListWidgetItem* item) {
     }
 
     if (item_type == ListItemBase::Type::kAddUserTipItem) {
-        // TODO: 先直接弹出一个 FindSuccessDialog
-        find_dialog_ = std::make_unique<FindSuccessDialog>(this);
+        if (send_pending_) {
+            return;
+        }
 
-        auto search_info = std::make_shared<SearchInfo>(0, 0, "PYC_Chat");
-        static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
+        if (!search_edit_) {
+            qDebug() << "search_edit_ nullptr";
+            return;
+        }
 
-        find_dialog_->show();
+        waitPending(true);
+        auto uid_str = search_edit_->text();
+
+        QJsonObject root;
+        root["uid"] = uid_str;
+
+        QJsonDocument doc(root);
+        emit TcpMgr::GetInstance().sig_send_data(ReqId::kSearchUserReq, doc.toJson(QJsonDocument::Compact));
+
         return;
     }
 
     // 清除弹出框
-    CloseFindDialog();
+    closeFindDialog();
 }
 
-void SearchList::slot_user_search(const SearchInfo& search_info) { (void)search_info; }
+void SearchList::slot_user_search(const std::shared_ptr<SearchInfo>& search_info) {
+    waitPending(false);
+    if (!search_info) {
+        find_dialog_ = std::make_unique<FindFailDialog>(this);
+    } else {
+        find_dialog_ = std::make_unique<FindSuccessDialog>(this);
+        static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
+
+        // TODO: 查找到已经是好友
+    }
+    find_dialog_->show();
+}

@@ -14,6 +14,7 @@ namespace chat {
 constexpr inline std::string_view kLoginCount = "login_count";
 constexpr inline std::string_view kUserTokenPrefix = "utoken_";
 constexpr inline std::string_view kUserBaseInfo = "ubaseinfo_";
+constexpr inline std::string_view kNameInfo = "nameinfo_";
 constexpr inline std::string_view kUserIpPrefix = "uip_";
 
 class RedisConnectionPool;
