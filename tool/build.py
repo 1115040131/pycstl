@@ -124,6 +124,7 @@ def main():
                 image='mysql:8.0',
                 container_name='pyc-mysql',
                 args=[f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf',
+                      f'-v {root_path}/chat/server/mysql/sql/init-script.sql:/docker-entrypoint-initdb.d/init-script.sql',
                       f'-v {data_direction}:/var/lib/mysql',
                       f'-v {log_direction}:/logs',
                       '--restart=on-failure:3 -p 6306:3306 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456']
