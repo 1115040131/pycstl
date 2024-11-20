@@ -4,9 +4,12 @@ package pyc.chat;
 
 message AddFriendReq {
     int32 apply_uid = 1;
-    string name = 2;
-    string desc = 3;
-    int32 to_uid = 4;
+    string apply_name = 2;
+    string nick = 3;
+    string desc = 4;
+    int32 sex = 5;
+    string icon = 6;
+    int32 to_uid = 7;
 }
 
 message AddFriendRsp {

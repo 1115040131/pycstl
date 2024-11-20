@@ -188,6 +188,19 @@ TEST(MysqlMgrTest, GetUser) {
     EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
 }
 
+TEST(MysqlMgrTest, AddFriendAddply) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    int from_id = 10001;
+    int to_id = 10002;
+
+    // 删除测试数据
+    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
+    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
+    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, from_id));
+    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, from_id));
+}
+
 TEST(MysqlMgrTest, DeleteUser) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
@@ -204,7 +217,6 @@ TEST(MysqlMgrTest, DeleteUser) {
 
     // 成功删除
     EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
-
 }
 
 }  // namespace chat

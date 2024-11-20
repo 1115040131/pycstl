@@ -14,9 +14,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // 登录成功切换到聊天界面
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_switch_chatdlg, this, &MainWindow::SlotSwitchChat);
-
-    // TODO: debug
-    // emit TcpMgr::GetInstance().sig_switch_chatdlg();
 }
 
 MainWindow::~MainWindow() { delete ui; }

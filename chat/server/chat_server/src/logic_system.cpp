@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "chat/common/error_code.h"
+#include "chat/server/chat_server/chat_grpc_client.h"
 #include "chat/server/chat_server/user_mgr.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
@@ -41,6 +42,10 @@ void LogicSystem::RegisterCallBack() {
     callback_map_[ReqId::kSearchUserReq] = [this](const std::shared_ptr<CSession>& session,
                                                   const std::string& msg_data) {
         SearchInfoHandler(session, msg_data);
+    };
+    callback_map_[ReqId::kAddFriendReq] = [this](const std::shared_ptr<CSession>& session,
+                                                 const std::string& msg_data) {
+        AddFriendHandler(session, msg_data);
     };
 }
 
@@ -160,22 +165,22 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     auto token_key = fmt::format("{}{}", kUserTokenPrefix, uid);
     auto token_value = RedisMgr::GetInstance().Get(token_key);
     if (!token_value) {
-        root["error"] = static_cast<int>(ErrorCode::kUidInvalid);
+        root["error"] = ErrorCode::kUidInvalid;
         return;
     }
     if (token_value != token) {
-        root["error"] = static_cast<int>(ErrorCode::kTokenInvalid);
+        root["error"] = ErrorCode::kTokenInvalid;
         return;
     }
 
     // 查询用户基本信息
     auto base_info = GetBaseInfo(uid);
     if (!base_info) {
-        root["error"] = static_cast<int>(ErrorCode::kUidInvalid);
+        root["error"] = ErrorCode::kUidInvalid;
         return;
     }
 
-    root["error"] = static_cast<int>(ErrorCode::kSuccess);
+    root["error"] = ErrorCode::kSuccess;
     root["token"] = token;
     root["base_info"] = base_info.value();
 
@@ -211,6 +216,7 @@ void LogicSystem::SearchInfoHandler(const std::shared_ptr<CSession>& session, co
 
     auto uid_str = src_root.value("uid", "");
     if (uid_str == "") {
+        PYC_LOG_ERROR("uid is empty");
         root["error"] = ErrorCode::kUidInvalid;
         return;
     }
@@ -228,12 +234,87 @@ void LogicSystem::SearchInfoHandler(const std::shared_ptr<CSession>& session, co
     }
 
     if (!search_info) {
+        PYC_LOG_ERROR("Failed to find user info {}", uid_str);
         root["error"] = ErrorCode::kUidInvalid;
         return;
     }
 
     root["error"] = ErrorCode::kSuccess;
     root["search_info"] = search_info.value();
+}
+
+void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
+    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+
+    nlohmann::json request = nlohmann::json::parse(msg_data, nullptr, false);
+    nlohmann::json response;
+    Defer defer([&session, &response]() { session->Send(response.dump(), ReqId::kAddFriendRes); });
+
+    if (request.is_discarded()) {
+        PYC_LOG_ERROR("Failed to parse Json data");
+        response["error"] = ErrorCode::kJsonError;
+        return;
+    }
+
+    int uid = request.value("uid", 0);
+    int to_uid = request.value("to_uid", 0);
+    auto apply_name = request.value("apply_name", "");
+    auto back_name = request.value("back_name", "");
+
+    // 查询自己的基本信息
+    auto base_info = GetBaseInfo(uid);
+    if (!base_info) {
+        response["error"] = ErrorCode::kUidInvalid;
+        return;
+    }
+
+    // 更新数据库
+    if (auto result = MysqlMgr::GetInstance().AddFriendAddply(uid, to_uid); !result) {
+        PYC_LOG_ERROR("Failed to update database");
+        response["error"] = ErrorCode::kNetworkError;
+        return;
+    }
+
+    // 查询对方服务器地址
+    auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
+    if (!to_server_name) {
+        PYC_LOG_INFO("User {} not online", to_uid);
+        response["error"] = ErrorCode::kSuccess;
+        return;
+    }
+    // 对方在同一个服务器上
+    if (to_server_name == GET_SECTION()) {
+        auto session = UserMgr::GetInstance().GetSession(to_uid);
+        if (!session) {
+            PYC_LOG_WARN("User {} not online", to_uid);
+        } else {
+            nlohmann::json notify;
+            notify["error"] = ErrorCode::kSuccess;
+            notify["apply_uid"] = uid;
+            notify["apply_name"] = apply_name;
+            notify["nick"] = base_info->nick;
+            notify["desc"] = "";
+            notify["sex"] = base_info->sex;
+            notify["icon"] = base_info->icon;
+            session->Send(notify.dump(), ReqId::kNotifyAddFriendReq);
+        }
+
+        response["error"] = ErrorCode::kSuccess;
+        return;
+    }
+
+    // 对方在其他服务器上
+    AddFriendReq rpc_request;
+    rpc_request.set_apply_uid(uid);
+    rpc_request.set_apply_name(apply_name);
+    rpc_request.set_nick(base_info->nick);
+    rpc_request.set_desc("");
+    rpc_request.set_sex(base_info->sex);
+    rpc_request.set_icon(base_info->icon);
+    rpc_request.set_to_uid(to_uid);
+    ChatGrpcClient::GetInstance().NotifyAddFriend(to_server_name.value(), rpc_request);
+
+    response["error"] = ErrorCode::kSuccess;
 }
 
 }  // namespace chat

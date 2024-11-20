@@ -48,6 +48,8 @@ sudo usermod -aG docker your_username
 
 ```bash
 ./make xxx
+
+./make all_test --cache_test_results=no
 ```
 
 ### 导出 compile_commands.json

@@ -34,6 +34,8 @@ public:
 
     std::optional<UserInfo> GetUser(std::string_view name);
 
+    std::optional<bool> AddFriendAddply(int from_uid, int to_uid);
+
     // 测试接口
     std::optional<bool> DeleteUser(std::string_view email);
 

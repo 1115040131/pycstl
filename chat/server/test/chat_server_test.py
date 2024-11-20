@@ -11,6 +11,14 @@ import unittest
 from test_define import *
 
 
+class UserInfo:
+    def __init__(self, uid: int, name: str, email: str, password: str):
+        self.uid: int = uid
+        self.name: str = name
+        self.email: str = email
+        self.password: str = password
+
+
 class Message:
     HEADER_FORMAT = '>HH'  # 大端序，两个无符号短整型（2个字节的 message_id 和 2个字节的 message_len）
 
@@ -82,13 +90,8 @@ class ChatServerTest(unittest.TestCase):
         cls.redis: redis.Redis = connect_redis(cls.config)
 
         # 注册账号并创建一个客户端连接
-        cls.user = f'pycstl_{time.time()}'
-        cls.email = f'{cls.user}@test.com'
-        cls.password = '123'
-        cls.uid = cls.register(cls.user, cls.email, cls.password)
-        cls.host, cls.port, cls.token = cls.get_server(cls.user, cls.email, cls.password, cls.uid)
-        cls.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        cls.client_socket.connect((cls.host, cls.port))
+        cls.user_info = cls.register()
+        cls.client_socket = cls.connect_server(cls.user_info)
 
     @classmethod
     def tearDownClass(cls):
@@ -96,15 +99,18 @@ class ChatServerTest(unittest.TestCase):
             cls.client_socket.close()
 
     @classmethod
-    def register(cls, user, email, password):
+    def register(cls) -> UserInfo:
         """
         注册账号
         """
 
+        name = f'pycstl_{time.time()}'
+        email = f'{name}@test.com'
+        password = '123'
         verify_code = "qwer"
         cls.redis.set("code_" + email, verify_code)
         response = requests.post(cls.gate_server_url + Url_Map[ReqId.kRegUser],
-                                 json={'user': user,
+                                 json={'user': name,
                                        'email': email,
                                        'password': password,
                                        'confirm': password,
@@ -113,25 +119,25 @@ class ChatServerTest(unittest.TestCase):
         assert response.headers['Content-Type'] == 'text/json'
         json_response = response.json()
         assert json_response['error'] == ErrorCode.kSuccess.value
-        assert json_response['user'] == user
+        assert json_response['user'] == name
         uid = json_response['uid']
         assert uid > 0
 
-        return uid
+        return UserInfo(uid, name, email, password)
 
     @classmethod
-    def get_server(cls, user, email, password, uid):
+    def get_server(cls, user_info: UserInfo):
         """
         获取服务器
         """
 
         response = requests.post(cls.gate_server_url + Url_Map[ReqId.kLogin],
-                                 json={'email': email,
-                                       'password': password})
+                                 json={'email': user_info.email,
+                                       'password': user_info.password})
         json_response = response.json()
         assert json_response['error'] == ErrorCode.kSuccess.value
-        assert json_response['uid'] == uid
-        assert json_response['user'] == user
+        assert json_response['uid'] == user_info.uid
+        assert json_response['user'] == user_info.name
         assert [json_response['host'], json_response['port']] in cls.chat_servers.values()
 
         host = json_response['host']
@@ -139,6 +145,42 @@ class ChatServerTest(unittest.TestCase):
         token = json_response['token']
 
         return host, port, token
+
+    @classmethod
+    def connect_server(cls, user_info: UserInfo) -> socket.socket:
+        """
+        连接服务器
+        """
+
+        host, port, token = cls.get_server(user_info)
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((host, port))
+
+        return client_socket
+
+    @classmethod
+    def login_server(cls, user_info: UserInfo) -> socket.socket:
+        """
+        登录服务器
+        """
+
+        host, port, token = cls.get_server(user_info)
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((host, port))
+
+        response = Message.send_and_receive(client_socket, Message(
+            ReqId.kChatLogin, json.dumps({'uid': user_info.uid,
+                                            "token": token})))
+        assert response.message_id == ReqId.kChatLoginRes
+        json_response = json.loads(response.message_body)
+        assert json_response['error'] == ErrorCode.kSuccess.value
+        assert json_response['token'] == token
+        assert json_response['base_info']['uid'] == user_info.uid
+        assert json_response['base_info']['name'] == user_info.name
+        server_name = cls.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info.uid}').decode('utf-8')
+        assert server_name in cls.chat_servers.keys()
+
+        return client_socket
 
     def test_pack(self):
         """
@@ -199,13 +241,10 @@ class ChatServerTest(unittest.TestCase):
         """
 
         # 注册账号
-        user1 = f'pycstl_{time.time()}'
-        email1 = f'{user1}@test.com'
-        password1 = '123'
-        user1_uid = self.register(user1, email1, password1)
+        user_info = self.register()
 
         # 获取连接
-        host, port, token = self.get_server(user1, email1, password1, user1_uid)
+        host, port, token = self.get_server(user_info)
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             # 连接服务器
@@ -225,33 +264,33 @@ class ChatServerTest(unittest.TestCase):
 
             # token 无效
             response = Message.send_and_receive(client_socket, Message(
-                ReqId.kChatLogin, json.dumps({'uid': user1_uid})))
+                ReqId.kChatLogin, json.dumps({'uid': user_info.uid})))
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
             json_response = json.loads(response.message_body)
             self.assertEqual(json_response['error'], ErrorCode.kTokenInvalid.value)
 
             # 登录前无缓存
-            self.assertIsNone(self.redis.get(f'{RedisKey.kUserBaseInfo.value}{user1_uid}'))
+            self.assertIsNone(self.redis.get(f'{RedisKey.kUserBaseInfo.value}{user_info.uid}'))
 
             # 登录成功
             response = Message.send_and_receive(client_socket, Message(
-                ReqId.kChatLogin, json.dumps({'uid': user1_uid,
+                ReqId.kChatLogin, json.dumps({'uid': user_info.uid,
                                               "token": token})))
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
             json_response = json.loads(response.message_body)
             self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
             self.assertEqual(json_response['token'], token)
-            self.assertEqual(json_response['base_info']['uid'], user1_uid)
-            self.assertEqual(json_response['base_info']['name'], user1)
-            server_name = self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user1_uid}').decode('utf-8')
+            self.assertEqual(json_response['base_info']['uid'], user_info.uid)
+            self.assertEqual(json_response['base_info']['name'], user_info.name)
+            server_name = self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info.uid}').decode('utf-8')
             self.assertIn(server_name, self.chat_servers.keys())
 
             # 登录后有缓存
-            cache = json.loads(self.redis.get(f'{RedisKey.kUserBaseInfo.value}{user1_uid}').decode('utf-8'))
-            self.assertEqual(cache['uid'], user1_uid)
-            self.assertEqual(cache['name'], user1)
-            self.assertEqual(cache['email'], email1)
-            self.assertEqual(cache['password'], password1)
+            cache = json.loads(self.redis.get(f'{RedisKey.kUserBaseInfo.value}{user_info.uid}').decode('utf-8'))
+            self.assertEqual(cache['uid'], user_info.uid)
+            self.assertEqual(cache['name'], user_info.name)
+            self.assertEqual(cache['email'], user_info.email)
+            self.assertEqual(cache['password'], user_info.password)
 
         # 登录人数变化
         self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
@@ -261,7 +300,7 @@ class ChatServerTest(unittest.TestCase):
             client_socket.connect((self.config["ChatServer1"]["Host"], int(self.config["ChatServer1"]["Port"])))
 
             response = Message.send_and_receive(client_socket, Message(
-                ReqId.kChatLogin, json.dumps({'uid': user1_uid,
+                ReqId.kChatLogin, json.dumps({'uid': user_info.uid,
                                               "token": token})))
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
             json_response = json.loads(response.message_body)
@@ -271,7 +310,7 @@ class ChatServerTest(unittest.TestCase):
 
             # TODO: 重复登录
             response = Message.send_and_receive(client_socket, Message(
-                ReqId.kChatLogin, json.dumps({'uid': user1_uid,
+                ReqId.kChatLogin, json.dumps({'uid': user_info.uid,
                                               "token": token})))
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
             json_response = json.loads(response.message_body)
@@ -280,6 +319,10 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2").decode('utf-8')), 0)
 
     def test_search_info(self):
+        """
+        搜索用户测试
+        """
+
         # json 错误
         response = Message.send_and_receive(self.client_socket, Message(ReqId.kSearchUserReq, 'hello'))
         self.assertEqual(response.message_id, ReqId.kSearchUserRes)
@@ -299,25 +342,95 @@ class ChatServerTest(unittest.TestCase):
 
         # 按 id 找
         response = Message.send_and_receive(self.client_socket, Message(
-            ReqId.kSearchUserReq, json.dumps({"uid": f'{self.uid}'})))
+            ReqId.kSearchUserReq, json.dumps({"uid": f'{self.user_info.uid}'})))
         self.assertEqual(response.message_id, ReqId.kSearchUserRes)
         json_response = json.loads(response.message_body)
         self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
-        self.assertEqual(json_response['search_info']['uid'], self.uid)
-        self.assertEqual(json_response['search_info']['name'], self.user)
-        self.assertEqual(json_response['search_info']['email'], self.email)
-        self.assertEqual(json_response['search_info']['password'], self.password)
+        self.assertEqual(json_response['search_info']['uid'], self.user_info.uid)
+        self.assertEqual(json_response['search_info']['name'], self.user_info.name)
+        self.assertEqual(json_response['search_info']['email'], self.user_info.email)
+        self.assertEqual(json_response['search_info']['password'], self.user_info.password)
 
         # 按 name 找
         response = Message.send_and_receive(self.client_socket, Message(
-            ReqId.kSearchUserReq, json.dumps({"uid": f'{self.user}'})))
+            ReqId.kSearchUserReq, json.dumps({"uid": f'{self.user_info.uid}'})))
         self.assertEqual(response.message_id, ReqId.kSearchUserRes)
         json_response = json.loads(response.message_body)
         self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
-        self.assertEqual(json_response['search_info']['uid'], self.uid)
-        self.assertEqual(json_response['search_info']['name'], self.user)
-        self.assertEqual(json_response['search_info']['email'], self.email)
-        self.assertEqual(json_response['search_info']['password'], self.password)
+        self.assertEqual(json_response['search_info']['uid'], self.user_info.uid)
+        self.assertEqual(json_response['search_info']['name'], self.user_info.name)
+        self.assertEqual(json_response['search_info']['email'], self.user_info.email)
+        self.assertEqual(json_response['search_info']['password'], self.user_info.password)
+
+    def test_add_friend(self):
+        """
+        添加好友测试
+        """
+
+        # 将两个服务器人数都设置为 0, 确保 client1, client3 在一个服务器上, client2 在另一个服务器上
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
+
+        # 注册账号
+        user_info_1 = self.register()
+        user_info_2 = self.register()
+        user_info_3 = self.register()
+        user_info_4 = self.register()
+
+        with self.login_server(user_info_1) as client_1, self.login_server(user_info_2) as client_2, self.login_server(user_info_3) as client_3:
+            # 确保用户 1 和 3 在同一个服务器上
+            self.assertEqual(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_1.uid}'),
+                             self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_3.uid}'))
+            self.assertNotEqual(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_1.uid}'),
+                                self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_2.uid}'))
+            self.assertIsNone(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_4.uid}'))
+
+            # json 错误
+            response = Message.send_and_receive(client_1, Message(ReqId.kAddFriendReq, 'hello'))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
+
+            # uid 错误, 自己的基本信息查询失败
+            response = Message.send_and_receive(client_1, Message(ReqId.kAddFriendReq, json.dumps({"uid": 0})))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kUidInvalid.value)
+
+            # 对方不在线, 查询对方服务器地址失败
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAddFriendReq, json.dumps({"uid": user_info_1.uid, "to_uid": user_info_4.uid})))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            # 对方在同一个服务器上
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAddFriendReq, json.dumps({"uid": user_info_1.uid, "to_uid": user_info_3.uid, "apply_name": user_info_1.name})))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            notify = Message.receive(client_3)
+            self.assertEqual(notify.message_id, ReqId.kNotifyAddFriendReq)
+            json_notify = json.loads(notify.message_body)
+            self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_notify['apply_uid'], user_info_1.uid)
+            self.assertEqual(json_notify['apply_name'], user_info_1.name)
+
+            # 对方在不同服务器上
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAddFriendReq, json.dumps({"uid": user_info_1.uid, "to_uid": user_info_2.uid, "apply_name": user_info_1.name})))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            notify = Message.receive(client_2)
+            self.assertEqual(notify.message_id, ReqId.kNotifyAddFriendReq)
+            json_notify = json.loads(notify.message_body)
+            self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_notify['apply_uid'], user_info_1.uid)
+            self.assertEqual(json_notify['apply_name'], user_info_1.name)
 
 
 if __name__ == '__main__':

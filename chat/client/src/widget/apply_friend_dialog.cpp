@@ -1,7 +1,10 @@
 #include "chat/client/widget/apply_friend_dialog.h"
 
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QScrollBar>
 
+#include "chat/client/tcp_mgr.h"
 #include "chat/client/user_mgr.h"
 #include "chat/client/widget/ui_apply_friend_dialog.h"
 
@@ -333,6 +336,22 @@ void ApplyFriendDialog::slot_add_friend_label_by_click_tip(const QString&) { slo
 
 void ApplyFriendDialog::slot_apply_sure() {
     qDebug() << "Slot Apply Sure";
+    QJsonObject root;
+
+    auto uid = UserMgr::GetInstance().GetUid();
+    root["uid"] = uid;
+
+    auto name = !ui->name_edit->text().isEmpty() ? ui->name_edit->text() : ui->name_edit->placeholderText();
+    root["apply_name"] = name;
+
+    auto back_name = !ui->back_edit->text().isEmpty() ? ui->back_edit->text() : ui->back_edit->placeholderText();
+    root["back_name"] = back_name;
+
+    root["to_uid"] = search_info_->uid;
+
+    QJsonDocument doc(root);
+
+    emit TcpMgr::GetInstance().sig_send_data(ReqId::kAddFriendReq, doc.toJson(QJsonDocument::Compact));
     this->hide();
     deleteLater();
 }

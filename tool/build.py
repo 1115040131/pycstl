@@ -141,6 +141,8 @@ def main():
                        'mysql_service_is_ready', interval=1),
         ),
         "chat_clear": lambda args: (
+            run_cmd('docker stop pyc-redis', check=False),
+            run_cmd('docker rm -v pyc-redis', check=False),
             run_cmd('docker stop pyc-mysql', check=False),
             run_cmd('docker rm -v pyc-mysql', check=False),
             run_cmd(f'sudo rm -rf {data_direction}'),

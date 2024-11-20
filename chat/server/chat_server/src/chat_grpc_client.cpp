@@ -2,6 +2,7 @@
 
 #include <grpcpp/create_channel.h>
 
+#include "chat/common/error_code.h"
 #include "chat/server/chat_server/define.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
@@ -64,19 +65,44 @@ ChatGrpcClient::~ChatGrpcClient() {
     }
 }
 
-AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_ip, const AddFriendReq request) {
-    DUMMY_CODE(server_ip, request);
+AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_name, const AddFriendReq& request) {
+    AddFriendRsp response;
+
+    auto iter = pools_.find(server_name);
+    if (iter == pools_.end()) {
+        PYC_LOG_ERROR("Server {} not found", server_name);
+        response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
+        return response;
+    }
+
+    auto& pool = iter->second;
+    auto connection = pool->GetConnection();
+    if (!connection) {
+        PYC_LOG_ERROR("Get connection failed");
+        response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
+        return response;
+    }
+    Defer defer([this, &pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
+
+    grpc::ClientContext context;
+    auto status = connection.value()->NotifyAddFriend(&context, request, &response);
+
+    if (!status.ok()) {
+        PYC_LOG_ERROR("Rpc failed: {}", status.error_message());
+        response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
+    }
+
+    return response;
+}
+
+AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_name, const AuthFriendReq& request) {
+    DUMMY_CODE(server_name, request);
     return {};
 }
 
-AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_ip, const AuthFriendReq request) {
-    DUMMY_CODE(server_ip, request);
-    return {};
-}
-
-TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_ip, const TextChatMsgReq& request,
+TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name, const TextChatMsgReq& request,
                                                  const nlohmann::json& return_value) {
-    DUMMY_CODE(server_ip, request, return_value);
+    DUMMY_CODE(server_name, request, return_value);
     return {};
 }
 

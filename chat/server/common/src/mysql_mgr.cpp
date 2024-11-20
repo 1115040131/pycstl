@@ -137,6 +137,19 @@ std::optional<UserInfo> MysqlMgr::GetUser(std::string_view name) {
     });
 }
 
+std::optional<bool> MysqlMgr::AddFriendAddply(int from_uid, int to_uid) {
+    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
+        auto result = connection->session_
+                          .sql(
+                              "INSERT INTO friend_apply (from_uid, to_uid) values (?, ?)"
+                              "ON DUPLICATE KEY UPDATE from_uid = from_uid, to_uid = to_uid")
+                          .bind(from_uid)
+                          .bind(to_uid)
+                          .execute();
+        return result.getAffectedItemsCount() > 0;
+    });
+};
+
 std::optional<bool> MysqlMgr::DeleteUser(std::string_view email) {
     return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
         auto result = connection->session_.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();

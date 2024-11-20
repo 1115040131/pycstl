@@ -21,11 +21,11 @@ private:
 public:
     ~ChatGrpcClient();
 
-    AddFriendRsp NotifyAddFriend(const std::string& server_ip, const AddFriendReq request);
+    AddFriendRsp NotifyAddFriend(const std::string& server_name, const AddFriendReq& request);
 
-    AuthFriendRsp NotifyAuthFriend(const std::string& server_ip, const AuthFriendReq request);
+    AuthFriendRsp NotifyAuthFriend(const std::string& server_name, const AuthFriendReq& request);
 
-    TextChatMsgRsp NotifyTextChatMsg(const std::string& server_ip, const TextChatMsgReq& request,
+    TextChatMsgRsp NotifyTextChatMsg(const std::string& server_name, const TextChatMsgReq& request,
                                      const nlohmann::json& return_value);
 
 private:

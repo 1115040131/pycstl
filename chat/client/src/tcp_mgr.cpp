@@ -134,7 +134,7 @@ void TcpMgr::initHttpHandlers() {
 
         if (!root.contains("search_info") || !root.value("search_info").isObject()) {
             qDebug() << "Search user Failed, base_info is not object";
-            emit sig_login_failed(error);
+            emit sig_user_search(nullptr);
             return;
         }
 
@@ -147,6 +147,64 @@ void TcpMgr::initHttpHandlers() {
                                          search_info_json["icon"].toString(), search_info_json["desc"].toString());
 
         emit sig_user_search(search_info);
+    });
+    handlers_.emplace(ReqId::kAddFriendRes, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "kAddFriendRes Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "kAddFriendRes failed, err is ErrorCode::kJsonError";
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "kAddFriendRes failed, err is" << ToString(error);
+            return;
+        }
+
+        auto apply_info = std::make_shared<AddFriendApply>(root["apply_uid"].toInt(), root["sex"].toInt(),
+                                                           root["apply_name"].toString(), root["nick"].toString(),
+                                                           root["icon"].toString(), root["desc"].toString());
+
+        emit sig_friend_apply(apply_info);
+
+        qDebug() << "kAddFriendRes Success!";
+    });
+    handlers_.emplace(ReqId::kNotifyAddFriendReq, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "kNotifyAddFriendReq Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "kNotifyAddFriendReq failed, err is ErrorCode::kJsonError";
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "kNotifyAddFriendReq failed, err is" << ToString(error);
+            return;
+        }
+
+        auto apply_info = std::make_shared<AddFriendApply>(root["apply_uid"].toInt(), root["sex"].toInt(),
+                                                           root["apply_name"].toString(), root["nick"].toString(),
+                                                           root["icon"].toString(), root["desc"].toString());
+
+        emit sig_friend_apply(apply_info);
+
+        qDebug() << "kNotifyAddFriendReq Success!";
     });
 }
 

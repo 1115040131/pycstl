@@ -77,8 +77,9 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
--- INSERT INTO `user` VALUES (3, 1002, 'llfc', 'secondtonone1@163.com', '654321)', 'llfc', '', 0, ':/res/head_1.jpg');
--- INSERT INTO `user` VALUES (4, 1003, 'tc', '18165031775@qq.com', '123456', 'tc', '', 0, ':/res/head_1.jpg');
+INSERT INTO `user` VALUES (1, 1, 'pyc', '1115040131@qq.com', '745230', 'pyc', '', 0, '/chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (2, 2, 'llfc', 'secondtonone1@163.com', '745230', 'llfc', '', 0, '/chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (3, 3, 'tc', '18165031775@qq.com', '745230', 'tc', '', 0, '/chat/client/res/head_1.jpg');
 -- INSERT INTO `user` VALUES (5, 1004, 'yuanweihua', '1456188862@qq.com', '}kyn;89>?<', 'yuanweihua', '', 0, ':/res/head_1.jpg');
 -- INSERT INTO `user` VALUES (6, 1005, 'test', '2022202210033@whu.edu.cn', '}kyn;89>?<', 'test', '', 0, ':/res/head_1.jpg');
 -- INSERT INTO `user` VALUES (8, 1007, 'fhr', '3157199927@qq.com', 'xuexi1228', 'fhr', '', 0, ':/res/head_1.jpg');
@@ -124,7 +125,7 @@ CREATE TABLE `user_id`  (
 -- ----------------------------
 -- Records of user_id
 -- ----------------------------
-INSERT INTO `user_id` VALUES (0);
+INSERT INTO `user_id` VALUES (1000);
 
 -- ----------------------------
 -- Procedure structure for reg_user

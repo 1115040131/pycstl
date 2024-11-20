@@ -4,12 +4,11 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "chat/server/chat_server/csession.h"
 #include "common/singleton.h"
 
 namespace pyc {
 namespace chat {
-
-class CSession;
 
 class UserMgr : public Singleton<UserMgr> {
     friend class Singleton<UserMgr>;
