@@ -20,9 +20,9 @@ public:
     explicit ApplyFriendPage(QWidget* parent = nullptr);
     ~ApplyFriendPage();
 
-private:
-    void addNewApply(const AddFriendApply& apply);
+    void addNewApply(const std::shared_ptr<ApplyInfo>& apply);
 
+private:
     void loadApplyList();
 
 signals:

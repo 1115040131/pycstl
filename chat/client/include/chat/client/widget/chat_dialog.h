@@ -3,6 +3,8 @@
 #include <QAction>
 #include <QDialog>
 
+#include "chat/client/user_data.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class ChatDialog;
@@ -37,13 +39,18 @@ private:
     void handleGlobalMousePress(QMouseEvent* event);
 
 private slots:
+    // 搜索框文本变化
     void slot_search_text_changed(const QString& text);
 
+    // 加载更过聊天用户
     void slot_loading_chat_user();
 
+    // 点击侧边栏
     void slot_side_chat();
-
     void slot_side_contact();
+
+    // 收到好友请求
+    void slot_friend_apply(std::shared_ptr<ApplyInfo> apply);
 
 private:
     Ui::ChatDialog* ui;

@@ -5,6 +5,8 @@
 #include <QRandomGenerator>
 #include <QTimer>
 
+#include "chat/client/tcp_mgr.h"
+#include "chat/client/user_mgr.h"
 #include "chat/client/widget/chat_user_widget.h"
 #include "chat/client/widget/loading_dialog.h"
 #include "chat/client/widget/ui_chat_dialog.h"
@@ -61,6 +63,9 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
 
     // 检测点击鼠标位置是否需要清空搜索框
     this->installEventFilter(this);
+
+    // 收到好友请求
+    connect(&TcpMgr::GetInstance(), &TcpMgr::sig_friend_apply, this, &ChatDialog::slot_friend_apply);
 }
 
 ChatDialog::~ChatDialog() { delete ui; }
@@ -174,4 +179,15 @@ void ChatDialog::slot_side_contact() {
     ui->stackedWidget->setCurrentWidget(ui->friend_apply_page);
     state_ = UIMode::kContactMode;
     ShowSearch(false);
+    ui->side_contact_label->ShowRedPoint(false);  // 消除红点
+}
+
+void ChatDialog::slot_friend_apply(std::shared_ptr<ApplyInfo> apply) {
+    if (UserMgr::GetInstance().AlreadyApply(apply->uid)) {
+        return;
+    }
+    UserMgr::GetInstance().AddApplyList(apply->uid, apply);
+    ui->side_contact_label->ShowRedPoint(true);
+    ui->contact_user_list->showRedPoint(true);
+    ui->friend_apply_page->addNewApply(apply);
 }

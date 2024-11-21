@@ -10,12 +10,12 @@ class ContactUserList : public QListWidget {
 public:
     ContactUserList(QWidget* parent = nullptr);
 
+    void showRedPoint(bool show);
+
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
-    void showRedPoint(bool show);
-
     void addContactUserList();
 
 signals:

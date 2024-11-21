@@ -169,12 +169,6 @@ void TcpMgr::initHttpHandlers() {
             return;
         }
 
-        auto apply_info = std::make_shared<AddFriendApply>(root["apply_uid"].toInt(), root["sex"].toInt(),
-                                                           root["apply_name"].toString(), root["nick"].toString(),
-                                                           root["icon"].toString(), root["desc"].toString());
-
-        emit sig_friend_apply(apply_info);
-
         qDebug() << "kAddFriendRes Success!";
     });
     handlers_.emplace(ReqId::kNotifyAddFriendReq, [this](const QByteArray& data) {
@@ -198,7 +192,7 @@ void TcpMgr::initHttpHandlers() {
             return;
         }
 
-        auto apply_info = std::make_shared<AddFriendApply>(root["apply_uid"].toInt(), root["sex"].toInt(),
+        auto apply_info = std::make_shared<ApplyInfo>(root["apply_uid"].toInt(), root["sex"].toInt(),
                                                            root["apply_name"].toString(), root["nick"].toString(),
                                                            root["icon"].toString(), root["desc"].toString());
 

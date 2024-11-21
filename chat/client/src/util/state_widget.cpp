@@ -12,7 +12,7 @@ void StateWidget::AddRedPoint() {
     layout->addWidget(red_point_);
     layout->setContentsMargins(0, 0, 0, 0);
     this->setLayout(layout);
-    // red_point_->setVisible(false);
+    red_point_->setVisible(false);
 }
 
 void StateWidget::ShowRedPoint(bool show) { red_point_->setVisible(show); }

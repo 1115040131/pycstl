@@ -121,6 +121,7 @@ void ContactUserList::slot_item_clicked(QListWidgetItem* item) {
         qDebug() << "slot invalid item clicked";
     } else if (item_type == ListItemBase::Type::kApplyFriendItem) {
         qDebug() << "apply friend item clicked";
+        showRedPoint(false);  // 消除红点
         emit sig_switch_apply_friend_page();
     } else if (item_type == ListItemBase::Type::kContactUserItem) {
         qDebug() << "contact user item clicked";

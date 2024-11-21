@@ -19,13 +19,13 @@ ApplyFriendPage::ApplyFriendPage(QWidget* parent) : QDialog(parent), ui(new Ui::
 
 ApplyFriendPage::~ApplyFriendPage() { delete ui; }
 
-void ApplyFriendPage::addNewApply(const AddFriendApply& apply) {
+void ApplyFriendPage::addNewApply(const std::shared_ptr<ApplyInfo>& apply) {
     // 先模拟头像随机
     int random_value = QRandomGenerator::global()->bounded(100);
     int head_index = random_value % heads.size();
 
     auto apply_item = new ApplyFriendItem;
-    apply_item->setInfo(ApplyInfo{apply.uid, 0, apply.name, apply.nick, heads[head_index], apply.desc, 0});
+    apply_item->setInfo(ApplyInfo{apply->uid, 0, apply->name, apply->nick, heads[head_index], apply->desc, 0});
     apply_item->showAddBtn(true);
 
     auto item = new QListWidgetItem;
@@ -36,19 +36,18 @@ void ApplyFriendPage::addNewApply(const AddFriendApply& apply) {
     ui->apply_friend_list->setItemWidget(item, apply_item);
 
     // 收到审核好友信号
-    // connect(apply_item,&ApplyFriendItem::sig_auth_friend, [this](const ApplyInfo& apply_info){
-    // });
+    // connect(apply_item, &ApplyFriendItem::sig_auth_friend, [this](ApplyInfo apply_info) {});
 }
 
 void ApplyFriendPage::loadApplyList() {
     const auto& apply_list = UserMgr::GetInstance().GetApplyList();
-    for (auto apply : apply_list) {
+    for (const auto& [_, apply] : apply_list) {
         int random_value = QRandomGenerator::global()->bounded(100);
         int head_index = random_value % heads.size();
-        apply.icon = heads[head_index];
+        apply->icon = heads[head_index];
 
         auto apply_item = new ApplyFriendItem;
-        apply_item->setInfo(apply);
+        apply_item->setInfo(*apply);
 
         auto item = new QListWidgetItem;
         item->setSizeHint(apply_item->sizeHint());
@@ -56,7 +55,7 @@ void ApplyFriendPage::loadApplyList() {
 
         ui->apply_friend_list->insertItem(0, item);
         ui->apply_friend_list->setItemWidget(item, apply_item);
-        if (apply.status) {
+        if (apply->status) {
             apply_item->showAddBtn(false);
         } else {
             apply_item->showAddBtn(true);

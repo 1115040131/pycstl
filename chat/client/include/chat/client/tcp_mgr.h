@@ -40,7 +40,7 @@ signals:
     void sig_user_search(const std::shared_ptr<SearchInfo>& search_info);
 
     // 添加好友
-    void sig_friend_apply(const std::shared_ptr<AddFriendApply>& apply);
+    void sig_friend_apply(const std::shared_ptr<ApplyInfo>& apply);
 
     // 对方同意添加好友
     void sig_add_auth_friend(const AuthInfo& auth_info);
