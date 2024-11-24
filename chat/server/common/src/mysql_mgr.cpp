@@ -21,8 +21,7 @@ MysqlMgr::MysqlMgr() {
 MysqlMgr::~MysqlMgr() { pool_->Close(); }
 
 template <typename F>
-auto MysqlExecute(std::unique_ptr<MysqlPool>& pool,
-                  F&& f) -> decltype(f(std::declval<std::optional<SqlConnection>&>())) {
+auto MysqlExecute(std::unique_ptr<MysqlPool>& pool, F&& f) -> decltype(f(std::declval<mysqlx::Session&>())) {
     auto connection = pool->GetConnection();
     if (!connection) {
         return std::nullopt;
@@ -33,7 +32,7 @@ auto MysqlExecute(std::unique_ptr<MysqlPool>& pool,
     });
 
     try {
-        return f(connection);
+        return f(connection->session_);
     }
     MYSQL_CATCH(g_logger)
 
@@ -41,14 +40,14 @@ auto MysqlExecute(std::unique_ptr<MysqlPool>& pool,
 }
 
 std::optional<int> MysqlMgr::RegUser(std::string_view name, std::string_view email, std::string_view password) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<int> {
-        connection->session_.sql("CALL reg_user(?, ?, ?, @result)")
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<int> {
+        session.sql("CALL reg_user(?, ?, ?, @result)")
             .bind(name.data())
             .bind(email.data())
             .bind(password.data())
             .execute();
 
-        mysqlx::Row row = connection->session_.sql("SELECT @result").execute().fetchOne();
+        mysqlx::Row row = session.sql("SELECT @result").execute().fetchOne();
 
         if (row.isNull()) {
             g_logger.error("Stored procedure not return result");
@@ -62,9 +61,8 @@ std::optional<int> MysqlMgr::RegUser(std::string_view name, std::string_view ema
 }
 
 std::optional<bool> MysqlMgr::CheckEmail(std::string_view name, std::string_view email) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
-        auto result =
-            connection->session_.sql("SELECT email FROM user WHERE name = ?").bind(name.data()).execute();
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
+        auto result = session.sql("SELECT email FROM user WHERE name = ?").bind(name.data()).execute();
         if (result.count() == 0) {
             return false;
         }
@@ -73,8 +71,8 @@ std::optional<bool> MysqlMgr::CheckEmail(std::string_view name, std::string_view
 }
 
 std::optional<bool> MysqlMgr::UpdatePassword(std::string_view name, std::string_view password) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
-        auto result = connection->session_.sql("UPDATE user SET pwd = ? WHERE name = ? AND pwd <> ?")
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
+        auto result = session.sql("UPDATE user SET pwd = ? WHERE name = ? AND pwd <> ?")
                           .bind(password.data())
                           .bind(name.data())
                           .bind(password.data())
@@ -84,8 +82,8 @@ std::optional<bool> MysqlMgr::UpdatePassword(std::string_view name, std::string_
 }
 
 std::optional<UserInfo> MysqlMgr::CheckPassword(std::string_view email, std::string_view password) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<UserInfo> {
-        auto result = connection->session_.sql("SELECT * FROM user WHERE email = ?").bind(email.data()).execute();
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<UserInfo> {
+        auto result = session.sql("SELECT * FROM user WHERE email = ?").bind(email.data()).execute();
         const auto& row = result.fetchOne();
         if (row.isNull() || row[4].get<std::string>() != password) {
             return std::nullopt;
@@ -102,8 +100,8 @@ std::optional<UserInfo> MysqlMgr::CheckPassword(std::string_view email, std::str
 }
 
 std::optional<UserInfo> MysqlMgr::GetUser(int uid) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<UserInfo> {
-        auto result = connection->session_.sql("SELECT * FROM user WHERE uid = ?").bind(uid).execute();
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<UserInfo> {
+        auto result = session.sql("SELECT * FROM user WHERE uid = ?").bind(uid).execute();
         const auto& row = result.fetchOne();
         if (row.isNull()) {
             return std::nullopt;
@@ -120,8 +118,8 @@ std::optional<UserInfo> MysqlMgr::GetUser(int uid) {
 }
 
 std::optional<UserInfo> MysqlMgr::GetUser(std::string_view name) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<UserInfo> {
-        auto result = connection->session_.sql("SELECT * FROM user WHERE name = ?").bind(name.data()).execute();
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<UserInfo> {
+        auto result = session.sql("SELECT * FROM user WHERE name = ?").bind(name.data()).execute();
         const auto& row = result.fetchOne();
         if (row.isNull()) {
             return std::nullopt;
@@ -138,11 +136,11 @@ std::optional<UserInfo> MysqlMgr::GetUser(std::string_view name) {
 }
 
 std::optional<bool> MysqlMgr::AddFriendAddply(int from_uid, int to_uid) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
-        auto result = connection->session_
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
+        auto result = session
                           .sql(
-                              "INSERT INTO friend_apply (from_uid, to_uid) values (?, ?)"
-                              "ON DUPLICATE KEY UPDATE from_uid = from_uid, to_uid = to_uid")
+                              "INSERT INTO friend_apply (from_uid, to_uid) values (?, ?) ON DUPLICATE KEY UPDATE "
+                              "from_uid = from_uid, to_uid = to_uid")
                           .bind(from_uid)
                           .bind(to_uid)
                           .execute();
@@ -151,8 +149,8 @@ std::optional<bool> MysqlMgr::AddFriendAddply(int from_uid, int to_uid) {
 };
 
 std::optional<bool> MysqlMgr::DeleteUser(std::string_view email) {
-    return MysqlExecute(pool_, [=](std::optional<SqlConnection>& connection) -> std::optional<bool> {
-        auto result = connection->session_.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
+        auto result = session.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();
         return result.getAffectedItemsCount() > 0;
     });
 }
