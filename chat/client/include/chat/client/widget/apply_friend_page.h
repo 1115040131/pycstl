@@ -20,7 +20,7 @@ public:
     explicit ApplyFriendPage(QWidget* parent = nullptr);
     ~ApplyFriendPage();
 
-    void addNewApply(const std::shared_ptr<ApplyInfo>& apply);
+    void addNewApply(const std::shared_ptr<ApplyInfo>& apply_info);
 
 private:
     void loadApplyList();
@@ -29,6 +29,9 @@ signals:
     void sig_show_search(bool);
 
 private slots:
+    // 弹出同意好友申请对话框
+    void slot_auth_friend(const std::shared_ptr<ApplyInfo>& apply_info);
+
     void slot_auth_rsp(const AuthRsp& auth_rsp);
 
 private:

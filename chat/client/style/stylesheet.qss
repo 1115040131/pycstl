@@ -765,3 +765,10 @@ LoadingDialog {
    font-family: "Microsoft YaHei"; /* 设置字体 */
    border-radius: 20px; /* 设置圆角 */
 }
+
+/* AuthFriendDialog */
+#AuthFriendDialog{
+   border: 2px solid #f1f1f1;
+   font-size: 14px;
+   background: #f7f7f8;
+}

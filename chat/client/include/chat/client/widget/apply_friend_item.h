@@ -17,18 +17,18 @@ public:
 
     QSize sizeHint() const override { return {250, 80}; }
 
-    int getUid() const { return apply_info_.uid; }
+    int getUid() const { return apply_info_->uid; }
 
-    void setInfo(const ApplyInfo& apply_info);
+    void setApplyInfo(const std::shared_ptr<ApplyInfo>& apply_info);
 
     void showAddBtn(bool show);
 
 signals:
-    void sig_auth_friend(const ApplyInfo& apply_info);
+    void sig_auth_friend(const std::shared_ptr<ApplyInfo>& apply_info);
 
 private:
     Ui::ApplyFriendItem* ui;
 
     bool added_;
-    ApplyInfo apply_info_;
+    std::shared_ptr<ApplyInfo> apply_info_;
 };

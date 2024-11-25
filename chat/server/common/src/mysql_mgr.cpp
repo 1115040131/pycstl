@@ -148,6 +148,32 @@ std::optional<bool> MysqlMgr::AddFriendAddply(int from_uid, int to_uid) {
     });
 };
 
+std::optional<std::vector<ApplyInfo>> MysqlMgr::GetApplyList(int to_uid, int begin_index, int limit) {
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<std::vector<ApplyInfo>> {
+        auto result = session
+                          .sql(
+                              "SELECT apply.from_uid, apply.status, user.name, user.nick, user.sex FROM "
+                              "friend_apply AS apply JOIN user ON apply.from_uid = user.uid WHERE apply.to_uid = "
+                              "? AND apply.id > ? ORDER BY apply.id ASC LIMIT ?")
+                          .bind(to_uid)
+                          .bind(begin_index)
+                          .bind(limit)
+                          .execute();
+
+        std::vector<ApplyInfo> apply_list;
+        for (const auto& row : result) {
+            ApplyInfo apply_info{};
+            apply_info.uid = row[0].get<int>();
+            apply_info.status = row[1].get<int>();
+            apply_info.name = row[2].get<std::string>();
+            apply_info.nick = row[3].get<std::string>();
+            apply_info.sex = row[4].get<int>();
+            apply_list.push_back(std::move(apply_info));
+        }
+        return apply_list;
+    });
+}
+
 std::optional<bool> MysqlMgr::DeleteUser(std::string_view email) {
     return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
         auto result = session.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();

@@ -191,14 +191,38 @@ TEST(MysqlMgrTest, GetUser) {
 TEST(MysqlMgrTest, AddFriendAddply) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
-    int from_id = 10001;
-    int to_id = 10002;
+    int to_id = 101;
+    for (int from_id = 102; from_id < 121; from_id++) {
+        // 添加好友申请
+        EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
+    }
+}
 
-    // 删除测试数据
-    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
-    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
-    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, from_id));
-    EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, from_id));
+TEST(MysqlMgrTest, GetApplyList) {
+    auto& mysql_mgr = MysqlMgr::GetInstance();
+
+    // 必须是注册过账户的 id
+    int to_id = 101;
+    for (int from_id = 102; from_id < 121; from_id++) {
+        // 添加好友申请
+        EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
+    }
+
+    auto apply_list = mysql_mgr.GetApplyList(to_id, 0, 9).value();
+    ASSERT_EQ(apply_list.size(), 9);
+    for (int i = 0; i < 9; i++) {
+        EXPECT_EQ(apply_list[i].uid, 102 + i);
+        EXPECT_EQ(apply_list[i].name, fmt::format("test_user_{}", 2 + i));
+        EXPECT_EQ(apply_list[i].nick, fmt::format("test_nick_{}", 2 + i));
+    }
+
+    auto apply_list2 = mysql_mgr.GetApplyList(to_id, 9, 15).value();
+    ASSERT_EQ(apply_list2.size(), 10);
+    for (int i = 0; i < 10; i++) {
+        EXPECT_EQ(apply_list2[i].uid, 111 + i);
+        EXPECT_EQ(apply_list2[i].name, fmt::format("test_user_{}", 11 + i));
+        EXPECT_EQ(apply_list2[i].nick, fmt::format("test_nick_{}", 11 + i));
+    }
 }
 
 TEST(MysqlMgrTest, DeleteUser) {

@@ -6,6 +6,7 @@ WIDGETS = [
     "apply_friend_dialog",
     "apply_friend_item",
     "apply_friend_page",
+    "auth_friend_dialog",
     "chat_dialog",
     "chat_page",
     "chat_user_widget",

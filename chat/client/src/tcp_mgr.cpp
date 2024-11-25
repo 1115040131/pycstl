@@ -103,9 +103,14 @@ void TcpMgr::initHttpHandlers() {
         qDebug() << "Login Success!";
 
         auto base_info = root["base_info"].toObject();
-        UserMgr::GetInstance().SetUid(base_info["uid"].toInt());
-        UserMgr::GetInstance().SetName(base_info["name"].toString());
+        auto user_info = std::make_shared<UserInfo>(base_info["uid"].toInt(), base_info["sex"].toInt(),
+                                                    base_info["name"].toString(), base_info["nick"].toString(),
+                                                    base_info["icon"].toString());
+        UserMgr::GetInstance().SetUserInfo(user_info);
         UserMgr::GetInstance().SetToken(base_info["token"].toString());
+        if (root.contains("apply_list")) {
+            UserMgr::GetInstance().AppendApplyList(root["apply_list"].toArray());
+        }
 
         emit sig_switch_chatdlg();
     });
@@ -193,8 +198,8 @@ void TcpMgr::initHttpHandlers() {
         }
 
         auto apply_info = std::make_shared<ApplyInfo>(root["apply_uid"].toInt(), root["sex"].toInt(),
-                                                           root["apply_name"].toString(), root["nick"].toString(),
-                                                           root["icon"].toString(), root["desc"].toString());
+                                                      root["apply_name"].toString(), root["nick"].toString(),
+                                                      root["icon"].toString(), root["desc"].toString());
 
         emit sig_friend_apply(apply_info);
 

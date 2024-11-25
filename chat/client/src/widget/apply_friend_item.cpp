@@ -11,15 +11,15 @@ ApplyFriendItem::ApplyFriendItem(QWidget* parent) : ListItemBase(parent), ui(new
 
 ApplyFriendItem::~ApplyFriendItem() { delete ui; }
 
-void ApplyFriendItem::setInfo(const ApplyInfo& apply_info) {
+void ApplyFriendItem::setApplyInfo(const std::shared_ptr<ApplyInfo>& apply_info) {
     apply_info_ = apply_info;
 
-    QPixmap pixmap(apply_info_.icon);
+    QPixmap pixmap(apply_info_->icon);
     ui->icon_label->setPixmap(pixmap);
     ui->icon_label->setScaledContents(true);
 
-    ui->user_name_label->setText(apply_info_.name);
-    ui->user_chat_label->setText(apply_info_.desc);
+    ui->user_name_label->setText(apply_info_->name);
+    ui->user_chat_label->setText(apply_info_->desc);
 }
 
 void ApplyFriendItem::showAddBtn(bool show) {

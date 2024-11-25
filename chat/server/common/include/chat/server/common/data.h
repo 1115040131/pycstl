@@ -23,5 +23,19 @@ struct UserInfo {
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(UserInfo, uid, name, email, password, nick, desc, sex, icon, back);
 };
 
+struct ApplyInfo {
+    int uid;
+    std::string name;
+    std::string nick;
+    std::string desc;
+    int sex;
+    std::string icon;
+    int status;
+
+    auto operator<=>(const ApplyInfo&) const = default;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(ApplyInfo, uid, name, nick, desc, sex, icon, status);
+};
+
 }  // namespace chat
 }  // namespace pyc

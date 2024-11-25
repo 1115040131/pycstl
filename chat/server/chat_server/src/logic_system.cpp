@@ -185,6 +185,14 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     root["base_info"] = base_info.value();
 
     // 获取申请列表
+    auto apply_list = MysqlMgr::GetInstance().GetApplyList(uid, 0);
+    if (apply_list) {
+        nlohmann::json apply_list_json;
+        for (const auto& apply : apply_list.value()) {
+            apply_list_json.push_back(apply);
+        }
+        root["apply_list"] = apply_list_json;
+    }
 
     // 获取好友列表
 

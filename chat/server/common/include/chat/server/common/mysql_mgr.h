@@ -36,6 +36,8 @@ public:
 
     std::optional<bool> AddFriendAddply(int from_uid, int to_uid);
 
+    std::optional<std::vector<ApplyInfo>> GetApplyList(int to_uid, int begin_index, int limit = 10);
+
     // 测试接口
     std::optional<bool> DeleteUser(std::string_view email);
 

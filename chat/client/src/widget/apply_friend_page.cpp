@@ -5,6 +5,7 @@
 #include "chat/client/tcp_mgr.h"
 #include "chat/client/user_mgr.h"
 #include "chat/client/widget/apply_friend_item.h"
+#include "chat/client/widget/auth_friend_dialog.h"
 #include "chat/client/widget/ui_apply_friend_page.h"
 
 ApplyFriendPage::ApplyFriendPage(QWidget* parent) : QDialog(parent), ui(new Ui::ApplyFriendPage) {
@@ -19,13 +20,14 @@ ApplyFriendPage::ApplyFriendPage(QWidget* parent) : QDialog(parent), ui(new Ui::
 
 ApplyFriendPage::~ApplyFriendPage() { delete ui; }
 
-void ApplyFriendPage::addNewApply(const std::shared_ptr<ApplyInfo>& apply) {
+void ApplyFriendPage::addNewApply(const std::shared_ptr<ApplyInfo>& apply_info) {
     // 先模拟头像随机
     int random_value = QRandomGenerator::global()->bounded(100);
     int head_index = random_value % heads.size();
+    apply_info->icon = heads[head_index];
 
     auto apply_item = new ApplyFriendItem;
-    apply_item->setInfo(ApplyInfo{apply->uid, 0, apply->name, apply->nick, heads[head_index], apply->desc, 0});
+    apply_item->setApplyInfo(apply_info);
     apply_item->showAddBtn(true);
 
     auto item = new QListWidgetItem;
@@ -36,18 +38,18 @@ void ApplyFriendPage::addNewApply(const std::shared_ptr<ApplyInfo>& apply) {
     ui->apply_friend_list->setItemWidget(item, apply_item);
 
     // 收到审核好友信号
-    // connect(apply_item, &ApplyFriendItem::sig_auth_friend, [this](ApplyInfo apply_info) {});
+    connect(apply_item, &ApplyFriendItem::sig_auth_friend, this, &ApplyFriendPage::slot_auth_friend);
 }
 
 void ApplyFriendPage::loadApplyList() {
     const auto& apply_list = UserMgr::GetInstance().GetApplyList();
-    for (const auto& [_, apply] : apply_list) {
+    for (const auto& apply_info : apply_list) {
         int random_value = QRandomGenerator::global()->bounded(100);
         int head_index = random_value % heads.size();
-        apply->icon = heads[head_index];
+        apply_info->icon = heads[head_index];
 
         auto apply_item = new ApplyFriendItem;
-        apply_item->setInfo(*apply);
+        apply_item->setApplyInfo(apply_info);
 
         auto item = new QListWidgetItem;
         item->setSizeHint(apply_item->sizeHint());
@@ -55,7 +57,7 @@ void ApplyFriendPage::loadApplyList() {
 
         ui->apply_friend_list->insertItem(0, item);
         ui->apply_friend_list->setItemWidget(item, apply_item);
-        if (apply->status) {
+        if (apply_info->status) {
             apply_item->showAddBtn(false);
         } else {
             apply_item->showAddBtn(true);
@@ -63,8 +65,7 @@ void ApplyFriendPage::loadApplyList() {
         }
 
         // 收到审核好友信号
-        // connect(apply_item,&ApplyFriendItem::sig_auth_friend, [this](const ApplyInfo& apply_info){
-        // });
+        connect(apply_item, &ApplyFriendItem::sig_auth_friend, this, &ApplyFriendPage::slot_auth_friend);
     }
 
     // 模拟假数据
@@ -75,8 +76,9 @@ void ApplyFriendPage::loadApplyList() {
         int msg_index = random_value % strs.size();
 
         auto apply_item = new ApplyFriendItem;
-        apply_item->setInfo(
-            ApplyInfo{0, 0, names[name_index], names[name_index], heads[head_index], strs[msg_index], 1});
+        auto apply_info = std::make_shared<ApplyInfo>(0, 0, names[name_index], names[name_index],
+                                                      heads[head_index], strs[msg_index], 1);
+        apply_item->setApplyInfo(apply_info);
         if (i < 3) {
             apply_item->showAddBtn(true);
         }
@@ -88,9 +90,15 @@ void ApplyFriendPage::loadApplyList() {
         ui->apply_friend_list->addItem(item);
         ui->apply_friend_list->setItemWidget(item, apply_item);
         // 收到审核好友信号
-        // connect(apply_item,&ApplyFriendItem::sig_auth_friend, [this](const ApplyInfo& apply_info){
-        // });
+        connect(apply_item, &ApplyFriendItem::sig_auth_friend, this, &ApplyFriendPage::slot_auth_friend);
     }
+}
+
+void ApplyFriendPage::slot_auth_friend(const std::shared_ptr<ApplyInfo>& apply_info) {
+    auto auth_friend_dialog = new AuthFriendDialog(this);
+    auth_friend_dialog->setModal(true);
+    auth_friend_dialog->setApplyInfo(apply_info);
+    auth_friend_dialog->show();
 }
 
 void ApplyFriendPage::slot_auth_rsp(const AuthRsp& auth_rsp) {

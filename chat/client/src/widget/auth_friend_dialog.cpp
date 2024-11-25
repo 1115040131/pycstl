@@ -1,4 +1,4 @@
-#include "chat/client/widget/apply_friend_dialog.h"
+#include "chat/client/widget/auth_friend_dialog.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -6,20 +6,20 @@
 
 #include "chat/client/tcp_mgr.h"
 #include "chat/client/user_mgr.h"
-#include "chat/client/widget/ui_apply_friend_dialog.h"
+#include "chat/client/widget/ui_auth_friend_dialog.h"
 
 inline constexpr int kMinApplyLbaelEditLength = 40;  // 申请好友标签输入框最低长度
 
 inline constexpr std::string_view kAddPrefix = "添加标签";
 
-ApplyFriendDialog::ApplyFriendDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ApplyFriendDialog) {
+AuthFriendDialog::AuthFriendDialog(QWidget* parent) : QDialog(parent), ui(new Ui::AuthFriendDialog) {
     ui->setupUi(this);
 
     // 隐藏对话框标题
     setWindowFlag(Qt::FramelessWindowHint);
 
     this->setModal(true);
-    ui->name_edit->setPlaceholderText(UserMgr::GetInstance().GetName());
+    // ui->name_edit->setPlaceholderText(UserMgr::GetInstance().GetName());
     ui->label_edit->setPlaceholderText(tr("搜索、添加标签"));
     // ui->back_edit->setPlaceholderText(tr("虚妄的诺言"));
 
@@ -30,16 +30,16 @@ ApplyFriendDialog::ApplyFriendDialog(QWidget* parent) : QDialog(parent), ui(new 
 
     ui->input_tip_widget->hide();  // 输入标签后再显示搜索框
 
-    connect(ui->more_label, &ClickedOnceLabel::clicked, this, &ApplyFriendDialog::slot_show_more_label);
+    connect(ui->more_label, &ClickedOnceLabel::clicked, this, &AuthFriendDialog::slot_show_more_label);
 
     initTipLabels();
 
     // 连接输入标签事件
-    connect(ui->label_edit, &CustomizeEdit::returnPressed, this, &ApplyFriendDialog::slot_label_enter);
-    connect(ui->label_edit, &CustomizeEdit::textChanged, this, &ApplyFriendDialog::slot_label_text_change);
-    connect(ui->label_edit, &CustomizeEdit::editingFinished, this, &ApplyFriendDialog::slot_label_edit_finished);
+    connect(ui->label_edit, &CustomizeEdit::returnPressed, this, &AuthFriendDialog::slot_label_enter);
+    connect(ui->label_edit, &CustomizeEdit::textChanged, this, &AuthFriendDialog::slot_label_text_change);
+    connect(ui->label_edit, &CustomizeEdit::editingFinished, this, &AuthFriendDialog::slot_label_edit_finished);
     connect(ui->tip_label, &ClickedOnceLabel::clicked, this,
-            &ApplyFriendDialog::slot_add_friend_label_by_click_tip);
+            &AuthFriendDialog::slot_add_friend_label_by_click_tip);
 
     ui->scrollArea->verticalScrollBar()->setHidden(true);
     ui->scrollArea->horizontalScrollBar()->setHidden(true);
@@ -48,20 +48,20 @@ ApplyFriendDialog::ApplyFriendDialog(QWidget* parent) : QDialog(parent), ui(new 
     // 连接确认和取消按钮的槽函数
     ui->sure_btn->setState("normal", "hover", "press");
     ui->cancel_btn->setState("normal", "hover", "press");
-    connect(ui->sure_btn, &ClickedBtn::clicked, this, &ApplyFriendDialog::slot_apply_sure);
-    connect(ui->cancel_btn, &ClickedBtn::clicked, this, &ApplyFriendDialog::slot_apply_cancel);
+    connect(ui->sure_btn, &ClickedBtn::clicked, this, &AuthFriendDialog::slot_auth_sure);
+    connect(ui->cancel_btn, &ClickedBtn::clicked, this, &AuthFriendDialog::slot_auth_cancel);
 }
 
-ApplyFriendDialog::~ApplyFriendDialog() { delete ui; }
+AuthFriendDialog::~AuthFriendDialog() { delete ui; }
 
-void ApplyFriendDialog::setSearchInfo(const std::shared_ptr<SearchInfo>& search_info) {
-    search_info_ = search_info;
-    ui->name_edit->setText(UserMgr::GetInstance().GetName());
-    ui->back_edit->setPlaceholderText(search_info->name);
-    ui->back_edit->setText(search_info->name);
+void AuthFriendDialog::setApplyInfo(const std::shared_ptr<ApplyInfo>& apply_info) {
+    apply_info_ = apply_info;
+    // ui->name_edit->setText(UserMgr::GetInstance().GetName());
+    ui->back_edit->setPlaceholderText(apply_info->name);
+    ui->back_edit->setText(apply_info->name);
 }
 
-bool ApplyFriendDialog::eventFilter(QObject* watched, QEvent* event) {
+bool AuthFriendDialog::eventFilter(QObject* watched, QEvent* event) {
     if (watched == ui->scrollArea) {
         if (event->type() == QEvent::Enter) {
             ui->scrollArea->verticalScrollBar()->setHidden(false);
@@ -72,12 +72,12 @@ bool ApplyFriendDialog::eventFilter(QObject* watched, QEvent* event) {
     return QDialog::eventFilter(watched, event);
 }
 
-ApplyFriendDialog::TipLabelInfo ApplyFriendDialog::makeNewTipLabel(const QString& text, QWidget* parent) {
+AuthFriendDialog::TipLabelInfo AuthFriendDialog::makeNewTipLabel(const QString& text, QWidget* parent) {
     auto label = new ClickedLabel(parent);
     label->setState("normal", "hover", "pressed", "selected_normal", "selected_hover", "selected_pressed");
     label->setObjectName("tipslb");
     label->setText(text);
-    connect(label, &ClickedLabel::clicked, this, &ApplyFriendDialog::slot_change_friend_label_by_tip);
+    connect(label, &ClickedLabel::clicked, this, &AuthFriendDialog::slot_change_friend_label_by_tip);
 
     QFontMetrics fontMetrics(label->font());                        // 获取QLabel控件的字体信息
     int text_width = fontMetrics.horizontalAdvance(label->text());  // 获取文本的宽度
@@ -86,7 +86,7 @@ ApplyFriendDialog::TipLabelInfo ApplyFriendDialog::makeNewTipLabel(const QString
     return {label, text_width, text_height};
 }
 
-void ApplyFriendDialog::initTipLabels() {
+void AuthFriendDialog::initTipLabels() {
     // 模拟创建多个标签展示
     tip_data_ = {"同学",          "家人",           "菜鸟教程",       "C++ Primer",
                  "Rust 程序设计", "父与子学Python", "nodejs开发指南", "go 语言开发指南",
@@ -112,7 +112,7 @@ void ApplyFriendDialog::initTipLabels() {
     }
 }
 
-QPoint ApplyFriendDialog::addTipLabel(ClickedLabel* tip_label, const QPoint& cur_point, int text_width, int) {
+QPoint AuthFriendDialog::addTipLabel(ClickedLabel* tip_label, const QPoint& cur_point, int text_width, int) {
     tip_label->move(cur_point);
     tip_label->show();
 
@@ -124,7 +124,7 @@ QPoint ApplyFriendDialog::addTipLabel(ClickedLabel* tip_label, const QPoint& cur
     return next_point;
 }
 
-void ApplyFriendDialog::resetLabels() {
+void AuthFriendDialog::resetLabels() {
     if (friend_labels_.empty()) {
         ui->label_edit->move(label_point_);
         return;
@@ -155,7 +155,7 @@ void ApplyFriendDialog::resetLabels() {
     }
 }
 
-void ApplyFriendDialog::addLabel(const QString& name) {
+void AuthFriendDialog::addLabel(const QString& name) {
     if (friend_labels_.count(name) > 0) {
         return;
     }
@@ -175,7 +175,7 @@ void ApplyFriendDialog::addLabel(const QString& name) {
     friend_labels_[name] = friend_label;
     friend_label_keys_.push_back(name);
 
-    connect(friend_label, &FriendLabel::sig_close, this, &ApplyFriendDialog::slot_remove_friend_label);
+    connect(friend_label, &FriendLabel::sig_close, this, &AuthFriendDialog::slot_remove_friend_label);
 
     // 将 edit 移动到添加的标签后面
     label_point_.setX(label_point_.x() + friend_label->width() + 2);
@@ -196,7 +196,7 @@ void ApplyFriendDialog::addLabel(const QString& name) {
     }
 }
 
-void ApplyFriendDialog::slot_show_more_label() {
+void AuthFriendDialog::slot_show_more_label() {
     ui->more_label_widget->hide();
     ui->label_list->setFixedWidth(343);
     tip_cur_point_ = QPoint(kTipOffset, 5);
@@ -244,7 +244,7 @@ void ApplyFriendDialog::slot_show_more_label() {
     ui->scrollcontent->setFixedHeight(ui->scrollcontent->height() + diff_height);
 }
 
-void ApplyFriendDialog::slot_label_enter() {
+void AuthFriendDialog::slot_label_enter() {
     auto text = ui->label_edit->text();
     if (text.isEmpty()) {
         return;
@@ -281,7 +281,7 @@ void ApplyFriendDialog::slot_label_enter() {
     ui->scrollcontent->setFixedHeight(ui->scrollcontent->height() + diff_height);
 }
 
-void ApplyFriendDialog::slot_remove_friend_label(const QString& name) {
+void AuthFriendDialog::slot_remove_friend_label(const QString& name) {
     label_point_.setX(2);
     label_point_.setY(6);
 
@@ -303,7 +303,7 @@ void ApplyFriendDialog::slot_remove_friend_label(const QString& name) {
     }
 }
 
-void ApplyFriendDialog::slot_change_friend_label_by_tip(const QString& name, ClickedLabel::State state) {
+void AuthFriendDialog::slot_change_friend_label_by_tip(const QString& name, ClickedLabel::State state) {
     auto iter = add_labels_.find(name);
     if (iter == add_labels_.end()) {
         return;
@@ -316,7 +316,7 @@ void ApplyFriendDialog::slot_change_friend_label_by_tip(const QString& name, Cli
     }
 }
 
-void ApplyFriendDialog::slot_label_text_change(const QString& text) {
+void AuthFriendDialog::slot_label_text_change(const QString& text) {
     if (text.isEmpty()) {
         ui->input_tip_widget->hide();
         return;
@@ -331,34 +331,31 @@ void ApplyFriendDialog::slot_label_text_change(const QString& text) {
     ui->input_tip_widget->show();
 }
 
-void ApplyFriendDialog::slot_label_edit_finished() { ui->input_tip_widget->hide(); }
+void AuthFriendDialog::slot_label_edit_finished() { ui->input_tip_widget->hide(); }
 
-void ApplyFriendDialog::slot_add_friend_label_by_click_tip(const QString&) { slot_label_enter(); }
+void AuthFriendDialog::slot_add_friend_label_by_click_tip(const QString&) { slot_label_enter(); }
 
-void ApplyFriendDialog::slot_apply_sure() {
-    qDebug() << "Slot Apply Sure";
+void AuthFriendDialog::slot_auth_sure() {
+    qDebug() << "Slot Auth Sure";
     QJsonObject root;
 
     auto uid = UserMgr::GetInstance().GetUid();
-    root["uid"] = uid;
-
-    auto name = !ui->name_edit->text().isEmpty() ? ui->name_edit->text() : ui->name_edit->placeholderText();
-    root["apply_name"] = name;
+    root["from_uid"] = uid;
 
     auto back_name = !ui->back_edit->text().isEmpty() ? ui->back_edit->text() : ui->back_edit->placeholderText();
     root["back_name"] = back_name;
 
-    root["to_uid"] = search_info_->uid;
+    root["to_uid"] = apply_info_->uid;
 
     QJsonDocument doc(root);
 
-    emit TcpMgr::GetInstance().sig_send_data(ReqId::kAddFriendReq, doc.toJson(QJsonDocument::Compact));
+    emit TcpMgr::GetInstance().sig_send_data(ReqId::kAuthFriendReq, doc.toJson(QJsonDocument::Compact));
     this->hide();
     deleteLater();
 }
 
-void ApplyFriendDialog::slot_apply_cancel() {
-    qDebug() << "Slot Apply Cancel";
+void AuthFriendDialog::slot_auth_cancel() {
+    qDebug() << "Slot Auth Cancel";
     this->hide();
     deleteLater();
 }
