@@ -432,6 +432,22 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(json_notify['apply_uid'], user_info_1.uid)
             self.assertEqual(json_notify['apply_name'], user_info_1.name)
 
+        # 测试登录后的好友列表
+        with self.connect_server(user_info_2) as client_2:
+            host, port, token = self.get_server(user_info_2)
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((host, port))
+
+            response = Message.send_and_receive(client_socket, Message(
+                ReqId.kChatLogin, json.dumps({'uid': user_info_2.uid,
+                                                "token": token})))
+            self.assertEqual(response.message_id, ReqId.kChatLoginRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(len(json_response['apply_list']), 1)
+            self.assertEqual(json_response['apply_list'][0]['uid'], user_info_1.uid)
+            self.assertEqual(json_response['apply_list'][0]['name'], user_info_1.name)
+
 
 if __name__ == '__main__':
     unittest.main()
