@@ -17,7 +17,6 @@ public:
     QSize sizeHint() const override { return QSize(250, 70); }
 
     void setInfo(const AuthInfo& auth_info);
-    void setInfo(const AuthRsp& auth_rsp);
     void setInfo(int uid, const QString& name, const QString& icon);
 
     void showRedPoint(bool show);

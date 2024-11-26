@@ -17,11 +17,6 @@ void ContactUserItem::setInfo(const AuthInfo& auth_info) {
     setUiData();
 }
 
-void ContactUserItem::setInfo(const AuthRsp& auth_rsp) {
-    user_info_ = UserInfo::FromAuthRsp(auth_rsp);
-    setUiData();
-}
-
 void ContactUserItem::setInfo(int uid, const QString& name, const QString& icon) {
     user_info_.uid = uid;
     user_info_.name = name;

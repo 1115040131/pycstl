@@ -66,6 +66,8 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
 
     // 收到好友请求
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_friend_apply, this, &ChatDialog::slot_friend_apply);
+    connect(&TcpMgr::GetInstance(), &TcpMgr::sig_auth_rsp, this, &ChatDialog::slot_auth_rsp);
+    connect(&TcpMgr::GetInstance(), &TcpMgr::sig_add_auth_friend, this, &ChatDialog::slot_add_auth_friend);
 }
 
 ChatDialog::~ChatDialog() { delete ui; }
@@ -104,7 +106,7 @@ void ChatDialog::addChatUserList() {
         int head_index = random_value % heads.size();
         int msg_index = random_value % strs.size();
 
-        auto* chat_user_widget = new ChatUserWidget();
+        auto chat_user_widget = new ChatUserWidget;
         chat_user_widget->SetInfo(names[name_index], heads[head_index], strs[msg_index]);
         QListWidgetItem* item = new QListWidgetItem();
         item->setSizeHint(chat_user_widget->sizeHint());
@@ -137,6 +139,20 @@ void ChatDialog::handleGlobalMousePress(QMouseEvent* event) {
         ui->search_edit->clear();
         ShowSearch(false);
     }
+}
+
+void ChatDialog::addAuthFriend(const std::shared_ptr<AuthInfo>& auth_info) {
+    int random_value = QRandomGenerator::global()->bounded(100);
+    int head_index = random_value % heads.size();
+
+    auto chat_user_widget = new ChatUserWidget;
+    auto user_info = std::make_shared<UserInfo>(UserInfo::FromAuthInfo(*auth_info));
+    user_info->icon = heads[head_index];  // TODO: 随机头像
+    chat_user_widget->SetInfo(user_info);
+    QListWidgetItem* item = new QListWidgetItem();
+    item->setSizeHint(chat_user_widget->sizeHint());
+    ui->chat_user_list->insertItem(0, item);
+    ui->chat_user_list->setItemWidget(item, chat_user_widget);
 }
 
 void ChatDialog::slot_search_text_changed(const QString& text) {
@@ -190,4 +206,26 @@ void ChatDialog::slot_friend_apply(std::shared_ptr<ApplyInfo> apply) {
     ui->side_contact_label->ShowRedPoint(true);
     ui->contact_user_list->showRedPoint(true);
     ui->friend_apply_page->addNewApply(apply);
+}
+
+void ChatDialog::slot_auth_rsp(const std::shared_ptr<AuthInfo>& auth_info) {
+    if (UserMgr::GetInstance().CheckFriendById(auth_info->uid)) {
+        return;
+    }
+    UserMgr::GetInstance().AddFriend(auth_info);
+
+    addAuthFriend(auth_info);
+
+    ui->contact_user_list->slot_auth_rsp(auth_info);
+}
+
+void ChatDialog::slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info) {
+    if (UserMgr::GetInstance().CheckFriendById(auth_info->uid)) {
+        return;
+    }
+    UserMgr::GetInstance().AddFriend(auth_info);
+
+    addAuthFriend(auth_info);
+
+    ui->contact_user_list->slot_add_auth_friend(auth_info);
 }

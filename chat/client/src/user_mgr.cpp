@@ -16,3 +16,19 @@ void UserMgr::AppendApplyList(const QJsonArray& apply_list) {
         apply_list_.push_back(apply_info);
     }
 }
+
+std::shared_ptr<FriendInfo> UserMgr::GetFriendById(int uid) const {
+    auto iter = friend_msp_.find(uid);
+    if (iter == friend_msp_.end()) {
+        return nullptr;
+    }
+    return iter->second;
+}
+
+bool UserMgr::CheckFriendById(int uid) const { return friend_msp_.find(uid) != friend_msp_.end(); }
+
+void UserMgr::AddFriend(const std::shared_ptr<AuthInfo>& auth_info) {
+    auto friend_info = std::make_shared<FriendInfo>(auth_info->uid, auth_info->name, auth_info->nick,
+                                                    auth_info->icon, auth_info->sex);
+    friend_msp_[friend_info->uid] = friend_info;
+}

@@ -9,19 +9,20 @@ ChatUserWidget::ChatUserWidget(QWidget* parent) : ListItemBase(parent), ui(new U
 
 ChatUserWidget::~ChatUserWidget() { delete ui; }
 
-void ChatUserWidget::SetInfo(const QString& name, const QString& head, const QString& msg) {
-    name_ = name;
-    head_ = head;
-    msg_ = msg;
+void ChatUserWidget::SetInfo(const std::shared_ptr<UserInfo>& user_info) {
+    user_info_ = user_info;
+    SetInfo(user_info->name, user_info->icon, user_info->last_msg);
+}
 
+void ChatUserWidget::SetInfo(const QString& name, const QString& head, const QString& msg) {
     // 加载图片
-    QPixmap pixmap(head_);
+    QPixmap pixmap(head);
 
     // 设置图片自动缩放
     ui->icon_label->setPixmap(
         pixmap.scaled(ui->icon_label->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     ui->icon_label->setScaledContents(true);
 
-    ui->user_name_label->setText(name_);
-    ui->user_chat_label->setText(msg_);
+    ui->user_name_label->setText(name);
+    ui->user_chat_label->setText(msg);
 }

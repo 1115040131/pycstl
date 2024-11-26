@@ -38,6 +38,9 @@ private:
     // 处理全局鼠标点击事件, 判断是否需要清空搜索框
     void handleGlobalMousePress(QMouseEvent* event);
 
+    // 添加好友
+    void addAuthFriend(const std::shared_ptr<AuthInfo>& auth_info);
+
 private slots:
     // 搜索框文本变化
     void slot_search_text_changed(const QString& text);
@@ -51,6 +54,12 @@ private slots:
 
     // 收到好友请求
     void slot_friend_apply(std::shared_ptr<ApplyInfo> apply);
+
+    // 同意好友请求
+    void slot_auth_rsp(const std::shared_ptr<AuthInfo>& auth_info);
+
+    // 收到同意好友请求
+    void slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
 
 private:
     Ui::ChatDialog* ui;

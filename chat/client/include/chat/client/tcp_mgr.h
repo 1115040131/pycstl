@@ -42,11 +42,11 @@ signals:
     // 添加好友
     void sig_friend_apply(const std::shared_ptr<ApplyInfo>& apply);
 
-    // 对方同意添加好友
-    void sig_add_auth_friend(const AuthInfo& auth_info);
-
     // 同意好友申请
-    void sig_auth_rsp(const AuthRsp& auth_rsp);
+    void sig_auth_rsp(const std::shared_ptr<AuthInfo>& auth_rsp);
+
+    // 对方同意添加好友
+    void sig_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
 
 public slots:
     // 连接到聊天服务器

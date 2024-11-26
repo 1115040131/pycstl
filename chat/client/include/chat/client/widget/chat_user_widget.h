@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chat/client/user_data.h"
 #include "chat/client/util/list_item_base.h"
 
 QT_BEGIN_NAMESPACE
@@ -19,9 +20,9 @@ public:
 
     void SetInfo(const QString& name, const QString& head, const QString& msg);
 
+    void SetInfo(const std::shared_ptr<UserInfo>& user_info);
+
 private:
     Ui::ChatUserWidget* ui;
-    QString name_;
-    QString head_;
-    QString msg_;
+    std::shared_ptr<UserInfo> user_info_;
 };

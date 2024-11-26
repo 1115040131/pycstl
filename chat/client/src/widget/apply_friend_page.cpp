@@ -14,7 +14,7 @@ ApplyFriendPage::ApplyFriendPage(QWidget* parent) : QDialog(parent), ui(new Ui::
     connect(ui->apply_friend_list, &ApplyFriendList::sig_show_search, this, &ApplyFriendPage::sig_show_search);
     loadApplyList();
 
-    // 连接 authrsp 信号处理
+    // 连接 auth_rsp 信号处理
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_auth_rsp, this, &ApplyFriendPage::slot_auth_rsp);
 }
 
@@ -101,8 +101,8 @@ void ApplyFriendPage::slot_auth_friend(const std::shared_ptr<ApplyInfo>& apply_i
     auth_friend_dialog->show();
 }
 
-void ApplyFriendPage::slot_auth_rsp(const AuthRsp& auth_rsp) {
-    auto uid = auth_rsp.uid;
+void ApplyFriendPage::slot_auth_rsp(const std::shared_ptr<AuthInfo>& auth_rsp) {
+    auto uid = auth_rsp->uid;
     auto iter = unauth_items_.find(uid);
     if (iter == unauth_items_.end()) {
         return;

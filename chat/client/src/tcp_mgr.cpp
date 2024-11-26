@@ -205,6 +205,64 @@ void TcpMgr::initHttpHandlers() {
 
         qDebug() << "kNotifyAddFriendReq Success!";
     });
+    handlers_.emplace(ReqId::kAuthFriendRes, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "kAuthFriendRes Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "kAuthFriendRes failed, err is ErrorCode::kJsonError";
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "kAuthFriendRes failed, err is" << ToString(error);
+            return;
+        }
+
+        auto auth_info =
+            std::make_shared<AuthInfo>(root["uid"].toInt(), root["sex"].toInt(), root["name"].toString(),
+                                       root["nick"].toString(), root["icon"].toString());
+
+        emit sig_auth_rsp(auth_info);
+
+        qDebug() << "kAuthFriendRes Success!";
+    });
+    handlers_.emplace(ReqId::kNotifyAuthFriendReq, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "kNotifyAuthFriendReq Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "kNotifyAuthFriendReq failed, err is ErrorCode::kJsonError";
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "kNotifyAuthFriendReq failed, err is" << ToString(error);
+            return;
+        }
+
+        auto auth_info =
+            std::make_shared<AuthInfo>(root["from_uid"].toInt(), root["sex"].toInt(), root["name"].toString(),
+                                       root["nick"].toString(), root["icon"].toString());
+
+        emit sig_add_auth_friend(auth_info);
+
+        qDebug() << "kNotifyAuthFriendReq Success!";
+    });
 }
 
 void TcpMgr::handleMessage(ReqId req_id, uint16_t, const QByteArray& data) {

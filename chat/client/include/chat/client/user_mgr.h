@@ -18,13 +18,19 @@ public:
     int GetUid() const { return user_info_->uid; }
     const QString& GetName() const { return user_info_->name; }
     const QString& GetToken() const { return token_; }
+
     const std::vector<std::shared_ptr<ApplyInfo>>& GetApplyList() const { return apply_list_; }
     void AddApplyList(int uid, const std::shared_ptr<ApplyInfo>& apply) { apply_list_.push_back(apply); }
     bool AlreadyApply(int uid) const;
     void AppendApplyList(const QJsonArray& apply_list);
 
+    bool CheckFriendById(int uid) const;
+    std::shared_ptr<FriendInfo> GetFriendById(int uid) const;
+    void AddFriend(const std::shared_ptr<AuthInfo>& auth_info);
+
 private:
     QString token_;
     std::shared_ptr<UserInfo> user_info_;
     std::vector<std::shared_ptr<ApplyInfo>> apply_list_;
+    std::unordered_map<int, std::shared_ptr<FriendInfo>> friend_msp_;
 };

@@ -2,6 +2,8 @@
 
 #include <QListWidget>
 
+#include "chat/client/user_data.h"
+
 class ContactUserItem;
 
 class ContactUserList : public QListWidget {
@@ -18,6 +20,8 @@ protected:
 private:
     void addContactUserList();
 
+    void addAuthFriendItem(const std::shared_ptr<AuthInfo>& auth_info);
+
 signals:
     void sig_loading_contact_user();
 
@@ -25,12 +29,13 @@ signals:
 
     void sig_switch_friend_info_page();
 
+public slots:
+    void slot_auth_rsp(const std::shared_ptr<AuthInfo>& auth_info);
+
+    void slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
+
 private slots:
     void slot_item_clicked(QListWidgetItem* item);
-
-    // void slot_add_auth_friend();
-
-    // void slot_auth_rsp();
 
 private:
     ContactUserItem* add_friend_item_;
