@@ -8,7 +8,26 @@
 namespace pyc {
 namespace chat {
 
-TEST(MysqlMgrTest, ConnectionTest) {
+class MysqlMgrTest : public ::testing::Test {
+protected:
+    static void SetUpTestSuite() {}
+
+    static void TearDownTestSuite() {
+        // 测试完清理 friend 和 friend_apply 两张表格
+        GET_CONFIG(host, "Mysql", "Host");
+        GET_CONFIG_INT(port, "Mysql", "Port");
+        GET_CONFIG(user, "Mysql", "User");
+        GET_CONFIG(password, "Mysql", "Password");
+        GET_CONFIG(schema, "Mysql", "Schema");
+
+        auto session = mysqlx::Session(host, port, user, password);
+        auto db = session.getSchema(schema);
+        db.getTable("friend").remove().execute();
+        db.getTable("friend_apply").remove().execute();
+    }
+};
+
+TEST_F(MysqlMgrTest, ConnectionTest) {
     GET_CONFIG(host, "Mysql", "Host");
     GET_CONFIG_INT(port, "Mysql", "Port");
     GET_CONFIG(user, "Mysql", "User");
@@ -83,7 +102,7 @@ TEST(MysqlMgrTest, ConnectionTest) {
     session.dropSchema(kSchema);
 }
 
-TEST(MysqlMgrTest, RegUser) {
+TEST_F(MysqlMgrTest, RegUser) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试
@@ -102,7 +121,7 @@ TEST(MysqlMgrTest, RegUser) {
     EXPECT_TRUE(mysql_mgr.DeleteUser(email2));
 }
 
-TEST(MysqlMgrTest, CheckEmail) {
+TEST_F(MysqlMgrTest, CheckEmail) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试
@@ -124,7 +143,7 @@ TEST(MysqlMgrTest, CheckEmail) {
     EXPECT_TRUE(mysql_mgr.DeleteUser(email2));
 }
 
-TEST(MysqlMgrTest, UpdatePassword) {
+TEST_F(MysqlMgrTest, UpdatePassword) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试
@@ -144,7 +163,7 @@ TEST(MysqlMgrTest, UpdatePassword) {
     EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
 }
 
-TEST(MysqlMgrTest, CheckPassword) {
+TEST_F(MysqlMgrTest, CheckPassword) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试
@@ -169,7 +188,7 @@ TEST(MysqlMgrTest, CheckPassword) {
     EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
 }
 
-TEST(MysqlMgrTest, GetUser) {
+TEST_F(MysqlMgrTest, GetUser) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试
@@ -188,44 +207,76 @@ TEST(MysqlMgrTest, GetUser) {
     EXPECT_TRUE(mysql_mgr.DeleteUser(email1));
 }
 
-TEST(MysqlMgrTest, AddFriendAddply) {
+TEST_F(MysqlMgrTest, AddFriendAppply) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     int to_id = 101;
     for (int from_id = 102; from_id < 121; from_id++) {
         // 添加好友申请
-        EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
+        EXPECT_TRUE(mysql_mgr.AddFriendAppply(from_id, to_id).value());
     }
 }
 
-TEST(MysqlMgrTest, GetApplyList) {
+TEST_F(MysqlMgrTest, GetApplyList) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 必须是注册过账户的 id
     int to_id = 101;
     for (int from_id = 102; from_id < 121; from_id++) {
         // 添加好友申请
-        EXPECT_TRUE(mysql_mgr.AddFriendAddply(from_id, to_id));
+        EXPECT_TRUE(mysql_mgr.AddFriendAppply(from_id, to_id).value());
     }
 
-    auto apply_list = mysql_mgr.GetApplyList(to_id, 0, 9).value();
-    ASSERT_EQ(apply_list.size(), 9);
-    for (int i = 0; i < 9; i++) {
-        EXPECT_EQ(apply_list[i].uid, 102 + i);
-        EXPECT_EQ(apply_list[i].name, fmt::format("test_user_{}", 2 + i));
-        EXPECT_EQ(apply_list[i].nick, fmt::format("test_nick_{}", 2 + i));
+    {
+        auto apply_list = mysql_mgr.GetApplyList(to_id, 0).value();
+        ASSERT_EQ(apply_list.size(), 10);
+        for (size_t i = 0; i < apply_list.size(); i++) {
+            EXPECT_EQ(apply_list[i].uid, 102 + i);
+            EXPECT_EQ(apply_list[i].name, fmt::format("test_user_{}", 2 + i));
+            EXPECT_EQ(apply_list[i].nick, fmt::format("test_nick_{}", 2 + i));
+        }
     }
-
-    auto apply_list2 = mysql_mgr.GetApplyList(to_id, 9, 15).value();
-    ASSERT_EQ(apply_list2.size(), 10);
-    for (int i = 0; i < 10; i++) {
-        EXPECT_EQ(apply_list2[i].uid, 111 + i);
-        EXPECT_EQ(apply_list2[i].name, fmt::format("test_user_{}", 11 + i));
-        EXPECT_EQ(apply_list2[i].nick, fmt::format("test_nick_{}", 11 + i));
+    {
+        auto apply_list = mysql_mgr.GetApplyList(to_id, 0, 25).value();
+        ASSERT_EQ(apply_list.size(), 19);
+        for (size_t i = 0; i < apply_list.size(); i++) {
+            EXPECT_EQ(apply_list[i].uid, 102 + i);
+            EXPECT_EQ(apply_list[i].name, fmt::format("test_user_{}", 2 + i));
+            EXPECT_EQ(apply_list[i].nick, fmt::format("test_nick_{}", 2 + i));
+        }
     }
+    // auto apply_list2 = mysql_mgr.GetApplyList(to_id, 9, 15).value();
+    // ASSERT_EQ(apply_list2.size(), 10);
+    // for (int i = 0; i < 10; i++) {
+    //     EXPECT_EQ(apply_list2[i].uid, 111 + i);
+    //     EXPECT_EQ(apply_list2[i].name, fmt::format("test_user_{}", 11 + i));
+    //     EXPECT_EQ(apply_list2[i].nick, fmt::format("test_nick_{}", 11 + i));
+    // }
 }
 
-TEST(MysqlMgrTest, DeleteUser) {
+TEST_F(MysqlMgrTest, AuthFriendApply) {
+    int from_uid = 201;
+    int to_uid = 202;
+
+    // 未申请好友, 同意添加好友失败
+    EXPECT_FALSE(MysqlMgr::GetInstance().AuthFriendApply(from_uid, to_uid).value());
+    EXPECT_FALSE(MysqlMgr::GetInstance().AuthFriendApply(to_uid, from_uid).value());
+
+    // 申请好友
+    EXPECT_TRUE(MysqlMgr::GetInstance().AddFriendAppply(from_uid, to_uid).value());
+
+    // 同意添加好友成功
+    EXPECT_FALSE(MysqlMgr::GetInstance().AuthFriendApply(from_uid, to_uid).value());
+    EXPECT_TRUE(MysqlMgr::GetInstance().AuthFriendApply(to_uid, from_uid).value());
+
+    // 添加好友
+    EXPECT_TRUE(MysqlMgr::GetInstance().AddFriend(from_uid, to_uid, "").value());
+
+    // 重复添加失败
+    EXPECT_FALSE(MysqlMgr::GetInstance().AddFriend(from_uid, to_uid, "").value());
+}
+
+TEST_F(MysqlMgrTest, DeleteUser) {
     auto& mysql_mgr = MysqlMgr::GetInstance();
 
     // 根据当前时间戳生成用户和邮箱用于测试

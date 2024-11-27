@@ -112,6 +112,10 @@ std::optional<UserInfo> MysqlMgr::GetUser(int uid) {
         user_info.name = row[2].get<std::string>();
         user_info.email = row[3].get<std::string>();
         user_info.password = row[4].get<std::string>();
+        user_info.nick = row[5].get<std::string>();
+        user_info.desc = row[6].get<std::string>();
+        user_info.sex = row[7].get<int>();
+        user_info.icon = row[8].get<std::string>();
 
         return user_info;
     });
@@ -130,12 +134,16 @@ std::optional<UserInfo> MysqlMgr::GetUser(std::string_view name) {
         user_info.name = row[2].get<std::string>();
         user_info.email = row[3].get<std::string>();
         user_info.password = row[4].get<std::string>();
+        user_info.nick = row[5].get<std::string>();
+        user_info.desc = row[6].get<std::string>();
+        user_info.sex = row[7].get<int>();
+        user_info.icon = row[8].get<std::string>();
 
         return user_info;
     });
 }
 
-std::optional<bool> MysqlMgr::AddFriendAddply(int from_uid, int to_uid) {
+std::optional<bool> MysqlMgr::AddFriendAppply(int from_uid, int to_uid) {
     return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
         auto result = session
                           .sql(
@@ -171,6 +179,66 @@ std::optional<std::vector<ApplyInfo>> MysqlMgr::GetApplyList(int to_uid, int beg
             apply_list.push_back(std::move(apply_info));
         }
         return apply_list;
+    });
+}
+
+std::optional<bool> MysqlMgr::AuthFriendApply(int from_uid, int to_uid) {
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
+        // 更新对方的好友申请
+        auto result = session.sql("UPDATE friend_apply SET status = 1 WHERE from_uid = ? AND to_uid = ?")
+                          .bind(to_uid)
+                          .bind(from_uid)
+                          .execute();
+
+        if (result.getAffectedItemsCount() == 0) {
+            return false;
+        }
+
+        // 若己方也有好友申请, 也同步更新, 不管成功失败
+        session.sql("UPDATE friend_apply SET status = 1 WHERE from_uid = ? AND to_uid = ?")
+            .bind(from_uid)
+            .bind(to_uid)
+            .execute();
+
+        return true;
+    });
+}
+
+std::optional<bool> MysqlMgr::AddFriend(int from_uid, int to_uid, std::string_view back_name) {
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
+        session.startTransaction();
+        try {
+            {  // 插入认证方好友
+                auto result = session.sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?)")
+                                  .bind(from_uid)
+                                  .bind(to_uid)
+                                  .bind(back_name.data())
+                                  .execute();
+                if (result.getAffectedItemsCount() <= 0) {
+                    session.rollback();
+                    return false;
+                }
+            }
+            {  // 插入申请方好友
+                auto result = session.sql("INSERT IGNORE INTO friend(self_id, friend_id, back) VALUES (?, ?, ?)")
+                                  .bind(to_uid)
+                                  .bind(from_uid)
+                                  .bind("")
+                                  .execute();
+                if (result.getAffectedItemsCount() <= 0) {
+                    session.rollback();
+                    return false;
+                }
+            }
+            session.commit();
+
+        } catch (const mysqlx::Error& err) {
+            g_logger.error("Error: {}", err.what());
+            session.rollback();
+            return false;
+        }
+
+        return true;
     });
 }
 

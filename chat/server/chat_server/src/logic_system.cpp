@@ -47,6 +47,10 @@ void LogicSystem::RegisterCallBack() {
                                                  const std::string& msg_data) {
         AddFriendHandler(session, msg_data);
     };
+    callback_map_[ReqId::kAuthFriendReq] = [this](const std::shared_ptr<CSession>& session,
+                                                  const std::string& msg_data) {
+        AuthFriendHandler(session, msg_data);
+    };
 }
 
 void LogicSystem::DealMsg() {
@@ -277,17 +281,19 @@ void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, con
     }
 
     // 更新数据库
-    if (auto result = MysqlMgr::GetInstance().AddFriendAddply(uid, to_uid); !result) {
+    if (!(MysqlMgr::GetInstance().AddFriendAppply(uid, to_uid) == true)) {
         PYC_LOG_ERROR("Failed to update database");
         response["error"] = ErrorCode::kNetworkError;
         return;
     }
 
+    // 数据库操作结束认为已经成功, 后续为通知对端
+    response["error"] = ErrorCode::kSuccess;
+
     // 查询对方服务器地址
     auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
     if (!to_server_name) {
-        PYC_LOG_INFO("User {} not online", to_uid);
-        response["error"] = ErrorCode::kSuccess;
+        PYC_LOG_DEBUG("User {} not online", to_uid);
         return;
     }
     // 对方在同一个服务器上
@@ -301,28 +307,101 @@ void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, con
             notify["apply_uid"] = uid;
             notify["apply_name"] = apply_name;
             notify["nick"] = base_info->nick;
-            notify["desc"] = "";
+            notify["desc"] = base_info->desc;
             notify["sex"] = base_info->sex;
             notify["icon"] = base_info->icon;
             session->Send(notify.dump(), ReqId::kNotifyAddFriendReq);
         }
+    } else {
+        // 对方在其他服务器上
+        AddFriendReq rpc_request;
+        rpc_request.set_apply_uid(uid);
+        rpc_request.set_apply_name(apply_name);
+        rpc_request.set_nick(base_info->nick);
+        rpc_request.set_desc(base_info->desc);
+        rpc_request.set_sex(base_info->sex);
+        rpc_request.set_icon(base_info->icon);
+        rpc_request.set_to_uid(to_uid);
+        ChatGrpcClient::GetInstance().NotifyAddFriend(to_server_name.value(), rpc_request);
+    }
+}
 
-        response["error"] = ErrorCode::kSuccess;
+void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
+    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+
+    nlohmann::json request = nlohmann::json::parse(msg_data, nullptr, false);
+    nlohmann::json response;
+    Defer defer([&session, &response]() { session->Send(response.dump(), ReqId::kAuthFriendRes); });
+
+    if (request.is_discarded()) {
+        PYC_LOG_ERROR("Failed to parse Json data");
+        response["error"] = ErrorCode::kJsonError;
         return;
     }
 
-    // 对方在其他服务器上
-    AddFriendReq rpc_request;
-    rpc_request.set_apply_uid(uid);
-    rpc_request.set_apply_name(apply_name);
-    rpc_request.set_nick(base_info->nick);
-    rpc_request.set_desc("");
-    rpc_request.set_sex(base_info->sex);
-    rpc_request.set_icon(base_info->icon);
-    rpc_request.set_to_uid(to_uid);
-    ChatGrpcClient::GetInstance().NotifyAddFriend(to_server_name.value(), rpc_request);
+    int from_uid = request.value("from_uid", 0);
+    int to_uid = request.value("to_uid", 0);
+    auto back_name = request.value("back_name", "");
 
+    PYC_LOG_INFO("{} to {}", from_uid, to_uid);
+
+    // 查询基本信息
+    auto from_base_info = GetBaseInfo(from_uid);
+    auto to_base_info = GetBaseInfo(to_uid);
+    if (!from_base_info || !to_base_info) {
+        response["error"] = ErrorCode::kUidInvalid;
+        return;
+    }
+
+    // 更新数据库
+    if (!(MysqlMgr::GetInstance().AuthFriendApply(from_uid, to_uid) == true) ||
+        !(MysqlMgr::GetInstance().AddFriend(from_uid, to_uid, back_name) == true)) {
+        PYC_LOG_ERROR("Failed to update database");
+        response["error"] = ErrorCode::kNetworkError;
+        return;
+    }
+
+    // 数据库操作结束认为已经成功, 后续为通知对端
     response["error"] = ErrorCode::kSuccess;
+    response["to_uid"] = to_uid;
+    response["name"] = to_base_info->name;
+    response["nick"] = to_base_info->nick;
+    response["sex"] = to_base_info->sex;
+    response["icon"] = to_base_info->icon;
+
+    // 查询对方服务器地址
+    auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
+    if (!to_server_name) {
+        PYC_LOG_DEBUG("User {} not online", to_uid);
+        return;
+    }
+
+    // 对方在同一个服务器上
+    if (to_server_name == GET_SECTION()) {
+        auto session = UserMgr::GetInstance().GetSession(to_uid);
+        if (!session) {
+            PYC_LOG_WARN("User {} not online", to_uid);
+        } else {
+            nlohmann::json notify;
+            notify["error"] = ErrorCode::kSuccess;
+            notify["from_uid"] = from_uid;
+            notify["name"] = from_base_info->name;
+            notify["nick"] = from_base_info->nick;
+            notify["sex"] = from_base_info->sex;
+            notify["icon"] = from_base_info->icon;
+            session->Send(notify.dump(), ReqId::kNotifyAuthFriendReq);
+        }
+    } else {
+        // 对方在其他服务器上
+        AuthFriendReq rpc_request;
+        rpc_request.set_from_uid(from_uid);
+        rpc_request.set_to_uid(to_uid);
+        rpc_request.set_name(from_base_info->name);
+        rpc_request.set_nick(from_base_info->nick);
+        rpc_request.set_sex(from_base_info->sex);
+        rpc_request.set_icon(from_base_info->icon);
+        ChatGrpcClient::GetInstance().NotifyAuthFriend(to_server_name.value(), rpc_request);
+    }
 }
 
 }  // namespace chat

@@ -182,6 +182,7 @@ class ChatServerTest(unittest.TestCase):
 
         return client_socket
 
+    # @unittest.skip("tmp skip")
     def test_pack(self):
         """
         测试粘包处理
@@ -447,6 +448,104 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(len(json_response['apply_list']), 1)
             self.assertEqual(json_response['apply_list'][0]['uid'], user_info_1.uid)
             self.assertEqual(json_response['apply_list'][0]['name'], user_info_1.name)
+
+    def test_auth_friend(self):
+        """
+        同意好友测试
+        """
+
+        # 将两个服务器人数都设置为 0, 确保 client1, client3 在一个服务器上, client2 在另一个服务器上
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
+
+        # 注册账号
+        user_info_1 = self.register()
+        user_info_2 = self.register()
+        user_info_3 = self.register()
+
+        with self.login_server(user_info_1) as client_1, self.login_server(user_info_2) as client_2, self.login_server(user_info_3) as client_3:
+            # 确保用户 1 和 3 在同一个服务器上
+            self.assertEqual(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_1.uid}'),
+                             self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_3.uid}'))
+            self.assertNotEqual(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_1.uid}'),
+                                self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_2.uid}'))
+
+            # json 错误
+            response = Message.send_and_receive(client_1, Message(ReqId.kAuthFriendReq, 'hello'))
+            self.assertEqual(response.message_id, ReqId.kAuthFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
+
+            # uid 错误, 自己的基本信息查询失败
+            response = Message.send_and_receive(client_1, Message(ReqId.kAuthFriendReq, json.dumps({"uid": 0})))
+            self.assertEqual(response.message_id, ReqId.kAuthFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kUidInvalid.value)
+
+            # 对方未申请好友, 同意添加好友失败
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAuthFriendReq, json.dumps({"from_uid": user_info_1.uid, "to_uid": user_info_2.uid})))
+            self.assertEqual(response.message_id, ReqId.kAuthFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kNetworkError.value)
+
+            # 申请好友
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAddFriendReq, json.dumps({"uid": user_info_1.uid, "to_uid": user_info_2.uid, "apply_name": user_info_1.name})))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAddFriendReq, json.dumps({"uid": user_info_1.uid, "to_uid": user_info_3.uid, "apply_name": user_info_1.name})))
+            self.assertEqual(response.message_id, ReqId.kAddFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            # 客户端 2, 3 先读取好友申请的数据
+            Message.receive(client_2)
+            Message.receive(client_3)
+
+            # 己方同意好友失败, 需对方同意
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kAuthFriendReq, json.dumps({"from_uid": user_info_1.uid, "to_uid": user_info_2.uid})))
+            self.assertEqual(response.message_id, ReqId.kAuthFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kNetworkError.value)
+
+            # client_2 同意好友申请
+            response = Message.send_and_receive(client_2, Message(
+                ReqId.kAuthFriendReq, json.dumps({"from_uid": user_info_2.uid, "to_uid": user_info_1.uid})))
+            self.assertEqual(response.message_id, ReqId.kAuthFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_response['to_uid'], user_info_1.uid)
+            self.assertEqual(json_response['name'], user_info_1.name)
+
+            # client_1 收到通知
+            notify = Message.receive(client_1)
+            self.assertEqual(notify.message_id, ReqId.kNotifyAuthFriendReq)
+            json_notify = json.loads(notify.message_body)
+            self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_notify['from_uid'], user_info_2.uid)
+            self.assertEqual(json_notify['name'], user_info_2.name)
+
+            # client_3 同意好友申请
+            response = Message.send_and_receive(client_3, Message(
+                ReqId.kAuthFriendReq, json.dumps({"from_uid": user_info_3.uid, "to_uid": user_info_1.uid})))
+            self.assertEqual(response.message_id, ReqId.kAuthFriendRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_response['to_uid'], user_info_1.uid)
+            self.assertEqual(json_response['name'], user_info_1.name)
+
+            # client_1 收到通知
+            notify = Message.receive(client_1)
+            self.assertEqual(notify.message_id, ReqId.kNotifyAuthFriendReq)
+            json_notify = json.loads(notify.message_body)
+            self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_notify['from_uid'], user_info_3.uid)
+            self.assertEqual(json_notify['name'], user_info_3.name)
 
 
 if __name__ == '__main__':

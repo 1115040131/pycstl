@@ -77,29 +77,29 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 1, 'pyc', '1115040131@qq.com', '745230', 'pyc', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (2, 2, 'llfc', 'secondtonone1@163.com', '745230', 'llfc', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (3, 3, 'tc', '18165031775@qq.com', '745230', 'tc', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (101, 101, 'test_user_1', 'test_email_1@test.com', '745230', 'test_nick_1', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (102, 102, 'test_user_2', 'test_email_2@test.com', '745230', 'test_nick_2', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (103, 103, 'test_user_3', 'test_email_3@test.com', '745230', 'test_nick_3', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (104, 104, 'test_user_4', 'test_email_4@test.com', '745230', 'test_nick_4', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (105, 105, 'test_user_5', 'test_email_5@test.com', '745230', 'test_nick_5', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (106, 106, 'test_user_6', 'test_email_6@test.com', '745230', 'test_nick_6', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (107, 107, 'test_user_7', 'test_email_7@test.com', '745230', 'test_nick_7', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (108, 108, 'test_user_8', 'test_email_8@test.com', '745230', 'test_nick_8', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (109, 109, 'test_user_9', 'test_email_9@test.com', '745230', 'test_nick_9', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (110, 110, 'test_user_10', 'test_email_10@test.com', '745230', 'test_nick_10', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (111, 111, 'test_user_11', 'test_email_11@test.com', '745230', 'test_nick_11', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (112, 112, 'test_user_12', 'test_email_12@test.com', '745230', 'test_nick_12', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (113, 113, 'test_user_13', 'test_email_13@test.com', '745230', 'test_nick_13', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (114, 114, 'test_user_14', 'test_email_14@test.com', '745230', 'test_nick_14', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (115, 115, 'test_user_15', 'test_email_15@test.com', '745230', 'test_nick_15', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (116, 116, 'test_user_16', 'test_email_16@test.com', '745230', 'test_nick_16', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (117, 117, 'test_user_17', 'test_email_17@test.com', '745230', 'test_nick_17', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (118, 118, 'test_user_18', 'test_email_18@test.com', '745230', 'test_nick_18', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (119, 119, 'test_user_19', 'test_email_19@test.com', '745230', 'test_nick_19', '', 0, '/chat/client/res/head_1.jpg');
-INSERT INTO `user` VALUES (120, 120, 'test_user_20', 'test_email_20@test.com', '745230', 'test_nick_20', '', 0, '/chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (1, 1, 'pyc', '1115040131@qq.com', '745230', 'pyc', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (2, 2, 'llfc', 'secondtonone1@163.com', '745230', 'llfc', '', 0, 'chat/client/res/head_2.jpg');
+INSERT INTO `user` VALUES (3, 3, 'tc', '18165031775@qq.com', '745230', 'tc', '', 0, 'chat/client/res/head_3.jpg');
+INSERT INTO `user` VALUES (101, 101, 'test_user_1', 'test_email_1@test.com', '745230', 'test_nick_1', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (102, 102, 'test_user_2', 'test_email_2@test.com', '745230', 'test_nick_2', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (103, 103, 'test_user_3', 'test_email_3@test.com', '745230', 'test_nick_3', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (104, 104, 'test_user_4', 'test_email_4@test.com', '745230', 'test_nick_4', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (105, 105, 'test_user_5', 'test_email_5@test.com', '745230', 'test_nick_5', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (106, 106, 'test_user_6', 'test_email_6@test.com', '745230', 'test_nick_6', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (107, 107, 'test_user_7', 'test_email_7@test.com', '745230', 'test_nick_7', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (108, 108, 'test_user_8', 'test_email_8@test.com', '745230', 'test_nick_8', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (109, 109, 'test_user_9', 'test_email_9@test.com', '745230', 'test_nick_9', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (110, 110, 'test_user_10', 'test_email_10@test.com', '745230', 'test_nick_10', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (111, 111, 'test_user_11', 'test_email_11@test.com', '745230', 'test_nick_11', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (112, 112, 'test_user_12', 'test_email_12@test.com', '745230', 'test_nick_12', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (113, 113, 'test_user_13', 'test_email_13@test.com', '745230', 'test_nick_13', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (114, 114, 'test_user_14', 'test_email_14@test.com', '745230', 'test_nick_14', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (115, 115, 'test_user_15', 'test_email_15@test.com', '745230', 'test_nick_15', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (116, 116, 'test_user_16', 'test_email_16@test.com', '745230', 'test_nick_16', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (117, 117, 'test_user_17', 'test_email_17@test.com', '745230', 'test_nick_17', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (118, 118, 'test_user_18', 'test_email_18@test.com', '745230', 'test_nick_18', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (119, 119, 'test_user_19', 'test_email_19@test.com', '745230', 'test_nick_19', '', 0, 'chat/client/res/head_1.jpg');
+INSERT INTO `user` VALUES (120, 120, 'test_user_20', 'test_email_20@test.com', '745230', 'test_nick_20', '', 0, 'chat/client/res/head_1.jpg');
 
 -- ----------------------------
 -- Table structure for user_id

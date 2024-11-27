@@ -34,9 +34,13 @@ public:
 
     std::optional<UserInfo> GetUser(std::string_view name);
 
-    std::optional<bool> AddFriendAddply(int from_uid, int to_uid);
+    std::optional<bool> AddFriendAppply(int from_uid, int to_uid);
 
     std::optional<std::vector<ApplyInfo>> GetApplyList(int to_uid, int begin_index, int limit = 10);
+
+    std::optional<bool> AuthFriendApply(int from_uid, int to_uid);
+
+    std::optional<bool> AddFriend(int from_uid, int to_uid, std::string_view back_name);
 
     // 测试接口
     std::optional<bool> DeleteUser(std::string_view email);

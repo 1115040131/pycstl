@@ -17,6 +17,7 @@ public:
 
     int GetUid() const { return user_info_->uid; }
     const QString& GetName() const { return user_info_->name; }
+    const QString& GetIcon() const { return user_info_->icon; }
     const QString& GetToken() const { return token_; }
 
     const std::vector<std::shared_ptr<ApplyInfo>>& GetApplyList() const { return apply_list_; }

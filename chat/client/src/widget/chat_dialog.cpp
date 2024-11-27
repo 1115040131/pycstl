@@ -43,7 +43,7 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
     addChatUserList();  // TODO: 测试函数, 添加用户列表
 
     // 侧边栏
-    QPixmap pixmap("chat/client/res/head_1.jpg");
+    QPixmap pixmap(UserMgr::GetInstance().GetIcon());
     ui->side_head_label->setPixmap(pixmap);
     ui->side_head_label->setScaledContents(true);  // 自动缩放图片内容以适应
     // QPixmap scaled_pixmap = pixmap.scaled(ui->side_head_label->size(), Qt::KeepAspectRatio);
@@ -142,12 +142,8 @@ void ChatDialog::handleGlobalMousePress(QMouseEvent* event) {
 }
 
 void ChatDialog::addAuthFriend(const std::shared_ptr<AuthInfo>& auth_info) {
-    int random_value = QRandomGenerator::global()->bounded(100);
-    int head_index = random_value % heads.size();
-
     auto chat_user_widget = new ChatUserWidget;
     auto user_info = std::make_shared<UserInfo>(UserInfo::FromAuthInfo(*auth_info));
-    user_info->icon = heads[head_index];  // TODO: 随机头像
     chat_user_widget->SetInfo(user_info);
     QListWidgetItem* item = new QListWidgetItem();
     item->setSizeHint(chat_user_widget->sizeHint());

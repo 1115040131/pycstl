@@ -7,6 +7,7 @@
 #include <QWheelEvent>
 
 #include "chat/client/tcp_mgr.h"
+#include "chat/client/user_mgr.h"
 #include "chat/client/util/customize_edit.h"
 #include "chat/client/widget/add_user_item.h"
 #include "chat/client/widget/find_fail_dialog.h"
@@ -145,10 +146,18 @@ void SearchList::slot_user_search(const std::shared_ptr<SearchInfo>& search_info
     if (!search_info) {
         find_dialog_ = std::make_unique<FindFailDialog>(this);
     } else {
-        find_dialog_ = std::make_unique<FindSuccessDialog>(this);
-        static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
-
-        // TODO: 查找到已经是好友
+        if (search_info->uid == UserMgr::GetInstance().GetUid()) {
+            qDebug() << "find self";
+            return;
+        } else if (UserMgr::GetInstance().CheckFriendById(search_info->uid)) {
+            // 查找到已经是好友
+            // TODO: 跳转到聊天
+            qDebug() << "find friend";
+            return;
+        } else {
+            find_dialog_ = std::make_unique<FindSuccessDialog>(this);
+            static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
+        }
     }
     find_dialog_->show();
 }

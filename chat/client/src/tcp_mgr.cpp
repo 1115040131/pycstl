@@ -227,7 +227,7 @@ void TcpMgr::initHttpHandlers() {
         }
 
         auto auth_info =
-            std::make_shared<AuthInfo>(root["uid"].toInt(), root["sex"].toInt(), root["name"].toString(),
+            std::make_shared<AuthInfo>(root["to_uid"].toInt(), root["sex"].toInt(), root["name"].toString(),
                                        root["nick"].toString(), root["icon"].toString());
 
         emit sig_auth_rsp(auth_info);

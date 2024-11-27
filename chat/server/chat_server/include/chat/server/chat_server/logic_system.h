@@ -56,6 +56,9 @@ private:
     // 处理添加好友
     void AddFriendHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data);
 
+    // 处理同意好友
+    void AuthFriendHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data);
+
 private:
     std::queue<std::unique_ptr<LogicNode>> msg_queue_{};
     std::mutex mutex_{};

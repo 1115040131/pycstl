@@ -45,6 +45,10 @@ message SendChatMsgRsp {
 message AuthFriendReq {
     int32 from_uid = 1;
     int32 to_uid = 2;
+    string name = 3;
+    string nick = 4;
+    int32 sex = 5;
+    string icon = 6;
 }
 
 message AuthFriendRsp {

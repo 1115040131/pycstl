@@ -47,7 +47,8 @@ if __name__ == '__main__':
         config: configparser.ConfigParser = read_config()
         db = Database(config)
         cursor = db.connection.cursor()
-        delete_query =  'DELETE FROM user WHERE email LIKE "pycstl_%@test.com"'
-        cursor.execute(delete_query)
+        cursor.execute('DELETE FROM user WHERE email LIKE "pycstl_%@test.com"')
+        cursor.execute('TRUNCATE TABLE friend')
+        cursor.execute('TRUNCATE TABLE friend_apply')
         db.connection.commit()  # 确认更改
-        print("Deleted", cursor.rowcount, "emails.")
+        print("Db Clear success")

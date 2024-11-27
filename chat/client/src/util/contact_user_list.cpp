@@ -106,11 +106,8 @@ void ContactUserList::addContactUserList() {
 
 void ContactUserList::addAuthFriendItem(const std::shared_ptr<AuthInfo>& auth_info) {
     // 在 groupitem 之后插入新项
-    int random_value = QRandomGenerator::global()->bounded(100);
-    int head_index = random_value % heads.size();
-
     auto contact_user_item = new ContactUserItem;
-    contact_user_item->setInfo(auth_info->uid, auth_info->name, heads[head_index]);
+    contact_user_item->setInfo(auth_info->uid, auth_info->name, auth_info->icon);
     auto item = new QListWidgetItem;
     item->setSizeHint(contact_user_item->sizeHint());
 
