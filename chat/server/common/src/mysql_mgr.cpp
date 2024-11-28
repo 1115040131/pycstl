@@ -242,10 +242,32 @@ std::optional<bool> MysqlMgr::AddFriend(int from_uid, int to_uid, std::string_vi
     });
 }
 
-std::optional<bool> MysqlMgr::DeleteUser(std::string_view email) {
-    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<bool> {
-        auto result = session.sql("DELETE FROM user WHERE email = ?").bind(email.data()).execute();
-        return result.getAffectedItemsCount() > 0;
+std::optional<std::vector<UserInfo>> MysqlMgr::GetFriendList(int uid) {
+    return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<std::vector<UserInfo>> {
+        auto result =
+            session
+                .sql(
+                    "SELECT user.uid, user.name, user.email, user.pwd, user.nick, user.desc, user.sex, user.icon, "
+                    "friend.back FROM friend JOIN user ON friend.friend_id = user.uid WHERE friend.self_id = ?")
+                .bind(uid)
+                .execute();
+
+        std::vector<UserInfo> friend_list;
+        for (const auto& row : result) {
+            UserInfo user_info{};
+            user_info.uid = row[0].get<int>();
+            user_info.name = row[1].get<std::string>();
+            user_info.email = row[2].get<std::string>();
+            user_info.password = row[3].get<std::string>();
+            user_info.nick = row[4].get<std::string>();
+            user_info.desc = row[5].get<std::string>();
+            user_info.sex = row[6].get<int>();
+            user_info.icon = row[7].get<std::string>();
+            user_info.back = row[8].get<std::string>();
+            friend_list.push_back(std::move(user_info));
+        }
+
+        return friend_list;
     });
 }
 

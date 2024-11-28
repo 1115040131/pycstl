@@ -32,6 +32,16 @@ if __name__ == '__main__':
 
     time.sleep(1)  # 给服务器足够时间启动
 
+    # 删除数据库中的测试用户
+    config: configparser.ConfigParser = read_config()
+    db = Database(config)
+    cursor = db.connection.cursor()
+    cursor.execute('DELETE FROM user WHERE email LIKE "pycstl_%@test.com"')
+    cursor.execute('TRUNCATE TABLE friend')
+    cursor.execute('TRUNCATE TABLE friend_apply')
+    db.connection.commit()  # 确认更改
+    print("Db Clear success")
+
     try:
         # 利用剩余的 argv 运行 unittest
         unittest.main(argv=sys.argv[:1] + remaining_argv)
@@ -42,13 +52,3 @@ if __name__ == '__main__':
     finally:
         # 关闭服务器
         terminate_server(server_processes)
-
-        # 删除数据库中的测试用户
-        config: configparser.ConfigParser = read_config()
-        db = Database(config)
-        cursor = db.connection.cursor()
-        cursor.execute('DELETE FROM user WHERE email LIKE "pycstl_%@test.com"')
-        cursor.execute('TRUNCATE TABLE friend')
-        cursor.execute('TRUNCATE TABLE friend_apply')
-        db.connection.commit()  # 确认更改
-        print("Db Clear success")

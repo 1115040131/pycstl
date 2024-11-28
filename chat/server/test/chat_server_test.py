@@ -433,13 +433,10 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(json_notify['apply_uid'], user_info_1.uid)
             self.assertEqual(json_notify['apply_name'], user_info_1.name)
 
-        # 测试登录后的好友列表
+        # 测试登录后的好友申请列表
         with self.connect_server(user_info_2) as client_2:
-            host, port, token = self.get_server(user_info_2)
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect((host, port))
-
-            response = Message.send_and_receive(client_socket, Message(
+            token = self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user_info_2.uid}').decode('utf-8')
+            response = Message.send_and_receive(client_2, Message(
                 ReqId.kChatLogin, json.dumps({'uid': user_info_2.uid,
                                                 "token": token})))
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
@@ -546,6 +543,21 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
             self.assertEqual(json_notify['from_uid'], user_info_3.uid)
             self.assertEqual(json_notify['name'], user_info_3.name)
+
+        # 测试登录后的好友列表
+        with self.connect_server(user_info_1) as client_1:
+            token = self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user_info_1.uid}').decode('utf-8')
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kChatLogin, json.dumps({'uid': user_info_1.uid,
+                                                "token": token})))
+            self.assertEqual(response.message_id, ReqId.kChatLoginRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(len(json_response['friend_list']), 2)
+            self.assertEqual(json_response['friend_list'][0]['uid'], user_info_2.uid)
+            self.assertEqual(json_response['friend_list'][0]['name'], user_info_2.name)
+            self.assertEqual(json_response['friend_list'][1]['uid'], user_info_3.uid)
+            self.assertEqual(json_response['friend_list'][1]['name'], user_info_3.name)
 
 
 if __name__ == '__main__':

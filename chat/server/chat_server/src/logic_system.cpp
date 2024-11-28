@@ -199,7 +199,16 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     }
 
     // 获取好友列表
+    auto friend_list = MysqlMgr::GetInstance().GetFriendList(uid);
+    if (friend_list) {
+        nlohmann::json friend_list_json;
+        for (const auto& friend_info : friend_list.value()) {
+            friend_list_json.push_back(friend_info);
+        }
+        root["friend_list"] = friend_list_json;
+    }
 
+    // 增加登录数量
     auto server_name = GET_SECTION();
     RedisMgr::GetInstance().HIncrBy(kLoginCount, server_name, 1);
 

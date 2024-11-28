@@ -42,8 +42,7 @@ public:
 
     std::optional<bool> AddFriend(int from_uid, int to_uid, std::string_view back_name);
 
-    // 测试接口
-    std::optional<bool> DeleteUser(std::string_view email);
+    std::optional<std::vector<UserInfo>> GetFriendList(int uid);
 
 private:
     std::unique_ptr<MysqlPool> pool_;
