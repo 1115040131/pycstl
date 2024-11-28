@@ -28,6 +28,9 @@ private:
     // 清除弹出框
     void closeFindDialog();
 
+signals:
+    void sig_jump_chat_item(const std::shared_ptr<SearchInfo>& search_info);
+
 private slots:
     void slot_item_clicked(QListWidgetItem* item);
 

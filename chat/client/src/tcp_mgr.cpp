@@ -1,5 +1,6 @@
 #include "chat/client/tcp_mgr.h"
 
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 
@@ -109,7 +110,22 @@ void TcpMgr::initHttpHandlers() {
         UserMgr::GetInstance().SetUserInfo(user_info);
         UserMgr::GetInstance().SetToken(base_info["token"].toString());
         if (root.contains("apply_list")) {
-            UserMgr::GetInstance().AppendApplyList(root["apply_list"].toArray());
+            auto apply_list = root["apply_list"].toArray();
+            for (const QJsonValue& apply : apply_list) {
+                auto apply_info = std::make_shared<ApplyInfo>(
+                    apply["uid"].toInt(), apply["sex"].toInt(), apply["name"].toString(), apply["nick"].toString(),
+                    apply["icon"].toString(), apply["desc"].toString(), apply["status"].toInt());
+                UserMgr::GetInstance().AddApplyList(apply_info);
+            }
+        }
+        if (root.contains("friend_list")) {
+            auto friend_list = root["friend_list"].toArray();
+            for (const QJsonValue& friend_json : friend_list) {
+                auto friend_info = std::make_shared<FriendInfo>(
+                    friend_json["uid"].toInt(), friend_json["name"].toString(), friend_json["nick"].toString(),
+                    friend_json["icon"].toString(), friend_json["sex"].toInt());
+                UserMgr::GetInstance().AddFriend(friend_info);
+            }
         }
 
         emit sig_switch_chatdlg();

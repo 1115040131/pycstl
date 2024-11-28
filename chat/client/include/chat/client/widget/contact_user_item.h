@@ -16,7 +16,8 @@ public:
 
     QSize sizeHint() const override { return QSize(250, 70); }
 
-    void setInfo(const AuthInfo& auth_info);
+    void setInfo(const std::shared_ptr<AuthInfo>& auth_info);
+    void setInfo(const std::shared_ptr<FriendInfo>& friend_info);
     void setInfo(int uid, const QString& name, const QString& icon);
 
     void showRedPoint(bool show);
@@ -26,5 +27,5 @@ private:
 
 private:
     Ui::ContactUserItem* ui;
-    UserInfo user_info_;
+    std::shared_ptr<UserInfo> user_info_;
 };

@@ -10,6 +10,8 @@ class ChatUserWidget;
 QT_END_NAMESPACE
 
 class ChatUserWidget : public ListItemBase {
+    Q_OBJECT
+
 public:
     explicit ChatUserWidget(QWidget* parent = nullptr);
     ~ChatUserWidget();
@@ -21,6 +23,8 @@ public:
     void SetInfo(const QString& name, const QString& head, const QString& msg);
 
     void SetInfo(const std::shared_ptr<UserInfo>& user_info);
+
+    const std::shared_ptr<UserInfo>& GetUserInfo() const { return user_info_; }
 
 private:
     Ui::ChatUserWidget* ui;

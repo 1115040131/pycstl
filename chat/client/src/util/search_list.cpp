@@ -145,19 +145,16 @@ void SearchList::slot_user_search(const std::shared_ptr<SearchInfo>& search_info
     waitPending(false);
     if (!search_info) {
         find_dialog_ = std::make_unique<FindFailDialog>(this);
+        find_dialog_->show();
+    } else if (search_info->uid == UserMgr::GetInstance().GetUid()) {
+        qDebug() << "find self";
+    } else if (UserMgr::GetInstance().CheckFriendById(search_info->uid)) {
+        // 查找到已经是好友
+        qDebug() << "find friend";
+        emit sig_jump_chat_item(search_info);
     } else {
-        if (search_info->uid == UserMgr::GetInstance().GetUid()) {
-            qDebug() << "find self";
-            return;
-        } else if (UserMgr::GetInstance().CheckFriendById(search_info->uid)) {
-            // 查找到已经是好友
-            // TODO: 跳转到聊天
-            qDebug() << "find friend";
-            return;
-        } else {
-            find_dialog_ = std::make_unique<FindSuccessDialog>(this);
-            static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
-        }
+        find_dialog_ = std::make_unique<FindSuccessDialog>(this);
+        static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);
+        find_dialog_->show();
     }
-    find_dialog_->show();
 }

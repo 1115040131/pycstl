@@ -5,9 +5,9 @@
 
 ListItemBase::ListItemBase(QWidget* parent) : QWidget(parent) {}
 
-void ListItemBase::paintEvent(QPaintEvent*) {
-    QStyleOption opt;
-    opt.initFrom(this);
-    QPainter painter(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
-}
+// void ListItemBase::paintEvent(QPaintEvent*) {
+//     QStyleOption opt;
+//     opt.initFrom(this);
+//     QPainter painter(this);
+//     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+// }

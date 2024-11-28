@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QJsonArray>
 #include <QString>
+#include <list>
 #include <unordered_map>
 #include <vector>
 
@@ -21,17 +21,28 @@ public:
     const QString& GetToken() const { return token_; }
 
     const std::vector<std::shared_ptr<ApplyInfo>>& GetApplyList() const { return apply_list_; }
-    void AddApplyList(int uid, const std::shared_ptr<ApplyInfo>& apply) { apply_list_.push_back(apply); }
+    void AddApplyList(const std::shared_ptr<ApplyInfo>& apply) { apply_list_.push_back(apply); }
     bool AlreadyApply(int uid) const;
-    void AppendApplyList(const QJsonArray& apply_list);
 
     bool CheckFriendById(int uid) const;
     std::shared_ptr<FriendInfo> GetFriendById(int uid) const;
     void AddFriend(const std::shared_ptr<AuthInfo>& auth_info);
+    void AddFriend(const std::shared_ptr<FriendInfo>& friend_info);
+
+    std::vector<std::shared_ptr<FriendInfo>> LoadChatListPerPage();
+    bool IsLoadChatFinish() const;
+    std::vector<std::shared_ptr<FriendInfo>> LoadContactListPerPage();
+    bool IsLoadContactFinish() const;
 
 private:
+    static constexpr size_t kChatPerPage = 13;
+
     QString token_;
     std::shared_ptr<UserInfo> user_info_;
     std::vector<std::shared_ptr<ApplyInfo>> apply_list_;
-    std::unordered_map<int, std::shared_ptr<FriendInfo>> friend_msp_;
+    std::list<std::shared_ptr<FriendInfo>> friend_list_;
+    std::unordered_map<int, std::shared_ptr<FriendInfo>> friend_map_;
+
+    size_t chat_loaded_ = 0;
+    size_t contact_loaded_ = 0;
 };

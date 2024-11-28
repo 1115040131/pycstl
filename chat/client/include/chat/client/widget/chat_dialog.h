@@ -2,6 +2,7 @@
 
 #include <QAction>
 #include <QDialog>
+#include <QListWidgetItem>
 
 #include "chat/client/user_data.h"
 
@@ -26,8 +27,11 @@ protected:
 private:
     void ShowSearch(bool is_search);
 
-    // 测试函数, 添加用户列表
+    // 添加聊天列表
     void addChatUserList();
+
+    // 添加好友列表
+    void addContactUserList();
 
     // 添加需要联动的标签
     void addLabelGroup(StateWidget* label);
@@ -41,12 +45,20 @@ private:
     // 添加好友
     void addAuthFriend(const std::shared_ptr<AuthInfo>& auth_info);
 
+    // 设置当前聊天窗口
+    void setSelectChatItem(int uid);
+
+    void setSelectChatPage(int uid);
+
 private slots:
     // 搜索框文本变化
     void slot_search_text_changed(const QString& text);
 
-    // 加载更过聊天用户
+    // 加载更多聊天用户
     void slot_loading_chat_user();
+
+    // 加载更多联系人
+    void slot_loading_contact_user();
 
     // 点击侧边栏
     void slot_side_chat();
@@ -60,6 +72,9 @@ private slots:
 
     // 收到同意好友请求
     void slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
+
+    // 跳转到聊天界面
+    void slot_jump_chat_item(const std::shared_ptr<SearchInfo>& search_info);
 
 private:
     Ui::ChatDialog* ui;
@@ -78,4 +93,7 @@ private:
     bool is_loading_ = false;
 
     std::vector<StateWidget*> labels_;
+
+    int current_chat_uid_ = 0;
+    std::unordered_map<int, QListWidgetItem*> chat_item_added_;
 };

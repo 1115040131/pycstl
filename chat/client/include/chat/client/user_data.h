@@ -57,6 +57,10 @@ struct UserInfo {
     QString last_msg;
     std::vector<std::shared_ptr<TextChatData>> chat_msgs;
 
+    static UserInfo FromSearchInfo(const SearchInfo& search_info) {
+        return {search_info.uid, search_info.sex, search_info.name, search_info.nick, search_info.icon};
+    }
+
     static UserInfo FromAuthInfo(const AuthInfo& auth_info) {
         return {auth_info.uid, auth_info.sex, auth_info.name, auth_info.nick, auth_info.icon};
     }

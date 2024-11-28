@@ -1,11 +1,11 @@
 #include "chat/client/util/contact_user_list.h"
 
 #include <QEvent>
-#include <QRandomGenerator>
 #include <QScrollBar>
 #include <QWheelEvent>
 
 #include "chat/client/tcp_mgr.h"
+#include "chat/client/user_mgr.h"
 #include "chat/client/widget/contact_user_item.h"
 #include "chat/client/widget/group_tip_item.h"
 
@@ -15,8 +15,6 @@ ContactUserList::ContactUserList(QWidget* parent) : QListWidget(parent) {
     // 安装事件过滤器
     this->viewport()->installEventFilter(this);
 
-    // 模拟从后端传来的数据, 进行列表加载
-    // TODO: 用后端的数据进行加载
     addContactUserList();
 
     connect(this, &QListWidget::itemClicked, this, &ContactUserList::slot_item_clicked);
@@ -48,7 +46,9 @@ bool ContactUserList::eventFilter(QObject* watched, QEvent* event) {
 
             // 检查是否滚到底部
             if (scroll_bar->value() >= scroll_bar->maximum()) {
-                emit sig_loading_contact_user();
+                if (!UserMgr::GetInstance().IsLoadContactFinish()) {
+                    emit sig_loading_contact_user();
+                }
             }
 
             return true;
@@ -88,19 +88,6 @@ void ContactUserList::addContactUserList() {
         this->addItem(group_item_);
         this->setItemWidget(group_item_, group_tip_item);
         group_item_->setFlags(group_item_->flags() & ~Qt::ItemIsSelectable);
-    }
-    for (int i = 0; i < 13; i++) {
-        int random_value = QRandomGenerator::global()->bounded(100);
-        int name_index = random_value % names.size();
-        int head_index = random_value % heads.size();
-        // int msg_index = random_value % strs.size();
-
-        auto contact_user_item = new ContactUserItem;
-        contact_user_item->setInfo(0, names[name_index], heads[head_index]);
-        auto item = new QListWidgetItem;
-        item->setSizeHint(contact_user_item->sizeHint());
-        this->addItem(item);
-        this->setItemWidget(item, contact_user_item);
     }
 }
 

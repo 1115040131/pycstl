@@ -4,6 +4,8 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 
+#include "chat/client/user_mgr.h"
+
 ChatUserList::ChatUserList(QWidget* parent) : QListWidget(parent) {
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -32,7 +34,9 @@ bool ChatUserList::eventFilter(QObject* watched, QEvent* event) {
 
             // 检查是否滚到底部
             if (scroll_bar->value() >= scroll_bar->maximum()) {
-                emit sig_loading_chat_user();
+                if (!UserMgr::GetInstance().IsLoadChatFinish()) {
+                    emit sig_loading_chat_user();
+                }
             }
 
             return true;
