@@ -1,7 +1,16 @@
 load("@hedron_compile_commands//:refresh_compile_commands.bzl", "refresh_compile_commands")
 load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 
+# npm
 npm_link_all_packages(name = "node_modules")
+
+# python
+compile_pip_requirements(
+    name = "requirements",
+    src = "requirements.in",
+    requirements_txt = "requirements_lock.txt",
+)
 
 refresh_compile_commands(
     name = "refresh_compile_commands",

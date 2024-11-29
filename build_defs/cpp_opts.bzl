@@ -18,5 +18,6 @@ STRICT_COPTS = select({
         "-Wold-style-cast",
         "-Wreturn-type",
         "-Wnon-virtual-dtor",
+        "-Wno-missing-requires",
     ],
 })

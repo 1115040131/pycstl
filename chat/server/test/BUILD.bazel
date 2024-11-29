@@ -32,6 +32,7 @@ py_test(
     deps = [
         requirement("mysql-connector-python"),
         requirement("redis"),
+        requirement("requests"),
         ":status_py_grpc",
     ],
 )
