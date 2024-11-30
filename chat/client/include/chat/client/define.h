@@ -51,4 +51,5 @@ static const std::vector<QString> strs = {"hello world !", "nice to meet u", "Ne
 static const std::vector<QString> heads = {"chat/client/res/head_1.jpg", "chat/client/res/head_2.jpg",
                                            "chat/client/res/head_3.jpg", "chat/client/res/head_4.jpg",
                                            "chat/client/res/head_5.jpg"};
-static const std::vector<QString> names = {"llfc", "zack", "golang", "cpp", "java", "nodejs", "python", "rust"};
+static const std::vector<QString> names = {"llfc_random", "zack_random", "golang", "cpp",
+                                           "java",        "nodejs",      "python", "rust"};

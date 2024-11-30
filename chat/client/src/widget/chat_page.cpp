@@ -1,8 +1,14 @@
 #include "chat/client/widget/chat_page.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QPainter>
 #include <QStyleOption>
+#include <QUuid>
 
+#include "chat/client/tcp_mgr.h"
+#include "chat/client/user_mgr.h"
 #include "chat/client/util/chat_item_base.h"
 #include "chat/client/util/picture_bubble.h"
 #include "chat/client/util/text_bubble.h"
@@ -36,18 +42,52 @@ void ChatPage::paintEvent(QPaintEvent*) {
 }
 
 void ChatPage::on_send_btn_clicked() {
-    auto chat_edit = ui->chat_edit;
-    ChatRole role = ChatRole::kSelf;
-    QString user_name = QStringLiteral("PYC_Chat");
-    QString user_icon = "chat/client/res/head_1.jpg";
+    if (!user_info_) {
+        qDebug() << __func__ << "user_info_ is nullptr";
+        return;
+    }
 
-    auto msg_list = chat_edit->getMsgList();
+    ChatRole role = ChatRole::kSelf;
+    auto msg_list = ui->chat_edit->getMsgList();
+
+    int text_size = 0;
+    QJsonObject root;
+    QJsonArray text_array;
+
     for (const auto& msg : msg_list) {
+        if (msg.content.length() > 1024) {
+            continue;
+        }
+
         QWidget* bubble = nullptr;
         switch (msg.type) {
-            case MsgInfo::Type::kText:
+            case MsgInfo::Type::kText: {
+                auto msg_id = QUuid::createUuid().toString();
                 bubble = new TextBubble(role, msg.content);
-                break;
+                if (text_size + msg.content.size() > 1024) {
+                    // 发送并清空之前累积的文本
+                    root["from_uid"] = UserMgr::GetInstance().GetUid();
+                    root["to_uid"] = user_info_->uid;
+                    root["text_array"] = text_array;
+                    QJsonDocument doc(root);
+                    emit TcpMgr::GetInstance().sig_send_data(ReqId::kTextChatMsgReq,
+                                                             doc.toJson(QJsonDocument::Compact));
+
+                    text_size = 0;
+                    root = QJsonObject();
+                    text_array = QJsonArray();
+                }
+
+                text_size += msg.content.size();
+                QJsonObject text;
+                text["msg_id"] = msg_id;
+                text["content"] = msg.content;
+                text_array.append(text);
+
+                auto chat_msg = std::make_shared<TextChatData>(msg_id, msg.content,
+                                                               UserMgr::GetInstance().GetUid(), user_info_->uid);
+                emit sig_append_chat_msg(chat_msg);
+            } break;
             case MsgInfo::Type::kImage:
                 bubble = new PictureBubble(role, QPixmap(msg.pixmap));
                 break;
@@ -60,10 +100,20 @@ void ChatPage::on_send_btn_clicked() {
 
         if (bubble) {
             auto chat_item = new ChatItemBase(role);
-            chat_item->setUserName(user_name);
-            chat_item->setUserIcon(user_icon);
+            chat_item->setUserName(UserMgr::GetInstance().GetName());
+            chat_item->setUserIcon(UserMgr::GetInstance().GetIcon());
             chat_item->setWidget(bubble);
             ui->chat_data_list->appendChatItem(chat_item);
         }
+    }
+
+    // 发送剩余信息
+    qDebug() << __func__ << "text_size: " << text_size << " text_array: " << text_array;
+    if (text_size > 0) {
+        root["from_uid"] = UserMgr::GetInstance().GetUid();
+        root["to_uid"] = user_info_->uid;
+        root["text_array"] = text_array;
+        QJsonDocument doc(root);
+        emit TcpMgr::GetInstance().sig_send_data(ReqId::kTextChatMsgReq, doc.toJson(QJsonDocument::Compact));
     }
 }

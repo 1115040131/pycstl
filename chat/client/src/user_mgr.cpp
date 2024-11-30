@@ -29,6 +29,14 @@ void UserMgr::AddFriend(const std::shared_ptr<FriendInfo>& friend_info) {
     friend_map_[friend_info->uid] = friend_info;
 }
 
+void UserMgr::AppendFriendChatMsg(int friend_id, const std::vector<std::shared_ptr<TextChatData>>& chat_msgs) {
+    auto iter = friend_map_.find(friend_id);
+    if (iter == friend_map_.end()) {
+        return;
+    }
+    iter->second->chat_msgs.insert(iter->second->chat_msgs.end(), chat_msgs.begin(), chat_msgs.end());
+}
+
 std::vector<std::shared_ptr<FriendInfo>> UserMgr::LoadChatListPerPage() {
     if (IsLoadChatFinish()) {
         return {};

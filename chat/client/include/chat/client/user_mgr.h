@@ -28,6 +28,7 @@ public:
     std::shared_ptr<FriendInfo> GetFriendById(int uid) const;
     void AddFriend(const std::shared_ptr<AuthInfo>& auth_info);
     void AddFriend(const std::shared_ptr<FriendInfo>& friend_info);
+    void AppendFriendChatMsg(int friend_id, const std::vector<std::shared_ptr<TextChatData>>& chat_msgs);
 
     std::vector<std::shared_ptr<FriendInfo>> LoadChatListPerPage();
     bool IsLoadChatFinish() const;

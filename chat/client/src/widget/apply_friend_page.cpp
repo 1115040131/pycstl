@@ -21,11 +21,6 @@ ApplyFriendPage::ApplyFriendPage(QWidget* parent) : QDialog(parent), ui(new Ui::
 ApplyFriendPage::~ApplyFriendPage() { delete ui; }
 
 void ApplyFriendPage::addNewApply(const std::shared_ptr<ApplyInfo>& apply_info) {
-    // 先模拟头像随机
-    int random_value = QRandomGenerator::global()->bounded(100);
-    int head_index = random_value % heads.size();
-    apply_info->icon = heads[head_index];
-
     auto apply_item = new ApplyFriendItem;
     apply_item->setApplyInfo(apply_info);
     apply_item->showAddBtn(true);
@@ -44,10 +39,6 @@ void ApplyFriendPage::addNewApply(const std::shared_ptr<ApplyInfo>& apply_info) 
 void ApplyFriendPage::loadApplyList() {
     const auto& apply_list = UserMgr::GetInstance().GetApplyList();
     for (const auto& apply_info : apply_list) {
-        int random_value = QRandomGenerator::global()->bounded(100);
-        int head_index = random_value % heads.size();
-        apply_info->icon = heads[head_index];
-
         auto apply_item = new ApplyFriendItem;
         apply_item->setApplyInfo(apply_info);
 

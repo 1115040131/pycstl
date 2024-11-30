@@ -92,6 +92,9 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
 
     // 连接 chat_user_list 点击信号
     connect(ui->chat_user_list, &ChatUserList::itemClicked, this, &ChatDialog::slot_chat_item_clicked);
+
+    // 连接 chat_page 发送消息信号
+    connect(ui->chat_page, &ChatPage::sig_append_chat_msg, this, &ChatDialog::slot_append_chat_msg);
 }
 
 ChatDialog::~ChatDialog() { delete ui; }
@@ -226,6 +229,8 @@ void ChatDialog::addAuthFriend(const std::shared_ptr<AuthInfo>& auth_info) {
     item->setSizeHint(chat_user_widget->sizeHint());
     ui->chat_user_list->insertItem(0, item);
     ui->chat_user_list->setItemWidget(item, chat_user_widget);
+
+    chat_item_added_[user_info->uid] = item;
 }
 
 void ChatDialog::setSelectChatItem(int uid) {
@@ -237,20 +242,20 @@ void ChatDialog::setSelectChatItem(int uid) {
         ui->chat_user_list->setCurrentRow(0);
         auto first_item = ui->chat_user_list->item(0);
         if (!first_item) {
-            qDebug() << "[setSelectChatItem] first_item is nullptr";
+            qDebug() << __func__ << "first_item is nullptr";
             return;
         }
 
         // 转为 Widget
         auto widget = ui->chat_user_list->itemWidget(first_item);
         if (!widget) {
-            qDebug() << "[setSelectChatItem] widget is nullptr";
+            qDebug() << __func__ << "widget is nullptr";
             return;
         }
 
         auto chat_user_widget = qobject_cast<ChatUserWidget*>(widget);
         if (!chat_user_widget) {
-            qDebug() << "[setSelectChatItem] chat_user_widget is nullptr";
+            qDebug() << __func__ << "chat_user_widget is nullptr";
             return;
         }
 
@@ -268,7 +273,41 @@ void ChatDialog::setSelectChatItem(int uid) {
     current_chat_uid_ = uid;
 }
 
-void ChatDialog::setSelectChatPage(int uid) { (void)uid; }
+void ChatDialog::setSelectChatPage(int uid) {
+    if (ui->chat_user_list->count() == 0) {
+        return;
+    }
+
+    QListWidgetItem* item = nullptr;
+    if (uid == 0) {
+        item = ui->chat_user_list->item(0);
+    } else {
+        auto iter = chat_item_added_.find(uid);
+        if (iter != chat_item_added_.end()) {
+            item = iter->second;
+        }
+    }
+    if (!item) {
+        qDebug() << __func__ << "item is nullptr";
+        return;
+    }
+
+    auto widget = ui->chat_user_list->itemWidget(item);
+    if (!widget) {
+        qDebug() << __func__ << "widget is nullptr";
+        return;
+    }
+
+    auto chat_user_widget = qobject_cast<ChatUserWidget*>(widget);
+    if (!chat_user_widget) {
+        qDebug() << __func__ << "chat_user_widget is nullptr";
+        return;
+    }
+
+    auto user_info = chat_user_widget->GetUserInfo();
+    ui->chat_page->setUserInfo(user_info);
+    return;
+}
 
 void ChatDialog::slot_search_text_changed(const QString& text) {
     if (text.isEmpty()) {
@@ -400,17 +439,45 @@ void ChatDialog::slot_chat_item_clicked(QListWidgetItem* item) {
     // 转为 Widget
     auto widget = ui->chat_user_list->itemWidget(item);
     if (!widget) {
-        qDebug() << "[slot_chat_item_clicked] widget is nullptr";
+        qDebug() << __func__ << "widget is nullptr";
         return;
     }
 
     auto chat_user_widget = qobject_cast<ChatUserWidget*>(widget);
     if (!chat_user_widget) {
-        qDebug() << "[slot_chat_item_clicked] chat_user_widget is nullptr";
+        qDebug() << __func__ << "chat_user_widget is nullptr";
         return;
     }
 
     auto user_info = chat_user_widget->GetUserInfo();
     ui->chat_page->setUserInfo(user_info);
     current_chat_uid_ = user_info->uid;
+}
+
+void ChatDialog::slot_append_chat_msg(const std::shared_ptr<TextChatData>& chat_msg) {
+    qDebug() << __func__ << "current_chat_uid_:" << current_chat_uid_;
+
+    if (current_chat_uid_ == 0) {
+        return;
+    }
+
+    auto iter = chat_item_added_.find(current_chat_uid_);
+    if (iter == chat_item_added_.end()) {
+        return;
+    }
+
+    auto widget = ui->chat_user_list->itemWidget(iter->second);
+    if (!widget) {
+        qDebug() << __func__ << "widget is nullptr";
+        return;
+    }
+
+    auto chat_user_widget = qobject_cast<ChatUserWidget*>(widget);
+    if (!chat_user_widget) {
+        qDebug() << __func__ << "chat_user_widget is nullptr";
+        return;
+    }
+
+    auto user_info = chat_user_widget->GetUserInfo();
+    user_info->chat_msgs.push_back(chat_msg);
 }

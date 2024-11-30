@@ -160,7 +160,7 @@ std::optional<std::vector<ApplyInfo>> MysqlMgr::GetApplyList(int to_uid, int beg
     return MysqlExecute(pool_, [=](mysqlx::Session& session) -> std::optional<std::vector<ApplyInfo>> {
         auto result = session
                           .sql(
-                              "SELECT apply.from_uid, apply.status, user.name, user.nick, user.sex FROM "
+                              "SELECT apply.from_uid, apply.status, user.name, user.nick, user.sex, user.icon FROM "
                               "friend_apply AS apply JOIN user ON apply.from_uid = user.uid WHERE apply.to_uid = "
                               "? AND apply.id > ? ORDER BY apply.id ASC LIMIT ?")
                           .bind(to_uid)
@@ -176,6 +176,7 @@ std::optional<std::vector<ApplyInfo>> MysqlMgr::GetApplyList(int to_uid, int beg
             apply_info.name = row[2].get<std::string>();
             apply_info.nick = row[3].get<std::string>();
             apply_info.sex = row[4].get<int>();
+            apply_info.icon = row[5].get<std::string>();
             apply_list.push_back(std::move(apply_info));
         }
         return apply_list;

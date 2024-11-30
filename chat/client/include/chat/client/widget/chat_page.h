@@ -23,6 +23,9 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 
+signals:
+    void sig_append_chat_msg(const std::shared_ptr<TextChatData>& chat_msg);
+
 private slots:
     void on_send_btn_clicked();
 

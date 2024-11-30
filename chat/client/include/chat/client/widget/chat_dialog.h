@@ -85,6 +85,9 @@ private slots:
     // 点击聊天列表
     void slot_chat_item_clicked(QListWidgetItem* item);
 
+    // 发送消息
+    void slot_append_chat_msg(const std::shared_ptr<TextChatData>& chat_msg);
+
 private:
     Ui::ChatDialog* ui;
 
