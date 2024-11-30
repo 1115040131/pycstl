@@ -1,0 +1,30 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "common",
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
+    copts = STRICT_COPTS,
+    data = glob(["config/*"]),
+    includes = ["include"],
+    deps = [
+        "//chat/common",
+        "//chat/server/proto:status_cc_grpc_proto",
+        "//common",
+        "//logger",
+        "@boost//:asio",
+        "@boost//:property_tree",
+        "@boost//:uuid",
+        "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
+        "@hiredis",
+        "@mysql-connector-cpp",
+        "@nlohmann_json//:json",
+    ],
+)

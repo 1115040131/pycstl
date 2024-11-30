@@ -1,0 +1,32 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "gate_server_lib",
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
+    copts = STRICT_COPTS,
+    includes = ["include"],
+    deps = [
+        "//chat/server/common",
+        "//chat/server/proto:verify_cc_grpc_proto",
+        "//common",
+        "//logger",
+        "@boost//:beast",
+        "@nlohmann_json//:json",
+    ],
+)
+
+cc_binary(
+    name = "gate_server",
+    srcs = ["gate_server.cpp"],
+    copts = STRICT_COPTS,
+    deps = [
+        ":gate_server_lib",
+    ],
+)

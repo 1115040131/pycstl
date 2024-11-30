@@ -1,0 +1,827 @@
+
+QDialog#LoginDialog,#RegisterDialog,#ResetDialog{
+   background-color:rgb(255,255,255)
+}
+
+#user_label,#pass_label{
+   color:black;
+}
+
+#err_tip[state='normal']{
+   color: green;
+}
+
+#err_tip[state='err']{
+   color: red;
+}
+
+
+#password_visible[state='unvisible']{
+   border-image: url(chat/client/res/unvisible.png);
+}
+
+#password_visible[state='unvisible_hover']{
+   border-image: url(chat/client/res/unvisible_hover.png);
+}
+
+#password_visible[state='visible']{
+   border-image: url(chat/client/res/visible.png);
+}
+
+#password_visible[state='visible_hover']{
+   border-image: url(chat/client/res/visible_hover.png);
+}
+
+
+#confirm_visible[state='unvisible']{
+   border-image: url(chat/client/res/unvisible.png);
+}
+
+#confirm_visible[state='unvisible_hover']{
+   border-image: url(chat/client/res/unvisible_hover.png);
+}
+
+#confirm_visible[state='visible']{
+   border-image: url(chat/client/res/visible.png);
+}
+
+#confirm_visible[state='visible_hover']{
+   border-image: url(chat/client/res/visible_hover.png);
+}
+
+#tip_lb, #tip2_lb{
+   color:green;
+}
+
+#forget_label[state='normal'], #forget_label[state='selected']{
+   color:black;
+}
+
+#forget_label[state='hover'], #forget_label[state='selected_hover']{
+   color: rgb(42, 112, 241);
+}
+
+/* ChatDialog */
+
+#side_bar{
+   background-color:rgb(46, 46, 46);
+}
+
+#search_widget #add_btn[state='normal']{
+   border-image: url(chat/client/res/add_friend_normal.png);
+}
+
+#search_widget #add_btn[state='hover']{
+   border-image: url(chat/client/res/add_friend_hover.png);
+}
+
+#search_widget #add_btn[state='press']{
+   border-image: url(chat/client/res/add_friend_hover.png);
+}
+
+#search_widget{
+   background-color:rgb(247, 247, 247);
+}
+
+#search_edit{
+   border: 2px solid #f1f1f1;
+}
+
+/* chat_user_widget */
+
+#chat_user_widget{
+   background-color:rgb(0, 0, 0);
+}
+
+/* chat_user_list */
+
+#chat_user_list {
+   background-color: rgb(247,247,248);
+   border: none;
+}
+
+#chat_user_list::item:selected {
+   background-color: #d3d7d4;
+   border: none;
+   outline: none;
+}
+
+#chat_user_list::item:hover {
+   background-color: rgb(206,207,208);
+   border: none;
+   outline: none;
+}
+
+#chat_user_list::focus {
+   border: none;
+   outline: none;
+}
+
+/* 搜索框列表 */
+#search_list {
+   background-color: rgb(247,247,248);
+   border: none;
+}
+
+#search_list::item:selected {
+   background-color: #d3d7d4;
+   border: none;
+   outline: none;
+}
+
+#search_list::item:hover {
+   background-color: rgb(206,207,208);
+   border: none;
+   outline: none;
+}
+
+#search_list::focus {
+   border: none;
+   outline: none;
+}
+
+/* add_user_item */
+#invalid_item {
+   background-color: #eaeaea;
+   border: none;
+}
+
+#add_tip {
+   border-image: url(chat/client/res/addtip.png);
+}
+
+#right_tip{
+   border-image: url(chat/client/res/right_tip.png);
+}
+
+#message_tip{
+   text-align: center;
+   font-family: "Microsoft YaHei";
+   font-size: 12pt;
+}
+
+/* ChatUserWidget */
+
+ChatUserWidget {
+   background-color:rgb(247, 247, 247);
+   border: none;
+}
+
+#user_chat_label {
+   color: rgb(153, 153, 153);
+   font-size: 12px;
+   font-family: "Microsoft YaHei";
+}
+
+#user_name_label {
+   color: rgb(0, 0, 0);
+   font-size: 14px;
+   font-weight: normal;
+   font-family: "Microsoft YaHei";
+}
+
+#user_name_label {
+   color: rgb(0, 0, 0);
+   font-size: 14px;
+   font-weight: normal;
+   font-family: "Microsoft YaHei";
+}
+
+#time_widget #time_label {
+   color: rgb(140, 140, 140);
+   font-size: 12px;
+   font-family: "Microsoft YaHei";
+}
+
+/* QScrollBar */
+
+QScrollBar:vertical {
+   background: transparent; /* 将轨道背景设置为透明 */
+   width: 8px; /* 滚动条宽度，根据需要调整 */
+   margin: 0px; /* 移除滚动条与滑块之间的间距 */
+}
+
+QScrollBar::handle:vertical {
+   background: rgb(173,170,169); /* 滑块颜色 */
+   min-height: 10px; /* 滑块最小高度，根据需要调整 */
+   border-radius: 4px; /* 滑块边缘圆角，调整以形成椭圆形状 */
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+   height: 0px; /* 移除上下按钮 */
+   border: none; /* 移除边框 */
+   background: transparent; /* 背景透明 */
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+   background: none; /* 页面滚动部分背景透明 */
+}
+
+LoadingDialog {
+   background: #f2eada
+}
+
+/* ChatPage */
+
+/* chat_widget */
+
+#title_label {
+   font-size: 18px;
+   font-weight: normal;
+   font-family: "Microsoft YaHei";
+}
+
+/* chat_edit */
+
+#chat_edit {
+   background: #ffffff;
+   border: none; /* 隐藏边框 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   font-size: 18px; /* 设置字体大小 */
+   padding: 5px; /* 设置内边距 */
+}
+
+/* tool_widget */
+
+#tool_widget{
+   background: #ffffff;
+   border-bottom: 0.5px solid #ececec; /* 设置下边框颜色和宽度 */
+}
+
+#emo_label[state='normal']{
+   border-image: url(chat/client/res/smile.png);
+}
+
+#emo_label[state='hover']{
+   border-image: url(chat/client/res/smile_hover.png);
+}
+
+#emo_label[state='press']{
+   border-image: url(chat/client/res/smile_press.png);
+}
+
+#file_label[state='normal']{
+   border-image: url(chat/client/res/filedir.png);
+}
+
+#file_label[state='hover']{
+   border-image: url(chat/client/res/filedir_hover.png);
+}
+
+#file_label[state='press']{
+   border-image: url(chat/client/res/filedir_press.png);
+}
+
+/* send_widget */
+
+#send_widget{
+   background: #ffffff;
+   border: none; /* 隐藏边框 */
+}
+
+#receive_btn[state='normal']{
+   background: #f0f0f0;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#receive_btn[state='hover']{
+   background: #d2d2d2;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#receive_btn[state='press']{
+   background: #c6c6c6;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#send_btn[state='normal']{
+   background: #f0f0f0;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#send_btn[state='hover']{
+   background: #d2d2d2;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#send_btn[state='press']{
+   background: #c6c6c6;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+/* chat_data_list */
+
+#chat_data_list {
+   background: #f0f0f0;
+}
+
+#chat_background {
+   background: #f0f0f0;
+}
+
+#chat_area {
+   border: none;
+}
+
+#chat_user_name {
+   color: rgb(153, 153, 153);
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+/* side_bar */
+
+#side_chat_label[state='normal']{
+   border-image: url(chat/client/res/chat_icon.png);
+}
+
+#side_chat_label[state='hover']{
+   border-image: url(chat/client/res/chat_icon_hover.png);
+}
+
+#side_chat_label[state='pressed']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_chat_label[state='selected_normal']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_chat_label[state='selected_hover']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_chat_label[state='selected_pressed']{
+   border-image: url(chat/client/res/chat_icon_press.png);
+}
+
+#side_contact_label[state='normal']{
+   border-image: url(chat/client/res/contact_list.png);
+}
+
+#side_contact_label[state='hover']{
+   border-image: url(chat/client/res/contact_list_hover.png);
+}
+
+#side_contact_label[state='pressed']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+#side_contact_label[state='selected_normal']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+#side_contact_label[state='selected_hover']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+#side_contact_label[state='selected_pressed']{
+   border-image: url(chat/client/res/contact_list_press.png);
+}
+
+/* FindSuccessDialog */
+#FindSuccessDialog {
+   background-color: #ffffff;
+}
+
+#name_label{
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#add_friend_btn[state='normal']{
+   background: #07c160;
+   color: #ffffff;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#add_friend_btn[state='hover']{
+   background: #3bbb4b;
+   color: #ffffff;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#add_friend_btn[state='press']{
+   background: #07c160;
+   color: #ffffff;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+/* ApplyFriendDialog */
+#ApplyFriendDialog{
+   border: 2px solid #f1f1f1;
+   font-size: 14px;
+   background: #f7f7f8;
+}
+
+/* scrollArea */
+#scrollArea{
+   background: #f7f7f8;
+   border: none;
+}
+
+#scrollcontent{
+   background: #f7f7f8;
+}
+
+#scrollcontent #apply_label{
+   font-family: "Microsoft YaHei";
+   font-size: 16px;
+   font-weight: normal;
+}
+
+/* apply_widget */
+#apply_widget QLabel{
+   color:rgb(140,140,140);
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+   height: 25px;
+}
+
+#apply_widget #name_edit, #apply_widget #back_edit{
+   border: 1px solid #f7f7f8;
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#apply_widget #label_edit {
+   border: none;
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#apply_widget #more_label{
+   border-image: url(chat/client/res/arowdown.png);
+}
+
+#apply_widget #tipslb[state='normal'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #1e1e1e;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='hover'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #1e1e1e;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='pressed'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='selected_normal'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='selected_hover'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tipslb[state='selected_pressed'] {
+   padding: 2px;
+   background: #e1e1e1;
+   color: #1e1e1e;
+   border-radius: 10px;
+}
+
+/* label_group_widget */
+#grid_widget{
+   background: #fdfdfd;
+}
+
+#input_tip_widget {
+   background: #d3eaf8;
+}
+
+#apply_widget #FriendLabel {
+   background: #daf6e7;
+   color: #48bf56;
+   border-radius: 10px;
+}
+
+#apply_widget #tip_label {
+   padding-left: 2px;
+   color:rgb(153,153,153);
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#close_label[state='normal'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='hover'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='pressed'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='select_normal'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='select_hover'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#close_label[state='select_pressed'] {
+   border-image: url(chat/client/res/tipclose.png);
+}
+
+#apply_sure_widget #sure_btn[state='normal']  {
+   background: #f0f0f0;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #sure_btn[state='hover'] {
+   background: #d2d2d2;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #sure_btn[state='press'] {
+   background: #c6c6c6;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #cancel_btn[state='normal']  {
+   background: #f0f0f0;
+   color: #2e2f30;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #cancel_btn[state='hover'] {
+   background: #d2d2d2;
+   color: #2e2f30;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#apply_sure_widget #cancel_btn[state='press'] {
+   background: #c6c6c6;
+   color: #2e2f30;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+/* contact_user_list */
+#contact_user_list {
+   /* background-color: rgb(247,247,248); */
+   border: none;
+}
+
+#contact_user_list::item:selected {
+   background-color: #d3d7d4;
+   border: none;
+   outline: none;
+}
+
+#contact_user_list::item:hover {
+   background-color: rgb(206,207,208);
+   border: none;
+   outline: none;
+}
+
+#contact_user_list::focus {
+   border: none;
+   outline: none;
+}
+
+/* GroupTipItem */
+#GroupTipItem {
+   background-color: #eaeaea;
+   border: none;
+}
+
+#GroupTipItem QLabel{
+   color: #2e2f30;
+   font-size: 12px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border: none;
+}
+
+#add_friend_item {
+   border-bottom: 1px solid #eaeaea;
+}
+
+#LineItem {
+   background-color:rgb(247,247,247);
+   border: none;
+}
+
+/* ApplyFriendPage */
+#friend_apply_label {
+   font-family: "Microsoft YaHei";
+   font-size: 18px;
+   font-weight: normal;
+}
+
+#friend_apply_widget {
+   background-color: #f1f2f3;
+   border-bottom: 1px solid #ede9e7;
+}
+
+#apply_friend_list {
+   background-color: #f1f2f3;
+   border-left: 1px solid #ede9e7;
+   border-top: none;
+   border-right: none;
+   border-bottom: none;
+}
+
+#ApplyFriendItem {
+   background-color: #f1f2f3;
+   border-bottom: 2px solid #dbd9d9;
+}
+
+#ApplyFriendItem #user_name_label {
+   color: rgb(0, 0, 0);
+   font-size: 16px; /* 设置字体大小 */
+   font-weight: normal;
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+#ApplyFriendItem #user_chat_label {
+   color: #a2a2a2;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+#ApplyFriendItem #add_btn[state='normal'] {
+   background-color: #d3d7d4;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#ApplyFriendItem #add_btn[state='hover'] {
+   background-color: #D3D3D3;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#ApplyFriendItem #add_btn[state='press'] {
+   background-color: #BEBEBE;
+   color: #2cb46e;
+   font-size: 16px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#ApplyFriendItem #already_add_label {
+   color: rgb(153, 153, 153);
+   font-size: 12px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+/* red_point */
+#red_point {
+   border-image: url(chat/client/res/red_point.png)
+}
+
+/* FindFailDialog */
+#FindFailDialog {
+   background-color: #ffffff;
+}
+
+#FindFailDialog #fail_tip, #fail_tip2 {
+   font-size: 14px;
+   font-family: "Microsoft YaHei";
+}
+
+#FindFailDialog #fail_sure_btn[state='normal']{
+   background: #07c160;
+   color: #ffffff;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#FindFailDialog #fail_sure_btn[state='hover']{
+   background: #3bbb4b;
+   color: #ffffff;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+#FindFailDialog #fail_sure_btn[state='press']{
+   background: #07c160;
+   color: #ffffff;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+   border-radius: 20px; /* 设置圆角 */
+}
+
+/* AuthFriendDialog */
+#AuthFriendDialog{
+   border: 2px solid #f1f1f1;
+   font-size: 14px;
+   background: #f7f7f8;
+}
+
+/* friend_info_page */
+#friend_info_page #name_label {
+    color: #161616;
+    font-size: 18px; /* 设置字体大小 */
+    font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+#friend_info_page #nick_tip,
+#friend_info_page #nick_label,
+#friend_info_page #back_label,
+#friend_info_page #back_tip
+{
+   color: #161616;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+#msg_chat_btn[state='normal'] {
+   border-image: url(chat/client/res/msg_chat_normal.png);
+}
+
+#msg_chat_btn[state='hover'] {
+   border-image: url(chat/client/res/msg_chat_hover.png);
+}
+
+#msg_chat_btn[state='press'] {
+   border-image: url(chat/client/res/msg_chat_press.png);
+}
+
+#video_chat_btn[state='normal'] {
+   border-image: url(chat/client/res/video_chat_normal.png);
+}
+
+#video_chat_btn[state='hover'] {
+   border-image: url(chat/client/res/video_chat_hover.png);
+}
+
+#video_chat_btn[state='press'] {
+   border-image: url(chat/client/res/video_chat_press.png);
+}
+
+#voice_chat_btn[state='normal'] {
+   border-image: url(chat/client/res/voice_chat_normal.png);
+}
+
+#voice_chat_btn[state='hover'] {
+   border-image: url(chat/client/res/voice_chat_hover.png);
+}
+
+#voice_chat_btn[state='press'] {
+   border-image: url(chat/client/res/voice_chat_press.png);
+}

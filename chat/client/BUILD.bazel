@@ -1,0 +1,41 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//chat/client/widget:widgets.bzl", "WIDGETS")
+load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+qt_cc_library(
+    name = "client_lib",
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
+    copts = STRICT_COPTS,
+    includes = ["include"],
+    deps = [
+        "//chat/client/widget:%s_ui" % widget
+        for widget in WIDGETS
+    ] + [
+        "//chat/common",
+        "//common",
+        "@rules_qt//:qt_network",
+        "@rules_qt//:qt_widgets",
+    ],
+)
+
+qt_cc_binary(
+    name = "client",
+    srcs = ["main.cpp"],
+    copts = STRICT_COPTS,
+    data = glob([
+        "config/*",
+        "res/*",
+        "static/*",
+        "style/*",
+    ]),
+    deps = [
+        ":client_lib",
+    ],
+)

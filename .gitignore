@@ -4,7 +4,7 @@
 
 bin
 build
-lib
+# lib
 
 # bazel
 bazel-*
@@ -12,3 +12,7 @@ MODULE.bazel.lock
 
 # python
 __pycache__
+
+# chat
+chat/server/mysql/data
+chat/server/mysql/logs

@@ -1,0 +1,63 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+# verify.grpc
+proto_library(
+    name = "verify_proto",
+    srcs = ["verify.proto"],
+)
+
+cc_proto_library(
+    name = "verify_cc_proto",
+    deps = ["verify_proto"],
+)
+
+cc_grpc_library(
+    name = "verify_cc_grpc_proto",
+    srcs = ["verify_proto"],
+    grpc_only = True,
+    deps = ["verify_cc_proto"],
+)
+
+js_library(
+    name = "verify_js_proto",
+    data = ["verify.proto"],
+)
+
+# status.grpc
+proto_library(
+    name = "status_proto",
+    srcs = ["status.proto"],
+)
+
+cc_proto_library(
+    name = "status_cc_proto",
+    deps = ["status_proto"],
+)
+
+cc_grpc_library(
+    name = "status_cc_grpc_proto",
+    srcs = ["status_proto"],
+    grpc_only = True,
+    deps = ["status_cc_proto"],
+)
+
+# chat.grpc
+proto_library(
+    name = "chat_proto",
+    srcs = ["chat.proto"],
+)
+
+cc_proto_library(
+    name = "chat_cc_proto",
+    deps = ["chat_proto"],
+)
+
+cc_grpc_library(
+    name = "chat_cc_grpc_proto",
+    srcs = ["chat_proto"],
+    grpc_only = True,
+    deps = ["chat_cc_proto"],
+)

@@ -60,10 +60,18 @@ def run(config_name):
     tool_path = Path(__file__).resolve().parent
 
     if client is None:
-        run_tmux(f"python3 {tool_path / 'build.py'} //network/example:{server}")
+        run_tmux({
+            "Network": [
+                f"python3 {tool_path / 'build.py'} //network/example:{server}"
+            ]
+        })
     else:
-        run_tmux(f"python3 {tool_path / 'build.py'} //network/example:{server}",
-                 f"python3 {tool_path / 'build.py'} //network/example:{client}")
+        run_tmux({
+            "Network": [
+                f"python3 {tool_path / 'build.py'} //network/example:{server}",
+                f"python3 {tool_path / 'build.py'} //network/example:{client}"
+            ]
+        })
 
 
 if __name__ == "__main__":

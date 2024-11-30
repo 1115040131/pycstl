@@ -1,0 +1,19 @@
+{
+    "name": "varify_server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@grpc/grpc-js": "latest",
+        "@grpc/proto-loader": "latest",
+        "ioredis": "latest",
+        "nodemailer": "latest",
+        "uuid": "latest"
+    },
+    "devDependencies": {}
+}

@@ -1,0 +1,14 @@
+load("widgets.bzl", "WIDGETS")
+load("@rules_qt//:qt.bzl", "qt_ui_library")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+[qt_ui_library(
+    name = "%s_ui" % widget,
+    ui = "%s.ui" % widget,
+    deps = ["@rules_qt//:qt_widgets"],
+) for widget in WIDGETS]

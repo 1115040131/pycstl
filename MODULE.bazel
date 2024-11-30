@@ -5,6 +5,10 @@ module(
     version = "0.0.1",
 )
 
+#-------------------------------------------------------------------------------------
+# C++
+#-------------------------------------------------------------------------------------
+
 # Boost
 # Famous C++ library that has given rise to many new additions to the C++ Standard Library
 # Makes @boost available for use: For example, add `@boost//:algorithm` to your deps.
@@ -31,5 +35,73 @@ bazel_dep(name = "glm", version = "1.0.0.bcr.1")
 bazel_dep(name = "grpc", version = "1.65.0", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "nlohmann_json", version = "3.11.3")
 
-# for test
+#-------------------------------------------------------------------------------------
+# Node.js
+#-------------------------------------------------------------------------------------
+
+bazel_dep(name = "aspect_rules_js", version = "2.0.0")
+
+####### Node.js version #########
+# By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
+# Optionally you can pin a different node version:
+# bazel_dep(name = "rules_nodejs", version = "6.2.0")
+# node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
+# node.toolchain(node_version = "16.14.2")
+#################################
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm", dev_dependency = True)
+
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+
+use_repo(npm, "npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+
+# Allows developers to use the matching pnpm version, for example:
+# bazel run -- @pnpm --dir $PWD install --lockfile-only
+use_repo(pnpm, "pnpm")
+
+#-------------------------------------------------------------------------------------
+# Python
+#-------------------------------------------------------------------------------------
+
+bazel_dep(name = "rules_python", version = "0.40.0")
+
+PYTHON_VERSION = "3.12"
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    configure_coverage_tool = False,
+    ignore_root_user_error = True,
+    python_version = PYTHON_VERSION,
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "pycstl_deps",
+    python_version = PYTHON_VERSION,
+    requirements_lock = "//:requirements_lock.txt",
+)
+use_repo(pip, "pycstl_deps")
+
+#-------------------------------------------------------------------------------------
+# Test only
+#-------------------------------------------------------------------------------------
+
 bazel_dep(name = "googletest", version = "1.15.0")
+
+# 导出 compile_commands.json
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+    commit = "f5fbd4cee671d8d908f37c83abaf70fba5928fc7",
+    # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
+    # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
+)

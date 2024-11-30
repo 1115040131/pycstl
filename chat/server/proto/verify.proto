@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pyc.chat;
+
+service VerifyService {
+    rpc GetVerifyCode (VerifyRequest) returns (VerifyResponse) {}
+}
+
+message VerifyRequest {
+    string email = 1;
+}
+
+message VerifyResponse {
+    int32 error = 1;
+    string email = 2;
+    string code = 3;
+}

@@ -1,0 +1,15 @@
+{
+    "email": {
+        "user": "pycstltest@163.com",
+        "pass": "VLEZIRCDKHHTMGIC"
+    },
+    "mysql": {
+        "host": "81.68.86.146",
+        "port": 3316
+    },
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6380,
+        "password": 123456
+    }
+}
