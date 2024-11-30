@@ -74,7 +74,16 @@ private slots:
     void slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
 
     // 跳转到聊天界面
-    void slot_jump_chat_item(const std::shared_ptr<SearchInfo>& search_info);
+    void slot_jump_chat_item(const std::shared_ptr<UserInfo>& user_info);
+
+    // 跳转申请好友界面
+    void slot_switch_apply_friend_page();
+
+    // 跳转好友信息界面
+    void slot_switch_friend_info_page(const std::shared_ptr<UserInfo>& user_info);
+
+    // 点击聊天列表
+    void slot_chat_item_clicked(QListWidgetItem* item);
 
 private:
     Ui::ChatDialog* ui;
@@ -96,4 +105,6 @@ private:
 
     int current_chat_uid_ = 0;
     std::unordered_map<int, QListWidgetItem*> chat_item_added_;
+
+    QWidget* prev_page_ = nullptr;
 };

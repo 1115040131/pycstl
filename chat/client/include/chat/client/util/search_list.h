@@ -29,7 +29,7 @@ private:
     void closeFindDialog();
 
 signals:
-    void sig_jump_chat_item(const std::shared_ptr<SearchInfo>& search_info);
+    void sig_jump_chat_item(const std::shared_ptr<UserInfo>& user_info);
 
 private slots:
     void slot_item_clicked(QListWidgetItem* item);

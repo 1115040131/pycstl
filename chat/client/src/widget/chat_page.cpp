@@ -18,6 +18,16 @@ ChatPage::ChatPage(QWidget* parent) : QDialog(parent), ui(new Ui::ChatPage) {
 
 ChatPage::~ChatPage() { delete ui; }
 
+void ChatPage::setUserInfo(const std::shared_ptr<UserInfo>& user_info) {
+    user_info_ = user_info;
+
+    ui->title_label->setText(user_info->name);
+    ui->chat_data_list->removeAllItem();
+    for (const auto& chat_msg : user_info->chat_msgs) {
+        ui->chat_data_list->appendChatMsg(chat_msg);
+    }
+}
+
 void ChatPage::paintEvent(QPaintEvent*) {
     QStyleOption opt;
     opt.initFrom(this);

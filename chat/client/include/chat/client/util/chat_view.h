@@ -2,6 +2,8 @@
 
 #include <QWidget>
 
+#include "chat/client/user_data.h"
+
 class QScrollArea;
 
 class ChatView : public QWidget {
@@ -13,12 +15,11 @@ public:
     void appendChatItem(QWidget* item);
     void prependChatItem(QWidget* item);
     void insertChatItem(QWidget* position, QWidget* item);
+    void removeAllItem();
+    void appendChatMsg(const std::shared_ptr<TextChatData>& chat_msg);
 
 protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
-
-private:
-    void initStyleSheet();
 
 private slots:
     void onVerticalScrollBarMoved(int min, int max);

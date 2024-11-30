@@ -13,6 +13,7 @@ WIDGETS = [
     "contact_user_item",
     "find_fail_dialog",
     "find_success_dialog",
+    "friend_info_page",
     "friend_label",
     "group_tip_item",
     "loading_dialog",

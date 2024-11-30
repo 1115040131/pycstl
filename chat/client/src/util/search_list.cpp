@@ -151,7 +151,8 @@ void SearchList::slot_user_search(const std::shared_ptr<SearchInfo>& search_info
     } else if (UserMgr::GetInstance().CheckFriendById(search_info->uid)) {
         // 查找到已经是好友
         qDebug() << "find friend";
-        emit sig_jump_chat_item(search_info);
+        auto user_info = std::make_shared<UserInfo>(UserInfo::FromSearchInfo(*search_info));
+        emit sig_jump_chat_item(user_info);
     } else {
         find_dialog_ = std::make_unique<FindSuccessDialog>(this);
         static_cast<FindSuccessDialog*>(find_dialog_.get())->setSearchInfo(search_info);

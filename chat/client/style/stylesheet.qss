@@ -772,3 +772,56 @@ LoadingDialog {
    font-size: 14px;
    background: #f7f7f8;
 }
+
+/* friend_info_page */
+#friend_info_page #name_label {
+    color: #161616;
+    font-size: 18px; /* 设置字体大小 */
+    font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+#friend_info_page #nick_tip,
+#friend_info_page #nick_label,
+#friend_info_page #back_label,
+#friend_info_page #back_tip
+{
+   color: #161616;
+   font-size: 14px; /* 设置字体大小 */
+   font-family: "Microsoft YaHei"; /* 设置字体 */
+}
+
+#msg_chat_btn[state='normal'] {
+   border-image: url(chat/client/res/msg_chat_normal.png);
+}
+
+#msg_chat_btn[state='hover'] {
+   border-image: url(chat/client/res/msg_chat_hover.png);
+}
+
+#msg_chat_btn[state='press'] {
+   border-image: url(chat/client/res/msg_chat_press.png);
+}
+
+#video_chat_btn[state='normal'] {
+   border-image: url(chat/client/res/video_chat_normal.png);
+}
+
+#video_chat_btn[state='hover'] {
+   border-image: url(chat/client/res/video_chat_hover.png);
+}
+
+#video_chat_btn[state='press'] {
+   border-image: url(chat/client/res/video_chat_press.png);
+}
+
+#voice_chat_btn[state='normal'] {
+   border-image: url(chat/client/res/voice_chat_normal.png);
+}
+
+#voice_chat_btn[state='hover'] {
+   border-image: url(chat/client/res/voice_chat_hover.png);
+}
+
+#voice_chat_btn[state='press'] {
+   border-image: url(chat/client/res/voice_chat_press.png);
+}

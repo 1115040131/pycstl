@@ -16,6 +16,8 @@ public:
     void setUserIcon(const QPixmap& icon);
     void setWidget(QWidget* w);
 
+    ChatRole getRole() const { return role_; }
+
 private:
     ChatRole role_;
     QLabel* name_label_;

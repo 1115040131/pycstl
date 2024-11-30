@@ -10,11 +10,15 @@ class ContactUserItem;
 QT_END_NAMESPACE
 
 class ContactUserItem : public ListItemBase {
+    Q_OBJECT
+
 public:
     explicit ContactUserItem(QWidget* parent = nullptr);
     ~ContactUserItem();
 
     QSize sizeHint() const override { return QSize(250, 70); }
+
+    const std::shared_ptr<UserInfo>& getUserInfo() const { return user_info_; }
 
     void setInfo(const std::shared_ptr<AuthInfo>& auth_info);
     void setInfo(const std::shared_ptr<FriendInfo>& friend_info);

@@ -24,7 +24,7 @@ public:
     Type GetItemType() const { return type_; }
 
 protected:
-    // void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
     Type type_;

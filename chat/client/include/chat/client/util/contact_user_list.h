@@ -27,7 +27,7 @@ signals:
 
     void sig_switch_apply_friend_page();
 
-    void sig_switch_friend_info_page();
+    void sig_switch_friend_info_page(const std::shared_ptr<UserInfo>& user_info);
 
 public slots:
     void slot_auth_rsp(const std::shared_ptr<AuthInfo>& auth_info);

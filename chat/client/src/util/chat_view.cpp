@@ -6,6 +6,11 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
+#include "chat/client/define.h"
+#include "chat/client/user_mgr.h"
+#include "chat/client/util/chat_item_base.h"
+#include "chat/client/util/text_bubble.h"
+
 ChatView::ChatView(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* main_layout = new QVBoxLayout();
     setLayout(main_layout);
@@ -37,7 +42,6 @@ ChatView::ChatView(QWidget* parent) : QWidget(parent) {
 
     scroll_area_->setWidgetResizable(true);
     scroll_area_->installEventFilter(this);
-    initStyleSheet();
 }
 
 void ChatView::appendChatItem(QWidget* item) {
@@ -53,7 +57,35 @@ void ChatView::insertChatItem(QWidget* position, QWidget* item) {
     (void)item;
 }
 
-void ChatView::initStyleSheet() {}
+void ChatView::removeAllItem() {
+    auto v_layout = qobject_cast<QVBoxLayout*>(scroll_area_->widget()->layout());
+    int count = v_layout->count();
+    for (int i = 0; i < count - 1; ++i) {
+        auto item = v_layout->takeAt(0);
+        if (item) {
+            delete item->widget();
+            delete item;
+        }
+    }
+}
+
+void ChatView::appendChatMsg(const std::shared_ptr<TextChatData>& chat_msg) {
+    ChatItemBase* item = nullptr;
+    if (chat_msg->from_uid == UserMgr::GetInstance().GetUid()) {
+        item = new ChatItemBase(ChatRole::kSelf);
+        item->setUserName(UserMgr::GetInstance().GetName());
+        item->setUserIcon(UserMgr::GetInstance().GetIcon());
+    } else {
+        auto friend_info = UserMgr::GetInstance().GetFriendById(chat_msg->from_uid);
+
+        item = new ChatItemBase(ChatRole::kOther);
+        item->setUserName(friend_info->name);
+        item->setUserIcon(QPixmap(friend_info->icon));
+    }
+    auto bubble = new TextBubble(item->getRole(), chat_msg->msg_content);
+    item->setWidget(bubble);
+    appendChatItem(item);
+}
 
 bool ChatView::eventFilter(QObject* watched, QEvent* event) {
     if (watched == scroll_area_) {
