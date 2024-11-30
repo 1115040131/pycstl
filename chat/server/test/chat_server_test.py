@@ -309,7 +309,7 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1").decode('utf-8')), 1)
             self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2").decode('utf-8')), 0)
 
-            # TODO: 重复登录
+            # 重复登录
             response = Message.send_and_receive(client_socket, Message(
                 ReqId.kChatLogin, json.dumps({'uid': user_info.uid,
                                               "token": token})))
@@ -558,6 +558,115 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(json_response['friend_list'][0]['name'], user_info_2.name)
             self.assertEqual(json_response['friend_list'][1]['uid'], user_info_3.uid)
             self.assertEqual(json_response['friend_list'][1]['name'], user_info_3.name)
+
+    def test_text_chat_msg(self):
+        """
+        发送文本消息
+        """
+
+        # 将两个服务器人数都设置为 0, 确保 client1, client3 在一个服务器上, client2 在另一个服务器上
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
+        self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
+
+        # 注册账号
+        user_info_1 = self.register()
+        user_info_2 = self.register()
+        user_info_3 = self.register()
+        user_info_4 = self.register()
+
+        with self.login_server(user_info_1) as client_1, self.login_server(user_info_2) as client_2, self.login_server(user_info_3) as client_3:
+            # 确保用户 1 和 3 在同一个服务器上
+            self.assertEqual(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_1.uid}'),
+                             self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_3.uid}'))
+            self.assertNotEqual(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_1.uid}'),
+                                self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_2.uid}'))
+            self.assertIsNone(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info_4.uid}'))
+
+            # json 错误
+            response = Message.send_and_receive(client_1, Message(ReqId.kTextChatMsgReq, 'hello'))
+            self.assertEqual(response.message_id, ReqId.kTextChatMsgRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kJsonError.value)
+
+            # uid 错误, 自己的基本信息查询失败
+            response = Message.send_and_receive(client_1, Message(ReqId.kTextChatMsgReq, json.dumps({"from_uid": 0})))
+            self.assertEqual(response.message_id, ReqId.kTextChatMsgRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kUidInvalid.value)
+
+            # uid 错误, 对方的基本信息查询失败
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kTextChatMsgReq, json.dumps({"from_uid": user_info_1.uid, "to_uid": 0})))
+            self.assertEqual(response.message_id, ReqId.kTextChatMsgRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kUidInvalid.value)
+
+            # 对方不在线, 查询对方服务器地址失败
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kTextChatMsgReq, json.dumps({"from_uid": user_info_1.uid, "to_uid": user_info_4.uid})))
+            self.assertEqual(response.message_id, ReqId.kTextChatMsgRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            # 对方在同一个服务器上
+            from_uid = user_info_1.uid
+            to_uid = user_info_3.uid
+            msg_id = f'{from_uid} to {to_uid}'
+            msg_content = f'Hello {user_info_3.name}'
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kTextChatMsgReq, json.dumps(
+                    {
+                        "from_uid": from_uid,
+                        "to_uid": to_uid,
+                        "text_array": [
+                            {"msg_id": msg_id, "content": msg_content}
+                        ]
+                    }
+                )))
+            self.assertEqual(response.message_id, ReqId.kTextChatMsgRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            notify = Message.receive(client_3)
+            self.assertEqual(notify.message_id, ReqId.kNotifyTextChatMsgReq)
+            json_notify = json.loads(notify.message_body)
+            self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_notify['from_uid'], from_uid)
+            self.assertEqual(json_notify['to_uid'], to_uid)
+            text_array = json_notify['text_array']
+            self.assertEqual(len(text_array), 1)
+            self.assertEqual(text_array[0]['msg_id'], msg_id)
+            self.assertEqual(text_array[0]['content'], msg_content)
+
+            # 对方在不同服务器上
+            from_uid = user_info_1.uid
+            to_uid = user_info_2.uid
+            msg_id = f'{from_uid} to {to_uid}'
+            msg_content = f'Hello {user_info_2.name}'
+            response = Message.send_and_receive(client_1, Message(
+                ReqId.kTextChatMsgReq, json.dumps(
+                    {
+                        "from_uid": from_uid,
+                        "to_uid": to_uid,
+                        "text_array": [
+                            {"msg_id": msg_id, "content": msg_content}
+                        ]
+                    }
+                )))
+            self.assertEqual(response.message_id, ReqId.kTextChatMsgRes)
+            json_response = json.loads(response.message_body)
+            self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
+
+            notify = Message.receive(client_2)
+            self.assertEqual(notify.message_id, ReqId.kNotifyTextChatMsgReq)
+            json_notify = json.loads(notify.message_body)
+            self.assertEqual(json_notify['error'], ErrorCode.kSuccess.value)
+            self.assertEqual(json_notify['from_uid'], from_uid)
+            self.assertEqual(json_notify['to_uid'], to_uid)
+            text_array = json_notify['text_array']
+            self.assertEqual(len(text_array), 1)
+            self.assertEqual(text_array[0]['msg_id'], msg_id)
+            self.assertEqual(text_array[0]['content'], msg_content)
 
 
 if __name__ == '__main__':

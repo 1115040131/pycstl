@@ -50,6 +50,9 @@ private:
 
     void setSelectChatPage(int uid);
 
+    // 更新聊天文本
+    void updateChatMsg(const std::vector<std::shared_ptr<TextChatData>>& chat_msgs);
+
 private slots:
     // 搜索框文本变化
     void slot_search_text_changed(const QString& text);
@@ -73,6 +76,9 @@ private slots:
     // 收到同意好友请求
     void slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
 
+    // 收到聊天消息
+    void slot_text_chat_msg(const std::vector<std::shared_ptr<TextChatData>>& chat_msgs);
+
     // 跳转到聊天界面
     void slot_jump_chat_item(const std::shared_ptr<UserInfo>& user_info);
 
@@ -86,7 +92,7 @@ private slots:
     void slot_chat_item_clicked(QListWidgetItem* item);
 
     // 发送消息
-    void slot_append_chat_msg(const std::shared_ptr<TextChatData>& chat_msg);
+    void slot_append_send_chat_msg(const std::shared_ptr<TextChatData>& chat_msg);
 
 private:
     Ui::ChatDialog* ui;

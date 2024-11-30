@@ -279,12 +279,71 @@ void TcpMgr::initHttpHandlers() {
 
         qDebug() << "kNotifyAuthFriendReq Success!";
     });
+    handlers_.emplace(ReqId::kTextChatMsgRes, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "kTextChatMsgRes Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "kTextChatMsgRes failed, err is ErrorCode::kJsonError";
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "kTextChatMsgRes failed, err is" << ToString(error);
+            return;
+        }
+
+        qDebug() << "kTextChatMsgRes Success!";
+    });
+    handlers_.emplace(ReqId::kNotifyTextChatMsgReq, [this](const QByteArray& data) {
+        QJsonDocument json_doc = QJsonDocument::fromJson(data);
+
+        if (json_doc.isNull()) {
+            qDebug() << "kNotifyTextChatMsgReq Failed to create QJsonDocument";
+            return;
+        }
+
+        QJsonObject root = json_doc.object();
+
+        if (!root.contains("error")) {
+            qDebug() << "kNotifyTextChatMsgReq failed, err is ErrorCode::kJsonError";
+            return;
+        }
+
+        auto error = static_cast<ErrorCode>(root["error"].toInt());
+        if (error != ErrorCode::kSuccess) {
+            qDebug() << "kNotifyTextChatMsgReq failed, err is" << ToString(error);
+            return;
+        }
+
+        qDebug() << "kNotifyTextChatMsgReq Success!";
+        std::vector<std::shared_ptr<TextChatData>> chat_msgs;
+        auto from_uid = root["from_uid"].toInt();
+        auto to_uid = root["to_uid"].toInt();
+        if (root.contains("text_array")) {
+            auto text_array = root["text_array"].toArray();
+            for (const QJsonValue& text_json : text_array) {
+                auto chat_msg = std::make_shared<TextChatData>(text_json["msg_id"].toString(),
+                                                               text_json["content"].toString(), from_uid, to_uid);
+                chat_msgs.push_back(chat_msg);
+            }
+        }
+
+        emit sig_text_chat_msg(chat_msgs);
+    });
 }
 
 void TcpMgr::handleMessage(ReqId req_id, uint16_t, const QByteArray& data) {
     auto iter = handlers_.find(req_id);
     if (iter == handlers_.end()) {
-        qDebug() << "not found id [" << ToString(req_id) << "] to handle";
+        qDebug() << "not found id [" << static_cast<uint16_t>(req_id) << ToString(req_id) << "] to handle";
         return;
     }
     iter->second(data);

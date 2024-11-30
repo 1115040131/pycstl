@@ -11,10 +11,6 @@
 namespace pyc {
 namespace chat {
 
-// TODO: remove
-template <typename... Targs>
-void DUMMY_CODE(Targs&&... /* unused */) {}
-
 class ChatConnectionPool : public ConnectionPool<std::unique_ptr<ChatService::Stub>> {
 public:
     ChatConnectionPool(std::string_view host, std::string_view port, size_t size) {
@@ -125,10 +121,34 @@ AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_name, c
     return response;
 }
 
-TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name, const TextChatMsgReq& request,
-                                                 const nlohmann::json& return_value) {
-    DUMMY_CODE(server_name, request, return_value);
-    return {};
+TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name, const TextChatMsgReq& request) {
+    TextChatMsgRsp response;
+
+    auto iter = pools_.find(server_name);
+    if (iter == pools_.end()) {
+        PYC_LOG_ERROR("Server {} not found", server_name);
+        response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
+        return response;
+    }
+
+    auto& pool = iter->second;
+    auto connection = pool->GetConnection();
+    if (!connection) {
+        PYC_LOG_ERROR("Get connection failed");
+        response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
+        return response;
+    }
+    Defer defer([this, &pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
+
+    grpc::ClientContext context;
+    auto status = connection.value()->NotifyTextChatMsg(&context, request, &response);
+
+    if (!status.ok()) {
+        PYC_LOG_ERROR("Rpc failed: {}", status.error_message());
+        response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
+    }
+
+    return response;
 }
 
 }  // namespace chat

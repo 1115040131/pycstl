@@ -37,6 +37,18 @@ const char* ToString(ReqId req_id) noexcept {
         TO_STRING_CASE(ReqId, kLogin);
         TO_STRING_CASE(ReqId, kChatLogin);
         TO_STRING_CASE(ReqId, kChatLoginRes);
+        TO_STRING_CASE(ReqId, kSearchUserReq);
+        TO_STRING_CASE(ReqId, kSearchUserRes);
+        TO_STRING_CASE(ReqId, kAddFriendReq);
+        TO_STRING_CASE(ReqId, kAddFriendRes);
+        TO_STRING_CASE(ReqId, kNotifyAddFriendReq);
+        TO_STRING_CASE(ReqId, kAuthFriendReq);
+        TO_STRING_CASE(ReqId, kAuthFriendRes);
+        TO_STRING_CASE(ReqId, kNotifyAuthFriendReq);
+        TO_STRING_CASE(ReqId, kTextChatMsgReq);
+        TO_STRING_CASE(ReqId, kTextChatMsgRes);
+        TO_STRING_CASE(ReqId, kNotifyTextChatMsgReq);
+
         default:
             break;
     }

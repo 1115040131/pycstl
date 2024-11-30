@@ -25,8 +25,7 @@ public:
 
     AuthFriendRsp NotifyAuthFriend(const std::string& server_name, const AuthFriendReq& request);
 
-    TextChatMsgRsp NotifyTextChatMsg(const std::string& server_name, const TextChatMsgReq& request,
-                                     const nlohmann::json& return_value);
+    TextChatMsgRsp NotifyTextChatMsg(const std::string& server_name, const TextChatMsgReq& request);
 
 private:
     std::unordered_map<std::string, std::unique_ptr<ChatConnectionPool>> pools_;

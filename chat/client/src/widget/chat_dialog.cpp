@@ -68,10 +68,11 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
     // 检测点击鼠标位置是否需要清空搜索框
     this->installEventFilter(this);
 
-    // 收到好友请求
+    // 收到服务器消息
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_friend_apply, this, &ChatDialog::slot_friend_apply);
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_auth_rsp, this, &ChatDialog::slot_auth_rsp);
     connect(&TcpMgr::GetInstance(), &TcpMgr::sig_add_auth_friend, this, &ChatDialog::slot_add_auth_friend);
+    connect(&TcpMgr::GetInstance(), &TcpMgr::sig_text_chat_msg, this, &ChatDialog::slot_text_chat_msg);
 
     // 连接 search_list 跳转聊天界面信号
     connect(ui->search_list, &SearchList::sig_jump_chat_item, this, &ChatDialog::slot_jump_chat_item);
@@ -94,7 +95,7 @@ ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog
     connect(ui->chat_user_list, &ChatUserList::itemClicked, this, &ChatDialog::slot_chat_item_clicked);
 
     // 连接 chat_page 发送消息信号
-    connect(ui->chat_page, &ChatPage::sig_append_chat_msg, this, &ChatDialog::slot_append_chat_msg);
+    connect(ui->chat_page, &ChatPage::sig_append_chat_msg, this, &ChatDialog::slot_append_send_chat_msg);
 }
 
 ChatDialog::~ChatDialog() { delete ui; }
@@ -309,6 +310,19 @@ void ChatDialog::setSelectChatPage(int uid) {
     return;
 }
 
+void ChatDialog::updateChatMsg(const std::vector<std::shared_ptr<TextChatData>>& chat_msgs) {
+    if (chat_msgs.empty()) {
+        qDebug() << __func__ << "chat_msgs empty";
+    }
+
+    for (const auto& chat_msg : chat_msgs) {
+        if (chat_msg->from_uid != current_chat_uid_) {
+            break;
+        }
+        ui->chat_page->appendChatMsg(chat_msg);
+    }
+}
+
 void ChatDialog::slot_search_text_changed(const QString& text) {
     if (text.isEmpty()) {
         clear_action_->setIcon(QIcon("chat/client/res/close_transparent.png"));
@@ -328,7 +342,7 @@ void ChatDialog::slot_loading_chat_user() {
     LoadingDialog* loading_dialog = new LoadingDialog(this);          // 将当前对话框设置为父对象
     loading_dialog->setAttribute(Qt::WA_DeleteOnClose);               // 对话框关闭时自动删除
     loading_dialog->show();                                           // 显示悬浮对话框
-    QTimer::singleShot(500, loading_dialog, &LoadingDialog::accept);  // TODO: for debug
+    QTimer::singleShot(500, loading_dialog, &LoadingDialog::accept);  // for debug
     addChatUserList();
     // loading_dialog->deleteLater();  // 加载完成后关闭对话框
 
@@ -345,7 +359,7 @@ void ChatDialog::slot_loading_contact_user() {
     LoadingDialog* loading_dialog = new LoadingDialog(this);          // 将当前对话框设置为父对象
     loading_dialog->setAttribute(Qt::WA_DeleteOnClose);               // 对话框关闭时自动删除
     loading_dialog->show();                                           // 显示悬浮对话框
-    QTimer::singleShot(500, loading_dialog, &LoadingDialog::accept);  // TODO: for debug
+    QTimer::singleShot(500, loading_dialog, &LoadingDialog::accept);  // for debug
     addContactUserList();
     // loading_dialog->deleteLater();  // 加载完成后关闭对话框
 
@@ -401,6 +415,43 @@ void ChatDialog::slot_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info
     ui->contact_user_list->slot_add_auth_friend(auth_info);
 }
 
+void ChatDialog::slot_text_chat_msg(const std::vector<std::shared_ptr<TextChatData>>& chat_msgs) {
+    if (chat_msgs.empty()) {
+        qDebug() << __func__ << "chat_msgs empty";
+    }
+
+    auto from_uid = chat_msgs.front()->from_uid;
+    UserMgr::GetInstance().AppendFriendChatMsg(from_uid, chat_msgs);
+
+    auto iter = chat_item_added_.find(from_uid);
+    if (iter != chat_item_added_.end()) {
+        auto widget = ui->chat_user_list->itemWidget(iter->second);
+        if (!widget) {
+            qDebug() << __func__ << "widget is nullptr";
+            return;
+        }
+
+        auto chat_user_widget = qobject_cast<ChatUserWidget*>(widget);
+        if (!chat_user_widget) {
+            qDebug() << __func__ << "chat_user_widget is nullptr";
+            return;
+        }
+
+        chat_user_widget->updateLastMsg(chat_msgs);
+        updateChatMsg(chat_msgs);
+    } else {
+        auto chat_user_widget = new ChatUserWidget;
+        chat_user_widget->SetInfo(UserMgr::GetInstance().GetFriendById(from_uid));
+        chat_user_widget->updateLastMsg(chat_msgs);
+        auto item = new QListWidgetItem;
+        item->setSizeHint(chat_user_widget->sizeHint());
+        ui->chat_user_list->insertItem(0, item);
+        ui->chat_user_list->setItemWidget(item, chat_user_widget);
+
+        chat_item_added_[from_uid] = item;
+    }
+}
+
 void ChatDialog::slot_jump_chat_item(const std::shared_ptr<UserInfo>& user_info) {
     qDebug() << "slot_jump_chat_item" << user_info->uid;
 
@@ -454,7 +505,7 @@ void ChatDialog::slot_chat_item_clicked(QListWidgetItem* item) {
     current_chat_uid_ = user_info->uid;
 }
 
-void ChatDialog::slot_append_chat_msg(const std::shared_ptr<TextChatData>& chat_msg) {
+void ChatDialog::slot_append_send_chat_msg(const std::shared_ptr<TextChatData>& chat_msg) {
     qDebug() << __func__ << "current_chat_uid_:" << current_chat_uid_;
 
     if (current_chat_uid_ == 0) {
@@ -480,4 +531,5 @@ void ChatDialog::slot_append_chat_msg(const std::shared_ptr<TextChatData>& chat_
 
     auto user_info = chat_user_widget->GetUserInfo();
     user_info->chat_msgs.push_back(chat_msg);
+    UserMgr::GetInstance().AppendFriendChatMsg(current_chat_uid_, std::vector{chat_msg});
 }

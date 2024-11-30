@@ -48,6 +48,9 @@ signals:
     // 对方同意添加好友
     void sig_add_auth_friend(const std::shared_ptr<AuthInfo>& auth_info);
 
+    // 收到聊天消息
+    void sig_text_chat_msg(const std::vector<std::shared_ptr<TextChatData>>& chat_msgs);
+
 public slots:
     // 连接到聊天服务器
     void slot_connect_tcp(const ServerInfo& server_info);

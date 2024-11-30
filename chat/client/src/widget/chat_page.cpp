@@ -34,6 +34,10 @@ void ChatPage::setUserInfo(const std::shared_ptr<UserInfo>& user_info) {
     }
 }
 
+void ChatPage::appendChatMsg(const std::shared_ptr<TextChatData>& chat_msg) {
+    ui->chat_data_list->appendChatMsg(chat_msg);
+}
+
 void ChatPage::paintEvent(QPaintEvent*) {
     QStyleOption opt;
     opt.initFrom(this);

@@ -21,8 +21,11 @@ public:
     }
 
     void SetInfo(const std::shared_ptr<UserInfo>& user_info);
+    void SetInfo(const std::shared_ptr<FriendInfo>& friend_info);
 
     const std::shared_ptr<UserInfo>& GetUserInfo() const { return user_info_; }
+
+    void updateLastMsg(const std::vector<std::shared_ptr<TextChatData>>& chat_msgs);
 
 protected:
     void paintEvent(QPaintEvent* event) override;

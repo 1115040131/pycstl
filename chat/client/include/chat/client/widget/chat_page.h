@@ -20,6 +20,8 @@ public:
 
     void setUserInfo(const std::shared_ptr<UserInfo>& user_info);
 
+    void appendChatMsg(const std::shared_ptr<TextChatData>& chat_msg);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 

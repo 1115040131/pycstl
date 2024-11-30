@@ -8,10 +8,6 @@
 namespace pyc {
 namespace chat {
 
-// TODO: remove
-template <typename... Targs>
-void DUMMY_CODE(Targs&&... /* unused */) {}
-
 ChatServiceImpl::ChatServiceImpl() {}
 
 grpc::Status ChatServiceImpl::NotifyAddFriend(grpc::ServerContext*, const AddFriendReq* request,
@@ -61,9 +57,31 @@ grpc::Status ChatServiceImpl::NotifyAuthFriend(grpc::ServerContext*, const AuthF
     return grpc::Status::OK;
 }
 
-grpc::Status ChatServiceImpl::NotifyTextChatMsg(grpc::ServerContext* context, const TextChatMsgReq* request,
+grpc::Status ChatServiceImpl::NotifyTextChatMsg(grpc::ServerContext*, const TextChatMsgReq* request,
                                                 TextChatMsgRsp* response) {
-    DUMMY_CODE(context, request, response);
+    // 查找用户是否在本服务器
+    auto to_uid = request->to_uid();
+    auto session = UserMgr::GetInstance().GetSession(to_uid);
+    if (!session) {
+        response->set_error(static_cast<int>(ErrorCode::kRpcFailed));
+        return grpc::Status::OK;
+    }
+
+    nlohmann::json notify;
+    notify["error"] = ErrorCode::kSuccess;
+    notify["from_uid"] = request->from_uid();
+    notify["to_uid"] = request->to_uid();
+
+    nlohmann::json text_array = nlohmann::json::array();
+    for (const auto& msg : request->text_msgs()) {
+        nlohmann::json text_json;
+        text_json["msg_id"] = msg.msg_id();
+        text_json["content"] = msg.msg_content();
+        text_array.push_back(text_json);
+    }
+    notify["text_array"] = text_array;
+
+    session->Send(notify.dump(), ReqId::kNotifyTextChatMsgReq);
 
     return grpc::Status::OK;
 }

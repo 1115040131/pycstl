@@ -51,6 +51,10 @@ void LogicSystem::RegisterCallBack() {
                                                   const std::string& msg_data) {
         AuthFriendHandler(session, msg_data);
     };
+    callback_map_[ReqId::kTextChatMsgReq] = [this](const std::shared_ptr<CSession>& session,
+                                                   const std::string& msg_data) {
+        TextChatMsgHandler(session, msg_data);
+    };
 }
 
 void LogicSystem::DealMsg() {
@@ -410,6 +414,67 @@ void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, co
         rpc_request.set_sex(from_base_info->sex);
         rpc_request.set_icon(from_base_info->icon);
         ChatGrpcClient::GetInstance().NotifyAuthFriend(to_server_name.value(), rpc_request);
+    }
+}
+
+void LogicSystem::TextChatMsgHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
+    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+
+    nlohmann::json request = nlohmann::json::parse(msg_data, nullptr, false);
+    nlohmann::json response;
+    Defer defer([&session, &response]() { session->Send(response.dump(), ReqId::kTextChatMsgRes); });
+
+    if (request.is_discarded()) {
+        PYC_LOG_ERROR("Failed to parse Json data");
+        response["error"] = ErrorCode::kJsonError;
+        return;
+    }
+
+    int from_uid = request.value("from_uid", 0);
+    int to_uid = request.value("to_uid", 0);
+    auto text_array = request.value("text_array", nlohmann::json::array());
+
+    // 查询基本信息
+    auto from_base_info = GetBaseInfo(from_uid);
+    auto to_base_info = GetBaseInfo(to_uid);
+    if (!from_base_info || !to_base_info) {
+        response["error"] = ErrorCode::kUidInvalid;
+        return;
+    }
+
+    response["error"] = ErrorCode::kSuccess;
+
+    // 查询对方服务器地址
+    auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
+    if (!to_server_name) {
+        PYC_LOG_DEBUG("User {} not online", to_uid);
+        return;
+    }
+
+    // 对方在同一个服务器上
+    if (to_server_name == GET_SECTION()) {
+        auto session = UserMgr::GetInstance().GetSession(to_uid);
+        if (!session) {
+            PYC_LOG_WARN("User {} not online", to_uid);
+        } else {
+            nlohmann::json notify;
+            notify["error"] = ErrorCode::kSuccess;
+            notify["from_uid"] = from_uid;
+            notify["to_uid"] = to_uid;
+            notify["text_array"] = text_array;
+            session->Send(notify.dump(), ReqId::kNotifyTextChatMsgReq);
+        }
+    } else {
+        // 对方在其他服务器上
+        TextChatMsgReq rpc_request;
+        rpc_request.set_from_uid(from_uid);
+        rpc_request.set_to_uid(to_uid);
+        for (const auto& text_json : text_array) {
+            auto text_msg = rpc_request.add_text_msgs();
+            text_msg->set_msg_id(text_json.value("msg_id", ""));
+            text_msg->set_msg_content(text_json.value("content", ""));
+        }
+        ChatGrpcClient::GetInstance().NotifyTextChatMsg(to_server_name.value(), rpc_request);
     }
 }
 
