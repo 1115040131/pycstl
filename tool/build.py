@@ -220,6 +220,9 @@ def main():
         "pycstl": lambda args: run_bazel_build('//pycstl //pycstl/test/...', args=args),
         "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', args=args),
 
+        ######################### build for sdl2 #########################
+        "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),
+
         ######################### build for tetris #########################
         "tetris": lambda args: run_bazel_build('//tetris', args=args),
         "tetris_run": lambda args: run_bazel_run('//tetris', args=args),
