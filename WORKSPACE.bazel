@@ -38,3 +38,37 @@ new_local_repository(
     build_file = "//third_party/mysql-connector-cpp:mysql-connector-cpp.BUILD",
     path = "third_party/mysql-connector-cpp",
 )
+
+#-------------------------------------------------------------------------------------
+# sdl2
+#-------------------------------------------------------------------------------------
+
+new_local_repository(
+    name = "sdl2",
+    build_file = "//third_party/sdl2:sdl2.BUILD",
+    path = "third_party/sdl2",
+)
+
+new_local_repository(
+    name = "sdl2_gfx",
+    build_file = "//third_party/sdl2_gfx:sdl2_gfx.BUILD",
+    path = "third_party/sdl2_gfx",
+)
+
+new_local_repository(
+    name = "sdl2_image",
+    build_file = "//third_party/sdl2_image:sdl2_image.BUILD",
+    path = "third_party/sdl2_image",
+)
+
+new_local_repository(
+    name = "sdl2_mixer",
+    build_file = "//third_party/sdl2_mixer:sdl2_mixer.BUILD",
+    path = "third_party/sdl2_mixer",
+)
+
+new_local_repository(
+    name = "sdl2_ttf",
+    build_file = "//third_party/sdl2_ttf:sdl2_ttf.BUILD",
+    path = "third_party/sdl2_ttf",
+)

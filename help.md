@@ -102,3 +102,14 @@ sudo apt install qttools5-dev-tools
 export QT_QPA_PLATFORM=wayland
 export QT_QPA_PLATFORM=xcb
 ```
+
+### SDL
+
+```bash
+# 安装音频驱动
+sudo apt install libpulse-dev
+
+# 源码编译 sdl2
+./configure
+make
+```
