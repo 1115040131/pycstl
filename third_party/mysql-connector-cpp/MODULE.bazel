@@ -1,0 +1,4 @@
+module(
+    name = "mysql-connector-cpp",
+    version = "0.0.1",
+)

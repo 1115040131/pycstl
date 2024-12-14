@@ -1,0 +1,4 @@
+module(
+    name = "sdl2_gfx",
+    version = "1.0.4",
+)

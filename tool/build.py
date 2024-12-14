@@ -102,8 +102,8 @@ def main():
         ),
 
         ######################### build for all #########################
-        "all": lambda args: run_bazel_build('//... -- -//hello_world', args=args),
-        "all_test": lambda args: run_bazel_test('//... -- -//hello_world', test_output=False, args=args),
+        "all": lambda args: run_bazel_build('//...', args=args + ['-- -//hello_world']),
+        "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args + ['-- -//hello_world']),
 
         ######################### build for chat #########################
         "chat": lambda args: run_bazel_build('//chat/...', args=args),

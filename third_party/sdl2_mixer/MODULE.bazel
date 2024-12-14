@@ -1,0 +1,4 @@
+module(
+    name = "sdl2_mixer",
+    version = "2.8.2",
+)
