@@ -1,0 +1,8 @@
+# 2.22.0
+cc_library(
+    name = "sdl2_ttf",
+    srcs = glob(["lib/*"]),
+    hdrs = glob(["include/SDL2/*.h"]),
+    includes = ["include/SDL2"],
+    visibility = ["//visibility:public"],
+)

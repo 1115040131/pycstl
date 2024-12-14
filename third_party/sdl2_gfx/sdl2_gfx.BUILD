@@ -1,0 +1,8 @@
+# 1.0.4
+cc_library(
+    name = "sdl2_gfx",
+    srcs = glob(["lib/*"]),
+    hdrs = glob(["include/SDL2/*.h"]),
+    includes = ["include/SDL2"],
+    visibility = ["//visibility:public"],
+)
