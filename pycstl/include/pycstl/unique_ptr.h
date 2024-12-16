@@ -1,9 +1,5 @@
 #pragma once
 
-#include <concepts>
-
-#include "pycstl/function.h"
-
 namespace pycstl {
 
 template <typename T, typename U = T>
