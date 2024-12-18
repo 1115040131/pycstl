@@ -222,6 +222,7 @@ def main():
 
         ######################### build for qt #########################
         "qt": lambda args: run_bazel_build('//qt/...', args=args),
+        "calculator": lambda args: run_bazel_run('//qt/calculator', args=args),
         "99table": lambda args: run_bazel_run('//qt/99table', args=args),
 
         ######################### build for sdl2 #########################

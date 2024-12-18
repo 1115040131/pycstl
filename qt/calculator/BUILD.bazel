@@ -1,0 +1,17 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_qt//:qt.bzl", "qt_cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+qt_cc_binary(
+    name = "calculator",
+    srcs = ["main.cpp"],
+    copts = STRICT_COPTS,
+    deps = [
+        "@rules_qt//:qt_widgets",
+    ],
+)
