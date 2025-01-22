@@ -106,10 +106,12 @@ export QT_QPA_PLATFORM=xcb
 ### SDL
 
 ```bash
-# 安装音频驱动
-sudo apt install libpulse-dev
+# 安装 configure make 工具
+sudo apt install automake autoconf libtool
+# 安装驱动
+sudo apt install libpulse-dev libxext-dev
 
-# 源码编译 sdl2
-./configure
-make
+# 强制使用无声驱动（dummy驱动）
+export SDL_AUDIODRIVER=dummy
+export AUDIODEV=null
 ```

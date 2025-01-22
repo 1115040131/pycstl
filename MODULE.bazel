@@ -17,6 +17,7 @@ bazel_dep(name = "glm", version = "1.0.0.bcr.1")
 bazel_dep(name = "grpc", version = "1.69.0", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "nlohmann_json", version = "3.11.3")
 bazel_dep(name = "platforms", version = "0.0.10")  # rules_qt need it
+bazel_dep(name = "rules_foreign_cc", version = "0.13.0")
 
 # Boost
 # Famous C++ library that has given rise to many new additions to the C++ Standard Library
@@ -76,34 +77,10 @@ register_toolchains(
 )
 
 # SDL2
-bazel_dep(name = "sdl2")
-local_path_override(
-    module_name = "sdl2",
-    path = "third_party/sdl2",
-)
-
 bazel_dep(name = "sdl2_gfx")
 local_path_override(
     module_name = "sdl2_gfx",
     path = "third_party/sdl2_gfx",
-)
-
-bazel_dep(name = "sdl2_image")
-local_path_override(
-    module_name = "sdl2_image",
-    path = "third_party/sdl2_image",
-)
-
-bazel_dep(name = "sdl2_mixer")
-local_path_override(
-    module_name = "sdl2_mixer",
-    path = "third_party/sdl2_mixer",
-)
-
-bazel_dep(name = "sdl2_ttf")
-local_path_override(
-    module_name = "sdl2_ttf",
-    path = "third_party/sdl2_ttf",
 )
 
 #-------------------------------------------------------------------------------------

@@ -13,11 +13,11 @@ cc_library(
     copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
+        "//sdl2",
+        "//sdl2:sdl2_image",
+        "//sdl2:sdl2_mixer",
+        "//sdl2:sdl2_ttf",
         "@eigen",
         "@fmt",
-        "@sdl2",
-        "@sdl2_image",
-        "@sdl2_mixer",
-        "@sdl2_ttf",
     ],
 )

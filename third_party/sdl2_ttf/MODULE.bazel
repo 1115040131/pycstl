@@ -1,4 +1,0 @@
-module(
-    name = "sdl2_ttf",
-    version = "2.22.0",
-)
