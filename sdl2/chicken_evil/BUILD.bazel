@@ -1,0 +1,16 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_binary(
+    name = "chicken_evil",
+    srcs = glob([
+        "src/**/*.cpp",
+        "include/**/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    data = glob(["assets/**"]),
+    includes = ["include"],
+    deps = [
+        "//common",
+        "//sdl2/common",
+    ],
+)

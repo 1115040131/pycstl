@@ -1,0 +1,23 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "common",
+    srcs = glob(["src/**/*.cpp"]),
+    hdrs = glob(["include/**/*.h"]),
+    copts = STRICT_COPTS,
+    includes = ["include"],
+    deps = [
+        "//sdl2",
+        "//sdl2:sdl2_image",
+        "//sdl2:sdl2_mixer",
+        "//sdl2:sdl2_ttf",
+        "@eigen",
+        "@fmt",
+    ],
+)
