@@ -1,5 +1,7 @@
 #include "shooter/scene_main.h"
 
+#include <algorithm>
+
 #include <SDL_image.h>
 
 #define ASSET_PATH "sdl2/shooter/assets/"
@@ -8,7 +10,7 @@
 namespace pyc {
 namespace sdl2 {
 
-void SceneMain::update() {}
+void SceneMain::update() { keyboardControl(); }
 
 void SceneMain::render() {
     SDL_Rect player_rect{
@@ -32,6 +34,25 @@ void SceneMain::init() {
 }
 
 void SceneMain::clean() {}
+
+void SceneMain::keyboardControl() {
+    auto key_board_state = SDL_GetKeyboardState(nullptr);
+    if (key_board_state[SDL_SCANCODE_W]) {
+        player_.position.y -= 0.5;
+    }
+    if (key_board_state[SDL_SCANCODE_S]) {
+        player_.position.y += 0.5;
+    }
+    if (key_board_state[SDL_SCANCODE_A]) {
+        player_.position.x -= 0.5;
+    }
+    if (key_board_state[SDL_SCANCODE_D]) {
+        player_.position.x += 0.5;
+    }
+
+    player_.position.x = std::clamp<float>(player_.position.x, 0, Game::kWindowWidth - player_.width);
+    player_.position.y = std::clamp<float>(player_.position.y, 0, Game::kWindowHeight - player_.height);
+}
 
 }  // namespace sdl2
 }  // namespace pyc

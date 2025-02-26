@@ -21,6 +21,9 @@ public:
     void clean() override;
 
 private:
+    void keyboardControl();
+
+private:
     Game& game_;
     Player player_;
 };
