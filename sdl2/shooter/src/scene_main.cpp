@@ -14,10 +14,13 @@ namespace sdl2 {
 void SceneMain::update(std::chrono::duration<double> delta) {
     keyboardControl(delta);
     playerProjectileUpdate(delta);
+    spwanEnemy(delta);
+    enemyUpdate(delta);
 }
 
 void SceneMain::render() {
     playerProjectileRender();
+    enemyRender();
 
     // 绘制玩家
     SDL_Rect player_rect{
@@ -32,6 +35,12 @@ void SceneMain::render() {
 void SceneMain::handleEvent(SDL_Event* event) { (void)event; }
 
 void SceneMain::init() {
+    // 生成随机数
+    std::random_device rd;
+    gen_ = std::mt19937(rd());
+    dis_ = std::uniform_real_distribution<double>(0, 1);
+
+    // 初始化玩家
     player_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/SpaceShip.png"));
     SDL_QueryTexture(player_.texture, nullptr, nullptr, &player_.width, &player_.height);
     player_.width /= 4;
@@ -39,6 +48,14 @@ void SceneMain::init() {
     player_.position.x = Game::kWindowWidth / 2 - player_.width / 2;
     player_.position.y = Game::kWindowHeight - player_.height;
 
+    // 初始化敌人原型
+    enemy_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/insect-2.png"));
+    SDL_QueryTexture(enemy_prototype_.texture, nullptr, nullptr, &enemy_prototype_.width,
+                     &enemy_prototype_.height);
+    enemy_prototype_.width /= 4;
+    enemy_prototype_.height /= 4;
+
+    // 初始化子弹原型
     projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/laser-1.png"));
     SDL_QueryTexture(projectile_prototype_.texture, nullptr, nullptr, &projectile_prototype_.width,
                      &projectile_prototype_.height);
@@ -47,9 +64,11 @@ void SceneMain::init() {
 }
 
 void SceneMain::clean() {
+    enemies_.clear();
     player_projectiles_.clear();
 
     SDL_DestroyTexture(player_.texture);
+    SDL_DestroyTexture(enemy_prototype_.texture);
     SDL_DestroyTexture(projectile_prototype_.texture);
 }
 
@@ -95,6 +114,36 @@ void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
 
     std::erase_if(player_projectiles_,
                   [](const auto& projectile) { return projectile.position.y + projectile.height < 0; });
+}
+
+void SceneMain::spwanEnemy(std::chrono::duration<double>) {
+    if (dis_(gen_) > 1.0 / 60) {
+        return;
+    }
+
+    auto enemy = enemy_prototype_;
+    enemy.position.x = dis_(gen_) * (Game::kWindowWidth - enemy.width);
+    enemies_.push_back(std::move(enemy));
+}
+
+void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
+    for (auto& enemy : enemies_) {
+        enemy.position.y += enemy.speed * delta.count();
+    }
+
+    std::erase_if(enemies_, [](const auto& enemy) { return enemy.position.y > Game::kWindowHeight; });
+}
+
+void SceneMain::enemyRender() {
+    for (const auto& enemy : enemies_) {
+        SDL_Rect enemy_rect{
+            static_cast<int>(enemy.position.x),
+            static_cast<int>(enemy.position.y),
+            enemy.width,
+            enemy.height,
+        };
+        SDL_RenderCopy(game_.renderer(), enemy.texture, nullptr, &enemy_rect);
+    }
 }
 
 void SceneMain::playerProjectileRender() {
