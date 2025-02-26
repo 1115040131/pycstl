@@ -1,5 +1,8 @@
 #include "shooter/game.h"
 
+#include <chrono>
+#include <thread>
+
 #include <SDL_image.h>
 #include <fmt/base.h>
 
@@ -8,12 +11,29 @@
 namespace pyc {
 namespace sdl2 {
 
+using namespace std::chrono_literals;
+
 void Game::run() {
+    constexpr auto kFrameTime = 1s / kFps;
+
+    auto last = std::chrono::steady_clock::now();
+
     while (is_running_) {
+        auto start = std::chrono::steady_clock::now();
+
         SDL_Event event{};
         handleEvent(&event);
-        update();
+
+        update(start - last);
+        last = start;
+
         render();
+
+        auto end = std::chrono::steady_clock::now();
+        auto elapsed = end - start;
+        if (elapsed < kFrameTime) {
+            std::this_thread::sleep_for(kFrameTime - elapsed);
+        }
     }
 }
 
@@ -66,7 +86,7 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     current_scene_->init();
 }
 
-void Game::update() { current_scene_->update(); }
+void Game::update(std::chrono::duration<double> delta) { current_scene_->update(delta); }
 
 void Game::render() {
     SDL_RenderClear(renderer_);

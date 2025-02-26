@@ -10,7 +10,7 @@
 namespace pyc {
 namespace sdl2 {
 
-void SceneMain::update() { keyboardControl(); }
+void SceneMain::update(std::chrono::duration<double> delta) { keyboardControl(delta); }
 
 void SceneMain::render() {
     SDL_Rect player_rect{
@@ -35,19 +35,19 @@ void SceneMain::init() {
 
 void SceneMain::clean() {}
 
-void SceneMain::keyboardControl() {
+void SceneMain::keyboardControl(std::chrono::duration<double> delta) {
     auto key_board_state = SDL_GetKeyboardState(nullptr);
     if (key_board_state[SDL_SCANCODE_W]) {
-        player_.position.y -= 0.5;
+        player_.position.y -= player_.speed * delta.count();
     }
     if (key_board_state[SDL_SCANCODE_S]) {
-        player_.position.y += 0.5;
+        player_.position.y += player_.speed * delta.count();
     }
     if (key_board_state[SDL_SCANCODE_A]) {
-        player_.position.x -= 0.5;
+        player_.position.x -= player_.speed * delta.count();
     }
     if (key_board_state[SDL_SCANCODE_D]) {
-        player_.position.x += 0.5;
+        player_.position.x += player_.speed * delta.count();
     }
 
     player_.position.x = std::clamp<float>(player_.position.x, 0, Game::kWindowWidth - player_.width);

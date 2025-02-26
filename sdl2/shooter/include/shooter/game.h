@@ -28,13 +28,14 @@ public:
 private:
     void changeScene(std::unique_ptr<Scene> scene);
 
-    void update();
+    void update(std::chrono::duration<double> delta);
     void render();
     void handleEvent(SDL_Event* event);
 
 public:
     static constexpr int kWindowWidth = 600;
     static constexpr int kWindowHeight = 800;
+    static constexpr double kFps = 60;
 
 private:
     bool is_running_ = false;

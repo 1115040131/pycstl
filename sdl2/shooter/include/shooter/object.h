@@ -10,6 +10,7 @@ struct Player {
     SDL_FPoint position{};
     int width{};
     int height{};
+    int speed{200};
 };
 
 }  // namespace sdl2

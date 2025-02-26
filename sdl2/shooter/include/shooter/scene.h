@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <SDL.h>
 
 namespace pyc {
@@ -9,7 +11,7 @@ class Scene {
 public:
     virtual ~Scene() = default;
 
-    virtual void update() = 0;
+    virtual void update(std::chrono::duration<double> delta) = 0;
     virtual void render() = 0;
     virtual void handleEvent(SDL_Event* event) = 0;
 

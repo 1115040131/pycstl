@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "shooter/game.h"
 #include "shooter/object.h"
 #include "shooter/scene.h"
@@ -13,7 +15,7 @@ public:
 
     virtual ~SceneMain() = default;
 
-    void update() override;
+    void update(std::chrono::duration<double> delta) override;
     void render() override;
     void handleEvent(SDL_Event* event) override;
 
@@ -21,7 +23,7 @@ public:
     void clean() override;
 
 private:
-    void keyboardControl();
+    void keyboardControl(std::chrono::duration<double> delta);
 
 private:
     Game& game_;
