@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <vector>
 
 #include "shooter/game.h"
 #include "shooter/object.h"
@@ -24,10 +25,16 @@ public:
 
 private:
     void keyboardControl(std::chrono::duration<double> delta);
+    void playerShoot();
+    void playerProjectileUpdate(std::chrono::duration<double> delta);
+
+    void playerProjectileRender();
 
 private:
     Game& game_;
     Player player_;
+    Projectile projectile_prototype_;
+    std::vector<Projectile> player_projectiles_;
 };
 
 }  // namespace sdl2
