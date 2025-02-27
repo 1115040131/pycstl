@@ -12,17 +12,27 @@ namespace pyc {
 namespace sdl2 {
 
 void SceneMain::update(std::chrono::duration<double> delta) {
-    keyboardControl(delta);
+    if (is_player_alive_) {
+        keyboardControl(delta);
+    }
     playerProjectileUpdate(delta);
     enemyProjectileUpdate(delta);
     spwanEnemy(delta);
     enemyUpdate(delta);
+    if (is_player_alive_) {
+        playerUpdate(delta);
+    }
+
+    // fmt::print("enemy: {} player_projectiles: {} enemy_projectiles: {}\n", enemies_.size(),
+    //            player_projectiles_.size(), enemy_projectiles_.size());
 }
 
 void SceneMain::render() {
     playerProjectileRender();
     enemyProjectileRender();
-    playerRender();
+    if (is_player_alive_) {
+        playerRender();
+    }
     enemyRender();
 }
 
@@ -103,29 +113,73 @@ void SceneMain::keyboardControl(std::chrono::duration<double> delta) {
 }
 
 void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
-    for (auto iter = player_projectiles_.begin(); iter != player_projectiles_.end();) {
-        auto& projectile = *iter;
+    for (auto& projectile : player_projectiles_) {
         projectile.position.y -= projectile.speed * delta.count();
         if (projectile.position.y + projectile.height < 0) {
-            iter = player_projectiles_.erase(iter);
-        } else {
-            ++iter;
+            projectile.valid = false;
+            continue;
+        }
+
+        SDL_Rect projectile_rect{
+            static_cast<int>(projectile.position.x),
+            static_cast<int>(projectile.position.y),
+            projectile.width,
+            projectile.height,
+        };
+        for (auto& enemy : enemies_) {
+            if (!enemy.valid) {
+                continue;
+            }
+
+            SDL_Rect enemy_rect{
+                static_cast<int>(enemy.position.x),
+                static_cast<int>(enemy.position.y),
+                enemy.width,
+                enemy.height,
+            };
+            if (SDL_HasIntersection(&projectile_rect, &enemy_rect)) {
+                projectile.valid = false;
+                enemy.health -= projectile.damage;
+                if (enemy.health <= 0) {
+                    enemyExplode(enemy);
+                    enemy.valid = false;
+                }
+                break;
+            }
         }
     }
+    std::erase_if(player_projectiles_, [](const auto& projectile) { return !projectile.valid; });
 }
 
 void SceneMain::enemyProjectileUpdate(std::chrono::duration<double> delta) {
-    for (auto iter = enemy_projectiles_.begin(); iter != enemy_projectiles_.end();) {
-        auto& projectile = *iter;
+    SDL_Rect player_rect{
+        static_cast<int>(player_.position.x),
+        static_cast<int>(player_.position.y),
+        player_.width,
+        player_.height,
+    };
+    for (auto& projectile : enemy_projectiles_) {
         projectile.position.x += projectile.direction.x * projectile.speed * delta.count();
         projectile.position.y += projectile.direction.y * projectile.speed * delta.count();
         if (projectile.position.x + projectile.width < 0 || projectile.position.x > Game::kWindowWidth ||
             projectile.position.y + projectile.height < 0 || projectile.position.y > Game::kWindowHeight) {
-            iter = enemy_projectiles_.erase(iter);
-        } else {
-            ++iter;
+            projectile.valid = false;
+            continue;
+        }
+
+        SDL_Rect projectile_rect{
+            static_cast<int>(projectile.position.x),
+            static_cast<int>(projectile.position.y),
+            projectile.width,
+            projectile.height,
+        };
+        if (is_player_alive_ && SDL_HasIntersection(&player_rect, &projectile_rect)) {
+            projectile.valid = false;
+            player_.health -= projectile.damage;
         }
     }
+
+    std::erase_if(enemy_projectiles_, [](const auto& projectile) { return !projectile.valid; });
 }
 
 void SceneMain::spwanEnemy(std::chrono::duration<double>) {
@@ -141,19 +195,51 @@ void SceneMain::spwanEnemy(std::chrono::duration<double>) {
 void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
     auto now = std::chrono::steady_clock::now();
 
-    for (auto iter = enemies_.begin(); iter != enemies_.end();) {
-        auto& enemy = *iter;
+    SDL_Rect player_rect{
+        static_cast<int>(player_.position.x),
+        static_cast<int>(player_.position.y),
+        player_.width,
+        player_.height,
+    };
+
+    for (auto& enemy : enemies_) {
+        if (!enemy.valid) {
+            continue;
+        }
+
         enemy.position.y += enemy.speed * delta.count();
         if (enemy.position.y > Game::kWindowHeight) {
-            iter = enemies_.erase(iter);
-        } else {
+            enemy.valid = false;
+            continue;
+        }
+
+        if (is_player_alive_) {
+            SDL_Rect enemy_rect{
+                static_cast<int>(enemy.position.x),
+                static_cast<int>(enemy.position.y),
+                enemy.width,
+                enemy.height,
+            };
+            if (SDL_HasIntersection(&player_rect, &enemy_rect)) {
+                player_.health--;
+                enemy.valid = false;
+                continue;
+            }
+
             if (enemy.last_fire + enemy.cool_down < now) {
                 enemy.last_fire = now;
                 enemyShoot(enemy);
             }
-
-            ++iter;
         }
+    }
+
+    std::erase_if(enemies_, [](const auto& enemy) { return !enemy.valid; });
+}
+
+void SceneMain::playerUpdate(std::chrono::duration<double>) {
+    if (player_.health <= 0) {
+        // TODO: game over
+        is_player_alive_ = false;
     }
 }
 
@@ -172,6 +258,8 @@ void SceneMain::enemyShoot(const Enemy& enemy) {
         projectile.position, {player_.position.x + player_.width / 2, player_.position.y + player_.height / 2});
     enemy_projectiles_.push_back(std::move(projectile));
 }
+
+void SceneMain::enemyExplode(const Enemy&) {}
 
 void SceneMain::playerRender() {
     SDL_Rect player_rect{

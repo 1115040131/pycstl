@@ -14,8 +14,9 @@ struct Player {
     SDL_FPoint position{};
     int width{};
     int height{};
-    int speed{200};
-    std::chrono::duration<double> cool_down{0.5s};
+    int speed{300};
+    int health{3};
+    std::chrono::duration<double> cool_down{0.3s};
     std::chrono::time_point<std::chrono::steady_clock> last_fire{};
 };
 
@@ -24,9 +25,11 @@ struct Enemy {
     SDL_FPoint position{};
     int width{};
     int height{};
-    int speed{200};
-    std::chrono::duration<double> cool_down{1s};
+    int speed{150};
+    int health{2};
+    std::chrono::duration<double> cool_down{2s};
     std::chrono::time_point<std::chrono::steady_clock> last_fire{};
+    bool valid{true};
 };
 
 struct Projectile {
@@ -36,6 +39,8 @@ struct Projectile {
     int width{};
     int height{};
     int speed{400};
+    int damage{1};
+    bool valid{true};
 };
 
 }  // namespace sdl2

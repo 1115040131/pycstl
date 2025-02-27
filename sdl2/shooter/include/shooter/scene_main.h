@@ -3,6 +3,7 @@
 #include <chrono>
 #include <list>
 #include <random>
+#include <vector>
 
 #include "shooter/game.h"
 #include "shooter/object.h"
@@ -31,9 +32,11 @@ private:
     void enemyProjectileUpdate(std::chrono::duration<double> delta);
     void spwanEnemy(std::chrono::duration<double> delta);
     void enemyUpdate(std::chrono::duration<double> delta);
+    void playerUpdate(std::chrono::duration<double> delta);
 
     void playerShoot();
     void enemyShoot(const Enemy& enemy);
+    void enemyExplode(const Enemy& enemy);
 
     // render
     void playerRender();
@@ -47,18 +50,19 @@ private:
 private:
     Game& game_;
     Player player_;
+    bool is_player_alive_{true};
 
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
 
     Enemy enemy_prototype_;
-    std::list<Enemy> enemies_;
+    std::vector<Enemy> enemies_;
 
     Projectile player_projectile_prototype_;
-    std::list<Projectile> player_projectiles_;
+    std::vector<Projectile> player_projectiles_;
 
     Projectile enemy_player_projectile_prototype_;
-    std::list<Projectile> enemy_projectiles_;
+    std::vector<Projectile> enemy_projectiles_;
 };
 
 }  // namespace sdl2
