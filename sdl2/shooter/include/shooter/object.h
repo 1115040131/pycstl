@@ -25,11 +25,14 @@ struct Enemy {
     int width{};
     int height{};
     int speed{200};
+    std::chrono::duration<double> cool_down{1s};
+    std::chrono::time_point<std::chrono::steady_clock> last_fire{};
 };
 
 struct Projectile {
     SDL_Texture* texture{};
     SDL_FPoint position{};
+    SDL_FPoint direction{};
     int width{};
     int height{};
     int speed{400};

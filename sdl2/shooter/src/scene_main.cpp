@@ -14,22 +14,16 @@ namespace sdl2 {
 void SceneMain::update(std::chrono::duration<double> delta) {
     keyboardControl(delta);
     playerProjectileUpdate(delta);
+    enemyProjectileUpdate(delta);
     spwanEnemy(delta);
     enemyUpdate(delta);
 }
 
 void SceneMain::render() {
     playerProjectileRender();
+    enemyProjectileRender();
+    playerRender();
     enemyRender();
-
-    // 绘制玩家
-    SDL_Rect player_rect{
-        static_cast<int>(player_.position.x),
-        static_cast<int>(player_.position.y),
-        player_.width,
-        player_.height,
-    };
-    SDL_RenderCopy(game_.renderer(), player_.texture, nullptr, &player_rect);
 }
 
 void SceneMain::handleEvent(SDL_Event* event) { (void)event; }
@@ -56,20 +50,28 @@ void SceneMain::init() {
     enemy_prototype_.height /= 4;
 
     // 初始化子弹原型
-    projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/laser-1.png"));
-    SDL_QueryTexture(projectile_prototype_.texture, nullptr, nullptr, &projectile_prototype_.width,
-                     &projectile_prototype_.height);
-    projectile_prototype_.width /= 4;
-    projectile_prototype_.height /= 4;
+    player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/laser-1.png"));
+    SDL_QueryTexture(player_projectile_prototype_.texture, nullptr, nullptr, &player_projectile_prototype_.width,
+                     &player_projectile_prototype_.height);
+    player_projectile_prototype_.width /= 4;
+    player_projectile_prototype_.height /= 4;
+
+    enemy_player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/bullet-1.png"));
+    SDL_QueryTexture(enemy_player_projectile_prototype_.texture, nullptr, nullptr,
+                     &enemy_player_projectile_prototype_.width, &enemy_player_projectile_prototype_.height);
+    enemy_player_projectile_prototype_.width /= 4;
+    enemy_player_projectile_prototype_.height /= 4;
 }
 
 void SceneMain::clean() {
     enemies_.clear();
     player_projectiles_.clear();
+    enemy_projectiles_.clear();
 
     SDL_DestroyTexture(player_.texture);
     SDL_DestroyTexture(enemy_prototype_.texture);
-    SDL_DestroyTexture(projectile_prototype_.texture);
+    SDL_DestroyTexture(player_projectile_prototype_.texture);
+    SDL_DestroyTexture(enemy_player_projectile_prototype_.texture);
 }
 
 void SceneMain::keyboardControl(std::chrono::duration<double> delta) {
@@ -93,27 +95,37 @@ void SceneMain::keyboardControl(std::chrono::duration<double> delta) {
 
     // 玩家射击
     if (key_board_state[SDL_SCANCODE_J]) {
-        if (std::chrono::steady_clock::now() - player_.last_fire > player_.cool_down) {
+        if (player_.last_fire + player_.cool_down < std::chrono::steady_clock::now()) {
             player_.last_fire = std::chrono::steady_clock::now();
             playerShoot();
         }
     }
 }
 
-void SceneMain::playerShoot() {
-    auto projectile = projectile_prototype_;
-    projectile.position.x = player_.position.x + player_.width / 2 - projectile.width / 2;
-    projectile.position.y = player_.position.y - projectile.height;
-    player_projectiles_.push_back(std::move(projectile));
+void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
+    for (auto iter = player_projectiles_.begin(); iter != player_projectiles_.end();) {
+        auto& projectile = *iter;
+        projectile.position.y -= projectile.speed * delta.count();
+        if (projectile.position.y + projectile.height < 0) {
+            iter = player_projectiles_.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
 }
 
-void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
-    for (auto& projectile : player_projectiles_) {
-        projectile.position.y -= projectile.speed * delta.count();
+void SceneMain::enemyProjectileUpdate(std::chrono::duration<double> delta) {
+    for (auto iter = enemy_projectiles_.begin(); iter != enemy_projectiles_.end();) {
+        auto& projectile = *iter;
+        projectile.position.x += projectile.direction.x * projectile.speed * delta.count();
+        projectile.position.y += projectile.direction.y * projectile.speed * delta.count();
+        if (projectile.position.x + projectile.width < 0 || projectile.position.x > Game::kWindowWidth ||
+            projectile.position.y + projectile.height < 0 || projectile.position.y > Game::kWindowHeight) {
+            iter = enemy_projectiles_.erase(iter);
+        } else {
+            ++iter;
+        }
     }
-
-    std::erase_if(player_projectiles_,
-                  [](const auto& projectile) { return projectile.position.y + projectile.height < 0; });
 }
 
 void SceneMain::spwanEnemy(std::chrono::duration<double>) {
@@ -127,11 +139,48 @@ void SceneMain::spwanEnemy(std::chrono::duration<double>) {
 }
 
 void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
-    for (auto& enemy : enemies_) {
-        enemy.position.y += enemy.speed * delta.count();
-    }
+    auto now = std::chrono::steady_clock::now();
 
-    std::erase_if(enemies_, [](const auto& enemy) { return enemy.position.y > Game::kWindowHeight; });
+    for (auto iter = enemies_.begin(); iter != enemies_.end();) {
+        auto& enemy = *iter;
+        enemy.position.y += enemy.speed * delta.count();
+        if (enemy.position.y > Game::kWindowHeight) {
+            iter = enemies_.erase(iter);
+        } else {
+            if (enemy.last_fire + enemy.cool_down < now) {
+                enemy.last_fire = now;
+                enemyShoot(enemy);
+            }
+
+            ++iter;
+        }
+    }
+}
+
+void SceneMain::playerShoot() {
+    auto projectile = player_projectile_prototype_;
+    projectile.position.x = player_.position.x + player_.width / 2 - projectile.width / 2;
+    projectile.position.y = player_.position.y - projectile.height;
+    player_projectiles_.push_back(std::move(projectile));
+}
+
+void SceneMain::enemyShoot(const Enemy& enemy) {
+    auto projectile = enemy_player_projectile_prototype_;
+    projectile.position.x = enemy.position.x + enemy.width / 2 - projectile.width / 2;
+    projectile.position.y = enemy.position.y + enemy.height;
+    projectile.direction = getDirection(
+        projectile.position, {player_.position.x + player_.width / 2, player_.position.y + player_.height / 2});
+    enemy_projectiles_.push_back(std::move(projectile));
+}
+
+void SceneMain::playerRender() {
+    SDL_Rect player_rect{
+        static_cast<int>(player_.position.x),
+        static_cast<int>(player_.position.y),
+        player_.width,
+        player_.height,
+    };
+    SDL_RenderCopy(game_.renderer(), player_.texture, nullptr, &player_rect);
 }
 
 void SceneMain::enemyRender() {
@@ -156,6 +205,27 @@ void SceneMain::playerProjectileRender() {
         };
         SDL_RenderCopy(game_.renderer(), projectile.texture, nullptr, &projectile_rect);
     }
+}
+
+void SceneMain::enemyProjectileRender() {
+    for (const auto& projectile : enemy_projectiles_) {
+        SDL_Rect projectile_rect{
+            static_cast<int>(projectile.position.x),
+            static_cast<int>(projectile.position.y),
+            projectile.width,
+            projectile.height,
+        };
+        auto angle = std::atan2(projectile.direction.y, projectile.direction.x) * 180 / M_PI - 90;
+        SDL_RenderCopyEx(game_.renderer(), projectile.texture, nullptr, &projectile_rect, angle, nullptr,
+                         SDL_FLIP_VERTICAL);
+    }
+}
+
+SDL_FPoint SceneMain::getDirection(const SDL_FPoint& from, const SDL_FPoint& to) {
+    auto dx = to.x - from.x;
+    auto dy = to.y - from.y;
+    auto length = std::sqrt(dx * dx + dy * dy);
+    return {dx / length, dy / length};
 }
 
 }  // namespace sdl2

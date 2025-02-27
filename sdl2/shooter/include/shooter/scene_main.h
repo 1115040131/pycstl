@@ -1,8 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <list>
 #include <random>
-#include <vector>
 
 #include "shooter/game.h"
 #include "shooter/object.h"
@@ -25,14 +25,24 @@ public:
     void clean() override;
 
 private:
+    // update
     void keyboardControl(std::chrono::duration<double> delta);
-    void playerShoot();
     void playerProjectileUpdate(std::chrono::duration<double> delta);
+    void enemyProjectileUpdate(std::chrono::duration<double> delta);
     void spwanEnemy(std::chrono::duration<double> delta);
     void enemyUpdate(std::chrono::duration<double> delta);
 
+    void playerShoot();
+    void enemyShoot(const Enemy& enemy);
+
+    // render
+    void playerRender();
     void enemyRender();
     void playerProjectileRender();
+    void enemyProjectileRender();
+
+    // helper
+    SDL_FPoint getDirection(const SDL_FPoint& from, const SDL_FPoint& to);
 
 private:
     Game& game_;
@@ -42,10 +52,13 @@ private:
     std::uniform_real_distribution<double> dis_;
 
     Enemy enemy_prototype_;
-    std::vector<Enemy> enemies_;
+    std::list<Enemy> enemies_;
 
-    Projectile projectile_prototype_;
-    std::vector<Projectile> player_projectiles_;
+    Projectile player_projectile_prototype_;
+    std::list<Projectile> player_projectiles_;
+
+    Projectile enemy_player_projectile_prototype_;
+    std::list<Projectile> enemy_projectiles_;
 };
 
 }  // namespace sdl2
