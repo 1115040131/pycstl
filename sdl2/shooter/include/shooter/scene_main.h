@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <list>
 #include <random>
 #include <vector>
 
@@ -33,6 +32,7 @@ private:
     void spwanEnemy(std::chrono::duration<double> delta);
     void enemyUpdate(std::chrono::duration<double> delta);
     void playerUpdate(std::chrono::duration<double> delta);
+    void explosionUpdate(std::chrono::duration<double> delta);
 
     void playerShoot();
     void enemyShoot(const Enemy& enemy);
@@ -43,6 +43,7 @@ private:
     void enemyRender();
     void playerProjectileRender();
     void enemyProjectileRender();
+    void explosionRender();
 
     // helper
     SDL_FPoint getDirection(const SDL_FPoint& from, const SDL_FPoint& to);
@@ -63,6 +64,9 @@ private:
 
     Projectile enemy_player_projectile_prototype_;
     std::vector<Projectile> enemy_projectiles_;
+
+    Explosion explosion_prototype_;
+    std::vector<Explosion> explosions_;
 };
 
 }  // namespace sdl2

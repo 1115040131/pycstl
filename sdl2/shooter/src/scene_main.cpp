@@ -22,9 +22,10 @@ void SceneMain::update(std::chrono::duration<double> delta) {
     if (is_player_alive_) {
         playerUpdate(delta);
     }
+    explosionUpdate(delta);
 
-    // fmt::print("enemy: {} player_projectiles: {} enemy_projectiles: {}\n", enemies_.size(),
-    //            player_projectiles_.size(), enemy_projectiles_.size());
+    fmt::print("enemy: {} player_projectiles: {} enemy_projectiles: {} explosions_: {}\n", enemies_.size(),
+               player_projectiles_.size(), enemy_projectiles_.size(), explosions_.size());
 }
 
 void SceneMain::render() {
@@ -34,6 +35,7 @@ void SceneMain::render() {
         playerRender();
     }
     enemyRender();
+    explosionRender();
 }
 
 void SceneMain::handleEvent(SDL_Event* event) { (void)event; }
@@ -71,6 +73,13 @@ void SceneMain::init() {
                      &enemy_player_projectile_prototype_.width, &enemy_player_projectile_prototype_.height);
     enemy_player_projectile_prototype_.width /= 4;
     enemy_player_projectile_prototype_.height /= 4;
+
+    // 初始化爆炸原型
+    explosion_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("effect/explosion.png"));
+    SDL_QueryTexture(explosion_prototype_.texture, nullptr, nullptr, &explosion_prototype_.width,
+                     &explosion_prototype_.height);
+    explosion_prototype_.total_frame = explosion_prototype_.width / explosion_prototype_.height;
+    explosion_prototype_.width = explosion_prototype_.height;
 }
 
 void SceneMain::clean() {
@@ -240,7 +249,27 @@ void SceneMain::playerUpdate(std::chrono::duration<double>) {
     if (player_.health <= 0) {
         // TODO: game over
         is_player_alive_ = false;
+
+        auto explosion = explosion_prototype_;
+        explosion.position = {
+            player_.position.x + player_.width / 2 - explosion.width / 2,
+            player_.position.y + player_.height / 2 - explosion.height / 2,
+        };
+        explosion.start = std::chrono::steady_clock::now();
+        explosions_.push_back(std::move(explosion));
     }
+}
+
+void SceneMain::explosionUpdate(std::chrono::duration<double>) {
+    auto now = std::chrono::steady_clock::now();
+    for (auto& explosion : explosions_) {
+        if (explosion.start + explosion.frame_delay * (explosion.current_frame + 1) < now) {
+            explosion.current_frame++;
+        }
+    }
+
+    std::erase_if(explosions_,
+                  [](const auto& explosion) { return explosion.current_frame >= explosion.total_frame; });
 }
 
 void SceneMain::playerShoot() {
@@ -259,7 +288,15 @@ void SceneMain::enemyShoot(const Enemy& enemy) {
     enemy_projectiles_.push_back(std::move(projectile));
 }
 
-void SceneMain::enemyExplode(const Enemy&) {}
+void SceneMain::enemyExplode(const Enemy& enemy) {
+    auto explosion = explosion_prototype_;
+    explosion.position = {
+        enemy.position.x + enemy.width / 2 - explosion.width / 2,
+        enemy.position.y + enemy.height / 2 - explosion.height / 2,
+    };
+    explosion.start = std::chrono::steady_clock::now();
+    explosions_.push_back(std::move(explosion));
+}
 
 void SceneMain::playerRender() {
     SDL_Rect player_rect{
@@ -306,6 +343,24 @@ void SceneMain::enemyProjectileRender() {
         auto angle = std::atan2(projectile.direction.y, projectile.direction.x) * 180 / M_PI - 90;
         SDL_RenderCopyEx(game_.renderer(), projectile.texture, nullptr, &projectile_rect, angle, nullptr,
                          SDL_FLIP_VERTICAL);
+    }
+}
+
+void SceneMain::explosionRender() {
+    for (const auto& explosion : explosions_) {
+        SDL_Rect src{
+            explosion.current_frame * explosion.height,
+            0,
+            explosion.height,
+            explosion.height,
+        };
+        SDL_Rect dst{
+            static_cast<int>(explosion.position.x),
+            static_cast<int>(explosion.position.y),
+            explosion.width,
+            explosion.height,
+        };
+        SDL_RenderCopy(game_.renderer(), explosion.texture, &src, &dst);
     }
 }
 

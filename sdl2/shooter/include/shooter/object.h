@@ -43,5 +43,16 @@ struct Projectile {
     bool valid{true};
 };
 
+struct Explosion {
+    SDL_Texture* texture{};
+    SDL_FPoint position{};
+    int width{};
+    int height{};
+    int current_frame{};
+    int total_frame{};
+    std::chrono::time_point<std::chrono::steady_clock> start{};
+    std::chrono::duration<double> frame_delay{100ms};
+};
+
 }  // namespace sdl2
 }  // namespace pyc
