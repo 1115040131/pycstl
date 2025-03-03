@@ -51,6 +51,7 @@ private:
     void enemyProjectileRender();
     void explosionRender();
     void itemRender();
+    void uiRender();
 
     // helper
     SDL_FPoint getDirection(const SDL_FPoint& from, const SDL_FPoint& to);
@@ -62,6 +63,7 @@ private:
     Player player_;
     bool is_player_alive_{true};
     Mix_Music* bgm_{};
+    SDL_Texture* ui_health_{};
 
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
