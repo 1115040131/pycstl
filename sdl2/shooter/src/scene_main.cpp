@@ -5,8 +5,7 @@
 #include <SDL_image.h>
 #include <fmt/base.h>
 
-#define ASSET_PATH "sdl2/shooter/assets/"
-#define ASSET(filename) (ASSET_PATH filename)
+
 
 namespace pyc {
 namespace sdl2 {

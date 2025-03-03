@@ -78,5 +78,14 @@ struct Item {
     bool valid{true};
 };
 
+struct Background {
+    SDL_Texture* texture{};
+    SDL_FPoint position{};
+    float offset{};
+    int width{};
+    int height{};
+    int speed{30};
+};
+
 }  // namespace sdl2
 }  // namespace pyc

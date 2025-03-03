@@ -79,6 +79,26 @@ void Game::init() {
     Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
     Mix_Volume(-1, MIX_MAX_VOLUME / 4);
 
+    // 初始化背景
+    near_stars_.texture = IMG_LoadTexture(renderer_, ASSET("image/Stars-A.png"));
+    if (!near_stars_.texture) {
+        fmt::println("IMG_LoadTexture: {}", IMG_GetError());
+        return;
+    }
+    SDL_QueryTexture(near_stars_.texture, nullptr, nullptr, &near_stars_.width, &near_stars_.height);
+    near_stars_.width /= 2;
+    near_stars_.height /= 2;
+
+    far_stars_.texture = IMG_LoadTexture(renderer_, ASSET("image/Stars-B.png"));
+    if (!far_stars_.texture) {
+        fmt::println("IMG_LoadTexture: {}", IMG_GetError());
+        return;
+    }
+    SDL_QueryTexture(far_stars_.texture, nullptr, nullptr, &far_stars_.width, &far_stars_.height);
+    far_stars_.width /= 2;
+    far_stars_.height /= 2;
+    far_stars_.speed = 20;
+
     is_running_ = true;
     changeScene(std::make_unique<SceneMain>());
 }
@@ -88,6 +108,9 @@ void Game::clean() {
     if (current_scene_) {
         current_scene_->clean();
     }
+
+    SDL_DestroyTexture(near_stars_.texture);
+    SDL_DestroyTexture(far_stars_.texture);
 
     IMG_Quit();
 
@@ -107,10 +130,14 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     current_scene_->init();
 }
 
-void Game::update(std::chrono::duration<double> delta) { current_scene_->update(delta); }
+void Game::update(std::chrono::duration<double> delta) {
+    backgroundUpdate(delta);
+    current_scene_->update(delta);
+}
 
 void Game::render() {
     SDL_RenderClear(renderer_);
+    backgroundRender();
     current_scene_->render();
     SDL_RenderPresent(renderer_);
 }
@@ -121,6 +148,33 @@ void Game::handleEvent(SDL_Event* event) {
             is_running_ = false;
         }
         current_scene_->handleEvent(event);
+    }
+}
+
+void Game::backgroundUpdate(std::chrono::duration<double> delta) {
+    near_stars_.offset += near_stars_.speed * delta.count();
+    if (near_stars_.offset > 0) {
+        near_stars_.offset -= near_stars_.height;
+    }
+
+    far_stars_.offset += far_stars_.speed * delta.count();
+    if (far_stars_.offset > 0) {
+        far_stars_.offset -= far_stars_.height;
+    }
+}
+
+void Game::backgroundRender() {
+    for (int y = far_stars_.offset; y < kWindowHeight; y += far_stars_.height) {
+        for (int x = 0; x < kWindowWidth; x += far_stars_.width) {
+            SDL_Rect dst{x, y, far_stars_.width, far_stars_.height};
+            SDL_RenderCopy(renderer_, far_stars_.texture, nullptr, &dst);
+        }
+    }
+    for (int y = near_stars_.offset; y < kWindowHeight; y += near_stars_.height) {
+        for (int x = 0; x < kWindowWidth; x += near_stars_.width) {
+            SDL_Rect dst{x, y, near_stars_.width, near_stars_.height};
+            SDL_RenderCopy(renderer_, near_stars_.texture, nullptr, &dst);
+        }
     }
 }
 

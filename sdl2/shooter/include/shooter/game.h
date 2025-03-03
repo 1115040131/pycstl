@@ -5,7 +5,11 @@
 #include <SDL.h>
 
 #include "common/singleton.h"
+#include "shooter/object.h"
 #include "shooter/scene.h"
+
+#define ASSET_PATH "sdl2/shooter/assets/"
+#define ASSET(filename) (ASSET_PATH filename)
 
 namespace pyc {
 namespace sdl2 {
@@ -26,11 +30,15 @@ public:
     SDL_Renderer* renderer() const { return renderer_; }
 
 private:
-    void changeScene(std::unique_ptr<Scene> scene);
-
     void update(std::chrono::duration<double> delta);
     void render();
     void handleEvent(SDL_Event* event);
+
+    void changeScene(std::unique_ptr<Scene> scene);
+
+    void backgroundUpdate(std::chrono::duration<double> delta);
+
+    void backgroundRender();
 
 public:
     static constexpr int kWindowWidth = 600;
@@ -42,6 +50,9 @@ private:
     std::unique_ptr<Scene> current_scene_ = nullptr;
     SDL_Window* window_ = nullptr;
     SDL_Renderer* renderer_ = nullptr;
+
+    Background near_stars_;
+    Background far_stars_;
 };
 
 }  // namespace sdl2
