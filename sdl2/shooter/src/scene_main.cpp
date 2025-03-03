@@ -44,6 +44,22 @@ void SceneMain::render() {
 void SceneMain::handleEvent(SDL_Event* event) { (void)event; }
 
 void SceneMain::init() {
+    // 载入 bgm
+    bgm_ = Mix_LoadMUS(ASSET("music/03_Racing_Through_Asteroids_Loop.ogg"));
+    if (!bgm_) {
+        fmt::println("Mix_LoadMUS: {}", Mix_GetError());
+        return;
+    }
+    Mix_PlayMusic(bgm_, -1);
+
+    // 读取音效
+    sounds_[to_underlying(Sound::kPlayerShoot)] = Mix_LoadWAV(ASSET("sound/laser_shoot4.wav"));
+    sounds_[to_underlying(Sound::kEnemyShoot)] = Mix_LoadWAV(ASSET("sound/xs_laser.wav"));
+    sounds_[to_underlying(Sound::kPlayerExplode)] = Mix_LoadWAV(ASSET("sound/explosion1.wav"));
+    sounds_[to_underlying(Sound::kEnemyExplode)] = Mix_LoadWAV(ASSET("sound/explosion3.wav"));
+    sounds_[to_underlying(Sound::kHit)] = Mix_LoadWAV(ASSET("sound/eff11.wav"));
+    sounds_[to_underlying(Sound::kGetItem)] = Mix_LoadWAV(ASSET("sound/eff5.wav"));
+
     // 生成随机数
     std::random_device rd;
     gen_ = std::mt19937(rd());
@@ -98,6 +114,9 @@ void SceneMain::clean() {
     enemy_projectiles_.clear();
     explosions_.clear();
     items_.clear();
+    for (auto& sound : sounds_) {
+        Mix_FreeChunk(sound);
+    }
 
     SDL_DestroyTexture(player_.texture);
     SDL_DestroyTexture(enemy_prototype_.texture);
@@ -105,6 +124,9 @@ void SceneMain::clean() {
     SDL_DestroyTexture(enemy_player_projectile_prototype_.texture);
     SDL_DestroyTexture(explosion_prototype_.texture);
     SDL_DestroyTexture(item_life_prototype_.texture);
+
+    Mix_HaltMusic();
+    Mix_FreeMusic(bgm_);
 }
 
 void SceneMain::keyboardControl(std::chrono::duration<double> delta) {
@@ -153,6 +175,7 @@ void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
             if (SDL_HasIntersection(&projectile_rect, &enemy_rect)) {
                 projectile.valid = false;
                 enemy.health -= projectile.damage;
+                Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kHit)], 0);
                 if (enemy.health <= 0) {
                     enemyExplode(enemy);
                     enemy.valid = false;
@@ -178,6 +201,7 @@ void SceneMain::enemyProjectileUpdate(std::chrono::duration<double> delta) {
         if (is_player_alive_ && SDL_HasIntersection(&player_rect, &projectile_rect)) {
             projectile.valid = false;
             player_.health -= projectile.damage;
+            Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kHit)], 0);
         }
     }
 
@@ -239,6 +263,8 @@ void SceneMain::playerUpdate(std::chrono::duration<double>) {
         };
         explosion.start = std::chrono::steady_clock::now();
         explosions_.push_back(std::move(explosion));
+
+        Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kPlayerExplode)], 0);
     }
 }
 
@@ -281,7 +307,7 @@ void SceneMain::itemUpdate(std::chrono::duration<double> delta) {
         }
 
         auto item_rect = getRect(item.position, item.width, item.height);
-        if (SDL_HasIntersection(&player_rect, &item_rect)) {
+        if (is_player_alive_ && SDL_HasIntersection(&player_rect, &item_rect)) {
             playerGetItem(item);
             item.valid = false;
         }
@@ -295,6 +321,8 @@ void SceneMain::playerShoot() {
     projectile.position.x = player_.position.x + player_.width / 2 - projectile.width / 2;
     projectile.position.y = player_.position.y - projectile.height;
     player_projectiles_.push_back(std::move(projectile));
+
+    Mix_PlayChannel(0, sounds_[to_underlying(Sound::kPlayerShoot)], 0);
 }
 
 void SceneMain::playerGetItem(const Item& item) {
@@ -308,6 +336,7 @@ void SceneMain::playerGetItem(const Item& item) {
         default:
             break;
     }
+    Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kGetItem)], 0);
 }
 
 void SceneMain::enemyShoot(const Enemy& enemy) {
@@ -317,6 +346,8 @@ void SceneMain::enemyShoot(const Enemy& enemy) {
     projectile.direction = getDirection(
         projectile.position, {player_.position.x + player_.width / 2, player_.position.y + player_.height / 2});
     enemy_projectiles_.push_back(std::move(projectile));
+
+    Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kEnemyShoot)], 0);
 }
 
 void SceneMain::enemyExplode(const Enemy& enemy) {
@@ -327,6 +358,8 @@ void SceneMain::enemyExplode(const Enemy& enemy) {
     };
     explosion.start = std::chrono::steady_clock::now();
     explosions_.push_back(std::move(explosion));
+
+    Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kEnemyExplode)], 0);
 
     if (dis_(gen_) < 0.5) {
         dropItem(enemy);

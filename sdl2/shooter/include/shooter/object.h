@@ -9,6 +9,11 @@ namespace sdl2 {
 
 using namespace std::chrono_literals;
 
+template <typename Enum>
+constexpr std::underlying_type_t<Enum> to_underlying(Enum e) noexcept {
+    return static_cast<std::underlying_type_t<Enum>>(e);
+}
+
 struct Player {
     SDL_Texture* texture{};
     SDL_FPoint position{};

@@ -4,6 +4,8 @@
 #include <thread>
 
 #include <SDL_image.h>
+#include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #include <fmt/base.h>
 
 #include "shooter/scene_main.h"
@@ -61,6 +63,22 @@ void Game::init() {
         return;
     }
 
+    // 初始化 SDL_Mixer
+    if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) != (MIX_INIT_MP3 | MIX_INIT_OGG)) {
+        fmt::println("Mix_Init: {}", Mix_GetError());
+        return;
+    }
+    // 打开音频设备
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
+        fmt::println("Mix_OpenAudio: {}", Mix_GetError());
+        return;
+    }
+    // 设置 channel 数量
+    Mix_AllocateChannels(32);
+    // 设置音量
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+    Mix_Volume(-1, MIX_MAX_VOLUME / 4);
+
     is_running_ = true;
     changeScene(std::make_unique<SceneMain>());
 }
@@ -72,6 +90,9 @@ void Game::clean() {
     }
 
     IMG_Quit();
+
+    Mix_CloseAudio();
+    Mix_Quit();
 
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <array>
 #include <chrono>
 #include <random>
 #include <vector>
+
+#include <SDL_mixer.h>
 
 #include "shooter/game.h"
 #include "shooter/object.h"
@@ -58,6 +61,7 @@ private:
     Game& game_;
     Player player_;
     bool is_player_alive_{true};
+    Mix_Music* bgm_{};
 
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
@@ -76,6 +80,18 @@ private:
 
     Item item_life_prototype_;
     std::vector<Item> items_;
+
+    enum class Sound : size_t {
+        kPlayerShoot,
+        kEnemyShoot,
+        kPlayerExplode,
+        kEnemyExplode,
+        kHit,
+        kGetItem,
+
+        kCount,
+    };
+    std::array<Mix_Chunk*, to_underlying(Sound::kCount)> sounds_;
 };
 
 }  // namespace sdl2
