@@ -16,6 +16,7 @@ struct Player {
     int height{};
     int speed{300};
     int health{3};
+    int max_health{3};
     std::chrono::duration<double> cool_down{0.3s};
     std::chrono::time_point<std::chrono::steady_clock> last_fire{};
 };
@@ -52,6 +53,24 @@ struct Explosion {
     int total_frame{};
     std::chrono::time_point<std::chrono::steady_clock> start{};
     std::chrono::duration<double> frame_delay{100ms};
+};
+
+struct Item {
+    enum class Type {
+        kLife,
+        kShield,
+        kTime,
+    };
+
+    SDL_Texture* texture{};
+    SDL_FPoint position{};
+    SDL_FPoint direction{};
+    int width{};
+    int height{};
+    int speed{200};
+    int bounce_count{3};
+    Type type{};
+    bool valid{true};
 };
 
 }  // namespace sdl2

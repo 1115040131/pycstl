@@ -23,9 +23,11 @@ void SceneMain::update(std::chrono::duration<double> delta) {
         playerUpdate(delta);
     }
     explosionUpdate(delta);
+    itemUpdate(delta);
 
-    fmt::print("enemy: {} player_projectiles: {} enemy_projectiles: {} explosions_: {}\n", enemies_.size(),
-               player_projectiles_.size(), enemy_projectiles_.size(), explosions_.size());
+    fmt::println("enemy: {} player_projectiles: {} enemy_projectiles: {} explosions_: {} items_: {}",
+                 enemies_.size(), player_projectiles_.size(), enemy_projectiles_.size(), explosions_.size(),
+                 items_.size());
 }
 
 void SceneMain::render() {
@@ -35,6 +37,7 @@ void SceneMain::render() {
         playerRender();
     }
     enemyRender();
+    itemRender();
     explosionRender();
 }
 
@@ -80,17 +83,28 @@ void SceneMain::init() {
                      &explosion_prototype_.height);
     explosion_prototype_.total_frame = explosion_prototype_.width / explosion_prototype_.height;
     explosion_prototype_.width = explosion_prototype_.height;
+
+    // 初始化物品原型
+    item_life_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/bonus_life.png"));
+    SDL_QueryTexture(item_life_prototype_.texture, nullptr, nullptr, &item_life_prototype_.width,
+                     &item_life_prototype_.height);
+    item_life_prototype_.width /= 4;
+    item_life_prototype_.height /= 4;
 }
 
 void SceneMain::clean() {
     enemies_.clear();
     player_projectiles_.clear();
     enemy_projectiles_.clear();
+    explosions_.clear();
+    items_.clear();
 
     SDL_DestroyTexture(player_.texture);
     SDL_DestroyTexture(enemy_prototype_.texture);
     SDL_DestroyTexture(player_projectile_prototype_.texture);
     SDL_DestroyTexture(enemy_player_projectile_prototype_.texture);
+    SDL_DestroyTexture(explosion_prototype_.texture);
+    SDL_DestroyTexture(item_life_prototype_.texture);
 }
 
 void SceneMain::keyboardControl(std::chrono::duration<double> delta) {
@@ -129,23 +143,13 @@ void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
             continue;
         }
 
-        SDL_Rect projectile_rect{
-            static_cast<int>(projectile.position.x),
-            static_cast<int>(projectile.position.y),
-            projectile.width,
-            projectile.height,
-        };
+        auto projectile_rect = getRect(projectile.position, projectile.width, projectile.height);
         for (auto& enemy : enemies_) {
             if (!enemy.valid) {
                 continue;
             }
 
-            SDL_Rect enemy_rect{
-                static_cast<int>(enemy.position.x),
-                static_cast<int>(enemy.position.y),
-                enemy.width,
-                enemy.height,
-            };
+            auto enemy_rect = getRect(enemy.position, enemy.width, enemy.height);
             if (SDL_HasIntersection(&projectile_rect, &enemy_rect)) {
                 projectile.valid = false;
                 enemy.health -= projectile.damage;
@@ -161,27 +165,16 @@ void SceneMain::playerProjectileUpdate(std::chrono::duration<double> delta) {
 }
 
 void SceneMain::enemyProjectileUpdate(std::chrono::duration<double> delta) {
-    SDL_Rect player_rect{
-        static_cast<int>(player_.position.x),
-        static_cast<int>(player_.position.y),
-        player_.width,
-        player_.height,
-    };
+    auto player_rect = getRect(player_.position, player_.width, player_.height);
     for (auto& projectile : enemy_projectiles_) {
         projectile.position.x += projectile.direction.x * projectile.speed * delta.count();
         projectile.position.y += projectile.direction.y * projectile.speed * delta.count();
-        if (projectile.position.x + projectile.width < 0 || projectile.position.x > Game::kWindowWidth ||
-            projectile.position.y + projectile.height < 0 || projectile.position.y > Game::kWindowHeight) {
+        if (outOfWindow(projectile.position, projectile.width, projectile.height)) {
             projectile.valid = false;
             continue;
         }
 
-        SDL_Rect projectile_rect{
-            static_cast<int>(projectile.position.x),
-            static_cast<int>(projectile.position.y),
-            projectile.width,
-            projectile.height,
-        };
+        auto projectile_rect = getRect(projectile.position, projectile.width, projectile.height);
         if (is_player_alive_ && SDL_HasIntersection(&player_rect, &projectile_rect)) {
             projectile.valid = false;
             player_.health -= projectile.damage;
@@ -203,13 +196,7 @@ void SceneMain::spwanEnemy(std::chrono::duration<double>) {
 
 void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
     auto now = std::chrono::steady_clock::now();
-
-    SDL_Rect player_rect{
-        static_cast<int>(player_.position.x),
-        static_cast<int>(player_.position.y),
-        player_.width,
-        player_.height,
-    };
+    auto player_rect = getRect(player_.position, player_.width, player_.height);
 
     for (auto& enemy : enemies_) {
         if (!enemy.valid) {
@@ -223,12 +210,7 @@ void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
         }
 
         if (is_player_alive_) {
-            SDL_Rect enemy_rect{
-                static_cast<int>(enemy.position.x),
-                static_cast<int>(enemy.position.y),
-                enemy.width,
-                enemy.height,
-            };
+            auto enemy_rect = getRect(enemy.position, enemy.width, enemy.height);
             if (SDL_HasIntersection(&player_rect, &enemy_rect)) {
                 player_.health--;
                 enemy.valid = false;
@@ -272,11 +254,60 @@ void SceneMain::explosionUpdate(std::chrono::duration<double>) {
                   [](const auto& explosion) { return explosion.current_frame >= explosion.total_frame; });
 }
 
+void SceneMain::itemUpdate(std::chrono::duration<double> delta) {
+    auto player_rect = getRect(player_.position, player_.width, player_.height);
+    for (auto& item : items_) {
+        item.position.x += item.direction.x * item.speed * delta.count();
+        item.position.y += item.direction.y * item.speed * delta.count();
+
+        if (item.bounce_count > 0) {
+            bool bounce = false;
+            if (item.position.x < 0 || item.position.x + item.width > Game::kWindowWidth) {
+                item.direction.x = -item.direction.x;
+                bounce = true;
+            }
+            if (item.position.y < 0 || item.position.y + item.height > Game::kWindowHeight) {
+                item.direction.y = -item.direction.y;
+                bounce = true;
+            }
+            if (bounce) {
+                item.bounce_count--;
+            }
+        } else {
+            if (outOfWindow(item.position, item.width, item.height)) {
+                item.valid = false;
+                continue;
+            }
+        }
+
+        auto item_rect = getRect(item.position, item.width, item.height);
+        if (SDL_HasIntersection(&player_rect, &item_rect)) {
+            playerGetItem(item);
+            item.valid = false;
+        }
+    }
+
+    std::erase_if(items_, [](const auto& item) { return !item.valid; });
+}
+
 void SceneMain::playerShoot() {
     auto projectile = player_projectile_prototype_;
     projectile.position.x = player_.position.x + player_.width / 2 - projectile.width / 2;
     projectile.position.y = player_.position.y - projectile.height;
     player_projectiles_.push_back(std::move(projectile));
+}
+
+void SceneMain::playerGetItem(const Item& item) {
+    switch (item.type) {
+        case Item::Type::kLife:
+            if (player_.health < player_.max_health) {
+                player_.health++;
+            }
+            break;
+
+        default:
+            break;
+    }
 }
 
 void SceneMain::enemyShoot(const Enemy& enemy) {
@@ -296,50 +327,45 @@ void SceneMain::enemyExplode(const Enemy& enemy) {
     };
     explosion.start = std::chrono::steady_clock::now();
     explosions_.push_back(std::move(explosion));
+
+    if (dis_(gen_) < 0.5) {
+        dropItem(enemy);
+    }
+}
+
+void SceneMain::dropItem(const Enemy& enemy) {
+    auto item = item_life_prototype_;
+    item.position = {
+        enemy.position.x + enemy.width / 2 - item.width / 2,
+        enemy.position.y + enemy.height / 2 - item.height / 2,
+    };
+    auto angle = dis_(gen_) * 2 * M_PI;
+    item.direction = {static_cast<float>(std::cos(angle)), static_cast<float>(std::sin(angle))};
+    items_.push_back(std::move(item));
 }
 
 void SceneMain::playerRender() {
-    SDL_Rect player_rect{
-        static_cast<int>(player_.position.x),
-        static_cast<int>(player_.position.y),
-        player_.width,
-        player_.height,
-    };
+    auto player_rect = getRect(player_.position, player_.width, player_.height);
     SDL_RenderCopy(game_.renderer(), player_.texture, nullptr, &player_rect);
 }
 
 void SceneMain::enemyRender() {
     for (const auto& enemy : enemies_) {
-        SDL_Rect enemy_rect{
-            static_cast<int>(enemy.position.x),
-            static_cast<int>(enemy.position.y),
-            enemy.width,
-            enemy.height,
-        };
+        auto enemy_rect = getRect(enemy.position, enemy.width, enemy.height);
         SDL_RenderCopy(game_.renderer(), enemy.texture, nullptr, &enemy_rect);
     }
 }
 
 void SceneMain::playerProjectileRender() {
     for (const auto& projectile : player_projectiles_) {
-        SDL_Rect projectile_rect{
-            static_cast<int>(projectile.position.x),
-            static_cast<int>(projectile.position.y),
-            projectile.width,
-            projectile.height,
-        };
+        auto projectile_rect = getRect(projectile.position, projectile.width, projectile.height);
         SDL_RenderCopy(game_.renderer(), projectile.texture, nullptr, &projectile_rect);
     }
 }
 
 void SceneMain::enemyProjectileRender() {
     for (const auto& projectile : enemy_projectiles_) {
-        SDL_Rect projectile_rect{
-            static_cast<int>(projectile.position.x),
-            static_cast<int>(projectile.position.y),
-            projectile.width,
-            projectile.height,
-        };
+        auto projectile_rect = getRect(projectile.position, projectile.width, projectile.height);
         auto angle = std::atan2(projectile.direction.y, projectile.direction.x) * 180 / M_PI - 90;
         SDL_RenderCopyEx(game_.renderer(), projectile.texture, nullptr, &projectile_rect, angle, nullptr,
                          SDL_FLIP_VERTICAL);
@@ -354,13 +380,15 @@ void SceneMain::explosionRender() {
             explosion.height,
             explosion.height,
         };
-        SDL_Rect dst{
-            static_cast<int>(explosion.position.x),
-            static_cast<int>(explosion.position.y),
-            explosion.width,
-            explosion.height,
-        };
+        auto dst = getRect(explosion.position, explosion.width, explosion.height);
         SDL_RenderCopy(game_.renderer(), explosion.texture, &src, &dst);
+    }
+}
+
+void SceneMain::itemRender() {
+    for (const auto& item : items_) {
+        auto item_rect = getRect(item.position, item.width, item.height);
+        SDL_RenderCopy(game_.renderer(), item.texture, nullptr, &item_rect);
     }
 }
 
@@ -369,6 +397,20 @@ SDL_FPoint SceneMain::getDirection(const SDL_FPoint& from, const SDL_FPoint& to)
     auto dy = to.y - from.y;
     auto length = std::sqrt(dx * dx + dy * dy);
     return {dx / length, dy / length};
+}
+
+bool SceneMain::outOfWindow(const SDL_FPoint& position, int width, int height) {
+    return position.x + width < 0 || position.x > Game::kWindowWidth || position.y + height < 0 ||
+           position.y > Game::kWindowHeight;
+}
+
+SDL_Rect SceneMain::getRect(const SDL_FPoint& position, int width, int height) {
+    return {
+        static_cast<int>(position.x),
+        static_cast<int>(position.y),
+        width,
+        height,
+    };
 }
 
 }  // namespace sdl2

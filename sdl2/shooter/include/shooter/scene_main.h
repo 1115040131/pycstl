@@ -33,10 +33,13 @@ private:
     void enemyUpdate(std::chrono::duration<double> delta);
     void playerUpdate(std::chrono::duration<double> delta);
     void explosionUpdate(std::chrono::duration<double> delta);
+    void itemUpdate(std::chrono::duration<double> delta);
 
     void playerShoot();
+    void playerGetItem(const Item& item);
     void enemyShoot(const Enemy& enemy);
     void enemyExplode(const Enemy& enemy);
+    void dropItem(const Enemy& enemy);
 
     // render
     void playerRender();
@@ -44,9 +47,12 @@ private:
     void playerProjectileRender();
     void enemyProjectileRender();
     void explosionRender();
+    void itemRender();
 
     // helper
     SDL_FPoint getDirection(const SDL_FPoint& from, const SDL_FPoint& to);
+    bool outOfWindow(const SDL_FPoint& position, int width, int height);
+    SDL_Rect getRect(const SDL_FPoint& position, int width, int height);
 
 private:
     Game& game_;
@@ -67,6 +73,9 @@ private:
 
     Explosion explosion_prototype_;
     std::vector<Explosion> explosions_;
+
+    Item item_life_prototype_;
+    std::vector<Item> items_;
 };
 
 }  // namespace sdl2
