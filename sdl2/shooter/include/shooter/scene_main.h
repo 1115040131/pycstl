@@ -35,6 +35,7 @@ private:
     void playerUpdate(std::chrono::duration<double> delta);
     void explosionUpdate(std::chrono::duration<double> delta);
     void itemUpdate(std::chrono::duration<double> delta);
+    void changeSceneDelay(std::chrono::duration<double> delta);
 
     void playerShoot();
     void playerGetItem(const Item& item);
@@ -63,6 +64,7 @@ private:
     Mix_Music* bgm_{};
     SDL_Texture* ui_health_{};
     TTF_Font* score_font_{};
+    std::chrono::duration<double> time_end_{};
 
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;

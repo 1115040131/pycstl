@@ -7,6 +7,7 @@
 #include <fmt/format.h>
 
 #include "shooter/game.h"
+#include "shooter/scene_end.h"
 #include "shooter/scene_title.h"
 
 namespace pyc {
@@ -25,6 +26,9 @@ void SceneMain::update(std::chrono::duration<double> delta) {
     }
     explosionUpdate(delta);
     itemUpdate(delta);
+    if (!is_player_alive_) {
+        changeSceneDelay(delta);
+    }
 
     // fmt::println("enemy: {} player_projectiles: {} enemy_projectiles: {} explosions_: {} items_: {}",
     //              enemies_.size(), player_projectiles_.size(), enemy_projectiles_.size(), explosions_.size(),
@@ -45,7 +49,7 @@ void SceneMain::render() {
 
 void SceneMain::handleEvent(SDL_Event* event) {
     if (event->type == SDL_KEYDOWN) {
-        if (event->key.keysym.sym == SDL_SCANCODE_X) {
+        if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
             game_.changeScene(std::make_unique<SceneTitle>());
         }
     }
@@ -269,7 +273,6 @@ void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
 
 void SceneMain::playerUpdate(std::chrono::duration<double>) {
     if (player_.health <= 0) {
-        // TODO: game over
         is_player_alive_ = false;
 
         auto explosion = explosion_prototype_;
@@ -281,6 +284,8 @@ void SceneMain::playerUpdate(std::chrono::duration<double>) {
         explosions_.push_back(std::move(explosion));
 
         Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kPlayerExplode)], 0);
+
+        game_.setFinalScore(score_);
     }
 }
 
@@ -330,6 +335,13 @@ void SceneMain::itemUpdate(std::chrono::duration<double> delta) {
     }
 
     std::erase_if(items_, [](const auto& item) { return !item.valid; });
+}
+
+void SceneMain::changeSceneDelay(std::chrono::duration<double> delta) {
+    time_end_ += delta;
+    if (time_end_ > 3s) {
+        game_.changeScene(std::make_unique<SceneEnd>());
+    }
 }
 
 void SceneMain::playerShoot() {

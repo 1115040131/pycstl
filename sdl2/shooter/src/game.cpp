@@ -154,15 +154,22 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     current_scene_->init();
 }
 
-void Game::renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font) {
+SDL_Point Game::renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font) {
     auto surface = TTF_RenderUTF8_Blended(font, text.data(), {255, 255, 255, 255});
     auto texture = SDL_CreateTextureFromSurface(renderer_, surface);
-    SDL_Rect rect{
-        Game::kWindowWidth / 2 - surface->w / 2,
-        static_cast<int>((Game::kWindowHeight - surface->h) * y_percentage - surface->h / 2),
-        surface->w,
-        surface->h,
-    };
+    int y = static_cast<int>((Game::kWindowHeight - surface->h) * y_percentage) - surface->h / 2;
+    SDL_Rect rect{Game::kWindowWidth / 2 - surface->w / 2, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer_, texture, nullptr, &rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+
+    return {rect.x + rect.w, y};
+}
+
+void Game::renderText(std::string_view text, SDL_Point position, TTF_Font* font) {
+    auto surface = TTF_RenderUTF8_Blended(font, text.data(), {255, 255, 255, 255});
+    auto texture = SDL_CreateTextureFromSurface(renderer_, surface);
+    SDL_Rect rect{position.x, position.y, surface->w, surface->h};
     SDL_RenderCopy(renderer_, texture, nullptr, &rect);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);

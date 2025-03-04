@@ -33,8 +33,12 @@ public:
     TTF_Font* title_font() const { return title_font_; }
     TTF_Font* text_font() const { return text_font_; }
 
+    int finalScore() const { return final_score_; }
+    void setFinalScore(int score) { final_score_ = score; }
+
     void changeScene(std::unique_ptr<Scene> scene);
-    void renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font);
+    SDL_Point renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font);
+    void renderText(std::string_view text, SDL_Point position, TTF_Font* font);
 
 private:
     void update(std::chrono::duration<double> delta);
@@ -61,6 +65,8 @@ private:
 
     TTF_Font* title_font_ = nullptr;
     TTF_Font* text_font_ = nullptr;
+
+    int final_score_ = 0;
 };
 
 }  // namespace sdl2
