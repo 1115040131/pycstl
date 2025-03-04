@@ -9,6 +9,7 @@
 #include <fmt/base.h>
 
 #include "shooter/scene_main.h"
+#include "shooter/scene_title.h"
 
 namespace pyc {
 namespace sdl2 {
@@ -104,8 +105,21 @@ void Game::init() {
     far_stars_.height /= 2;
     far_stars_.speed = 20;
 
+    // 载入字体
+    title_font_ = TTF_OpenFont(ASSET("font/VonwaonBitmap-16px.ttf"), 64);
+    if (!title_font_) {
+        fmt::println("TTF_OpenFont: {}", TTF_GetError());
+        return;
+    }
+    text_font_ = TTF_OpenFont(ASSET("font/VonwaonBitmap-16px.ttf"), 32);
+    if (!text_font_) {
+        fmt::println("TTF_OpenFont: {}", TTF_GetError());
+        return;
+    }
+
     is_running_ = true;
-    changeScene(std::make_unique<SceneMain>());
+    // changeScene(std::make_unique<SceneMain>());
+    changeScene(std::make_unique<SceneTitle>());
 }
 
 void Game::clean() {
@@ -116,6 +130,9 @@ void Game::clean() {
 
     SDL_DestroyTexture(near_stars_.texture);
     SDL_DestroyTexture(far_stars_.texture);
+
+    TTF_CloseFont(title_font_);
+    TTF_CloseFont(text_font_);
 
     IMG_Quit();
 
@@ -135,6 +152,20 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     }
     current_scene_ = std::move(scene);
     current_scene_->init();
+}
+
+void Game::renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font) {
+    auto surface = TTF_RenderUTF8_Blended(font, text.data(), {255, 255, 255, 255});
+    auto texture = SDL_CreateTextureFromSurface(renderer_, surface);
+    SDL_Rect rect{
+        Game::kWindowWidth / 2 - surface->w / 2,
+        static_cast<int>((Game::kWindowHeight - surface->h) * y_percentage - surface->h / 2),
+        surface->w,
+        surface->h,
+    };
+    SDL_RenderCopy(renderer_, texture, nullptr, &rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 void Game::update(std::chrono::duration<double> delta) {

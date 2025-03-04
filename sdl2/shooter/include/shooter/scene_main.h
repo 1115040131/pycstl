@@ -8,7 +8,6 @@
 #include <SDL_mixer.h>
 #include <SDL_ttf.h>
 
-#include "shooter/game.h"
 #include "shooter/object.h"
 #include "shooter/scene.h"
 
@@ -17,8 +16,6 @@ namespace sdl2 {
 
 class SceneMain : public Scene {
 public:
-    SceneMain() : game_(Game::GetInstance()) {}
-
     virtual ~SceneMain() = default;
 
     void update(std::chrono::duration<double> delta) override;
@@ -60,7 +57,6 @@ private:
     SDL_Rect getRect(const SDL_FPoint& position, int width, int height);
 
 private:
-    Game& game_;
     Player player_;
     bool is_player_alive_{true};
     int score_{};

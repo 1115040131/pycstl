@@ -6,6 +6,9 @@
 #include <fmt/base.h>
 #include <fmt/format.h>
 
+#include "shooter/game.h"
+#include "shooter/scene_title.h"
+
 namespace pyc {
 namespace sdl2 {
 
@@ -23,9 +26,9 @@ void SceneMain::update(std::chrono::duration<double> delta) {
     explosionUpdate(delta);
     itemUpdate(delta);
 
-    fmt::println("enemy: {} player_projectiles: {} enemy_projectiles: {} explosions_: {} items_: {}",
-                 enemies_.size(), player_projectiles_.size(), enemy_projectiles_.size(), explosions_.size(),
-                 items_.size());
+    // fmt::println("enemy: {} player_projectiles: {} enemy_projectiles: {} explosions_: {} items_: {}",
+    //              enemies_.size(), player_projectiles_.size(), enemy_projectiles_.size(), explosions_.size(),
+    //              items_.size());
 }
 
 void SceneMain::render() {
@@ -40,7 +43,13 @@ void SceneMain::render() {
     uiRender();
 }
 
-void SceneMain::handleEvent(SDL_Event* event) { (void)event; }
+void SceneMain::handleEvent(SDL_Event* event) {
+    if (event->type == SDL_KEYDOWN) {
+        if (event->key.keysym.sym == SDL_SCANCODE_X) {
+            game_.changeScene(std::make_unique<SceneTitle>());
+        }
+    }
+}
 
 void SceneMain::init() {
     // 载入 bgm

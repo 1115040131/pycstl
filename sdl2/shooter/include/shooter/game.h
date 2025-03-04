@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 
 #include "common/singleton.h"
 #include "shooter/object.h"
@@ -29,12 +30,16 @@ public:
     SDL_Window* window() const { return window_; }
     SDL_Renderer* renderer() const { return renderer_; }
 
+    TTF_Font* title_font() const { return title_font_; }
+    TTF_Font* text_font() const { return text_font_; }
+
+    void changeScene(std::unique_ptr<Scene> scene);
+    void renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font);
+
 private:
     void update(std::chrono::duration<double> delta);
     void render();
     void handleEvent(SDL_Event* event);
-
-    void changeScene(std::unique_ptr<Scene> scene);
 
     void backgroundUpdate(std::chrono::duration<double> delta);
 
@@ -53,6 +58,9 @@ private:
 
     Background near_stars_;
     Background far_stars_;
+
+    TTF_Font* title_font_ = nullptr;
+    TTF_Font* text_font_ = nullptr;
 };
 
 }  // namespace sdl2
