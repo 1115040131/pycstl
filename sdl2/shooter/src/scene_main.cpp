@@ -4,8 +4,7 @@
 
 #include <SDL_image.h>
 #include <fmt/base.h>
-
-
+#include <fmt/format.h>
 
 namespace pyc {
 namespace sdl2 {
@@ -62,6 +61,9 @@ void SceneMain::init() {
 
     // 初始化 UI
     ui_health_ = IMG_LoadTexture(game_.renderer(), ASSET("image/Health UI Black.png"));
+
+    // 载入字体
+    score_font_ = TTF_OpenFont(ASSET("font/VonwaonBitmap-12px.ttf"), 24);
 
     // 生成随机数
     std::random_device rd;
@@ -121,6 +123,7 @@ void SceneMain::clean() {
         Mix_FreeChunk(sound);
     }
     SDL_DestroyTexture(ui_health_);
+    TTF_CloseFont(score_font_);
 
     SDL_DestroyTexture(player_.texture);
     SDL_DestroyTexture(enemy_prototype_.texture);
@@ -340,6 +343,7 @@ void SceneMain::playerGetItem(const Item& item) {
         default:
             break;
     }
+    score_ += 5;
     Mix_PlayChannel(-1, sounds_[to_underlying(Sound::kGetItem)], 0);
 }
 
@@ -368,6 +372,8 @@ void SceneMain::enemyExplode(const Enemy& enemy) {
     if (dis_(gen_) < 0.5) {
         dropItem(enemy);
     }
+
+    score_ += 10;
 }
 
 void SceneMain::dropItem(const Enemy& enemy) {
@@ -430,20 +436,30 @@ void SceneMain::itemRender() {
 }
 
 void SceneMain::uiRender() {
+    // 渲染血条
     int x = 10;
     int y = 10;
     int size = 32;
     int offset = 40;
     SDL_SetTextureColorMod(ui_health_, 255, 255, 255);
-    for(int i = 0; i < player_.health; i++) {
-        SDL_Rect rect {x + i * offset, y, size, size};
+    for (int i = 0; i < player_.health; i++) {
+        SDL_Rect rect{x + i * offset, y, size, size};
         SDL_RenderCopy(game_.renderer(), ui_health_, nullptr, &rect);
     }
     SDL_SetTextureColorMod(ui_health_, 100, 100, 100);
-    for(int i = player_.health; i < player_.max_health; i++) {
-        SDL_Rect rect {x + i * offset, y, size, size};
+    for (int i = player_.health; i < player_.max_health; i++) {
+        SDL_Rect rect{x + i * offset, y, size, size};
         SDL_RenderCopy(game_.renderer(), ui_health_, nullptr, &rect);
     }
+
+    // 渲染分数
+    auto text = fmt::format("SCORE: {}", score_);
+    auto surface = TTF_RenderText_Blended(score_font_, text.c_str(), {255, 255, 255, 255});
+    auto texture = SDL_CreateTextureFromSurface(game_.renderer(), surface);
+    SDL_Rect score_rect{Game::kWindowWidth - surface->w - 10, 10, surface->w, surface->h};
+    SDL_RenderCopy(game_.renderer(), texture, nullptr, &score_rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
 }
 
 SDL_FPoint SceneMain::getDirection(const SDL_FPoint& from, const SDL_FPoint& to) {

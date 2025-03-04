@@ -79,6 +79,11 @@ void Game::init() {
     Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
     Mix_Volume(-1, MIX_MAX_VOLUME / 4);
 
+    if (TTF_Init() == -1) {
+        fmt::println("TTF_Init: {}", TTF_GetError());
+        return;
+    }
+
     // 初始化背景
     near_stars_.texture = IMG_LoadTexture(renderer_, ASSET("image/Stars-A.png"));
     if (!near_stars_.texture) {
@@ -116,6 +121,8 @@ void Game::clean() {
 
     Mix_CloseAudio();
     Mix_Quit();
+
+    TTF_Quit();
 
     SDL_DestroyRenderer(renderer_);
     SDL_DestroyWindow(window_);

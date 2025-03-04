@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 
 #include "shooter/game.h"
 #include "shooter/object.h"
@@ -62,8 +63,10 @@ private:
     Game& game_;
     Player player_;
     bool is_player_alive_{true};
+    int score_{};
     Mix_Music* bgm_{};
     SDL_Texture* ui_health_{};
+    TTF_Font* score_font_{};
 
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
