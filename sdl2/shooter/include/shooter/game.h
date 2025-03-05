@@ -22,6 +22,8 @@ class Game : public Singleton<Game> {
 private:
     Game() = default;
 
+    ~Game();
+
 public:
     void run();
 
@@ -50,8 +52,10 @@ private:
     void handleEvent(SDL_Event* event);
 
     void backgroundUpdate(std::chrono::duration<double> delta);
-
     void backgroundRender();
+
+    void saveData();
+    void loadData();
 
 public:
     static constexpr int kWindowWidth = 600;

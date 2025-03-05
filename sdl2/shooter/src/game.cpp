@@ -1,6 +1,8 @@
 #include "shooter/game.h"
 
 #include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <thread>
 
 #include <SDL_image.h>
@@ -15,6 +17,12 @@ namespace pyc {
 namespace sdl2 {
 
 using namespace std::chrono_literals;
+
+Game::~Game() {
+    fmt::println("Game::~Game()");
+    saveData();
+    clean();
+}
 
 void Game::run() {
     constexpr auto kFrameTime = 1s / kFps;
@@ -117,8 +125,10 @@ void Game::init() {
         return;
     }
 
+    // 载入数据
+    loadData();
+
     is_running_ = true;
-    // changeScene(std::make_unique<SceneMain>());
     changeScene(std::make_unique<SceneTitle>());
 }
 
@@ -229,6 +239,34 @@ void Game::backgroundRender() {
             SDL_RenderCopy(renderer_, near_stars_.texture, nullptr, &dst);
         }
     }
+}
+
+void Game::saveData() {
+    std::filesystem::create_directories("data");
+    std::ofstream file("data/save.dat");
+    if (!file) {
+        fmt::println("Failed to save data");
+        return;
+    }
+    for (const auto& [score, name] : leader_board_) {
+        file << score << ' ' << name << '\n';
+    }
+    file.close();
+}
+
+void Game::loadData() {
+    std::ifstream file("data/save.dat");
+    if (!file) {
+        fmt::println("Failed to load data");
+        return;
+    }
+    leader_board_.clear();
+    int score;
+    std::string name;
+    while (file >> score >> name) {
+        insertLeaderBoard(name, score);
+    }
+    file.close();
 }
 
 }  // namespace sdl2

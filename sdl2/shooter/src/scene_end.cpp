@@ -86,7 +86,7 @@ void SceneEnd::renderPhase2() {
         game_.renderText(fmt::format("{}. {}", i, item.second), {100, y}, game_.text_font());
         game_.renderText(std::to_string(item.first), {100, y}, game_.text_font(), false);
         i++;
-        y += 40;
+        y += 45;
     }
     if (blink_time_ < 0.5s) {
         game_.renderTextCentered("按 J 重新开始游戏", 0.85, game_.text_font());
