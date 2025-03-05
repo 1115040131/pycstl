@@ -49,11 +49,13 @@ void Game::run() {
 }
 
 void Game::init() {
+    // 初始化 SDL
     if (SDL_Init(SDL_INIT_EVERYTHING)) {
         fmt::println("SDL_Init: {}", SDL_GetError());
         return;
     }
 
+    // 创建窗口
     window_ = SDL_CreateWindow("Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, kWindowWidth,
                                kWindowHeight, SDL_WINDOW_SHOWN);
     if (!window_) {
@@ -61,12 +63,16 @@ void Game::init() {
         return;
     }
 
+    // 创建渲染器
     renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer_) {
         fmt::println("SDL_CreateRenderer: {}", SDL_GetError());
         return;
     }
+    // 设置逻辑分辨率
+    SDL_RenderSetLogicalSize(renderer_, kWindowWidth, kWindowHeight);
 
+    // 初始化 SDL_Image
     if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
         fmt::println("IMG_Init: {}", IMG_GetError());
         return;
@@ -209,6 +215,10 @@ void Game::handleEvent(SDL_Event* event) {
     while (SDL_PollEvent(event)) {
         if (event->type == SDL_QUIT) {
             is_running_ = false;
+        } else if (event->type == SDL_KEYDOWN) {
+            if (event->key.keysym.scancode == SDL_SCANCODE_F4) {
+                SDL_SetWindowFullscreen(window_, SDL_GetWindowFlags(window_) ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
+            }
         }
         current_scene_->handleEvent(event);
     }

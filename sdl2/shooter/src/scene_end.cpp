@@ -9,6 +9,13 @@ namespace pyc {
 namespace sdl2 {
 
 void SceneEnd::init() {
+    bgm_ = Mix_LoadMUS(ASSET("music/06_Battle_in_Space_Intro.ogg"));
+    if (!bgm_) {
+        fmt::println("Mix_LoadMUS: {}", Mix_GetError());
+        return;
+    }
+    Mix_PlayMusic(bgm_, -1);
+
     if (!SDL_IsTextInputActive()) {
         SDL_StartTextInput();
     }
@@ -17,7 +24,12 @@ void SceneEnd::init() {
     }
 }
 
-void SceneEnd::clean() {}
+void SceneEnd::clean() {
+    if (bgm_) {
+        Mix_HaltMusic();
+        Mix_FreeMusic(bgm_);
+    }
+}
 
 void SceneEnd::update(std::chrono::duration<double> delta) {
     blink_time_ += delta;

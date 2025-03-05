@@ -86,8 +86,8 @@ void SceneMain::init() {
     // 初始化玩家
     player_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/SpaceShip.png"));
     SDL_QueryTexture(player_.texture, nullptr, nullptr, &player_.width, &player_.height);
-    player_.width /= 4;
-    player_.height /= 4;
+    player_.width /= 5;
+    player_.height /= 5;
     player_.position.x = Game::kWindowWidth / 2 - player_.width / 2;
     player_.position.y = Game::kWindowHeight - player_.height;
 
@@ -108,8 +108,8 @@ void SceneMain::init() {
     enemy_player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/bullet-1.png"));
     SDL_QueryTexture(enemy_player_projectile_prototype_.texture, nullptr, nullptr,
                      &enemy_player_projectile_prototype_.width, &enemy_player_projectile_prototype_.height);
-    enemy_player_projectile_prototype_.width /= 4;
-    enemy_player_projectile_prototype_.height /= 4;
+    enemy_player_projectile_prototype_.width /= 2;
+    enemy_player_projectile_prototype_.height /= 2;
 
     // 初始化爆炸原型
     explosion_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("effect/explosion.png"));
@@ -257,6 +257,7 @@ void SceneMain::enemyUpdate(std::chrono::duration<double> delta) {
             auto enemy_rect = getRect(enemy.position, enemy.width, enemy.height);
             if (SDL_HasIntersection(&player_rect, &enemy_rect)) {
                 player_.health--;
+                enemyExplode(enemy);
                 enemy.valid = false;
                 continue;
             }
@@ -430,7 +431,7 @@ void SceneMain::playerProjectileRender() {
 void SceneMain::enemyProjectileRender() {
     for (const auto& projectile : enemy_projectiles_) {
         auto projectile_rect = getRect(projectile.position, projectile.width, projectile.height);
-        auto angle = std::atan2(projectile.direction.y, projectile.direction.x) * 180 / M_PI - 90;
+        auto angle = std::atan2(projectile.direction.y, projectile.direction.x) * 180 / M_PI + 90;
         SDL_RenderCopyEx(game_.renderer(), projectile.texture, nullptr, &projectile_rect, angle, nullptr,
                          SDL_FLIP_VERTICAL);
     }
@@ -444,7 +445,7 @@ void SceneMain::explosionRender() {
             explosion.height,
             explosion.height,
         };
-        auto dst = getRect(explosion.position, explosion.width, explosion.height);
+        auto dst = getRect(explosion.position, explosion.width * 2, explosion.height * 2);
         SDL_RenderCopy(game_.renderer(), explosion.texture, &src, &dst);
     }
 }

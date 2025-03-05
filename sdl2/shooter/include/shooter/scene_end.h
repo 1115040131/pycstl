@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL_mixer.h>
+
 #include "shooter/scene.h"
 
 namespace pyc {
@@ -26,6 +28,7 @@ private:
     bool is_typing_{true};
     std::string player_name_;
     std::chrono::duration<double> blink_time_{};
+    Mix_Music* bgm_{};
 };
 
 }  // namespace sdl2

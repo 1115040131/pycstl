@@ -17,7 +17,12 @@ void SceneTitle::init() {
     Mix_PlayMusic(bgm_, -1);
 }
 
-void SceneTitle::clean() {}
+void SceneTitle::clean() {
+    if (bgm_) {
+        Mix_HaltMusic();
+        Mix_FreeMusic(bgm_);
+    }
+}
 
 void SceneTitle::update(std::chrono::duration<double> delta) {
     time_ += delta;
