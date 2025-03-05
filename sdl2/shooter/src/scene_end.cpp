@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 
 #include "shooter/game.h"
+#include "shooter/scene_main.h"
 
 namespace pyc {
 namespace sdl2 {
@@ -41,10 +42,20 @@ void SceneEnd::handleEvent(SDL_Event* event) {
             if (event->key.keysym.scancode == SDL_SCANCODE_RETURN) {
                 is_typing_ = false;
                 SDL_StopTextInput();
+                if (player_name_.empty()) {
+                    player_name_ = "无名氏";
+                }
+                game_.insertLeaderBoard(player_name_, game_.finalScore());
             } else if (event->key.keysym.scancode == SDL_SCANCODE_BACKSPACE) {
                 if (!player_name_.empty()) {
                     removeLastUTF8Char(player_name_);
                 }
+            }
+        }
+    } else {
+        if (event->type == SDL_KEYDOWN) {
+            if (event->key.keysym.scancode == SDL_SCANCODE_J) {
+                game_.changeScene(std::make_unique<SceneMain>());
             }
         }
     }
@@ -67,7 +78,20 @@ void SceneEnd::renderPhase1() {
     }
 }
 
-void SceneEnd::renderPhase2() {}
+void SceneEnd::renderPhase2() {
+    game_.renderTextCentered("得分榜", 0.1, game_.title_font());
+    int i = 1;
+    auto y = static_cast<int>(0.2 * Game::kWindowHeight);
+    for (const auto& item : game_.leaderBoard()) {
+        game_.renderText(fmt::format("{}. {}", i, item.second), {100, y}, game_.text_font());
+        game_.renderText(std::to_string(item.first), {100, y}, game_.text_font(), false);
+        i++;
+        y += 40;
+    }
+    if (blink_time_ < 0.5s) {
+        game_.renderTextCentered("按 J 重新开始游戏", 0.85, game_.text_font());
+    }
+}
 
 void SceneEnd::removeLastUTF8Char(std::string& str) {
     if (str.empty()) {

@@ -146,6 +146,13 @@ void Game::clean() {
     SDL_Quit();
 }
 
+void Game::insertLeaderBoard(const std::string& name, int score) {
+    leader_board_.insert({score, name});
+    if (leader_board_.size() > 8) {
+        leader_board_.erase(std::prev(leader_board_.end()));
+    }
+}
+
 void Game::changeScene(std::unique_ptr<Scene> scene) {
     if (current_scene_) {
         current_scene_->clean();
@@ -166,10 +173,11 @@ SDL_Point Game::renderTextCentered(std::string_view text, float y_percentage, TT
     return {rect.x + rect.w, y};
 }
 
-void Game::renderText(std::string_view text, SDL_Point position, TTF_Font* font) {
+void Game::renderText(std::string_view text, SDL_Point position, TTF_Font* font, bool is_left) {
     auto surface = TTF_RenderUTF8_Blended(font, text.data(), {255, 255, 255, 255});
     auto texture = SDL_CreateTextureFromSurface(renderer_, surface);
-    SDL_Rect rect{position.x, position.y, surface->w, surface->h};
+    auto rect = is_left ? SDL_Rect{position.x, position.y, surface->w, surface->h}
+                        : SDL_Rect{kWindowWidth - position.x - surface->w, position.y, surface->w, surface->h};
     SDL_RenderCopy(renderer_, texture, nullptr, &rect);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(texture);

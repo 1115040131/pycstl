@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <memory>
 
 #include <SDL.h>
@@ -36,9 +37,12 @@ public:
     int finalScore() const { return final_score_; }
     void setFinalScore(int score) { final_score_ = score; }
 
+    const std::multimap<int, std::string, std::greater<int>>& leaderBoard() const { return leader_board_; }
+    void insertLeaderBoard(const std::string& name, int score);
+
     void changeScene(std::unique_ptr<Scene> scene);
     SDL_Point renderTextCentered(std::string_view text, float y_percentage, TTF_Font* font);
-    void renderText(std::string_view text, SDL_Point position, TTF_Font* font);
+    void renderText(std::string_view text, SDL_Point position, TTF_Font* font, bool is_left = true);
 
 private:
     void update(std::chrono::duration<double> delta);
@@ -67,6 +71,7 @@ private:
     TTF_Font* text_font_ = nullptr;
 
     int final_score_ = 0;
+    std::multimap<int, std::string, std::greater<int>> leader_board_;
 };
 
 }  // namespace sdl2
