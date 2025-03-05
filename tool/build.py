@@ -229,6 +229,7 @@ def main():
         ######################### build for sdl2 #########################
         "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),
         "chicken_evil": lambda args: run_bazel_run('//sdl2/chicken_evil', args=args),
+        "shooter": lambda args: run_bazel_run('//sdl2/shooter', args=args),
 
         ######################### build for tetris #########################
         "tetris": lambda args: run_bazel_build('//tetris', args=args),
