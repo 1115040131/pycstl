@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include <fmt/base.h>
 #include <fmt/format.h>
 

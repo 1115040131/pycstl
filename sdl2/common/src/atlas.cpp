@@ -1,6 +1,6 @@
 #include "sdl2/common/atlas.h"
 
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 #include <fmt/format.h>
 
 namespace pyc {

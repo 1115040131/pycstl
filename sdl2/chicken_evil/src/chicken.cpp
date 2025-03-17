@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include <SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 
 #include "chicken_evil/resource_mgr.h"
 

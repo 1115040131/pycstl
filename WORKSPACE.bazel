@@ -12,28 +12,31 @@ git_repository(
     name = "sdl2",
     build_file_content = _ALL_CONTENT,
     remote = "https://github.com/libsdl-org/SDL.git",
-    tag = "release-2.30.11",
+    tag = "release-2.32.2",
 )
 
 git_repository(
     name = "sdl2_image",
     build_file_content = _ALL_CONTENT,
+    init_submodules = True,
     remote = "https://github.com/libsdl-org/SDL_image.git",
-    tag = "release-2.8.4",
+    tag = "release-2.8.8",
 )
 
 git_repository(
     name = "sdl2_mixer",
     build_file_content = _ALL_CONTENT,
+    init_submodules = True,
     remote = "https://github.com/libsdl-org/SDL_mixer.git",
-    tag = "release-2.6.3",
+    tag = "release-2.8.1",
 )
 
 git_repository(
     name = "sdl2_ttf",
     build_file_content = _ALL_CONTENT,
+    init_submodules = True,
     remote = "https://github.com/libsdl-org/SDL_ttf.git",
-    tag = "release-2.0.18",
+    tag = "release-2.24.0",
 )
 
 git_repository(

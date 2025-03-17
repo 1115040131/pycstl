@@ -106,8 +106,6 @@ export QT_QPA_PLATFORM=xcb
 ### SDL
 
 ```bash
-# 安装 configure make 工具
-sudo apt install automake autoconf libtool
 # 安装驱动
 sudo apt install libpulse-dev libxext-dev
 

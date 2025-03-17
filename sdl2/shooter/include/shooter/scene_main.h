@@ -5,8 +5,8 @@
 #include <random>
 #include <vector>
 
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "shooter/object.h"
 #include "shooter/scene.h"
