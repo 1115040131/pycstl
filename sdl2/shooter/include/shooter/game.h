@@ -3,8 +3,8 @@
 #include <map>
 #include <memory>
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "common/singleton.h"
 #include "shooter/object.h"

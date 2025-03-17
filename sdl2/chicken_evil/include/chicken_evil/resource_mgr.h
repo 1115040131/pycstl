@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "common/singleton.h"
 #include "sdl2/common/atlas.h"

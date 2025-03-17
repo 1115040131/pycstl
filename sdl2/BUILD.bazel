@@ -1,40 +1,49 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "configure_make")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
-# sdl2
-configure_make(
+cmake(
     name = "sdl2",
-    env = {
-        "PKG_CONFIG": "/usr/bin/pkg-config",
-    },
+    cache_entries = {"SDL_STATIC_ENABLED_BY_DEFAULT": "OFF"},
     includes = ["SDL2"],
     lib_source = "@sdl2//:all_srcs",
-    out_static_libs = ["libSDL2.a"],
+    out_shared_libs = [
+        "libSDL2-2.0d.so",
+        "libSDL2-2.0d.so.0",
+    ],
     visibility = ["//visibility:public"],
 )
 
-configure_make(
+cmake(
     name = "sdl2_image",
-    includes = ["SDL2"],
+    cache_entries = {"SDL2IMAGE_VENDORED": "ON"},
     lib_source = "@sdl2_image//:all_srcs",
-    out_static_libs = ["libSDL2_image.a"],
+    out_shared_libs = [
+        "libSDL2_image-2.0d.so",
+        "libSDL2_image-2.0d.so.0",
+    ],
     visibility = ["//visibility:public"],
     deps = ["sdl2"],
 )
 
-configure_make(
+cmake(
     name = "sdl2_mixer",
-    includes = ["SDL2"],
+    cache_entries = {"SDL2MIXER_VENDORED": "ON"},
     lib_source = "@sdl2_mixer//:all_srcs",
-    out_static_libs = ["libSDL2_mixer.a"],
+    out_shared_libs = [
+        "libSDL2_mixer-2.0d.so",
+        "libSDL2_mixer-2.0d.so.0",
+    ],
     visibility = ["//visibility:public"],
     deps = ["sdl2"],
 )
 
-configure_make(
+cmake(
     name = "sdl2_ttf",
-    includes = ["SDL2"],
+    cache_entries = {"SDL2TTF_VENDORED": "ON"},
     lib_source = "@sdl2_ttf//:all_srcs",
-    out_static_libs = ["libSDL2_ttf.a"],
+    out_shared_libs = [
+        "libSDL2_ttf-2.0d.so",
+        "libSDL2_ttf-2.0d.so.0",
+    ],
     visibility = ["//visibility:public"],
     deps = ["sdl2"],
 )

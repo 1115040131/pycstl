@@ -5,10 +5,10 @@
 #include <ranges>
 #include <thread>
 
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #include <fmt/base.h>
 
 #include "chicken_evil/gameplay.h"
