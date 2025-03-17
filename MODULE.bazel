@@ -12,12 +12,12 @@ module(
 # 1. The metadata of glog is fetched from the BCR, including its dependencies (gflags).
 # 2. The `repo_name` attribute allows users to reference this dependency via the `gtest` repo name.
 bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
-bazel_dep(name = "fmt", version = "11.1.0")
+bazel_dep(name = "fmt", version = "11.1.4")
 bazel_dep(name = "glm", version = "1.0.0.bcr.1")
-bazel_dep(name = "grpc", version = "1.69.0", repo_name = "com_github_grpc_grpc")
-bazel_dep(name = "nlohmann_json", version = "3.11.3")
-bazel_dep(name = "platforms", version = "0.0.10")  # rules_qt need it
-bazel_dep(name = "rules_foreign_cc", version = "0.13.0")
+bazel_dep(name = "grpc", version = "1.70.1", repo_name = "com_github_grpc_grpc")
+bazel_dep(name = "nlohmann_json", version = "3.11.3.bcr.1")
+bazel_dep(name = "platforms", version = "0.0.11")  # rules_qt need it
+bazel_dep(name = "rules_foreign_cc", version = "0.14.0")
 
 # Boost
 # Famous C++ library that has given rise to many new additions to the C++ Standard Library
@@ -87,7 +87,7 @@ local_path_override(
 # Node.js
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "aspect_rules_js", version = "2.0.0")
+bazel_dep(name = "aspect_rules_js", version = "2.2.0")
 
 ####### Node.js version #########
 # By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
@@ -117,7 +117,7 @@ use_repo(pnpm, "pnpm")
 # Python
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "rules_python", version = "1.0.0")
+bazel_dep(name = "rules_python", version = "1.2.0")
 
 PYTHON_VERSION = "3.12"
 
@@ -140,7 +140,7 @@ use_repo(pip, "pycstl_deps")
 # Test only
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "googletest", version = "1.15.2")
+bazel_dep(name = "googletest", version = "1.16.0")
 
 # 导出 compile_commands.json
 # Hedron's Compile Commands Extractor for Bazel
