@@ -35,3 +35,34 @@ git_repository(
     remote = "https://github.com/libsdl-org/SDL_ttf.git",
     tag = "release-2.0.18",
 )
+
+git_repository(
+    name = "sdl3",
+    build_file_content = _ALL_CONTENT,
+    remote = "https://github.com/libsdl-org/SDL.git",
+    tag = "release-3.2.8",
+)
+
+git_repository(
+    name = "sdl3_image",
+    build_file_content = _ALL_CONTENT,
+    init_submodules = True,
+    remote = "https://github.com/libsdl-org/SDL_image.git",
+    tag = "release-3.2.4",
+)
+
+git_repository(
+    name = "sdl3_mixer",
+    build_file_content = _ALL_CONTENT,
+    commit = "e777b524e8f854c6c6590e2b5766bb1cee52e016",
+    init_submodules = True,
+    remote = "https://github.com/libsdl-org/SDL_mixer.git",
+)
+
+git_repository(
+    name = "sdl3_ttf",
+    build_file_content = _ALL_CONTENT,
+    init_submodules = True,
+    remote = "https://github.com/libsdl-org/SDL_ttf.git",
+    tag = "release-3.2.0",
+)

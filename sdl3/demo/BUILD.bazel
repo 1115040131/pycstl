@@ -1,0 +1,17 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_binary(
+    name = "demo",
+    srcs = glob([
+        "*.cpp",
+    ]),
+    copts = STRICT_COPTS,
+    data = glob(["assets/**"]),
+    deps = [
+        "//sdl3",
+        "//sdl3:sdl3_image",
+        "//sdl3:sdl3_mixer",
+        "//sdl3:sdl3_ttf",
+        "@fmt",
+    ],
+)

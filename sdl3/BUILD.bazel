@@ -1,0 +1,51 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+
+# sdl3
+cmake(
+    name = "sdl3",
+    lib_source = "@sdl3//:all_srcs",
+    out_shared_libs = [
+        "libSDL3.so",
+        "libSDL3.so.0",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cmake(
+    name = "sdl3_image",
+    cache_entries = {"SDLIMAGE_VENDORED": "ON"},
+    lib_source = "@sdl3_image//:all_srcs",
+    out_shared_libs = [
+        "libSDL3_image.so",
+        "libSDL3_image.so.0",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["sdl3"],
+)
+
+cmake(
+    name = "sdl3_mixer",
+    cache_entries = {
+        "SDLMIXER_VENDORED": "ON",
+        "SDLMIXER_MIDI_NATIVE": "OFF",
+    },
+    lib_source = "@sdl3_mixer//:all_srcs",
+    out_shared_libs = [
+        "libSDL3_mixer.so",
+        "libSDL3_mixer.so.0",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["sdl3"],
+)
+
+cmake(
+    name = "sdl3_ttf",
+    cache_entries = {"SDLTTF_VENDORED": "ON"},
+    lib_source = "@sdl3_ttf//:all_srcs",
+    out_shared_libs = [
+        "libSDL3_ttf.so",
+        "libSDL3_ttf.so.0",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["sdl3"],
+)
