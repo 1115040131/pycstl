@@ -143,5 +143,20 @@ void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, fl
     SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
 }
 
+void Game::drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
+                        SDL_FColor color) {
+    SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
+    for (float i = 0; i < boundary_width; i++) {
+        SDL_FRect rect = {
+            top_left.x - i,
+            top_left.y - i,
+            bottom_right.x - top_left.x + 2 * i,
+            bottom_right.y - top_left.y + 2 * i,
+        };
+        SDL_RenderRect(renderer_, &rect);
+    }
+    SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
+}
+
 }  // namespace sdl3
 }  // namespace pyc
