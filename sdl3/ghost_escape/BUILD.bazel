@@ -1,0 +1,21 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_binary(
+    name = "ghost_escape",
+    srcs = glob([
+        "ghost_escape/*.cpp",
+        "ghost_escape/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    data = glob(["assets/**"]),
+    includes = ["."],
+    deps = [
+        "//common",
+        "//sdl3",
+        "//sdl3:sdl3_image",
+        "//sdl3:sdl3_mixer",
+        "//sdl3:sdl3_ttf",
+        "@fmt",
+        "@glm",
+    ],
+)
