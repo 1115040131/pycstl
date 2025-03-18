@@ -1,4 +1,4 @@
-#include "ghost_escape/game.h"
+#include "sdl3/common/game.h"
 
 #include <chrono>
 #include <thread>
@@ -7,6 +7,8 @@
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <fmt/base.h>
+
+#include "sdl3/common/scene.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -55,7 +57,22 @@ void Game::init(std::string_view title, int width, int height) {
     is_running_ = true;
 }
 
-void Game::clean() {}
+void Game::clean() {
+    if (current_scene_) {
+        current_scene_->clean();
+    }
+
+    // 释放渲染器和窗口
+    SDL_DestroyRenderer(renderer_);
+    SDL_DestroyWindow(window_);
+    // 退出 Mix
+    Mix_CloseAudio();
+    Mix_Quit();
+    // 退出 TTF
+    TTF_Quit();
+    // 退出 SDL
+    SDL_Quit();
+}
 
 void Game::run() {
     constexpr auto kFrameTime = 1s / kFps;
@@ -89,14 +106,30 @@ void Game::handleEvents() {
                 is_running_ = false;
                 break;
             default:
+                current_scene_->handleEvents(event);
                 break;
         }
     }
 }
 
-void Game::update(std::chrono::duration<double> delta) { (void)delta; }
+void Game::update(std::chrono::duration<double> delta) { current_scene_->update(delta); }
 
-void Game::render() {}
+void Game::render() {
+    SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
+    SDL_RenderClear(renderer_);
+    current_scene_->render();
+    SDL_RenderPresent(renderer_);
+}
+
+void Game::changeScene(std::unique_ptr<Scene> scene) {
+    if (current_scene_) {
+        current_scene_->clean();
+    }
+    current_scene_ = std::move(scene);
+    if (current_scene_) {
+        current_scene_->init();
+    }
+}
 
 }  // namespace sdl3
 }  // namespace pyc

@@ -9,13 +9,5 @@ cc_binary(
     copts = STRICT_COPTS,
     data = glob(["assets/**"]),
     includes = ["."],
-    deps = [
-        "//common",
-        "//sdl3",
-        "//sdl3:sdl3_image",
-        "//sdl3:sdl3_mixer",
-        "//sdl3:sdl3_ttf",
-        "@fmt",
-        "@glm",
-    ],
+    deps = ["//sdl3/common"],
 )
