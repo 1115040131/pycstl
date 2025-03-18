@@ -1,5 +1,8 @@
 #include "ghost_escape/game.h"
 
+#include <chrono>
+#include <thread>
+
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -7,6 +10,8 @@
 
 namespace pyc {
 namespace sdl3 {
+
+using namespace std::chrono_literals;
 
 void Game::init(std::string_view title, int width, int height) {
     title_ = title;
@@ -53,10 +58,26 @@ void Game::init(std::string_view title, int width, int height) {
 void Game::clean() {}
 
 void Game::run() {
+    constexpr auto kFrameTime = 1s / kFps;
+    auto last = std::chrono::steady_clock::now();  // 上一帧update时间
     while (is_running_) {
+        auto start = std::chrono::steady_clock::now();  // 当前帧时间
+
         handleEvents();
-        update(std::chrono::duration<double>(0));
+        update(start - last);
+        last = start;
         render();
+
+        auto end = std::chrono::steady_clock::now();
+        auto elapsed = end - last;
+        if (elapsed < kFrameTime) {
+            std::this_thread::sleep_for(kFrameTime - elapsed - 0.1ms);
+        }
+
+        {
+            auto tmp = std::chrono::steady_clock::now();
+            fmt::println("elapsed: {},  FPS: {}", elapsed.count(), 1.0s / (tmp - start));
+        }
     }
 }
 

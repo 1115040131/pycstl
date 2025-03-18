@@ -28,6 +28,9 @@ private:
     void update(std::chrono::duration<double> delta);
     void render();
 
+public:
+    static constexpr double kFps = 60;
+
 private:
     std::string title_;
     glm::vec2 screen_size_;
