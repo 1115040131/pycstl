@@ -11,8 +11,14 @@ public:
     virtual void clean() override;
 
     virtual void handleEvents(SDL_Event& event) override;
-    virtual void update(std::chrono::duration<double> delta) override;
+    virtual void update(std::chrono::duration<float> delta) override;
     virtual void render() override;
+
+private:
+    void renderBackground();
+
+private:
+    glm::vec2 world_size_;
 };
 
 }  // namespace sdl3

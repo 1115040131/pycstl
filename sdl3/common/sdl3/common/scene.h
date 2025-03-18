@@ -15,10 +15,10 @@ public:
     virtual void clean() override {}
 
     virtual void handleEvents(SDL_Event& event) override {}
-    virtual void update(std::chrono::duration<double> delta) override {}
+    virtual void update(std::chrono::duration<float> delta) override {}
     virtual void render() override {}
 
-private:
+protected:
     glm::vec2 camera_position_;
     std::vector<Object*> objects_;
 };

@@ -112,7 +112,7 @@ void Game::handleEvents() {
     }
 }
 
-void Game::update(std::chrono::duration<double> delta) { current_scene_->update(delta); }
+void Game::update(std::chrono::duration<float> delta) { current_scene_->update(delta); }
 
 void Game::render() {
     SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
@@ -129,6 +129,18 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     if (current_scene_) {
         current_scene_->init();
     }
+}
+
+void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
+                    SDL_FColor color) {
+    SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
+    for (float x = top_left.x; x <= bottom_right.x; x += grid_width) {
+        SDL_RenderLine(renderer_, x, top_left.y, x, bottom_right.y);
+    }
+    for (float y = top_left.y; y <= bottom_right.y; y += grid_height) {
+        SDL_RenderLine(renderer_, top_left.x, y, bottom_right.x, y);
+    }
+    SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
 }
 
 }  // namespace sdl3

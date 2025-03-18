@@ -18,7 +18,7 @@ public:
     virtual void clean() {}
 
     virtual void handleEvents(SDL_Event& event) {}
-    virtual void update(std::chrono::duration<double> delta) {}
+    virtual void update(std::chrono::duration<float> delta) {}
     virtual void render() {}
 
 protected:
