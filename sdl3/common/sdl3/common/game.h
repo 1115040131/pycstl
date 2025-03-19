@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "common/singleton.h"
+#include "sdl3/common/asset_store.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -28,6 +29,7 @@ public:
     const std::string& getTitle() const { return title_; }
     const glm::vec2& getScreenSize() const { return screen_size_; }
     const std::shared_ptr<Scene>& getCurrentScene() const { return current_scene_; }
+    const std::unique_ptr<AssetStore>& getAssetStore() const { return asset_store_; }
 
     void init(std::string_view title, int width, int height);
     void run();
@@ -54,10 +56,12 @@ private:
     SDL_Window* window_;
     SDL_Renderer* renderer_;
 
+    bool is_running_;
+
     std::string title_;
     glm::vec2 screen_size_;
-    bool is_running_;
     std::shared_ptr<Scene> current_scene_;
+    std::unique_ptr<AssetStore> asset_store_;
 };
 
 }  // namespace sdl3

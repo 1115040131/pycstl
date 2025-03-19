@@ -54,6 +54,9 @@ void Game::init(std::string_view title, int width, int height) {
     // 设置窗口分辨率
     SDL_SetRenderLogicalPresentation(renderer_, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+    // 创建 AssetStore
+    asset_store_ = std::make_unique<AssetStore>(renderer_);
+
     is_running_ = true;
 }
 
@@ -61,6 +64,8 @@ void Game::clean() {
     if (current_scene_) {
         current_scene_->clean();
     }
+
+    asset_store_.reset();
 
     // 释放渲染器和窗口
     SDL_DestroyRenderer(renderer_);
