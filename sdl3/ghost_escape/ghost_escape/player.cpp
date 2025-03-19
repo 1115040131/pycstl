@@ -5,19 +5,24 @@
 namespace pyc {
 namespace sdl3 {
 
-void Player::init() { max_speed_ = 500.F; }
+void Player::init() {
+    Actor::init();
+    max_speed_ = 500.F;
+}
 
-void Player::clean() {}
+void Player::clean() { Actor::clean(); }
 
-void Player::handleEvents(SDL_Event&) {}
+void Player::handleEvents(SDL_Event& event) { Actor::handleEvents(event); }
 
 void Player::update(std::chrono::duration<float> delta) {
+    Actor::update(delta);
     keyboardControl();
     move(delta);
     syncCamera();
 }
 
 void Player::render() {
+    Actor::render();
     game_.drawBoundary(render_position_, render_position_ + glm::vec2(20.F), 5.F, {1, 0, 0, 1});
 }
 

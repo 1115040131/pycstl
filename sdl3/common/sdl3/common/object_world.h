@@ -9,6 +9,8 @@ namespace sdl3 {
 
 class ObjectWorld : public ObjectScreen {
 public:
+    virtual void init() override { type_ = Type::kWorld; }
+
     virtual void update(std::chrono::duration<float> delta) override;
 
     const glm::vec2& getPosition() const { return position_; }
