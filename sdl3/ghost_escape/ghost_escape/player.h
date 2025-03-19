@@ -1,12 +1,11 @@
 #pragma once
 
-#include "ghost_escape/player.h"
-#include "sdl3/common/scene.h"
+#include "sdl3/common/actor.h"
 
 namespace pyc {
 namespace sdl3 {
 
-class SceneMain : public Scene {
+class Player : public Actor {
 public:
     virtual void init() override;
     virtual void clean() override;
@@ -16,10 +15,9 @@ public:
     virtual void render() override;
 
 private:
-    void renderBackground();
-
-private:
-    Player player_;
+    void keyboardControl();
+    void move(std::chrono::duration<float> delta);
+    void syncCamera();
 };
 
 }  // namespace sdl3

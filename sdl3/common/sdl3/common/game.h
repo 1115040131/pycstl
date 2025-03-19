@@ -23,10 +23,11 @@ private:
     ~Game() = default;
 
 public:
-    SDL_Window* window() const { return window_; }
-    SDL_Renderer* renderer() const { return renderer_; }
-    const std::string& title() const { return title_; }
-    const glm::vec2& screenSize() const { return screen_size_; }
+    SDL_Window* getWindow() const { return window_; }
+    SDL_Renderer* getRenderer() const { return renderer_; }
+    const std::string& getTitle() const { return title_; }
+    const glm::vec2& getScreenSize() const { return screen_size_; }
+    const std::shared_ptr<Scene>& getCurrentScene() const { return current_scene_; }
 
     void init(std::string_view title, int width, int height);
     void run();

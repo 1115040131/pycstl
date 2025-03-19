@@ -4,17 +4,22 @@ namespace pyc {
 namespace sdl3 {
 
 void SceneMain::init() {
-    world_size_ = game_.screenSize() * 3.0F;
-    camera_position_ = glm::vec2(-100.F);
+    world_size_ = game_.getScreenSize() * 3.0F;
+    camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
+    player_.init();
+    player_.setPosition(world_size_ / 2.F);
 }
 
-void SceneMain::clean() {}
+void SceneMain::clean() { player_.clean(); }
 
 void SceneMain::handleEvents(SDL_Event&) {}
 
-void SceneMain::update(std::chrono::duration<float> delta) { camera_position_ += glm::vec2(80.F) * delta.count(); }
+void SceneMain::update(std::chrono::duration<float> delta) { player_.update(delta); }
 
-void SceneMain::render() { renderBackground(); }
+void SceneMain::render() {
+    renderBackground();
+    player_.render();
+}
 
 void SceneMain::renderBackground() {
     auto start = -camera_position_;
