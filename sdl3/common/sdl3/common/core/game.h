@@ -9,6 +9,7 @@
 
 #include "common/singleton.h"
 #include "sdl3/common/core/asset_store.h"
+#include "sdl3/common/core/texture.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -36,11 +37,14 @@ public:
 
     void changeScene(std::unique_ptr<Scene> scene);
 
+    // render
+    void renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size) const;
+
     // util
     void drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
-                  SDL_FColor color);
+                  SDL_FColor color) const;
     void drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
-                      SDL_FColor color);
+                      SDL_FColor color) const;
 
 private:
     void clean();

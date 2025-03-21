@@ -16,7 +16,7 @@ public:
     virtual void render() override;
 
 private:
-    void renderBackground();
+    void renderBackground() const;
 
 private:
     std::shared_ptr<Player> player_{};

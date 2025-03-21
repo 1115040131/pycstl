@@ -25,7 +25,7 @@ void SceneMain::render() {
     Scene::render();
 }
 
-void SceneMain::renderBackground() {
+void SceneMain::renderBackground() const {
     auto start = -camera_position_;
     auto end = world_size_ - camera_position_;
     game_.drawGrid(start, end, 80.0F, 80.0F, {0.5, 0.5, 0.5, 1});

@@ -1,5 +1,6 @@
 #include "ghost_escape/player.h"
 
+#include "sdl3/common/affiliate/sprite.h"
 #include "sdl3/common/core/scene.h"
 
 namespace pyc {
@@ -8,6 +9,10 @@ namespace sdl3 {
 void Player::init() {
     Actor::init();
     max_speed_ = 500.F;
+    auto sprite = std::make_shared<Sprite>();
+    sprite->setTexture(Texture::makeTexture(ASSET("sprite/ghost-idle.png")));
+    sprite->setParent(this);
+    addChild(sprite);
 }
 
 void Player::clean() { Actor::clean(); }

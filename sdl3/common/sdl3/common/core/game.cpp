@@ -136,8 +136,19 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     }
 }
 
+void Game::renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size)const {
+    SDL_FRect dst_rect = {
+        position.x,
+        position.y,
+        size.x,
+        size.y,
+    };
+    SDL_RenderTextureRotated(renderer_, texture.texture, &texture.src_rect, &dst_rect, texture.angle, nullptr,
+                             texture.is_flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+}
+
 void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
-                    SDL_FColor color) {
+                    SDL_FColor color) const{
     SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
     for (float x = top_left.x; x <= bottom_right.x; x += grid_width) {
         SDL_RenderLine(renderer_, x, top_left.y, x, bottom_right.y);
@@ -149,7 +160,7 @@ void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, fl
 }
 
 void Game::drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
-                        SDL_FColor color) {
+                        SDL_FColor color) const{
     SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
     for (float i = 0; i < boundary_width; i++) {
         SDL_FRect rect = {
