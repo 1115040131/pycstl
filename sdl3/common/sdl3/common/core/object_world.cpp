@@ -1,6 +1,6 @@
-#include "sdl3/common/object_world.h"
+#include "sdl3/common/core/object_world.h"
 
-#include "sdl3/common/scene.h"
+#include "sdl3/common/core/scene.h"
 
 namespace pyc {
 namespace sdl3 {

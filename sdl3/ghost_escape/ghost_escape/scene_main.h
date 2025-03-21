@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ghost_escape/player.h"
-#include "sdl3/common/scene.h"
+#include "sdl3/common/core/scene.h"
 
 namespace pyc {
 namespace sdl3 {

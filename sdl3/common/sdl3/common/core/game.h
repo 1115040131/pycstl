@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "common/singleton.h"
-#include "sdl3/common/asset_store.h"
+#include "sdl3/common/core/asset_store.h"
 
 namespace pyc {
 namespace sdl3 {

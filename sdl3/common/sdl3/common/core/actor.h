@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sdl3/common/object_world.h"
+#include "sdl3/common/core/object_world.h"
 
 namespace pyc {
 namespace sdl3 {

@@ -1,4 +1,4 @@
-#include "sdl3/common/asset_store.h"
+#include "sdl3/common/core/asset_store.h"
 
 #include <fmt/format.h>
 

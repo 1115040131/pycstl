@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sdl3/common/actor.h"
+#include "sdl3/common/core/actor.h"
 
 namespace pyc {
 namespace sdl3 {

@@ -6,7 +6,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "sdl3/common/game.h"
+#include "sdl3/common/core/game.h"
 
 namespace pyc {
 namespace sdl3 {

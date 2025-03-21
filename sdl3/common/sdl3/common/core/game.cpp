@@ -1,4 +1,4 @@
-#include "sdl3/common/game.h"
+#include "sdl3/common/core/game.h"
 
 #include <chrono>
 #include <thread>
@@ -8,7 +8,7 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <fmt/base.h>
 
-#include "sdl3/common/scene.h"
+#include "sdl3/common/core/scene.h"
 
 namespace pyc {
 namespace sdl3 {

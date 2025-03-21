@@ -1,7 +1,7 @@
 #include <fmt/base.h>
 
 #include "ghost_escape/scene_main.h"
-#include "sdl3/common/game.h"
+#include "sdl3/common/core/game.h"
 
 using namespace pyc::sdl3;
 

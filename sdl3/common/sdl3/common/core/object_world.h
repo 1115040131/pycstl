@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "sdl3/common/object_screen.h"
+#include "sdl3/common/core/object_screen.h"
 
 namespace pyc {
 namespace sdl3 {

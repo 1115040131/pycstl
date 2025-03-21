@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "sdl3/common/object.h"
+#include "sdl3/common/core/object.h"
 
 namespace pyc {
 namespace sdl3 {
