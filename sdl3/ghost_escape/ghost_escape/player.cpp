@@ -1,6 +1,6 @@
 #include "ghost_escape/player.h"
 
-#include "sdl3/common/affiliate/sprite.h"
+#include "sdl3/common/affiliate/sprite_anim.h"
 #include "sdl3/common/core/scene.h"
 
 namespace pyc {
@@ -9,10 +9,8 @@ namespace sdl3 {
 void Player::init() {
     Actor::init();
     max_speed_ = 500.F;
-    auto sprite = std::make_shared<Sprite>();
-    sprite->setTexture(Texture::makeTexture(ASSET("sprite/ghost-idle.png")));
-    sprite->setParent(this);
-    addChild(sprite);
+    addChild(SpriteAnim::Create(this, ASSET("sprite/ghost-idle.png"), 2.F));
+    // addChild(Sprite::Create(this, ASSET("sprite/ghost-idle.png")));
 }
 
 void Player::clean() { Actor::clean(); }
@@ -26,10 +24,7 @@ void Player::update(std::chrono::duration<float> delta) {
     syncCamera();
 }
 
-void Player::render() {
-    Actor::render();
-    game_.drawBoundary(render_position_, render_position_ + glm::vec2(20.F), 5.F, {1, 0, 0, 1});
-}
+void Player::render() { Actor::render(); }
 
 void Player::keyboardControl() {
     // 玩家移动

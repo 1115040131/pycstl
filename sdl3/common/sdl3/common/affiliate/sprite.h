@@ -4,13 +4,14 @@
 namespace pyc {
 namespace sdl3 {
 
-
 class Sprite : public ObjectAffiliate {
 public:
+    static std::shared_ptr<Sprite> Create(ObjectScreen* parent, const std::string& file_path, float scale = 1.F);
+
     virtual void render() override;
 
     const Texture& getTexture() const { return texture_; }
-    void setTexture(const Texture& texture);
+    virtual void setTexture(const Texture& texture);
 
 protected:
     Texture texture_;

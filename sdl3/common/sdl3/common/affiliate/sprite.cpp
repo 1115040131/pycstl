@@ -5,10 +5,13 @@
 namespace pyc {
 namespace sdl3 {
 
-Texture Texture::makeTexture(const std::string& file_path) {
-    Texture texture{Game::GetInstance().getAssetStore()->getImage(file_path)};
-    SDL_GetTextureSize(texture.texture, &texture.src_rect.w, &texture.src_rect.h);
-    return texture;
+std::shared_ptr<Sprite> Sprite::Create(ObjectScreen* parent, const std::string& file_path, float scale) {
+    auto sprite = std::make_shared<Sprite>();
+    sprite->init();
+    sprite->setParent(parent);
+    sprite->setTexture(Texture::Create(file_path));
+    sprite->setScale(scale);
+    return sprite;
 }
 
 void Sprite::setTexture(const Texture& texture) {

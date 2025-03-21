@@ -12,7 +12,7 @@ struct Texture {
     float angle{};
     bool is_flip{};
 
-    static Texture makeTexture(const std::string& file_path);
+    static Texture Create(const std::string& file_path);
 };
 
 }  // namespace sdl3

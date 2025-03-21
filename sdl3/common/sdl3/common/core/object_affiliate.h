@@ -17,6 +17,8 @@ public:
     const glm::vec2& getSize() const { return size_; }
     void setSize(const glm::vec2& size) { size_ = size; }
 
+    void setScale(float scale) { size_ = size_ * scale; }
+
 protected:
     ObjectScreen* parent_{};
     glm::vec2 offset_{};
