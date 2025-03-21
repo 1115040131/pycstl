@@ -13,6 +13,7 @@ std::shared_ptr<SpriteAnim> SpriteAnim::Create(ObjectScreen* parent, const std::
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);
+    parent->addChild(sprite);
     return sprite;
 }
 
@@ -30,6 +31,12 @@ void SpriteAnim::setTexture(const Texture& texture) {
     total_frames_ = texture.src_rect.w / texture.src_rect.h;
     texture_.src_rect.w = texture.src_rect.h;
     size_ = glm::vec2(texture_.src_rect.w, texture_.src_rect.h);
+}
+
+void SpriteAnim::syncFrame(const SpriteAnim& other) {
+    current_frame_ = other.current_frame_;
+    elapsed_time_ = other.elapsed_time_;
+    texture_.src_rect.x = other.texture_.src_rect.x;
 }
 
 }  // namespace sdl3

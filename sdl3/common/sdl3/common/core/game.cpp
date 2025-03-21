@@ -96,10 +96,10 @@ void Game::run() {
             std::this_thread::sleep_for(kFrameTime - elapsed - 0.1ms);
         }
 
-        {
-            auto tmp = std::chrono::steady_clock::now();
-            fmt::println("elapsed: {},  FPS: {}", elapsed.count(), 1.0s / (tmp - start));
-        }
+        // {
+        //     auto tmp = std::chrono::steady_clock::now();
+        //     fmt::println("elapsed: {},  FPS: {}", elapsed.count(), 1.0s / (tmp - start));
+        // }
     }
 }
 

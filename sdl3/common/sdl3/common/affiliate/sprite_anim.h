@@ -17,6 +17,8 @@ public:
     int getFps() const { return fps_; }
     void setFps(int fps) { fps_ = fps; }
 
+    void syncFrame(const SpriteAnim& other);
+
 private:
     float fps_{10};
 

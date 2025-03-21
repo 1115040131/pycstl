@@ -18,30 +18,42 @@ void Scene::clean() {
 void Scene::handleEvents(SDL_Event& event) {
     Object::handleEvents(event);
     for (auto& child : children_screen_) {
-        child->handleEvents(event);
+        if (child->isActive()) {
+            child->handleEvents(event);
+        }
     }
     for (auto& child : children_world_) {
-        child->handleEvents(event);
+        if (child->isActive()) {
+            child->handleEvents(event);
+        }
     }
 }
 
 void Scene::update(std::chrono::duration<float> delta) {
     Object::update(delta);
     for (auto& child : children_world_) {
-        child->update(delta);
+        if (child->isActive()) {
+            child->update(delta);
+        }
     }
     for (auto& child : children_screen_) {
-        child->update(delta);
+        if (child->isActive()) {
+            child->update(delta);
+        }
     }
 }
 
 void Scene::render() {
     Object::render();
     for (auto& child : children_world_) {
-        child->render();
+        if (child->isActive()) {
+            child->render();
+        }
     }
     for (auto& child : children_screen_) {
-        child->render();
+        if (child->isActive()) {
+            child->render();
+        }
     }
 }
 

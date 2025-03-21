@@ -12,19 +12,25 @@ void Object::clean() {
 
 void Object::handleEvents(SDL_Event& event) {
     for (auto& child : children_) {
-        child->handleEvents(event);
+        if (child->isActive()) {
+            child->handleEvents(event);
+        }
     }
 }
 
 void Object::update(std::chrono::duration<float> delta) {
     for (auto& child : children_) {
-        child->update(delta);
+        if (child->isActive()) {
+            child->update(delta);
+        }
     }
 }
 
 void Object::render() {
     for (auto& child : children_) {
-        child->render();
+        if (child->isActive()) {
+            child->render();
+        }
     }
 }
 

@@ -13,6 +13,9 @@ public:
     const Texture& getTexture() const { return texture_; }
     virtual void setTexture(const Texture& texture);
 
+    void setAngle(float angle) { texture_.angle = angle; }
+    void setFlip(bool flip) { texture_.is_flip = flip; }
+
 protected:
     Texture texture_;
 };

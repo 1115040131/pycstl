@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sdl3/common/core/actor.h"
+#include "sdl3/common/affiliate/sprite_anim.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -18,6 +19,12 @@ private:
     void keyboardControl();
     void move(std::chrono::duration<float> delta);
     void syncCamera();
+    void checkState();
+
+private:
+    std::shared_ptr<SpriteAnim> sprite_idle_{};
+    std::shared_ptr<SpriteAnim> sprite_move_{};
+    bool is_moving_{};
 };
 
 }  // namespace sdl3
