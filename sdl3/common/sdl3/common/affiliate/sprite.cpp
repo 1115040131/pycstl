@@ -5,13 +5,15 @@
 namespace pyc {
 namespace sdl3 {
 
-std::shared_ptr<Sprite> Sprite::Create(ObjectScreen* parent, const std::string& file_path, float scale) {
-    auto sprite = std::make_shared<Sprite>();
+Sprite* Sprite::Create(ObjectScreen* parent, const std::string& file_path, float scale) {
+    auto sprite = std::make_unique<Sprite>();
+    auto sprite_ptr = sprite.get();
     sprite->init();
     sprite->setParent(parent);
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
-    return sprite;
+    parent->addChild(std::move(sprite));
+    return sprite_ptr;
 }
 
 void Sprite::setTexture(const Texture& texture) {

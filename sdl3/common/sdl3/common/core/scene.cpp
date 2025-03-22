@@ -62,30 +62,36 @@ void Scene::setCameraPosition(const glm::vec2& camera_position) {
     camera_position_ = glm::clamp(camera_position, -kOffset, world_size_ - game_.getScreenSize() + kOffset);
 }
 
-void Scene::addChild(const std::shared_ptr<Object>& child) {
+void Scene::addChild(std::unique_ptr<Object> child) {
     switch (child->getType()) {
         case Object::Type::kWorld:
-            children_world_.push_back(std::static_pointer_cast<ObjectWorld>(child));
+            children_world_.emplace_back(static_cast<ObjectWorld*>(child.release()));
             break;
         case Object::Type::kScreen:
-            children_screen_.push_back(std::static_pointer_cast<ObjectScreen>(child));
+            children_screen_.emplace_back(static_cast<ObjectScreen*>(child.release()));
             break;
         default:
-            children_.push_back(child);
+            children_.push_back(std::move(child));
             break;
     }
 }
 
-void Scene::removeChild(const std::shared_ptr<Object>& child) {
-    switch (child->getType()) {
+void Scene::removeChild(Object* child_to_remove) {
+    switch (child_to_remove->getType()) {
         case Object::Type::kWorld:
-            std::erase(children_world_, child);
+            std::erase_if(children_world_, [child_to_remove](const std::unique_ptr<ObjectWorld>& child) {
+                return child.get() == child_to_remove;
+            });
             break;
         case Object::Type::kScreen:
-            std::erase(children_screen_, child);
+            std::erase_if(children_screen_, [child_to_remove](const std::unique_ptr<ObjectScreen>& child) {
+                return child.get() == child_to_remove;
+            });
             break;
         default:
-            std::erase(children_, child);
+            std::erase_if(children_, [child_to_remove](const std::unique_ptr<Object>& child) {
+                return child.get() == child_to_remove;
+            });
             break;
     }
 }

@@ -6,7 +6,7 @@ namespace sdl3 {
 
 class Sprite : public ObjectAffiliate {
 public:
-    static std::shared_ptr<Sprite> Create(ObjectScreen* parent, const std::string& file_path, float scale = 1.F);
+    static Sprite* Create(ObjectScreen* parent, const std::string& file_path, float scale = 1.F);
 
     virtual void render() override;
 

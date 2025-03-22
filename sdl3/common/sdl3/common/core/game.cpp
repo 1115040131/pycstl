@@ -15,6 +15,10 @@ namespace sdl3 {
 
 using namespace std::chrono_literals;
 
+Game::Game() = default;
+
+Game::~Game() = default;
+
 void Game::init(std::string_view title, int width, int height) {
     title_ = title;
     screen_size_ = glm::vec2(width, height);
@@ -136,7 +140,7 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     }
 }
 
-void Game::renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size)const {
+void Game::renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size) const {
     SDL_FRect dst_rect = {
         position.x,
         position.y,
@@ -148,7 +152,7 @@ void Game::renderTexture(const Texture& texture, const glm::vec2& position, cons
 }
 
 void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
-                    SDL_FColor color) const{
+                    SDL_FColor color) const {
     SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
     for (float x = top_left.x; x <= bottom_right.x; x += grid_width) {
         SDL_RenderLine(renderer_, x, top_left.y, x, bottom_right.y);
@@ -160,7 +164,7 @@ void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, fl
 }
 
 void Game::drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
-                        SDL_FColor color) const{
+                        SDL_FColor color) const {
     SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
     for (float i = 0; i < boundary_width; i++) {
         SDL_FRect rect = {

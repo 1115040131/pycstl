@@ -37,15 +37,19 @@ public:
     bool isActive() const { return is_active_; }
     void setActive(bool active) { is_active_ = active; }
 
-    virtual void addChild(const std::shared_ptr<Object>& child) { children_.push_back(child); }
-    virtual void removeChild(const std::shared_ptr<Object>& child) { std::erase(children_, child); }
+    virtual void addChild(std::unique_ptr<Object> child) { children_.push_back(std::move(child)); }
+    virtual void removeChild(Object* child_to_remove) {
+        std::erase_if(children_, [child_to_remove](const std::unique_ptr<Object>& child) {
+            return child.get() == child_to_remove;
+        });
+    }
 
 protected:
     std::string name_;
     Type type_ = Type::kCommon;
     Game& game_ = Game::GetInstance();
     bool is_active_{true};
-    std::vector<std::shared_ptr<Object>> children_;
+    std::vector<std::unique_ptr<Object>> children_;
 };
 
 }  // namespace sdl3

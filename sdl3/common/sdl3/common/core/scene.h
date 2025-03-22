@@ -28,14 +28,14 @@ public:
     glm::vec2 worldToScreen(const glm::vec2& position) const { return position - camera_position_; }
     glm::vec2 screenToWorld(const glm::vec2& screen_position) const { return screen_position + camera_position_; }
 
-    virtual void addChild(const std::shared_ptr<Object>& child) override;
-    virtual void removeChild(const std::shared_ptr<Object>& child) override;
+    virtual void addChild(std::unique_ptr<Object> child) override;
+    virtual void removeChild(Object* child_to_remove) override;
 
 protected:
     glm::vec2 world_size_;
     glm::vec2 camera_position_;
-    std::vector<std::shared_ptr<ObjectWorld>> children_world_;
-    std::vector<std::shared_ptr<ObjectScreen>> children_screen_;
+    std::vector<std::unique_ptr<ObjectWorld>> children_world_;
+    std::vector<std::unique_ptr<ObjectScreen>> children_screen_;
 };
 
 }  // namespace sdl3

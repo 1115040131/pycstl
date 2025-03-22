@@ -7,8 +7,8 @@ namespace sdl3 {
 
 class SpriteAnim : public Sprite {
 public:
-    static std::shared_ptr<SpriteAnim> Create(ObjectScreen* parent, const std::string& file_path,
-                                              float scale = 1.F, float fps = 10.F);
+    static SpriteAnim* Create(ObjectScreen* parent, const std::string& file_path, float scale = 1.F,
+                              float fps = 10.F);
 
     virtual void update(std::chrono::duration<float> delta) override;
 

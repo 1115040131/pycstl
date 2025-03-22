@@ -19,7 +19,7 @@ private:
     void renderBackground() const;
 
 private:
-    std::shared_ptr<Player> player_{};
+    Player* player_{};
 };
 
 }  // namespace sdl3

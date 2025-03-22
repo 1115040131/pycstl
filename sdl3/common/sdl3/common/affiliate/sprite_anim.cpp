@@ -5,16 +5,16 @@ namespace sdl3 {
 
 using namespace std::chrono_literals;
 
-std::shared_ptr<SpriteAnim> SpriteAnim::Create(ObjectScreen* parent, const std::string& file_path, float scale,
-                                               float fps) {
-    auto sprite = std::make_shared<SpriteAnim>();
+SpriteAnim* SpriteAnim::Create(ObjectScreen* parent, const std::string& file_path, float scale, float fps) {
+    auto sprite = std::make_unique<SpriteAnim>();
+    auto sprite_ptr = sprite.get();
     sprite->init();
     sprite->setParent(parent);
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);
-    parent->addChild(sprite);
-    return sprite;
+    parent->addChild(std::move(sprite));
+    return sprite_ptr;
 }
 
 void SpriteAnim::update(std::chrono::duration<float> delta) {

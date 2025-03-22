@@ -20,16 +20,16 @@ class Game : public Singleton<Game> {
     friend class Singleton<Game>;
 
 private:
-    Game() = default;
-
-    ~Game() = default;
+    Game();
 
 public:
+    ~Game();
+
     SDL_Window* getWindow() const { return window_; }
     SDL_Renderer* getRenderer() const { return renderer_; }
     const std::string& getTitle() const { return title_; }
     const glm::vec2& getScreenSize() const { return screen_size_; }
-    const std::shared_ptr<Scene>& getCurrentScene() const { return current_scene_; }
+    const std::unique_ptr<Scene>& getCurrentScene() const { return current_scene_; }
     const std::unique_ptr<AssetStore>& getAssetStore() const { return asset_store_; }
 
     void init(std::string_view title, int width, int height);
@@ -64,7 +64,7 @@ private:
 
     std::string title_;
     glm::vec2 screen_size_;
-    std::shared_ptr<Scene> current_scene_;
+    std::unique_ptr<Scene> current_scene_;
     std::unique_ptr<AssetStore> asset_store_;
 };
 

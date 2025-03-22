@@ -7,11 +7,12 @@ void SceneMain::init() {
     world_size_ = game_.getScreenSize() * 3.0F;
     camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
 
-    player_ = std::make_shared<Player>();
+    auto player = std::make_unique<Player>();
+    player_ = player.get();
     player_->init();
     player_->setPosition(world_size_ / 2.F);
 
-    addChild(player_);
+    addChild(std::move(player));
 }
 
 void SceneMain::clean() { Scene::clean(); }

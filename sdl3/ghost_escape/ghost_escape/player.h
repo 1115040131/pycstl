@@ -22,8 +22,8 @@ private:
     void checkState();
 
 private:
-    std::shared_ptr<SpriteAnim> sprite_idle_{};
-    std::shared_ptr<SpriteAnim> sprite_move_{};
+    SpriteAnim* sprite_idle_{};
+    SpriteAnim* sprite_move_{};
     bool is_moving_{};
 };
 
