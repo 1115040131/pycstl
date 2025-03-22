@@ -15,7 +15,7 @@ void Player::init() {
 
 void Player::clean() { Actor::clean(); }
 
-void Player::handleEvents(SDL_Event& event) { Actor::handleEvents(event); }
+void Player::handleEvents(const SDL_Event& event) { Actor::handleEvents(event); }
 
 void Player::update(std::chrono::duration<float> delta) {
     Actor::update(delta);

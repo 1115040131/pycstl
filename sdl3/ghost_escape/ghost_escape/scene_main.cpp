@@ -24,7 +24,7 @@ void SceneMain::init() {
 
 void SceneMain::clean() { Scene::clean(); }
 
-void SceneMain::handleEvents(SDL_Event& event) { Scene::handleEvents(event); }
+void SceneMain::handleEvents(const SDL_Event& event) { Scene::handleEvents(event); }
 
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);

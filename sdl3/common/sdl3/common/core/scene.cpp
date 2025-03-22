@@ -9,7 +9,7 @@ void Scene::clean() {
     Clean(children_screen_);
 }
 
-void Scene::handleEvents(SDL_Event& event) {
+void Scene::handleEvents(const SDL_Event& event) {
     HandleEvents(children_, event);
     HandleEvents(children_screen_, event);
     HandleEvents(children_world_, event);

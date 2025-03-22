@@ -25,7 +25,7 @@ public:
     virtual void init() {}
     virtual void clean();
 
-    virtual void handleEvents(SDL_Event& event);
+    virtual void handleEvents(const SDL_Event& event);
     virtual void update(std::chrono::duration<float> delta);
     virtual void render();
 
@@ -68,7 +68,7 @@ void Clean(std::vector<std::unique_ptr<T>>& children) {
 }
 
 template <DerivedFromObject T>
-void HandleEvents(std::vector<std::unique_ptr<T>>& children, SDL_Event& event) {
+void HandleEvents(std::vector<std::unique_ptr<T>>& children, const SDL_Event& event) {
     for (auto& child : children) {
         if (child->isActive()) {
             child->handleEvents(event);
@@ -78,16 +78,15 @@ void HandleEvents(std::vector<std::unique_ptr<T>>& children, SDL_Event& event) {
 
 template <DerivedFromObject T>
 void Update(std::vector<std::unique_ptr<T>>& children, std::chrono::duration<float> delta) {
-    auto partition_it =
-        std::partition(children.begin(), children.end(), [delta](const std::unique_ptr<T>& child) {
-            if (child->needRemove()) {
-                child->clean();
-                return false;
-            } else if (child->isActive()) {
-                child->update(delta);
-            }
-            return true;
-        });
+    auto partition_it = std::partition(children.begin(), children.end(), [delta](const std::unique_ptr<T>& child) {
+        if (child->needRemove()) {
+            child->clean();
+            return false;
+        } else if (child->isActive()) {
+            child->update(delta);
+        }
+        return true;
+    });
     children.erase(partition_it, children.end());
 }
 

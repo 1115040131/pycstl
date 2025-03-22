@@ -11,7 +11,7 @@ public:
     virtual void init() override;
     virtual void clean() override;
 
-    virtual void handleEvents(SDL_Event& event) override;
+    virtual void handleEvents(const SDL_Event& event) override;
     virtual void update(std::chrono::duration<float> delta) override;
     virtual void render() override;
 
