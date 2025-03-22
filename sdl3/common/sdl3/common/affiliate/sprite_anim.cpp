@@ -5,23 +5,35 @@ namespace sdl3 {
 
 using namespace std::chrono_literals;
 
-SpriteAnim* SpriteAnim::Create(ObjectScreen* parent, const std::string& file_path, float scale, float fps) {
+SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, float fps,
+                                     bool is_loop) {
     auto sprite = std::make_unique<SpriteAnim>();
-    auto sprite_ptr = sprite.get();
     sprite->init();
     sprite->setParent(parent);
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);
-    parent->addChild(std::move(sprite));
-    return sprite_ptr;
+    sprite->setLoop(is_loop);
+    return static_cast<SpriteAnim*>(parent->addChild(std::move(sprite)));
 }
 
 void SpriteAnim::update(std::chrono::duration<float> delta) {
+    if (is_finish_) {
+        return;
+    }
     elapsed_time_ += delta;
     while (elapsed_time_ > 1.0s / fps_) {
         elapsed_time_ -= 1.0s / fps_;
-        current_frame_ = (current_frame_ + 1) % total_frames_;
+        current_frame_++;
+        if (current_frame_ >= total_frames_) {
+            if (is_loop_) {
+                current_frame_ = 0;
+            } else {
+                current_frame_ = total_frames_ - 1;
+                is_finish_ = true;
+                break;
+            }
+        }
     }
     texture_.src_rect.x = texture_.src_rect.w * current_frame_;
 }

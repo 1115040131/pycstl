@@ -142,8 +142,8 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
 
 void Game::renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size) const {
     SDL_FRect dst_rect = {
-        position.x,
-        position.y,
+        position.x - size.x / 2,
+        position.y - size.y / 2,
         size.x,
         size.y,
     };

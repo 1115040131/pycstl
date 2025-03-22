@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include <SDL3/SDL.h>
+#include <fmt/base.h>
 #include <glm/glm.hpp>
 
 #include "common/singleton.h"

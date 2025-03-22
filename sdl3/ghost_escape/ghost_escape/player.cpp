@@ -1,15 +1,16 @@
 #include "ghost_escape/player.h"
 
 #include "sdl3/common/core/scene.h"
+
 namespace pyc {
 namespace sdl3 {
 
 void Player::init() {
     Actor::init();
     max_speed_ = 500.F;
-    sprite_idle_ = SpriteAnim::Create(this, ASSET("sprite/ghost-idle.png"), 2.F);
-    sprite_move_ = SpriteAnim::Create(this, ASSET("sprite/ghost-move.png"), 2.F);
-    sprite_move_->setActive(false);
+    anim_idle_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-idle.png"), 2.F);
+    anim_move_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-move.png"), 2.F);
+    anim_move_->setActive(false);
 }
 
 void Player::clean() { Actor::clean(); }
@@ -44,33 +45,28 @@ void Player::keyboardControl() {
     }
 }
 
-void Player::move(std::chrono::duration<float> delta) {
-    setPosition(glm::clamp(position_ + velocity_ * delta.count(), glm::vec2(),
-                           game_.getCurrentScene()->getWorldSize() - 20.F));
-}
-
 void Player::syncCamera() { game_.getCurrentScene()->setCameraPosition(position_ - game_.getScreenSize() / 2.F); }
 
 void Player::checkState() {
     if (velocity_.x < 0) {
-        sprite_idle_->setFlip(true);
-        sprite_move_->setFlip(true);
+        anim_idle_->setFlip(true);
+        anim_move_->setFlip(true);
     } else if (velocity_.x > 0) {
-        sprite_idle_->setFlip(false);
-        sprite_move_->setFlip(false);
+        anim_idle_->setFlip(false);
+        anim_move_->setFlip(false);
     }
 
     auto curr_is_moving = glm::length(velocity_) > 50.F;
     if (is_moving_ != curr_is_moving) {
         is_moving_ = curr_is_moving;
         if (is_moving_) {
-            sprite_idle_->setActive(false);
-            sprite_move_->setActive(true);
-            sprite_move_->syncFrame(*sprite_idle_);
+            anim_idle_->setActive(false);
+            anim_move_->setActive(true);
+            anim_move_->syncFrame(*anim_idle_);
         } else {
-            sprite_idle_->setActive(true);
-            sprite_move_->setActive(false);
-            sprite_idle_->syncFrame(*sprite_move_);
+            anim_idle_->setActive(true);
+            anim_move_->setActive(false);
+            anim_idle_->syncFrame(*anim_move_);
         }
     }
 }

@@ -14,6 +14,9 @@ public:
     void setMaxSpeed(float max_speed) { max_speed_ = max_speed; }
 
 protected:
+    void move(std::chrono::duration<float> delta);
+
+protected:
     glm::vec2 velocity_{};
     float max_speed_{100};
 };

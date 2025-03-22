@@ -28,7 +28,7 @@ public:
     glm::vec2 worldToScreen(const glm::vec2& position) const { return position - camera_position_; }
     glm::vec2 screenToWorld(const glm::vec2& screen_position) const { return screen_position + camera_position_; }
 
-    virtual void addChild(std::unique_ptr<Object> child) override;
+    virtual Object* addChild(std::unique_ptr<Object> child) override;
     virtual void removeChild(Object* child_to_remove) override;
 
 protected:

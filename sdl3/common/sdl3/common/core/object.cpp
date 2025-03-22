@@ -3,34 +3,26 @@
 namespace pyc {
 namespace sdl3 {
 
-void Object::clean() {
-    for (auto& child : children_) {
-        child->clean();
-    }
-    children_.clear();
+void Object::clean() { Clean(children_); }
+
+void Object::handleEvents(SDL_Event& event) { HandleEvents(children_, event); }
+
+void Object::update(std::chrono::duration<float> delta) { Update(children_, delta); }
+
+void Object::render() { Render(children_); }
+
+Object* Object::addChild(std::unique_ptr<Object> child) {
+    child->setParent(this);
+    children_.push_back(std::move(child));
+    return children_.back().get();
 }
 
-void Object::handleEvents(SDL_Event& event) {
-    for (auto& child : children_) {
-        if (child->isActive()) {
-            child->handleEvents(event);
-        }
-    }
-}
-
-void Object::update(std::chrono::duration<float> delta) {
-    for (auto& child : children_) {
-        if (child->isActive()) {
-            child->update(delta);
-        }
-    }
-}
-
-void Object::render() {
-    for (auto& child : children_) {
-        if (child->isActive()) {
-            child->render();
-        }
+void Object::removeChild(Object* child_to_remove) {
+    auto iter = std::ranges::find_if(children_, [child_to_remove](const std::unique_ptr<Object>& child) {
+        return child.get() == child_to_remove;
+    });
+    if (iter != children_.end()) {
+        (*iter)->need_remove_ = true;
     }
 }
 

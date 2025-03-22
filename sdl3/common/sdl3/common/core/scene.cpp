@@ -4,57 +4,27 @@ namespace pyc {
 namespace sdl3 {
 
 void Scene::clean() {
-    Object::clean();
-    for (auto& child : children_world_) {
-        child->clean();
-    }
-    children_world_.clear();
-    for (auto& child : children_screen_) {
-        child->clean();
-    }
-    children_screen_.clear();
+    Clean(children_);
+    Clean(children_world_);
+    Clean(children_screen_);
 }
 
 void Scene::handleEvents(SDL_Event& event) {
-    Object::handleEvents(event);
-    for (auto& child : children_screen_) {
-        if (child->isActive()) {
-            child->handleEvents(event);
-        }
-    }
-    for (auto& child : children_world_) {
-        if (child->isActive()) {
-            child->handleEvents(event);
-        }
-    }
+    HandleEvents(children_, event);
+    HandleEvents(children_screen_, event);
+    HandleEvents(children_world_, event);
 }
 
 void Scene::update(std::chrono::duration<float> delta) {
-    Object::update(delta);
-    for (auto& child : children_world_) {
-        if (child->isActive()) {
-            child->update(delta);
-        }
-    }
-    for (auto& child : children_screen_) {
-        if (child->isActive()) {
-            child->update(delta);
-        }
-    }
+    Update(children_, delta);
+    Update(children_world_, delta);
+    Update(children_screen_, delta);
 }
 
 void Scene::render() {
-    Object::render();
-    for (auto& child : children_world_) {
-        if (child->isActive()) {
-            child->render();
-        }
-    }
-    for (auto& child : children_screen_) {
-        if (child->isActive()) {
-            child->render();
-        }
-    }
+    Render(children_);
+    Render(children_world_);
+    Render(children_screen_);
 }
 
 void Scene::setCameraPosition(const glm::vec2& camera_position) {
@@ -62,36 +32,44 @@ void Scene::setCameraPosition(const glm::vec2& camera_position) {
     camera_position_ = glm::clamp(camera_position, -kOffset, world_size_ - game_.getScreenSize() + kOffset);
 }
 
-void Scene::addChild(std::unique_ptr<Object> child) {
+Object* Scene::addChild(std::unique_ptr<Object> child) {
+    child->setParent(this);
     switch (child->getType()) {
         case Object::Type::kWorld:
             children_world_.emplace_back(static_cast<ObjectWorld*>(child.release()));
-            break;
+            return children_world_.back().get();
         case Object::Type::kScreen:
             children_screen_.emplace_back(static_cast<ObjectScreen*>(child.release()));
-            break;
+            return children_screen_.back().get();
         default:
             children_.push_back(std::move(child));
             break;
     }
+    return children_.back().get();
 }
 
 void Scene::removeChild(Object* child_to_remove) {
     switch (child_to_remove->getType()) {
-        case Object::Type::kWorld:
-            std::erase_if(children_world_, [child_to_remove](const std::unique_ptr<ObjectWorld>& child) {
-                return child.get() == child_to_remove;
-            });
-            break;
-        case Object::Type::kScreen:
-            std::erase_if(children_screen_, [child_to_remove](const std::unique_ptr<ObjectScreen>& child) {
-                return child.get() == child_to_remove;
-            });
-            break;
+        case Object::Type::kWorld: {
+            auto iter = std::ranges::find_if(children_world_,
+                                             [child_to_remove](const std::unique_ptr<ObjectWorld>& child) {
+                                                 return child.get() == child_to_remove;
+                                             });
+            if (iter != children_world_.end()) {
+                (*iter)->setNeedRemove(true);
+            }
+        } break;
+        case Object::Type::kScreen: {
+            auto iter = std::ranges::find_if(children_screen_,
+                                             [child_to_remove](const std::unique_ptr<ObjectScreen>& child) {
+                                                 return child.get() == child_to_remove;
+                                             });
+            if (iter != children_screen_.end()) {
+                (*iter)->setNeedRemove(true);
+            }
+        } break;
         default:
-            std::erase_if(children_, [child_to_remove](const std::unique_ptr<Object>& child) {
-                return child.get() == child_to_remove;
-            });
+            Object::removeChild(child_to_remove);
             break;
     }
 }

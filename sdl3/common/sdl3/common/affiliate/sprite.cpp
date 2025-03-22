@@ -5,15 +5,13 @@
 namespace pyc {
 namespace sdl3 {
 
-Sprite* Sprite::Create(ObjectScreen* parent, const std::string& file_path, float scale) {
+Sprite* Sprite::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale) {
     auto sprite = std::make_unique<Sprite>();
-    auto sprite_ptr = sprite.get();
     sprite->init();
     sprite->setParent(parent);
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
-    parent->addChild(std::move(sprite));
-    return sprite_ptr;
+    return static_cast<Sprite*>(parent->addChild(std::move(sprite)));
 }
 
 void Sprite::setTexture(const Texture& texture) {
@@ -26,7 +24,14 @@ void Sprite::render() {
         fmt::println("Sprite::render: texture or parent is nullptr");
         return;
     }
-    game_.renderTexture(texture_, parent_->getRenderPosition() + offset_, size_);
+    if (parent_->getType() == Object::Type::kCommon) {
+        fmt::println("Sprite::render: parent is not ObjectScreen");
+        return;
+    }
+    if (is_finish_) {
+        return;
+    }
+    game_.renderTexture(texture_, static_cast<ObjectScreen*>(parent_)->getRenderPosition() + offset_, size_);
 }
 
 }  // namespace sdl3
