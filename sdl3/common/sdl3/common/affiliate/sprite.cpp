@@ -5,11 +5,12 @@
 namespace pyc {
 namespace sdl3 {
 
-Sprite* Sprite::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale) {
+Sprite* Sprite::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, Anchor anchor) {
     auto sprite = std::make_unique<Sprite>();
     sprite->init();
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
+    sprite->setOffsetByAnchor(anchor);
     return static_cast<Sprite*>(parent->addChild(std::move(sprite)));
 }
 

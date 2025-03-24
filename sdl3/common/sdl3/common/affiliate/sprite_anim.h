@@ -12,7 +12,7 @@ class ObjectScreen;
 class SpriteAnim : public Sprite {
 public:
     static SpriteAnim* CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale = 1.F,
-                                    float fps = 10.F, bool is_loop = true);
+                                    float fps = 10.F, bool is_loop = true, Anchor anchor = Anchor::kCenter);
 
     virtual void update(std::chrono::duration<float> delta) override;
 

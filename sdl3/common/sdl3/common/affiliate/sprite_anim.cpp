@@ -8,13 +8,14 @@ namespace sdl3 {
 using namespace std::chrono_literals;
 
 SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, float fps,
-                                     bool is_loop) {
+                                     bool is_loop, Anchor anchor) {
     auto sprite = std::make_unique<SpriteAnim>();
     sprite->init();
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);
     sprite->setLoop(is_loop);
+    sprite->setOffsetByAnchor(anchor);
     return static_cast<SpriteAnim*>(parent->addChild(std::move(sprite)));
 }
 

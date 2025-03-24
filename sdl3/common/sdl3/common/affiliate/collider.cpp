@@ -5,11 +5,12 @@
 namespace pyc {
 namespace sdl3 {
 
-Collider* Collider::CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type) {
+Collider* Collider::CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type, Anchor anchor) {
     auto collider = std::make_unique<Collider>();
     collider->init();
     collider->setSize(size);
     collider->type_ = type;
+    collider->setOffsetByAnchor(anchor);
     return static_cast<Collider*>(parent->addChild(std::move(collider)));
 }
 

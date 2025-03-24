@@ -14,7 +14,8 @@ public:
         kRectange,
     };
 
-    static Collider* CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type = Type::kCircle);
+    static Collider* CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type = Type::kCircle,
+                                  Anchor anchor = Anchor::kCenter);
 
     virtual void render() override;
 
