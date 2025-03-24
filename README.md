@@ -113,9 +113,3 @@ sudo apt install libpulse-dev libxext-dev
 export SDL_AUDIODRIVER=dummy
 export AUDIODEV=null
 ```
-
-### SDL3
-
-```bash
-sudo apt install nasm # for dav1d compile
-```

@@ -14,6 +14,11 @@ cmake(
 cmake(
     name = "sdl3_image",
     cache_entries = {"SDLIMAGE_VENDORED": "ON"},
+    data = ["@nasm"],
+    env = {
+        "ASM_NASM": "$(execpath @nasm//:nasm)",
+        "NASM_PATH": "$(execpath @nasm//:nasm)/..",
+    },
     lib_source = "@sdl3_image//:all_srcs",
     out_shared_libs = [
         "libSDL3_image.so",

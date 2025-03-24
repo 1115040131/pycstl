@@ -15,6 +15,10 @@ cmake(
 cmake(
     name = "sdl2_image",
     cache_entries = {"SDL2IMAGE_VENDORED": "ON"},
+    data = ["@nasm"],
+    env = {
+        "ASM_NASM": "$(execpath @nasm//:nasm)",
+    },
     lib_source = "@sdl2_image//:all_srcs",
     out_shared_libs = [
         "libSDL2_image-2.0d.so",
