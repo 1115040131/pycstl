@@ -6,6 +6,8 @@
 namespace pyc {
 namespace sdl3 {
 
+class ObjectScreen;
+
 class Sprite : public ObjectAffiliate {
 public:
     static Sprite* CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale = 1.F);

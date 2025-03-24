@@ -1,5 +1,3 @@
-#include <fmt/base.h>
-
 #include "ghost_escape/scene_main.h"
 #include "sdl3/common/core/game.h"
 

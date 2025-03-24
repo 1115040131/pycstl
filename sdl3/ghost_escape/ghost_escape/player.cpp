@@ -11,6 +11,8 @@ void Player::init() {
     anim_idle_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-idle.png"), 2.F);
     anim_move_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-move.png"), 2.F);
     anim_move_->setActive(false);
+
+    collider_ = Collider::CreateAndSet(this, anim_idle_->getSize());
 }
 
 void Player::clean() { Actor::clean(); }

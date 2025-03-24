@@ -1,5 +1,7 @@
 #include "sdl3/common/affiliate/sprite_anim.h"
 
+#include "sdl3/common/core/object_screen.h"
+
 namespace pyc {
 namespace sdl3 {
 
@@ -9,7 +11,6 @@ SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& fi
                                      bool is_loop) {
     auto sprite = std::make_unique<SpriteAnim>();
     sprite->init();
-    sprite->setParent(parent);
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);

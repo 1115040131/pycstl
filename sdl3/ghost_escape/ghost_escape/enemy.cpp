@@ -11,23 +11,26 @@ void Enemy::init() {
     anim_hurt_->setActive(false);
     anim_die_->setActive(false);
     current_anim_ = anim_normal_;
+
+    collider_ = Collider::CreateAndSet(this, current_anim_->getSize());
 }
 
 void Enemy::update(std::chrono::duration<float> delta) {
     aimTarget();
     move(delta);
+    attack();
     checkState();
     Actor::update(delta);
 
     // test
-    static float timer = 0;
-    timer += delta.count();
-    if (timer > 2) {
-        changeState(State::kDie);
-    } else if (timer > 1) {
-        changeState(State::kHurt);
-    }
-    remove();
+    // static float timer = 0;
+    // timer += delta.count();
+    // if (timer > 2) {
+    //     changeState(State::kDie);
+    // } else if (timer > 1) {
+    //     changeState(State::kHurt);
+    // }
+    // remove();
 }
 
 void Enemy::aimTarget() {
@@ -40,6 +43,16 @@ void Enemy::aimTarget() {
         return;
     }
     velocity_ = glm::normalize(direction) * max_speed_;
+}
+
+void Enemy::attack() {
+    if (!collider_ || !target_ || !target_->getCollider()) {
+        return;
+    }
+    fmt::println("isColliding: {}", collider_->isColliding(*target_->getCollider()));
+    if (collider_->isColliding(*target_->getCollider())) {
+        // TODO attack
+    }
 }
 
 void Enemy::checkState() {}

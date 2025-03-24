@@ -10,10 +10,9 @@ void SceneMain::init() {
     camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
 
     auto player = std::make_unique<Player>();
-    player_ = player.get();
-    player_->init();
-    player_->setPosition(world_size_ / 2.F);
-    addChild(std::move(player));
+    player->init();
+    player->setPosition(world_size_ / 2.F);
+    player_ = static_cast<Player*>(addChild(std::move(player)));
 
     auto enemy = std::make_unique<Enemy>();
     enemy->init();
@@ -28,8 +27,8 @@ void SceneMain::handleEvents(const SDL_Event& event) { Scene::handleEvents(event
 
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
-    fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
-                 children_screen_.size(), children_.size());
+    // fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
+    //              children_screen_.size(), children_.size());
 }
 
 void SceneMain::render() {

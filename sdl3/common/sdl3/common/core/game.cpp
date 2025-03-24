@@ -6,7 +6,6 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <fmt/base.h>
 
 #include "sdl3/common/core/scene.h"
 
@@ -149,6 +148,18 @@ void Game::renderTexture(const Texture& texture, const glm::vec2& position, cons
     };
     SDL_RenderTextureRotated(renderer_, texture.texture, &texture.src_rect, &dst_rect, texture.angle, nullptr,
                              texture.is_flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+}
+
+void Game::renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha) const {
+    auto texture = asset_store_->getImage(ASSET("UI/circle.png"));
+    SDL_FRect dst_rect = {
+        position.x - size.x / 2,
+        position.y - size.y / 2,
+        size.x,
+        size.y,
+    };
+    SDL_SetTextureAlphaModFloat(texture, alpha);
+    SDL_RenderTexture(renderer_, texture, nullptr, &dst_rect);
 }
 
 void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,

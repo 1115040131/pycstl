@@ -22,6 +22,7 @@ private:
     };
 
     void aimTarget();
+    void attack();
     void checkState();
     void changeState(State state);
 
