@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <SDL2/SDL_mixer.h>
 
 #include "shooter/scene.h"
