@@ -1,0 +1,18 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_binary(
+    name = "monkey",
+    srcs = glob([
+        "monkey/**/*.cpp",
+        "monkey/**/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    includes = ["."],
+    deps = ["@fmt"],
+)

@@ -211,6 +211,11 @@ def main():
         "logger": lambda args: run_bazel_build('//logger //logger/test/...', args=args),
         "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
 
+        ######################### build for monkey #########################
+        "monkey": lambda args: run_bazel_build('//monkey //monkey/test:monkey_all_test', args=args),
+        "monkey_run": lambda args: run_bazel_run('//monkey', args=args),
+        "monkey_test": lambda args: run_bazel_test('//monkey/test:monkey_all_test', args=args),
+
         ######################### build for network #########################
         "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args=args),
         "network_run": lambda args: (
