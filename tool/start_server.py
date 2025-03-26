@@ -62,14 +62,14 @@ def run(config_name):
     if client is None:
         run_tmux({
             "Network": [
-                f"python3 {tool_path / 'build.py'} //network/example:{server}"
+                f"python3 {tool_path / 'build.py'} run //network/example:{server}"
             ]
         })
     else:
         run_tmux({
             "Network": [
-                f"python3 {tool_path / 'build.py'} //network/example:{server}",
-                f"python3 {tool_path / 'build.py'} //network/example:{client}"
+                f"python3 {tool_path / 'build.py'} run //network/example:{server}",
+                f"python3 {tool_path / 'build.py'} run //network/example:{client}"
             ]
         })
 

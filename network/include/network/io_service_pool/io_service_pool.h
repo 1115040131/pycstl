@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <thread>
 #include <vector>
 
@@ -29,7 +28,7 @@ private:
 
 private:
     std::vector<IOService> io_services_{};
-    std::vector<std::unique_ptr<Work>> works_{};  // 防止 IOService run 后直接返回
+    std::vector<Work> works_{};  // 防止 IOService run 后直接返回
     std::vector<std::thread> threads_{};
     std::size_t curr_idx_ = 0;  // 当前 io_service 下标
 };

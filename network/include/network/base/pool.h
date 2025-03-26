@@ -9,7 +9,7 @@ namespace asio = boost::asio;
 class Pool {
 public:
     using IOService = asio::io_context;
-    using Work = asio::io_context::work;
+    using Work = asio::executor_work_guard<asio::io_context::executor_type>;
 
     virtual ~Pool() = default;
 

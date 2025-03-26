@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <thread>
 #include <vector>
 
@@ -28,7 +27,7 @@ private:
 
 private:
     IOService io_service_{};
-    std::unique_ptr<Work> work_ = std::make_unique<Work>(io_service_);
+    Work work_ = asio::make_work_guard(io_service_);
     std::vector<std::thread> threads_{};
 };
 

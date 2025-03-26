@@ -10,7 +10,7 @@ using asio::ip::tcp;
 
 class HttpClient {
 public:
-    HttpClient(asio::io_service& io_service, const std::string& server, const std::string& path)
+    HttpClient(asio::io_context& io_service, const std::string& server, const std::string& path)
         : resolver_(io_service), socket_(io_service) {
         if (!IsValidIpAddress(server)) {
             throw std::invalid_argument(fmt::format("Invalid IP address: {}", server));

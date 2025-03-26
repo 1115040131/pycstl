@@ -9,7 +9,7 @@ IOServicePool::IOServicePool(std::size_t size) : io_services_(size) {
 
     works_.reserve(size);
     for (std::size_t i = 0; i < size; ++i) {
-        works_.emplace_back(std::make_unique<Work>(io_services_[i]));
+        works_.emplace_back(asio::make_work_guard(io_services_[i]));
     }
 
     threads_.reserve(size);

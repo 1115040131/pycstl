@@ -12,7 +12,7 @@ IOServicePool::IOServicePool(std::size_t size) : io_services_(size) {
 
     works_.reserve(size);
     for (std::size_t i = 0; i < size; ++i) {
-        works_.emplace_back(std::make_unique<Work>(io_services_[i]));
+        works_.emplace_back(boost::asio::make_work_guard(io_services_[i]));
     }
 
     threads_.reserve(size);
@@ -33,9 +33,11 @@ IOServicePool::IOService& IOServicePool::GetIOService() {
 }
 
 void IOServicePool::Stop() {
+    // 当 io_service 已经绑定任务时, 需要先停止 io_service, 再释放 work
+    for (auto& io_service : io_services_) {
+        io_service.stop();
+    }
     for (auto& work : works_) {
-        // 当 io_service 已经绑定任务时, 需要先停止 io_service, 再释放 work
-        work->get_io_context().stop();
         work.reset();
     }
     for (auto& thread : threads_) {

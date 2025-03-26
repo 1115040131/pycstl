@@ -17,7 +17,7 @@ int main() {
         asio::io_context io_context;
 
         // 构造 endpoint
-        asio::ip::tcp::endpoint remote_endpoint(asio::ip::address::from_string("127.0.0.1"), 10086);
+        asio::ip::tcp::endpoint remote_endpoint(asio::ip::make_address("127.0.0.1"), 10086);
         asio::ip::tcp::socket sock(io_context);
         boost::system::error_code error_code = boost::asio::error::host_not_found;
         sock.connect(remote_endpoint, error_code);

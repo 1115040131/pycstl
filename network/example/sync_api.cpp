@@ -21,7 +21,7 @@ int ClientEndPoint() {
 
     // Step 2. Using IP protocol version independent address representation.
     boost::system::error_code error_code;
-    asio::ip::address ip_address = asio::ip::address::from_string(raw_ip_address, error_code);
+    asio::ip::address ip_address = asio::ip::make_address(raw_ip_address, error_code);
     if (error_code.value() != 0) [[unlikely]] {
         fmt::println("Failed to parse the IP address {}. Error code = {}, Message: {}", raw_ip_address,
                      error_code.value(), error_code.message());
@@ -140,7 +140,7 @@ int ConnectToEnd() {
 
     try {
         // Step 2. Creating an endpoint designating a target server application.
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
 
         // Step 3. Creating and opening a socket.
         asio::io_context io_context;
@@ -161,13 +161,12 @@ int DnsConnectToEnd() {
     std::string host = "llfc.club";
     std::string port_num = "3333";
     asio::io_context io_context;
-    asio::ip::tcp::resolver::query query(host, port_num, asio::ip::tcp::resolver::query::numeric_service);  // 查询
     asio::ip::tcp::resolver resolver(io_context);  // 域名解析器
 
     try {
-        asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+        auto endpoints = resolver.resolve(host, port_num, boost::asio::ip::resolver_base::numeric_service);
         asio::ip::tcp::socket sock(io_context);
-        asio::connect(sock, iter);
+        asio::connect(sock, endpoints);
     } catch (const boost::system::system_error& e) {
         fmt::println(std::cerr, "Error occured! Error code = {}. Message: {}", e.code().value(), e.what());
 
@@ -222,13 +221,12 @@ void UseConstBuffer() {
     buffer_sequence.push_back(asio_buf);
 }
 
-void UseBufferStr() { [[maybe_unused]] asio::const_buffers_1 output_buf = asio::buffer("hello world"); }
+void UseBufferStr() { [[maybe_unused]] asio::const_buffer output_buf = asio::buffer("hello world"); }
 
 void UseBufferArray() {
     constexpr std::size_t kBufSizeBytes = 20;
     std::unique_ptr<char[]> buf(new char[kBufSizeBytes]);
-    [[maybe_unused]] asio::mutable_buffers_1 input_buf =
-        asio::buffer(static_cast<void*>(buf.get()), kBufSizeBytes);
+    [[maybe_unused]] asio::mutable_buffer input_buf = asio::buffer(static_cast<void*>(buf.get()), kBufSizeBytes);
 }
 
 void UseStreamBuffer() {
@@ -266,7 +264,7 @@ int SendDataByWriteSome() {
     unsigned short port_num = 3333;
 
     try {
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
         asio::io_context io_context;
         asio::ip::tcp::socket sock(io_context, endpoint.protocol());
         sock.connect(endpoint);
@@ -286,7 +284,7 @@ int SendDataBySend() {
     unsigned short port_num = 3333;
 
     try {
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
         asio::io_context io_context;
         asio::ip::tcp::socket sock(io_context, endpoint.protocol());
         sock.connect(endpoint);
@@ -317,7 +315,7 @@ int SendDataByWrite() {
     unsigned short port_num = 3333;
 
     try {
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
         asio::io_context io_context;
         asio::ip::tcp::socket sock(io_context, endpoint.protocol());
         sock.connect(endpoint);
@@ -361,7 +359,7 @@ int ReadDataByReadSome() {
     unsigned short port_num = 3333;
 
     try {
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
         asio::io_context io_context;
         asio::ip::tcp::socket sock(io_context, endpoint.protocol());
         sock.connect(endpoint);
@@ -381,7 +379,7 @@ int ReadDataByReceive() {
     unsigned short port_num = 3333;
 
     try {
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
         asio::io_context io_context;
         asio::ip::tcp::socket sock(io_context, endpoint.protocol());
         sock.connect(endpoint);
@@ -408,7 +406,7 @@ int ReadDataByRead() {
     unsigned short port_num = 3333;
 
     try {
-        asio::ip::tcp::endpoint endpoint(asio::ip::address::from_string(raw_ip_address), port_num);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address(raw_ip_address), port_num);
         asio::io_context io_context;
         asio::ip::tcp::socket sock(io_context, endpoint.protocol());
         sock.connect(endpoint);

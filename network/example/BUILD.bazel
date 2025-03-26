@@ -10,7 +10,7 @@ cc_library(
     copts = STRICT_COPTS,
     deps = [
         "//common",
-        "@boost//:asio",
+        "@boost.asio",
     ],
 )
 
@@ -23,7 +23,7 @@ cc_library(
     copts = STRICT_COPTS,
     deps = [
         "//common",
-        "@boost//:asio",
+        "@boost.asio",
     ],
 )
 
