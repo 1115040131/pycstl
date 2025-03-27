@@ -1,7 +1,5 @@
 #include "sdl3/common/core/object_affiliate.h"
 
-#include <fmt/base.h>
-
 #include "sdl3/common/core/object_world.h"
 
 namespace pyc {

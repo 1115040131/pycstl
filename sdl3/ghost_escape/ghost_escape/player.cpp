@@ -1,6 +1,7 @@
 #include "ghost_escape/player.h"
 
 #include "sdl3/common/core/scene.h"
+#include "sdl3/common/raw/stats.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -13,6 +14,8 @@ void Player::init() {
     anim_move_->setActive(false);
 
     collider_ = Collider::CreateAndSet(this, anim_idle_->getSize() / 2.F);
+
+    stats_ = Stats::CreateAndSet(this);
 }
 
 void Player::clean() { Actor::clean(); }

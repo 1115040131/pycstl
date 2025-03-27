@@ -1,5 +1,7 @@
 #include "ghost_escape/enemy.h"
 
+#include "sdl3/common/raw/stats.h"
+
 namespace pyc {
 namespace sdl3 {
 
@@ -13,6 +15,8 @@ void Enemy::init() {
     current_anim_ = anim_normal_;
 
     collider_ = Collider::CreateAndSet(this, current_anim_->getSize());
+
+    stats_ = Stats::CreateAndSet(this);
 }
 
 void Enemy::update(std::chrono::duration<float> delta) {
@@ -21,16 +25,6 @@ void Enemy::update(std::chrono::duration<float> delta) {
     attack();
     checkState();
     Actor::update(delta);
-
-    // test
-    // static float timer = 0;
-    // timer += delta.count();
-    // if (timer > 2) {
-    //     changeState(State::kDie);
-    // } else if (timer > 1) {
-    //     changeState(State::kHurt);
-    // }
-    // remove();
 }
 
 void Enemy::aimTarget() {
@@ -49,9 +43,10 @@ void Enemy::attack() {
     if (!collider_ || !target_ || !target_->getCollider()) {
         return;
     }
-    fmt::println("isColliding: {}", collider_->isColliding(*target_->getCollider()));
     if (collider_->isColliding(*target_->getCollider())) {
-        // TODO attack
+        if (stats_ && target_->getStats()) {
+            target_->takeDamage(stats_->getDamage());
+        }
     }
 }
 
