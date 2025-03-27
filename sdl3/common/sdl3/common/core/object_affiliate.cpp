@@ -1,9 +1,20 @@
 #include "sdl3/common/core/object_affiliate.h"
 
+#include <fmt/base.h>
+
 #include "sdl3/common/core/object_world.h"
 
 namespace pyc {
 namespace sdl3 {
+
+ObjectScreen* ObjectAffiliate::getParent() const { return static_cast<ObjectScreen*>(parent_); }
+
+void ObjectAffiliate::setParent(Object* parent) {
+    if (!dynamic_cast<ObjectScreen*>(parent)) {
+        fmt::println("ObjectAffiliate::setParent: parent is not a ObjectScreen");
+    }
+    parent_ = parent;
+}
 
 void ObjectAffiliate::setOffsetByAnchor(Anchor anchor) {
     anchor_ = anchor;
@@ -40,17 +51,9 @@ void ObjectAffiliate::setOffsetByAnchor(Anchor anchor) {
     }
 }
 
-glm::vec2 ObjectAffiliate::getRenderPosition() const {
-    return (parent_ && (parent_->getType() == Object::Type::kScreen || parent_->getType() == Object::Type::kWorld))
-               ? static_cast<ObjectScreen*>(parent_)->getRenderPosition() + offset_
-               : offset_;
-}
+glm::vec2 ObjectAffiliate::getRenderPosition() const { return getParent()->getRenderPosition() + offset_; }
 
-glm::vec2 ObjectAffiliate::getPosition() const {
-    return (parent_ && parent_->getType() == Object::Type::kWorld)
-               ? static_cast<ObjectWorld*>(parent_)->getRenderPosition() + offset_
-               : offset_;
-}
+glm::vec2 ObjectAffiliate::getPosition() const { return getParent()->getRenderPosition() + offset_; }
 
 }  // namespace sdl3
 }  // namespace pyc

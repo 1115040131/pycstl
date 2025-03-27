@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sdl3/common/core/object.h"
+#include "sdl3/common/core/object_screen.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -19,6 +20,9 @@ public:
         kBottomCenter,
         kBottomRight,
     };
+
+    virtual ObjectScreen* getParent() const override;
+    virtual void setParent(Object* parent) override;
 
     const glm::vec2& getOffset() const { return offset_; }
     void setOffset(const glm::vec2& offset) {

@@ -40,8 +40,8 @@ public:
     bool needRemove() const { return need_remove_; }
     void setNeedRemove(bool need_remove) { need_remove_ = need_remove; }
 
-    Object* getParent() const { return parent_; }
-    void setParent(Object* parent) { parent_ = parent; }
+    virtual Object* getParent() const { return parent_; }
+    virtual void setParent(Object* parent) { parent_ = parent; }
 
     virtual Object* addChild(std::unique_ptr<Object> child);
     virtual void removeChild(Object* child_to_remove);
