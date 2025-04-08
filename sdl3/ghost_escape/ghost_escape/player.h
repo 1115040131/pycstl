@@ -2,6 +2,7 @@
 
 #include "sdl3/common/affiliate/sprite_anim.h"
 #include "sdl3/common/core/actor.h"
+#include "sdl3/common/world/effect.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -19,10 +20,12 @@ private:
     void keyboardControl();
     void syncCamera();
     void checkState();
+    void checkIsDead();
 
 private:
     SpriteAnim* anim_idle_{};
     SpriteAnim* anim_move_{};
+    std::unique_ptr<Effect> effect_{};
     bool is_moving_{};
 };
 

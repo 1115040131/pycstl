@@ -16,6 +16,8 @@ void Player::init() {
     collider_ = Collider::CreateAndSet(this, anim_idle_->getSize() / 2.F);
 
     stats_ = Stats::CreateAndSet(this);
+
+    effect_ = Effect::Create(ASSET("effect/1764.png"), {}, 2.F);
 }
 
 void Player::clean() { Actor::clean(); }
@@ -28,6 +30,7 @@ void Player::update(std::chrono::duration<float> delta) {
     move(delta);
     syncCamera();
     checkState();
+    checkIsDead();
 }
 
 void Player::render() { Actor::render(); }
@@ -73,6 +76,14 @@ void Player::checkState() {
             anim_move_->setActive(false);
             anim_idle_->syncFrame(*anim_move_);
         }
+    }
+}
+
+void Player::checkIsDead() {
+    if (!stats_->isAlive()) {
+        effect_->setPosition(getPosition());
+        game_.getCurrentScene()->safeAddChild(std::move(effect_));
+        setActive(false);
     }
 }
 

@@ -43,6 +43,7 @@ public:
     virtual Object* getParent() const { return parent_; }
     virtual void setParent(Object* parent) { parent_ = parent; }
 
+    Object* safeAddChild(std::unique_ptr<Object> child);
     virtual Object* addChild(std::unique_ptr<Object> child);
     virtual void removeChild(Object* child_to_remove);
 
@@ -54,6 +55,7 @@ protected:
     bool need_remove_{};
     Object* parent_{};
     std::vector<std::unique_ptr<Object>> children_;
+    std::vector<std::unique_ptr<Object>> object_to_add_;
 };
 
 template <typename T>

@@ -20,9 +20,11 @@ void Enemy::init() {
 }
 
 void Enemy::update(std::chrono::duration<float> delta) {
-    aimTarget();
-    move(delta);
-    attack();
+    if (target_ && target_->isAlive()) {
+        aimTarget();
+        move(delta);
+        attack();
+    }
     checkState();
     Actor::update(delta);
 }

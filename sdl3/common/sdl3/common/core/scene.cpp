@@ -16,6 +16,10 @@ void Scene::handleEvents(const SDL_Event& event) {
 }
 
 void Scene::update(std::chrono::duration<float> delta) {
+    for (auto& child : object_to_add_) {
+        addChild(std::move(child));
+    }
+    object_to_add_.clear();
     Update(children_, delta);
     Update(children_world_, delta);
     Update(children_screen_, delta);
