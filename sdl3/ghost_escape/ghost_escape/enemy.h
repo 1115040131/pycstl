@@ -8,6 +8,8 @@ namespace sdl3 {
 
 class Enemy : public Actor {
 public:
+    static std::unique_ptr<Enemy> Create(const glm::vec2& position, Actor* target);
+
     virtual void init() override;
 
     virtual void update(std::chrono::duration<float> delta) override;

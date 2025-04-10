@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <memory>
+#include <random>
 #include <string_view>
 
 #include <SDL3/SDL.h>
@@ -38,6 +39,23 @@ public:
 
     void changeScene(std::unique_ptr<Scene> scene);
 
+    // random
+    template <typename T>
+    T random(T min, T max) {
+        static_assert(std::is_arithmetic_v<T>, "Template argument must be an integral or floating point type");
+
+        if constexpr (std::is_integral_v<T>) {
+            return std::uniform_int_distribution<T>(min, max)(gen_);
+        } else if constexpr (std::is_floating_point_v<T>) {
+            return std::uniform_real_distribution<T>(min, max)(gen_);
+        }
+    }
+
+    template <typename T>
+    glm::vec<2, T> random(const glm::vec<2, T>& min, const glm::vec<2, T>& max) {
+        return {random(min.x, max.x), random(min.y, max.y)};
+    }
+
     // render
     void renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size) const;
     void renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha = 1.F) const;
@@ -68,6 +86,9 @@ private:
     glm::vec2 screen_size_;
     std::unique_ptr<Scene> current_scene_;
     std::unique_ptr<AssetStore> asset_store_;
+
+    // 随机数生成器
+    std::mt19937 gen_ = std::mt19937(std::random_device{}());
 };
 
 }  // namespace sdl3

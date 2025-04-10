@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ghost_escape/player.h"
+#include "ghost_escape/spawner.h"
 #include "sdl3/common/core/scene.h"
 
 namespace pyc {
@@ -20,6 +21,7 @@ private:
 
 private:
     Player* player_{};
+    Spawner* spawner_{};
 };
 
 }  // namespace sdl3

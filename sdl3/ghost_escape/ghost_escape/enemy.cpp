@@ -5,6 +5,14 @@
 namespace pyc {
 namespace sdl3 {
 
+std::unique_ptr<Enemy> Enemy::Create(const glm::vec2& position, Actor* target) {
+    auto enemy = std::make_unique<Enemy>();
+    enemy->init();
+    enemy->setPosition(position);
+    enemy->setTarget(target);
+    return enemy;
+}
+
 void Enemy::init() {
     Actor::init();
     anim_normal_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-Sheet.png"), 2.F);

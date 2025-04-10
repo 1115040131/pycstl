@@ -1,8 +1,5 @@
 #include "ghost_escape/scene_main.h"
 
-#include "ghost_escape/enemy.h"
-#include "sdl3/common/world/effect.h"
-
 namespace pyc {
 namespace sdl3 {
 
@@ -15,13 +12,10 @@ void SceneMain::init() {
     player->setPosition(world_size_ / 2.F);
     player_ = static_cast<Player*>(addChild(std::move(player)));
 
-    auto enemy = std::make_unique<Enemy>();
-    enemy->init();
-    enemy->setPosition(world_size_ / 2.F + glm::vec2(200));
-    enemy->setTarget(player_);
-
-    Effect::CreateAndSet(this, ASSET("effect/184_3.png"), world_size_ / 2.F + glm::vec2(200), 1.F,
-                         std::move(enemy));
+    auto spawner = std::make_unique<Spawner>();
+    spawner->init();
+    spawner->setTarget(player_);
+    spawner_ = static_cast<Spawner*>(addChild(std::move(spawner)));
 }
 
 void SceneMain::clean() { Scene::clean(); }
