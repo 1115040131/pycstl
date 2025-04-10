@@ -1,11 +1,13 @@
 #pragma once
 
-#include "ghost_escape/player.h"
-#include "ghost_escape/spawner.h"
 #include "sdl3/common/core/scene.h"
 
 namespace pyc {
 namespace sdl3 {
+
+class Player;
+class Spawner;
+class UIMouse;
 
 class SceneMain : public Scene {
 public:
@@ -22,6 +24,7 @@ private:
 private:
     Player* player_{};
     Spawner* spawner_{};
+    UIMouse* ui_mouse_{};
 };
 
 }  // namespace sdl3

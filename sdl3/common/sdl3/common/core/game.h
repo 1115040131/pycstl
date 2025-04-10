@@ -29,8 +29,13 @@ public:
 
     SDL_Window* getWindow() const { return window_; }
     SDL_Renderer* getRenderer() const { return renderer_; }
+
     const std::string& getTitle() const { return title_; }
     const glm::vec2& getScreenSize() const { return screen_size_; }
+
+    const glm::vec2& getMousePosition() const { return mouse_position_; }
+    SDL_MouseButtonFlags getMouseButtonFlags() const { return mouse_button_flags_; }
+
     const std::unique_ptr<Scene>& getCurrentScene() const { return current_scene_; }
     const std::unique_ptr<AssetStore>& getAssetStore() const { return asset_store_; }
 
@@ -84,6 +89,10 @@ private:
 
     std::string title_;
     glm::vec2 screen_size_;
+
+    glm::vec2 mouse_position_;
+    SDL_MouseButtonFlags mouse_button_flags_;
+
     std::unique_ptr<Scene> current_scene_;
     std::unique_ptr<AssetStore> asset_store_;
 

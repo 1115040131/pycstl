@@ -120,7 +120,10 @@ void Game::handleEvents() {
     }
 }
 
-void Game::update(std::chrono::duration<float> delta) { current_scene_->update(delta); }
+void Game::update(std::chrono::duration<float> delta) {
+    mouse_button_flags_ = SDL_GetMouseState(&mouse_position_.x, &mouse_position_.y);
+    current_scene_->update(delta);
+}
 
 void Game::render() {
     SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);

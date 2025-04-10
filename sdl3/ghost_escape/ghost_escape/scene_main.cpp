@@ -1,9 +1,15 @@
 #include "ghost_escape/scene_main.h"
 
+#include "ghost_escape/player.h"
+#include "ghost_escape/spawner.h"
+#include "sdl3/common/screen/ui_mouse.h"
+
 namespace pyc {
 namespace sdl3 {
 
 void SceneMain::init() {
+    SDL_HideCursor();
+
     world_size_ = game_.getScreenSize() * 3.0F;
     camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
 
@@ -16,6 +22,8 @@ void SceneMain::init() {
     spawner->init();
     spawner->setTarget(player_);
     spawner_ = static_cast<Spawner*>(addChild(std::move(spawner)));
+
+    ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
 }
 
 void SceneMain::clean() { Scene::clean(); }
