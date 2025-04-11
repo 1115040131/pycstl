@@ -25,11 +25,29 @@ public:
     const glm::vec2& getCameraPosition() const { return camera_position_; }
     void setCameraPosition(const glm::vec2& camera_position);
 
+    const std::vector<std::unique_ptr<ObjectWorld>>& getChildrenWorld() const { return children_world_; }
+    const std::vector<std::unique_ptr<ObjectScreen>>& getChildrenScreen() const { return children_screen_; }
+
     glm::vec2 worldToScreen(const glm::vec2& position) const { return position - camera_position_; }
     glm::vec2 screenToWorld(const glm::vec2& screen_position) const { return screen_position + camera_position_; }
 
     virtual Object* addChild(std::unique_ptr<Object> child) override;
     virtual void removeChild(Object* child_to_remove) override;
+
+#ifdef DEBUG_MODE
+    virtual void printChildren(int indent = 0) override {
+        fmt::println("{:{}}{}:", "", indent, name_);
+        for (const auto& child : children_) {
+            child->printChildren(indent + 4);
+        }
+        for (const auto& child : children_world_) {
+            child->printChildren(indent + 4);
+        }
+        for (const auto& child : children_screen_) {
+            child->printChildren(indent + 4);
+        }
+    }
+#endif
 
 protected:
     glm::vec2 world_size_;

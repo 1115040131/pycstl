@@ -7,6 +7,9 @@ Stats* Stats::CreateAndSet(Actor* parent, double max_health, double max_mana, do
                            double mana_regon, double damage) {
     auto stats = std::make_unique<Stats>();
     stats->init();
+#ifdef DEBUG_MODE
+    stats->SET_NAME(Stats);
+#endif
     stats->health_.value = max_health;
     stats->health_.max_value = max_health;
     stats->health_.regen = health_regen;
@@ -44,7 +47,9 @@ void Stats::takeDamage(double damage) {
             invincible_time_counter_ = std::chrono::duration<float>::zero();
         }
 
-        fmt::println("Player health: {}, is alive: {}", getHealth(), isAlive());
+#ifdef DEBUG_MODE
+        fmt::println("{} health: {}, is alive: {}", parent_->getName(), getHealth(), isAlive());
+#endif
     }
 }
 

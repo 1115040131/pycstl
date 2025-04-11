@@ -40,6 +40,7 @@ Object* Scene::addChild(std::unique_ptr<Object> child) {
     child->setParent(this);
     switch (child->getType()) {
         case Object::Type::kWorld:
+        case Object::Type::kEnemy:
             children_world_.emplace_back(static_cast<ObjectWorld*>(child.release()));
             return children_world_.back().get();
         case Object::Type::kScreen:
@@ -54,7 +55,8 @@ Object* Scene::addChild(std::unique_ptr<Object> child) {
 
 void Scene::removeChild(Object* child_to_remove) {
     switch (child_to_remove->getType()) {
-        case Object::Type::kWorld: {
+        case Object::Type::kWorld:
+        case Object::Type::kEnemy: {
             auto iter = std::ranges::find_if(children_world_,
                                              [child_to_remove](const std::unique_ptr<ObjectWorld>& child) {
                                                  return child.get() == child_to_remove;

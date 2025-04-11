@@ -8,6 +8,9 @@ namespace sdl3 {
 Collider* Collider::CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type, Anchor anchor) {
     auto collider = std::make_unique<Collider>();
     collider->init();
+#ifdef DEBUG_MODE
+    collider->SET_NAME(Collider);
+#endif
     collider->setSize(size);
     collider->type_ = type;
     collider->setOffsetByAnchor(anchor);
@@ -16,7 +19,7 @@ Collider* Collider::CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type,
 
 void Collider::render() {
 #ifdef DEBUG_MODE
-    game_.renderFillCircle(getPosition(), size_, 0.5F);
+    game_.renderFillCircle(getRenderPosition(), size_, 0.5F);
 #endif
 }
 

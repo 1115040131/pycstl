@@ -11,6 +11,9 @@ SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& fi
                                      bool is_loop, Anchor anchor) {
     auto sprite = std::make_unique<SpriteAnim>();
     sprite->init();
+#ifdef DEBUG_MODE
+    sprite->SET_NAME(SpriteAnim);
+#endif
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);

@@ -15,6 +15,13 @@ std::unique_ptr<Enemy> Enemy::Create(const glm::vec2& position, Actor* target) {
 
 void Enemy::init() {
     Actor::init();
+
+#ifdef DEBUG_MODE
+    SET_NAME(Enemy);
+#endif
+
+    type_ = Object::Type::kEnemy;
+
     anim_normal_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-Sheet.png"), 2.F);
     anim_hurt_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghostHurt-Sheet.png"), 2.F);
     anim_die_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghostDead-Sheet.png"), 2.F, 10.F, false);
@@ -28,12 +35,13 @@ void Enemy::init() {
 }
 
 void Enemy::update(std::chrono::duration<float> delta) {
-    if (target_ && target_->isAlive()) {
+    if (target_ && target_->isAlive() && isAlive()) {
         aimTarget();
         move(delta);
         attack();
     }
     checkState();
+    remove();
     Actor::update(delta);
 }
 
@@ -60,7 +68,20 @@ void Enemy::attack() {
     }
 }
 
-void Enemy::checkState() {}
+void Enemy::checkState() {
+    auto current_state = State::kNormal;
+    if (stats_) {
+        if (!stats_->isAlive()) {
+            current_state = State::kDie;
+        } else if (stats_->isInvincible()) {
+            current_state = State::kHurt;
+        }
+    }
+
+    if (state_ != current_state) {
+        changeState(current_state);
+    }
+}
 
 void Enemy::changeState(State state) {
     if (current_anim_) {

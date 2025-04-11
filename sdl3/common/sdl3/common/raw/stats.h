@@ -26,6 +26,8 @@ public:
 
     bool isAlive() const { return is_alive_; }
 
+    bool isInvincible() const { return is_invincible_; }
+
     void takeDamage(double damage);
 
 protected:

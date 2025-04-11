@@ -8,6 +8,9 @@ namespace sdl3 {
 Sprite* Sprite::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, Anchor anchor) {
     auto sprite = std::make_unique<Sprite>();
     sprite->init();
+#ifdef DEBUG_MODE
+    sprite->SET_NAME(Sprite);
+#endif
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setOffsetByAnchor(anchor);

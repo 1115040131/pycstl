@@ -6,9 +6,12 @@ namespace sdl3 {
 using namespace std::chrono_literals;
 
 UIMouse* UIMouse::CreateAndSet(Object* parent, const std::string& file_path1, const std::string& file_path2,
-                               float scale, ObjectAffiliate::Anchor anchor) {
+                               float scale, Anchor anchor) {
     auto ui_mouse = std::make_unique<UIMouse>();
     ui_mouse->init();
+#ifdef DEBUG_MODE
+    ui_mouse->SET_NAME(UIMouse);
+#endif
     ui_mouse->sprite1_ = Sprite::CreateAndSet(ui_mouse.get(), file_path1, scale, anchor);
     ui_mouse->sprite2_ = Sprite::CreateAndSet(ui_mouse.get(), file_path2, scale, anchor);
     return static_cast<UIMouse*>(parent->addChild(std::move(ui_mouse)));

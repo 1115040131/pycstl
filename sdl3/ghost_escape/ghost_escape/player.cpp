@@ -8,6 +8,11 @@ namespace sdl3 {
 
 void Player::init() {
     Actor::init();
+
+#ifdef DEBUG_MODE
+    SET_NAME(Player);
+#endif
+
     max_speed_ = 500.F;
     anim_idle_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-idle.png"), 2.F);
     anim_move_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-move.png"), 2.F);

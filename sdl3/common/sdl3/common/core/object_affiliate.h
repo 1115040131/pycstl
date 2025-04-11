@@ -8,19 +8,6 @@ namespace sdl3 {
 
 class ObjectAffiliate : public Object {
 public:
-    enum class Anchor {
-        kNone,
-        kTopLeft,
-        kTopCenter,
-        kTopRight,
-        kCenterLeft,
-        kCenter,
-        kCenterRight,
-        kBottomLeft,
-        kBottomCenter,
-        kBottomRight,
-    };
-
     virtual ObjectScreen* getParent() const override;
     virtual void setParent(Object* parent) override;
 

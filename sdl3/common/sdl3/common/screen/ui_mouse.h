@@ -9,8 +9,7 @@ namespace sdl3 {
 class UIMouse : public ObjectScreen {
 public:
     static UIMouse* CreateAndSet(Object* parent, const std::string& file_path1, const std::string& file_path2,
-                                 float scale = 1.0f,
-                                 ObjectAffiliate::Anchor anchor = ObjectAffiliate::Anchor::kCenter);
+                                 float scale = 1.0f, Anchor anchor = Anchor::kCenter);
 
     virtual void update(std::chrono::duration<float> delta) override;
 

@@ -8,6 +8,14 @@
 
 #include "sdl3/common/core/game.h"
 
+#ifdef DEBUG_MODE
+#include <fmt/format.h>
+
+#include "sdl3/common/core/util.h"
+
+#define SET_NAME(class_name) setName(fmt::format(#class_name " {}", GetCount<class_name>()));
+#endif
+
 namespace pyc {
 namespace sdl3 {
 
@@ -17,6 +25,20 @@ public:
         kCommon,
         kScreen,
         kWorld,
+        kEnemy,
+    };
+
+    enum class Anchor {
+        kNone,
+        kTopLeft,
+        kTopCenter,
+        kTopRight,
+        kCenterLeft,
+        kCenter,
+        kCenterRight,
+        kBottomLeft,
+        kBottomCenter,
+        kBottomRight,
     };
 
     Object() = default;
@@ -28,9 +50,6 @@ public:
     virtual void handleEvents(const SDL_Event& event);
     virtual void update(std::chrono::duration<float> delta);
     virtual void render();
-
-    void setName(const std::string& name) { name_ = name; }
-    const std::string& getName() const { return name_; }
 
     Type getType() const { return type_; }
 
@@ -47,8 +66,22 @@ public:
     virtual Object* addChild(std::unique_ptr<Object> child);
     virtual void removeChild(Object* child_to_remove);
 
+#ifdef DEBUG_MODE
+    void setName(const std::string& name) { name_ = name; }
+    const std::string& getName() const { return name_; }
+
+    virtual void printChildren(int indent = 0) {
+        fmt::println("{:{}}{}:", "", indent, name_);
+        for (const auto& child : children_) {
+            child->printChildren(indent + 4);
+        }
+    }
+#endif
+
 protected:
+#ifdef DEBUG_MODE
     std::string name_;
+#endif
     Type type_ = Type::kCommon;
     Game& game_ = Game::GetInstance();
     bool is_active_{true};
@@ -82,13 +115,15 @@ template <DerivedFromObject T>
 void Update(std::vector<std::unique_ptr<T>>& children, std::chrono::duration<float> delta) {
     auto partition_it = std::partition(children.begin(), children.end(), [delta](const std::unique_ptr<T>& child) {
         if (child->needRemove()) {
-            child->clean();
             return false;
         } else if (child->isActive()) {
             child->update(delta);
         }
         return true;
     });
+    for (auto iter = partition_it; iter != children.end(); ++iter) {
+        (*iter)->clean();
+    }
     children.erase(partition_it, children.end());
 }
 

@@ -1,6 +1,6 @@
 #include "sdl3/common/core/object_affiliate.h"
 
-#include "sdl3/common/core/object_world.h"
+#include "sdl3/common/core/scene.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -51,7 +51,9 @@ void ObjectAffiliate::setOffsetByAnchor(Anchor anchor) {
 
 glm::vec2 ObjectAffiliate::getRenderPosition() const { return getParent()->getRenderPosition() + offset_; }
 
-glm::vec2 ObjectAffiliate::getPosition() const { return getParent()->getRenderPosition() + offset_; }
+glm::vec2 ObjectAffiliate::getPosition() const {
+    return game_.getCurrentScene()->screenToWorld(getRenderPosition());
+}
 
 }  // namespace sdl3
 }  // namespace pyc

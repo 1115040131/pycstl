@@ -3,12 +3,17 @@
 #include "ghost_escape/player.h"
 #include "ghost_escape/spawner.h"
 #include "sdl3/common/screen/ui_mouse.h"
+#include "sdl3/common/world/spell.h"
 
 namespace pyc {
 namespace sdl3 {
 
 void SceneMain::init() {
     SDL_HideCursor();
+
+#ifdef DEBUG_MODE
+    name_ = "SceneMain";
+#endif
 
     world_size_ = game_.getScreenSize() * 3.0F;
     camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
@@ -20,6 +25,9 @@ void SceneMain::init() {
 
     auto spawner = std::make_unique<Spawner>();
     spawner->init();
+#ifdef DEBUG_MODE
+    spawner->setName("Spawner");
+#endif
     spawner->setTarget(player_);
     spawner_ = static_cast<Spawner*>(addChild(std::move(spawner)));
 
@@ -28,12 +36,25 @@ void SceneMain::init() {
 
 void SceneMain::clean() { Scene::clean(); }
 
-void SceneMain::handleEvents(const SDL_Event& event) { Scene::handleEvents(event); }
+void SceneMain::handleEvents(const SDL_Event& event) {
+    Scene::handleEvents(event);
+
+    // test
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            auto world_position = screenToWorld(game_.getMousePosition());
+            Spell::CreateAndSet(this, ASSET("effect/Thunderstrike w blur.png"), world_position, 120.F, 3.F);
+        }
+    }
+}
 
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
-    fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
-                 children_screen_.size(), children_.size());
+#ifdef DEBUG_MODE
+    // fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
+    //              children_screen_.size(), children_.size());
+    // printChildren();
+#endif
 }
 
 void SceneMain::render() {
