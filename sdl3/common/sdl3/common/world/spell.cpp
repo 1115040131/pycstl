@@ -6,8 +6,8 @@
 namespace pyc {
 namespace sdl3 {
 
-Spell* Spell::CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& position, float damage,
-                           float scale, Anchor anchor) {
+std::unique_ptr<Spell> Spell::Create(const std::string& file_path, const glm::vec2& position, float damage,
+                                     float scale, Anchor anchor) {
     auto spell = std::make_unique<Spell>();
     spell->init();
 #ifdef DEBUG_MODE
@@ -18,7 +18,12 @@ Spell* Spell::CreateAndSet(Object* parent, const std::string& file_path, const g
     spell->collider_ =
         Collider::CreateAndSet(spell.get(), spell->sprite_anim_->getSize(), Collider::Type::kCircle, anchor);
     spell->setPosition(position);
-    return static_cast<Spell*>(parent->addChild(std::move(spell)));
+    return spell;
+}
+
+Spell* Spell::CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& position, float damage,
+                           float scale, Anchor anchor) {
+    return static_cast<Spell*>(parent->addChild(Create(file_path, position, damage, scale, anchor)));
 }
 
 void Spell::update(std::chrono::duration<float> delta) {

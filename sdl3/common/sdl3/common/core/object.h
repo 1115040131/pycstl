@@ -19,6 +19,8 @@
 namespace pyc {
 namespace sdl3 {
 
+using namespace std::chrono_literals;
+
 class Object {
 public:
     enum class Type {

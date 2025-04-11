@@ -12,8 +12,6 @@
 namespace pyc {
 namespace sdl3 {
 
-using namespace std::chrono_literals;
-
 Game::Game() = default;
 
 Game::~Game() = default;

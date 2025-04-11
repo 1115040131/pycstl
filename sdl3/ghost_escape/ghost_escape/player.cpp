@@ -23,6 +23,8 @@ void Player::init() {
     stats_ = Stats::CreateAndSet(this);
 
     effect_ = Effect::Create(ASSET("effect/1764.png"), {}, 2.F);
+
+    weapon_thunder_ = WeaponThunder::CreateAndSet(this, 2s, 40.F);
 }
 
 void Player::clean() { Actor::clean(); }

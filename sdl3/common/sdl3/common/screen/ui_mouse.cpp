@@ -3,8 +3,6 @@
 namespace pyc {
 namespace sdl3 {
 
-using namespace std::chrono_literals;
-
 UIMouse* UIMouse::CreateAndSet(Object* parent, const std::string& file_path1, const std::string& file_path2,
                                float scale, Anchor anchor) {
     auto ui_mouse = std::make_unique<UIMouse>();

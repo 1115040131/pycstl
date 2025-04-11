@@ -8,6 +8,9 @@ namespace sdl3 {
 
 class Spell : public ObjectWorld {
 public:
+    static std::unique_ptr<Spell> Create(const std::string& file_path, const glm::vec2& position, float damage,
+                                         float scale = 1.F, Anchor = Anchor::kCenter);
+
     static Spell* CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& position,
                                float damage, float scale = 1.F, Anchor = Anchor::kCenter);
 

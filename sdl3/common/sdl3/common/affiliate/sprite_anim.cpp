@@ -5,8 +5,6 @@
 namespace pyc {
 namespace sdl3 {
 
-using namespace std::chrono_literals;
-
 SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, float fps,
                                      bool is_loop, Anchor anchor) {
     auto sprite = std::make_unique<SpriteAnim>();

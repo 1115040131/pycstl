@@ -36,17 +36,7 @@ void SceneMain::init() {
 
 void SceneMain::clean() { Scene::clean(); }
 
-void SceneMain::handleEvents(const SDL_Event& event) {
-    Scene::handleEvents(event);
-
-    // test
-    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
-        if (event.button.button == SDL_BUTTON_LEFT) {
-            auto world_position = screenToWorld(game_.getMousePosition());
-            Spell::CreateAndSet(this, ASSET("effect/Thunderstrike w blur.png"), world_position, 120.F, 3.F);
-        }
-    }
-}
+void SceneMain::handleEvents(const SDL_Event& event) { Scene::handleEvents(event); }
 
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);

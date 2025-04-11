@@ -3,8 +3,8 @@
 namespace pyc {
 namespace sdl3 {
 
-Stats* Stats::CreateAndSet(Actor* parent, double max_health, double max_mana, double health_regen,
-                           double mana_regon, double damage) {
+Stats* Stats::CreateAndSet(Actor* parent, float max_health, float max_mana, float health_regen, float mana_regon,
+                           float damage) {
     auto stats = std::make_unique<Stats>();
     stats->init();
 #ifdef DEBUG_MODE
@@ -36,9 +36,9 @@ void Stats::setParent(Object* parent) {
     parent_ = parent;
 }
 
-void Stats::takeDamage(double damage) {
+void Stats::takeDamage(float damage) {
     if (is_alive_ && !is_invincible_) {
-        health_.value = std::max(0.0, health_.value - damage);
+        health_.value = std::max(0.F, health_.value - damage);
 
         if (health_.value <= 0.0) {
             is_alive_ = false;
