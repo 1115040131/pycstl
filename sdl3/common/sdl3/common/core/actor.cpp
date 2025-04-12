@@ -6,9 +6,9 @@
 namespace pyc {
 namespace sdl3 {
 
-void Actor::move(std::chrono::duration<float> delta) {
-    setPosition(
-        glm::clamp(position_ + velocity_ * delta.count(), glm::vec2(), game_.getCurrentScene()->getWorldSize()));
+void Actor::update(std::chrono::duration<float> delta) {
+    updateHealthBar();
+    ObjectWorld::update(delta);
 }
 
 void Actor::takeDamage(double damage) {
@@ -22,6 +22,17 @@ bool Actor::isAlive() const {
         return stats_->isAlive();
     }
     return true;
+}
+
+void Actor::move(std::chrono::duration<float> delta) {
+    setPosition(
+        glm::clamp(position_ + velocity_ * delta.count(), glm::vec2(), game_.getCurrentScene()->getWorldSize()));
+}
+
+void Actor::updateHealthBar() {
+    if (stats_ && health_bar_) {
+        health_bar_->setPercentage(stats_->getHealth() / stats_->getMaxHealth());
+    }
 }
 
 }  // namespace sdl3

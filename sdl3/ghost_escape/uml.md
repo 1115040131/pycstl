@@ -73,8 +73,11 @@ class ObjectWorld {
 
 ObjectWorld <|-- Actor
 class Actor {
-    # Stats* stats_;
+    + void update(std::chrono::duration&lt;float&gt; delta)
+
     # float max_speed_;
+    # Stats* stats_;
+    # AffiliateBar* health_bar_;
 }
 
 Actor <|-- Player
@@ -160,6 +163,14 @@ class Collider {
     + void render()
 
     - Type type_ = Type::kCircle;
+}
+
+ObjectAffiliate <|-- AffiliateBar
+class AffiliateBar {
+    + void render()
+
+    # float percentage_;
+    # std::map&lt;float, SDL_FColor&gt; color_map_;
 }
 
 Object <|-- Stats

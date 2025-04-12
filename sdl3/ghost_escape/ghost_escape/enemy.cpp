@@ -28,10 +28,14 @@ void Enemy::init() {
     anim_hurt_->setActive(false);
     anim_die_->setActive(false);
     current_anim_ = anim_normal_;
+    auto size = current_anim_->getSize();
 
-    collider_ = Collider::CreateAndSet(this, current_anim_->getSize());
+    collider_ = Collider::CreateAndSet(this, size);
 
     stats_ = Stats::CreateAndSet(this);
+
+    health_bar_ = AffiliateBar::CreateAndSet(this, {size.x - 10, 10}, Anchor::kTopCenter);
+    health_bar_->setOffset(health_bar_->getOffset() + glm::vec2(0, size.y / 2.f - 10));
 }
 
 void Enemy::update(std::chrono::duration<float> delta) {

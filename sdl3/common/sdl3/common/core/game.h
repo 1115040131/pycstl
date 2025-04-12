@@ -64,6 +64,7 @@ public:
     // render
     void renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size) const;
     void renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha = 1.F) const;
+    void renderHBar(const glm::vec2& position, const glm::vec2& size, float percent, SDL_FColor color) const;
 
     // util
     void drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,

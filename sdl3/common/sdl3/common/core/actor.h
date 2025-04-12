@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sdl3/common/affiliate/affiliate_bar.h"
 #include "sdl3/common/core/object_world.h"
 
 namespace pyc {
@@ -9,6 +10,8 @@ class Stats;
 
 class Actor : public ObjectWorld {
 public:
+    virtual void update(std::chrono::duration<float> delta) override;
+
     const glm::vec2& getVelocity() const { return velocity_; }
     void setVelocity(const glm::vec2& velocity) { velocity_ = velocity; }
 
@@ -23,11 +26,14 @@ public:
 protected:
     void move(std::chrono::duration<float> delta);
 
+    void updateHealthBar();
+
 protected:
     glm::vec2 velocity_{};
     float max_speed_{100};
 
     Stats* stats_{};
+    AffiliateBar* health_bar_{};
 };
 
 }  // namespace sdl3
