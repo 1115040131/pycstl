@@ -62,7 +62,8 @@ public:
     }
 
     // render
-    void renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size) const;
+    void renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size,
+                       const glm::vec2 mask = {1.0, 1.0}) const;
     void renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha = 1.F) const;
     void renderHBar(const glm::vec2& position, const glm::vec2& size, float percent, SDL_FColor color) const;
 

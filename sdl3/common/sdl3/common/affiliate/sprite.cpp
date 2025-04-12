@@ -30,7 +30,7 @@ void Sprite::render() {
     if (is_finish_) {
         return;
     }
-    game_.renderTexture(texture_, getRenderPosition(), size_);
+    game_.renderTexture(texture_, getRenderPosition(), size_, percent_);
 }
 
 }  // namespace sdl3

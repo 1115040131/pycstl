@@ -2,11 +2,10 @@
 
 #include "sdl3/common/affiliate/affiliate_bar.h"
 #include "sdl3/common/core/object_world.h"
+#include "sdl3/common/raw/stats.h"
 
 namespace pyc {
 namespace sdl3 {
-
-class Stats;
 
 class Actor : public ObjectWorld {
 public:

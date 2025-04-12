@@ -54,6 +54,7 @@ class SceneMain {
     - Player* player_;
     - Spawner* spawner_;
     - UIMouse* ui_mouse_;
+    - HUDStatus* hud_status_;
 }
 
 Object <|-- ObjectScreen
@@ -130,6 +131,20 @@ class UIMouse {
     # Sprite* sprite1_;
     # Sprite* sprite2_;
     # duration&lt;float&gt; timer_;
+}
+
+ObjectScreen <|-- HUDStatus
+class HUDStatus {
+    + void init()
+    + void update(std::chrono::duration&lt;float&gt; delta)
+
+    # Actor* target_;
+    # Sprite* health_bar_;
+    # Sprite* health_bar_bg_;
+    # Sprite* health_icon_;
+    # Sprite* mana_bar_;
+    # Sprite* mana_bar_bg_;
+    # Sprite* mana_icon_;
 }
 
 Object <|-- ObjectAffiliate

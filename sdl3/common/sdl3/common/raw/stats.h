@@ -1,10 +1,11 @@
 #pragma once
 
-#include "sdl3/common/core/actor.h"
 #include "sdl3/common/core/object.h"
 
 namespace pyc {
 namespace sdl3 {
+
+class Actor;
 
 class Stats : public Object {
 public:
@@ -12,9 +13,6 @@ public:
                                float health_regen = 0.0, float mana_regon = 10.0, float damage = 40.0);
 
     virtual void update(std::chrono::duration<float> delta) override;
-
-    virtual Actor* getParent() const override;
-    virtual void setParent(Object* parent) override;
 
     float getHealth() const { return health_.value; }
     float getMaxHealth() const { return health_.max_value; }

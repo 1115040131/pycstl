@@ -16,6 +16,7 @@ public:
         offset_ = offset;
         anchor_ = Anchor::kNone;
     }
+    void addOffset(const glm::vec2& offset) { offset_ += offset; }
 
     const glm::vec2& getSize() const { return size_; }
     void setSize(const glm::vec2& size) {

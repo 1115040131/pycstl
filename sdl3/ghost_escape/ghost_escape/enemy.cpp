@@ -1,7 +1,5 @@
 #include "ghost_escape/enemy.h"
 
-#include "sdl3/common/raw/stats.h"
-
 namespace pyc {
 namespace sdl3 {
 

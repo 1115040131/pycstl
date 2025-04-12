@@ -18,6 +18,8 @@ public:
     bool isFinish() const { return is_finish_; }
     void setFinish(bool is_finish) { is_finish_ = is_finish; }
 
+    void setPercent(const glm::vec2& percent) { percent_ = percent; }
+
     const Texture& getTexture() const { return texture_; }
     virtual void setTexture(const Texture& texture);
 
@@ -26,6 +28,7 @@ public:
 
 protected:
     bool is_finish_{};
+    glm::vec2 percent_{1, 1};
 
     Texture texture_;
 };

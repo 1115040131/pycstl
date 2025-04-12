@@ -1,7 +1,6 @@
 #include "ghost_escape/player.h"
 
 #include "sdl3/common/core/scene.h"
-#include "sdl3/common/raw/stats.h"
 
 namespace pyc {
 namespace sdl3 {

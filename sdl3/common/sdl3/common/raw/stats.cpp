@@ -1,5 +1,7 @@
 #include "sdl3/common/raw/stats.h"
 
+#include "sdl3/common/core/actor.h"
+
 namespace pyc {
 namespace sdl3 {
 
@@ -25,15 +27,6 @@ void Stats::update(std::chrono::duration<float> delta) {
     health_.update(delta);
     mana_.update(delta);
     invincibleUpdate(delta);
-}
-
-Actor* Stats::getParent() const { return static_cast<Actor*>(parent_); }
-
-void Stats::setParent(Object* parent) {
-    if (!dynamic_cast<Actor*>(parent)) {
-        fmt::println("Stats::setParent: parent is not an Actor");
-    }
-    parent_ = parent;
 }
 
 void Stats::takeDamage(float damage) {

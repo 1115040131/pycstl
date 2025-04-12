@@ -8,6 +8,7 @@ namespace sdl3 {
 class Player;
 class Spawner;
 class UIMouse;
+class HUDStatus;
 
 class SceneMain : public Scene {
 public:
@@ -25,6 +26,7 @@ private:
     Player* player_{};
     Spawner* spawner_{};
     UIMouse* ui_mouse_{};
+    HUDStatus* hud_stats_{};
 };
 
 }  // namespace sdl3

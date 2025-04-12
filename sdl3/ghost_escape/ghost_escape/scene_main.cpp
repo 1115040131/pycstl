@@ -1,9 +1,9 @@
 #include "ghost_escape/scene_main.h"
 
+#include "ghost_escape/hud_stats.h"
 #include "ghost_escape/player.h"
 #include "ghost_escape/spawner.h"
 #include "sdl3/common/screen/ui_mouse.h"
-#include "sdl3/common/world/spell.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -32,6 +32,8 @@ void SceneMain::init() {
     spawner_ = static_cast<Spawner*>(addChild(std::move(spawner)));
 
     ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
+
+    hud_stats_ = HUDStatus::CreateAndSet(this, player_, glm::vec2(30));
 }
 
 void SceneMain::clean() { Scene::clean(); }
