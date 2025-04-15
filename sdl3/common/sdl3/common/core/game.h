@@ -27,9 +27,6 @@ private:
 public:
     ~Game();
 
-    SDL_Window* getWindow() const { return window_; }
-    SDL_Renderer* getRenderer() const { return renderer_; }
-
     const std::string& getTitle() const { return title_; }
     const glm::vec2& getScreenSize() const { return screen_size_; }
 
@@ -67,6 +64,9 @@ public:
     void renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha = 1.F) const;
     void renderHBar(const glm::vec2& position, const glm::vec2& size, float percent, SDL_FColor color) const;
 
+    // text
+    TTF_Text* createTTF_Text(std::string_view text, const std::string& font_path, int font_size) const;
+
     // util
     void drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
                   SDL_FColor color) const;
@@ -84,10 +84,11 @@ public:
     static constexpr double kFps = 60;
 
 private:
-    SDL_Window* window_;
-    SDL_Renderer* renderer_;
+    SDL_Window* window_{};
+    SDL_Renderer* renderer_{};
+    TTF_TextEngine* ttf_engine_{};
 
-    bool is_running_;
+    bool is_running_{};
 
     std::string title_;
     glm::vec2 screen_size_;

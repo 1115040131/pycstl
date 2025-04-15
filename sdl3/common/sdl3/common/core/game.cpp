@@ -55,6 +55,9 @@ void Game::init(std::string_view title, int width, int height) {
     // 设置窗口分辨率
     SDL_SetRenderLogicalPresentation(renderer_, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+    // 创建字体引擎
+    ttf_engine_ = TTF_CreateRendererTextEngine(renderer_);
+
     // 创建 AssetStore
     asset_store_ = std::make_unique<AssetStore>(renderer_);
 
@@ -69,8 +72,15 @@ void Game::clean() {
     asset_store_.reset();
 
     // 释放渲染器和窗口
-    SDL_DestroyRenderer(renderer_);
-    SDL_DestroyWindow(window_);
+    if (ttf_engine_) {
+        TTF_DestroyRendererTextEngine(ttf_engine_);
+    }
+    if (renderer_) {
+        SDL_DestroyRenderer(renderer_);
+    }
+    if (window_) {
+        SDL_DestroyWindow(window_);
+    }
     // 退出 Mix
     Mix_CloseAudio();
     Mix_Quit();
@@ -187,6 +197,11 @@ void Game::renderHBar(const glm::vec2& position, const glm::vec2& size, float pe
     SDL_RenderRect(renderer_, &boundary_rect);
     SDL_RenderFillRect(renderer_, &fill_rect);
     SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
+}
+
+TTF_Text* Game::createTTF_Text(std::string_view text, const std::string& font_path, int font_size) const {
+    auto font = asset_store_->getFont(font_path, font_size);
+    return TTF_CreateText(ttf_engine_, font, text.data(), text.size());
 }
 
 void Game::drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,

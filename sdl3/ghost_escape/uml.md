@@ -193,6 +193,11 @@ class AffiliateBar {
     # std::map&lt;float, SDL_FColor&gt; color_map_;
 }
 
+ObjectAffiliate <|-- TextLabel
+class TextLabel {
+    + void render()
+}
+
 Object <|-- Stats
 class Stats {
     + void update(std::chrono::duration&lt;float&gt; delta)

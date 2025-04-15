@@ -1,5 +1,6 @@
 #include "ghost_escape/player.h"
 
+#include "sdl3/common/affiliate/text_label.h"
 #include "sdl3/common/core/scene.h"
 
 namespace pyc {
@@ -24,6 +25,8 @@ void Player::init() {
     effect_ = Effect::Create(ASSET("effect/1764.png"), {}, 2.F);
 
     weapon_thunder_ = WeaponThunder::CreateAndSet(this, 2s, 40.F);
+
+    TextLabel::CreateAndSet(this, "这是主角", ASSET("font/VonwaonBitmap-16px.ttf"), 16);
 }
 
 void Player::clean() { Actor::clean(); }
