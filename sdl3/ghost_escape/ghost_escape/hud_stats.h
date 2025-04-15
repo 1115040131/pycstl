@@ -9,7 +9,7 @@ namespace sdl3 {
 
 class HUDStatus : public ObjectScreen {
 public:
-    static HUDStatus* CreateAndSet(Object* parent, Actor* target, glm::vec2 render_position);
+    static HUDStatus* CreateAndSet(Object* parent, Actor* target, const glm::vec2& render_position);
 
     virtual void init() override;
 

@@ -19,6 +19,8 @@ public:
     void setCoolDown(std::chrono::duration<float> cool_down) { cool_down_ = cool_down; }
     void setManaCost(float mana_cost) { mana_cost_ = mana_cost; }
 
+    float getCoolDownPercent() const;
+
     bool canAttack() const;
 
     void attack(const glm::vec2& position, std::unique_ptr<Spell> spell);

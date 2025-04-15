@@ -21,6 +21,8 @@ void Weapon::setParent(Object* parent) {
     parent_ = parent;
 }
 
+float Weapon::getCoolDownPercent() const { return std::clamp(timer_ / cool_down_, 0.0f, 1.0f); }
+
 bool Weapon::canAttack() const { return timer_ >= cool_down_ && getParent()->getStats()->canUseMana(mana_cost_); }
 
 void Weapon::attack(const glm::vec2& position, std::unique_ptr<Spell> spell) {

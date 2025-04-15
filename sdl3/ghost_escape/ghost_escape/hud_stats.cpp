@@ -3,7 +3,7 @@
 namespace pyc {
 namespace sdl3 {
 
-HUDStatus* HUDStatus::CreateAndSet(Object* parent, Actor* target, glm::vec2 render_position) {
+HUDStatus* HUDStatus::CreateAndSet(Object* parent, Actor* target, const glm::vec2& render_position) {
     auto hud_stats = std::make_unique<HUDStatus>();
     hud_stats->init();
 #ifdef DEBUG_MODE

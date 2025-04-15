@@ -8,12 +8,24 @@ namespace sdl3 {
 WeaponThunder* WeaponThunder::CreateAndSet(Actor* parent, std::chrono::duration<float> cool_down,
                                            float mana_cost) {
     auto weapon_thunder = std::make_unique<WeaponThunder>();
+    weapon_thunder->init();
 #ifdef DEBUG_MODE
     weapon_thunder->SET_NAME(WeaponThunder);
 #endif
     weapon_thunder->setCoolDown(cool_down);
     weapon_thunder->setManaCost(mana_cost);
+    const auto& game = Game::GetInstance();
+    weapon_thunder->hud_skill_ =
+        HUDSkill::CreateAndSet(game.getCurrentScene().get(), ASSET("UI/Electric-Icon.png"),
+                               glm::vec2(game.getScreenSize().x - 300, 30), 0.14f);
     return static_cast<WeaponThunder*>(parent->addChild(std::move(weapon_thunder)));
+}
+
+void WeaponThunder::update(std::chrono::duration<float> delta) {
+    Weapon::update(delta);
+    if (hud_skill_) {
+        hud_skill_->setPercent(getCoolDownPercent());
+    }
 }
 
 void WeaponThunder::handleEvents(const SDL_Event& event) {

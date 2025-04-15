@@ -147,6 +147,11 @@ class HUDStatus {
     # Sprite* mana_icon_;
 }
 
+ObjectScreen <|-- HUDSkill
+class HUDSkill {
+    + void render()
+}
+
 Object <|-- ObjectAffiliate
 class ObjectAffiliate {
     # vec2 offset_;
@@ -218,7 +223,7 @@ class Weapon {
 
 Weapon <|-- WeaponThunder
 class WeaponThunder {
-    + void handleEvents(const SDL_Event& event) override;
+    + void handleEvents(const SDL_Event& event)
 }
 
 Stats o-- Bar
