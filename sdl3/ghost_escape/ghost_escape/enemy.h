@@ -40,6 +40,8 @@ private:
     SpriteAnim* anim_die_{};
 
     SpriteAnim* current_anim_{};
+
+    int score_{10};
 };
 
 }  // namespace sdl3

@@ -41,6 +41,10 @@ public:
 
     void changeScene(std::unique_ptr<Scene> scene);
 
+    void setScore(int score);
+    void addScore(int score);
+    int getScore() const { return score_; }
+
     // random
     template <typename T>
     T random(T min, T max) {
@@ -101,6 +105,9 @@ private:
 
     // 随机数生成器
     std::mt19937 gen_ = std::mt19937(std::random_device{}());
+
+    int score_{};
+    int high_score_{};
 };
 
 }  // namespace sdl3

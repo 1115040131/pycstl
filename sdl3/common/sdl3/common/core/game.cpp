@@ -150,6 +150,13 @@ void Game::changeScene(std::unique_ptr<Scene> scene) {
     }
 }
 
+void Game::setScore(int score) {
+    score_ = score;
+    high_score_ = std::max(high_score_, score_);
+}
+
+void Game::addScore(int score) { setScore(score_ + score); }
+
 void Game::renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size,
                          const glm::vec2 mask) const {
     SDL_FRect src_rect = {

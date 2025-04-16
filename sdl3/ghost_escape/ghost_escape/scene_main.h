@@ -9,6 +9,7 @@ class Player;
 class Spawner;
 class UIMouse;
 class HUDStatus;
+class HUDText;
 
 class SceneMain : public Scene {
 public:
@@ -20,6 +21,8 @@ public:
     virtual void render() override;
 
 private:
+    void updateScore();
+
     void renderBackground() const;
 
 private:
@@ -27,6 +30,7 @@ private:
     Spawner* spawner_{};
     UIMouse* ui_mouse_{};
     HUDStatus* hud_stats_{};
+    HUDText* hud_text_score_{};
 };
 
 }  // namespace sdl3

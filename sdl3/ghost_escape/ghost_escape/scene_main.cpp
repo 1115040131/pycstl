@@ -1,8 +1,11 @@
 #include "ghost_escape/scene_main.h"
 
+#include <fmt/format.h>
+
 #include "ghost_escape/hud_stats.h"
 #include "ghost_escape/player.h"
 #include "ghost_escape/spawner.h"
+#include "sdl3/common/screen/hud_text.h"
 #include "sdl3/common/screen/ui_mouse.h"
 
 namespace pyc {
@@ -31,9 +34,11 @@ void SceneMain::init() {
     spawner->setTarget(player_);
     spawner_ = static_cast<Spawner*>(addChild(std::move(spawner)));
 
-    ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
-
     hud_stats_ = HUDStatus::CreateAndSet(this, player_, glm::vec2(30));
+    hud_text_score_ = HUDText::CreateAndSet(this, "Score: 0", glm::vec2(game_.getScreenSize().x - 120.f, 30.f),
+                                            glm::vec2(200, 50), ASSET("font/VonwaonBitmap-16px.ttf"), 32,
+                                            ASSET("UI/Textfield_01.png"));
+    ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
 }
 
 void SceneMain::clean() { Scene::clean(); }
@@ -42,6 +47,7 @@ void SceneMain::handleEvents(const SDL_Event& event) { Scene::handleEvents(event
 
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
+    updateScore();
 #ifdef DEBUG_MODE
     // fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
     //              children_screen_.size(), children_.size());
@@ -53,6 +59,8 @@ void SceneMain::render() {
     renderBackground();
     Scene::render();
 }
+
+void SceneMain::updateScore() { hud_text_score_->setText(fmt::format("Score: {}", game_.getScore())); }
 
 void SceneMain::renderBackground() const {
     auto start = -camera_position_;
