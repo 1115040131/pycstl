@@ -45,6 +45,20 @@ public:
     void addScore(int score);
     int getScore() const { return score_; }
 
+    // audio
+    void playMusic(const std::string& file_path, bool loop = true) const {
+        Mix_PlayMusic(asset_store_->getMusic(file_path), loop ? -1 : 1);
+    }
+    void playSound(const std::string& file_path) const {
+        Mix_PlayChannel(-1, asset_store_->getSound(file_path), 0);
+    }
+    void stopMusic() const { Mix_HaltMusic(); }
+    void stopSound() const { Mix_HaltChannel(-1); }
+    void pauseMusic() const { Mix_PausedMusic(); }
+    void pauseSound() const { Mix_Paused(-1); }
+    void resumeMusic() const { Mix_ResumeMusic(); }
+    void resumeSound() const { Mix_Resume(-1); }
+
     // random
     template <typename T>
     T random(T min, T max) {

@@ -32,6 +32,7 @@ void WeaponThunder::handleEvents(const SDL_Event& event) {
     if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             if (canAttack()) {
+                game_.playSound(ASSET("sound/big-thunder.mp3"));
                 auto position = game_.getCurrentScene()->screenToWorld(game_.getMousePosition());
                 auto spell = Spell::Create(ASSET("effect/Thunderstrike w blur.png"), position, 40.F, 3.F);
                 attack(position, std::move(spell));

@@ -41,6 +41,14 @@ void Player::update(std::chrono::duration<float> delta) {
 
 void Player::render() { Actor::render(); }
 
+void Player::takeDamage(double damage) {
+    if (!stats_ || stats_->isInvincible()) {
+        return;
+    }
+    Actor::takeDamage(damage);
+    game_.playSound(ASSET("sound/hit-flesh-02-266309.mp3"));
+}
+
 void Player::keyboardControl() {
     // 玩家移动
     velocity_ *= 0.9F;
@@ -90,6 +98,7 @@ void Player::checkIsDead() {
         effect_->setPosition(getPosition());
         game_.getCurrentScene()->safeAddChild(std::move(effect_));
         setActive(false);
+        game_.playSound(ASSET("sound/female-scream-02-89290.mp3"));
     }
 }
 

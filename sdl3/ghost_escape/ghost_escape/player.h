@@ -17,6 +17,8 @@ public:
     virtual void update(std::chrono::duration<float> delta) override;
     virtual void render() override;
 
+    virtual void takeDamage(double damage) override;
+
 private:
     void keyboardControl();
     void syncCamera();

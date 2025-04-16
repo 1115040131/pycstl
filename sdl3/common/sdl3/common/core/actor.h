@@ -19,7 +19,7 @@ public:
 
     Stats* getStats() const { return stats_; }
 
-    void takeDamage(double damage);
+    virtual void takeDamage(double damage);
     bool isAlive() const;
 
 protected:
