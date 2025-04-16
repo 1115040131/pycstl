@@ -1,3 +1,12 @@
+# Debug configuration
+build:debug --compilation_mode=dbg
+
+# Release configuration
+build:release --compilation_mode=opt
+
+# Fastbuild configuration (optional, as it is the default)
+build:fastbuild --compilation_mode=fastbuild
+
 common --enable_bzlmod
 common --enable_workspace
 common --incompatible_disallow_empty_glob=false
