@@ -159,8 +159,8 @@ void Game::renderTexture(const Texture& texture, const glm::vec2& position, cons
         texture.src_rect.h * mask.y,
     };
     SDL_FRect dst_rect = {
-        position.x - size.x / 2,
-        position.y - size.y / 2 + size.y * (1 - mask.y),
+        position.x,
+        position.y + size.y * (1 - mask.y),
         size.x * mask.x,
         size.y * mask.y,
     };
@@ -171,8 +171,8 @@ void Game::renderTexture(const Texture& texture, const glm::vec2& position, cons
 void Game::renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha) const {
     auto texture = asset_store_->getImage(ASSET("UI/circle.png"));
     SDL_FRect dst_rect = {
-        position.x - size.x / 2,
-        position.y - size.y / 2,
+        position.x,
+        position.y,
         size.x,
         size.y,
     };
@@ -183,14 +183,14 @@ void Game::renderFillCircle(const glm::vec2& position, const glm::vec2& size, fl
 void Game::renderHBar(const glm::vec2& position, const glm::vec2& size, float percent, SDL_FColor color) const {
     SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
     SDL_FRect boundary_rect = {
-        position.x - size.x / 2,
-        position.y - size.y / 2,
+        position.x,
+        position.y,
         size.x,
         size.y,
     };
     SDL_FRect fill_rect = {
-        position.x - size.x / 2,
-        position.y - size.y / 2,
+        position.x,
+        position.y,
         size.x * percent,
         size.y,
     };

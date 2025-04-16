@@ -19,8 +19,6 @@ TextLabel* TextLabel::CreateAndSet(ObjectScreen* parent, std::string_view text, 
 
 void TextLabel::render() {
     auto render_position = getRenderPosition();
-    fmt::println("TextLabel size: {} x {}", render_position.x, render_position.y);
-
     TTF_DrawRendererText(ttf_text_, render_position.x, render_position.y);
 }
 
@@ -55,10 +53,6 @@ void TextLabel::updateSize() {
     setSize(glm::vec2{
         static_cast<float>(w),
         static_cast<float>(h),
-    });
-    addOffset(glm::vec2{
-        -size_.x / 2,
-        -size_.y / 2,
     });
 }
 
