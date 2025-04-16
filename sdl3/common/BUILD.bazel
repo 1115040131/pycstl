@@ -11,7 +11,10 @@ cc_library(
     srcs = glob(["sdl3/common/**/*.cpp"]),
     hdrs = glob(["sdl3/common/**/*.h"]),
     copts = STRICT_COPTS,
-    defines = ["DEBUG_MODE"],
+    defines = select({
+        "//conditions:default": [],
+        "//:debug": ["DEBUG_MODE"],
+    }),
     includes = ["."],
     deps = [
         "//common",
