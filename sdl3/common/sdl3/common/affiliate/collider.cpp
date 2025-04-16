@@ -25,7 +25,9 @@ void Collider::render() {
 
 bool Collider::isColliding(const Collider& other) const {
     if (type_ == Type::kCircle && other.type_ == Type::kCircle) {
-        return glm::distance(getPosition(), other.getPosition()) < (size_.x + other.size_.x) / 2.F;
+        return glm::distance(getPosition() + glm::vec2(size_.x / 2.0f),
+                             other.getPosition() + glm::vec2(other.size_.x / 2.0f)) <
+               (size_.x + other.size_.x) / 2.0f;
     }
     return false;
 }
