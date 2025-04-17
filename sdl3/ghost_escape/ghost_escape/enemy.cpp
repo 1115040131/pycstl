@@ -28,7 +28,7 @@ void Enemy::init() {
     current_anim_ = anim_normal_;
     auto size = current_anim_->getSize();
 
-    collider_ = Collider::CreateAndSet(this, size);
+    collider_ = Collider::CreateAndSet(this, size * 0.85f);
 
     stats_ = Stats::CreateAndSet(this);
 

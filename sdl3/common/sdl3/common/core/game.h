@@ -44,6 +44,7 @@ public:
     void setScore(int score);
     void addScore(int score);
     int getScore() const { return score_; }
+    int getHighScore() const { return high_score_; }
 
     // audio
     void playMusic(const std::string& file_path, bool loop = true) const {
