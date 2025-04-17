@@ -10,7 +10,11 @@
 namespace pyc {
 namespace sdl3 {
 
-#define ASSET_PATH "sdl3/ghost_escape/assets/"
+#ifndef PROJECT
+#define PROJECT "UNKNOWN"
+#endif
+
+#define ASSET_PATH "sdl3/" PROJECT "/assets/"
 #define ASSET(filename) (ASSET_PATH filename)
 
 class AssetStore {

@@ -38,9 +38,11 @@ def run_valgrind(target, args=[]):
         command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
     run_cmd(command)
 
+
 # 路径定义
 root_path = Path(__file__).resolve().parent.parent
 tool_path = root_path / 'tool'  # tool 目录
+
 
 def chat_run(targets, args):
     run_bazel_build('//chat/...', args)
@@ -72,6 +74,7 @@ def chat_run(targets, args):
                 f"python3 {tool_path / 'build.py'} chat_client"
             ]
         })
+
 
 def main():
     if len(sys.argv) < 2:
@@ -233,8 +236,8 @@ def main():
 
         ######################### build for sdl3 #########################
         "sdl3_demo": lambda args: run_bazel_run('//sdl3/demo', args=args),
-        "ghost_escape": lambda args: run_bazel_run('//sdl3/ghost_escape', args=args),
-        "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=release', args=args),
+        "ghost_escape": lambda args: run_bazel_run('//sdl3/ghost_escape --define=project=ghost_escape', args=args),
+        "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=release --define=project=ghost_escape', args=args),
 
         ######################### build for tetris #########################
         "tetris": lambda args: run_bazel_build('//tetris', args=args),

@@ -6,6 +6,11 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+config_setting(
+    name = "ghost_escape",
+    define_values = {"project": "ghost_escape"},
+)
+
 cc_library(
     name = "common",
     srcs = glob(["sdl3/common/**/*.cpp"]),
@@ -14,6 +19,9 @@ cc_library(
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
+    }) + select({
+        "//conditions:default": [],
+        ":ghost_escape": ["PROJECT=\\\"ghost_escape\\\""],
     }),
     includes = ["."],
     deps = [
