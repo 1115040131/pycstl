@@ -24,7 +24,7 @@ void Sprite::setTexture(const Texture& texture) {
 
 void Sprite::render() {
     if (!texture_.texture || !parent_) {
-        fmt::println("Sprite::render: texture or parent is nullptr");
+        // fmt::println("Sprite::render: texture or parent is nullptr");
         return;
     }
     if (is_finish_) {

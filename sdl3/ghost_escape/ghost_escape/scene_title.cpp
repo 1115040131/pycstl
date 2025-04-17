@@ -17,11 +17,22 @@ void SceneTitle::init() {
     HUDText::CreateAndSet(this, fmt::format("最高分: {}", game_.getHighScore()),
                           game_.getScreenSize() / 2.0f + glm::vec2(0, 100), glm::vec2(200, 50),
                           ASSET("font/VonwaonBitmap-16px.ttf"), 32, ASSET("UI/Textfield_01.png"));
+
+    button_quit_ =
+        HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(200), ASSET("UI/A_Quit1.png"),
+                                ASSET("UI/A_Quit2.png"), ASSET("UI/A_Quit3.png"), 2.0f);
 }
 
 void SceneTitle::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
     updateColor(delta);
+    checkButtonQuit();
+
+#ifdef DEBUG_MODE
+    // fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
+    //              children_screen_.size(), children_.size());
+    // printChildren();
+#endif
 }
 
 void SceneTitle::render() {
@@ -34,6 +45,12 @@ void SceneTitle::updateColor(std::chrono::duration<float> delta) {
     boundary_color_.r = 0.5f + 0.5 * std::sin(timer_.count() * 0.9f);
     boundary_color_.g = 0.5f + 0.5 * std::sin(timer_.count() * 0.8f);
     boundary_color_.b = 0.5f + 0.5 * std::sin(timer_.count() * 0.7f);
+}
+
+void SceneTitle::checkButtonQuit() {
+    if (button_quit_->getIsTrigger()) {
+        game_.quit();
+    }
 }
 
 void SceneTitle::renderBackground() const {

@@ -19,7 +19,7 @@ Collider* Collider::CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type,
 
 void Collider::render() {
 #ifdef DEBUG_MODE
-    game_.renderFillCircle(getRenderPosition(), size_, 0.5F);
+    game_.renderFillCircle(ASSET("UI/circle.png"), getRenderPosition(), size_, 0.5F);
 #endif
 }
 

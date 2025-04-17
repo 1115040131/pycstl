@@ -5,7 +5,7 @@ namespace sdl3 {
 
 HUDSkill* HUDSkill::CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& render_position,
                                  float scale, Anchor anchor) {
-    auto skill = std::unique_ptr<HUDSkill>(new HUDSkill());
+    auto skill = std::make_unique<HUDSkill>();
     skill->init();
 #ifdef DEBUG_MODE
     skill->SET_NAME(HUDSkill);

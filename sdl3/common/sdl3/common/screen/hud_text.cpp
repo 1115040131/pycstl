@@ -6,7 +6,7 @@ namespace sdl3 {
 HUDText* HUDText::CreateAndSet(Object* parent, std::string_view text, const glm::vec2& render_position,
                                const glm::vec2& size, const std::string& font_path, int font_size,
                                const std::string& file_path, Anchor anchor) {
-    auto hud_text = std::unique_ptr<HUDText>(new HUDText());
+    auto hud_text = std::make_unique<HUDText>();
     hud_text->init();
 #ifdef DEBUG_MODE
     hud_text->SET_NAME(HUDText);

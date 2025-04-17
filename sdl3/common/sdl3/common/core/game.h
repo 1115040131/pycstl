@@ -46,6 +46,8 @@ public:
     int getScore() const { return score_; }
     int getHighScore() const { return high_score_; }
 
+    void quit() { is_running_ = false; }
+
     // audio
     void playMusic(const std::string& file_path, bool loop = true) const {
         Mix_PlayMusic(asset_store_->getMusic(file_path), loop ? -1 : 1);
@@ -80,17 +82,21 @@ public:
     // render
     void renderTexture(const Texture& texture, const glm::vec2& position, const glm::vec2& size,
                        const glm::vec2 mask = {1.0, 1.0}) const;
-    void renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha = 1.F) const;
+    void renderFillCircle(const std::string& file_path, const glm::vec2& position, const glm::vec2& size,
+                          float alpha = 1.F) const;
     void renderHBar(const glm::vec2& position, const glm::vec2& size, float percent, SDL_FColor color) const;
+
+    void drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
+                  SDL_FColor color) const;
+    void drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
+                      SDL_FColor color) const;
 
     // text
     TTF_Text* createTTF_Text(std::string_view text, const std::string& font_path, int font_size) const;
 
     // util
-    void drawGrid(const glm::vec2& top_left, const glm::vec2& bottom_right, float grid_width, float grid_height,
-                  SDL_FColor color) const;
-    void drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
-                      SDL_FColor color) const;
+    bool isInRect(const glm::vec2& position, const glm::vec2& top_left, const glm::vec2& bottom_right) const;
+    bool isMouseInRect(const glm::vec2& top_left, const glm::vec2& bottom_right) const;
 
 private:
     void clean();

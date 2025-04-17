@@ -112,6 +112,8 @@ void Game::run() {
         //     fmt::println("elapsed: {},  FPS: {}", elapsed.count(), 1.0s / (tmp - start));
         // }
     }
+
+    clean();
 }
 
 void Game::handleEvents() {
@@ -175,8 +177,9 @@ void Game::renderTexture(const Texture& texture, const glm::vec2& position, cons
                              texture.is_flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
-void Game::renderFillCircle(const glm::vec2& position, const glm::vec2& size, float alpha) const {
-    auto texture = asset_store_->getImage(ASSET("UI/circle.png"));
+void Game::renderFillCircle(const std::string& file_path, const glm::vec2& position, const glm::vec2& size,
+                            float alpha) const {
+    auto texture = asset_store_->getImage(file_path);
     SDL_FRect dst_rect = {
         position.x,
         position.y,
@@ -236,6 +239,15 @@ void Game::drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right
         SDL_RenderRect(renderer_, &rect);
     }
     SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
+}
+
+bool Game::isInRect(const glm::vec2& position, const glm::vec2& top_left, const glm::vec2& bottom_right) const {
+    return position.x >= top_left.x && position.x <= bottom_right.x && position.y >= top_left.y &&
+           position.y <= bottom_right.y;
+}
+
+bool Game::isMouseInRect(const glm::vec2& top_left, const glm::vec2& bottom_right) const {
+    return isInRect(getMousePosition(), top_left, bottom_right);
 }
 
 }  // namespace sdl3
