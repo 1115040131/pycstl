@@ -16,6 +16,7 @@ public:
 private:
     void updateColor(std::chrono::duration<float> delta);
 
+    void checkButtonStart();
     void checkButtonQuit();
 
     void renderBackground() const;

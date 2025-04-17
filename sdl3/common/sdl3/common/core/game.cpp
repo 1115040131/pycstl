@@ -96,6 +96,19 @@ void Game::run() {
     while (is_running_) {
         auto start = std::chrono::steady_clock::now();  // 当前帧时间
 
+        if (next_scene_) {
+            if (current_scene_) {
+                current_scene_->clean();
+            }
+            current_scene_ = std::move(next_scene_);
+            if (current_scene_) {
+                current_scene_->init();
+            }
+#ifdef DEBUG_MODE
+            fmt::println("Change scene {}", current_scene_->getName());
+#endif
+        }
+
         handleEvents();
         update(start - last);
         last = start;
@@ -142,15 +155,7 @@ void Game::render() {
     SDL_RenderPresent(renderer_);
 }
 
-void Game::changeScene(std::unique_ptr<Scene> scene) {
-    if (current_scene_) {
-        current_scene_->clean();
-    }
-    current_scene_ = std::move(scene);
-    if (current_scene_) {
-        current_scene_->init();
-    }
-}
+void Game::changeScene(std::unique_ptr<Scene> scene) { next_scene_ = std::move(scene); }
 
 void Game::setScore(int score) {
     score_ = score;

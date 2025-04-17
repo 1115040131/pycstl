@@ -2,6 +2,7 @@
 
 #include <fmt/format.h>
 
+#include "ghost_escape/scene_main.h"
 #include "sdl3/common/screen/hud_text.h"
 
 namespace pyc {
@@ -18,6 +19,12 @@ void SceneTitle::init() {
                           game_.getScreenSize() / 2.0f + glm::vec2(0, 100), glm::vec2(200, 50),
                           ASSET("font/VonwaonBitmap-16px.ttf"), 32, ASSET("UI/Textfield_01.png"));
 
+    button_start_ = HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(-200, 200),
+                                            ASSET("UI/A_Start1.png"), ASSET("UI/A_Start2.png"),
+                                            ASSET("UI/A_Start3.png"), 2.0f);
+    button_credits_ =
+        HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(0, 200), ASSET("UI/A_Credits1.png"),
+                                ASSET("UI/A_Credits2.png"), ASSET("UI/A_Credits3.png"), 2.0f);
     button_quit_ =
         HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(200), ASSET("UI/A_Quit1.png"),
                                 ASSET("UI/A_Quit2.png"), ASSET("UI/A_Quit3.png"), 2.0f);
@@ -26,6 +33,7 @@ void SceneTitle::init() {
 void SceneTitle::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
     updateColor(delta);
+    checkButtonStart();
     checkButtonQuit();
 
 #ifdef DEBUG_MODE
@@ -45,6 +53,12 @@ void SceneTitle::updateColor(std::chrono::duration<float> delta) {
     boundary_color_.r = 0.5f + 0.5 * std::sin(timer_.count() * 0.9f);
     boundary_color_.g = 0.5f + 0.5 * std::sin(timer_.count() * 0.8f);
     boundary_color_.b = 0.5f + 0.5 * std::sin(timer_.count() * 0.7f);
+}
+
+void SceneTitle::checkButtonStart() {
+    if (button_start_->getIsTrigger()) {
+        game_.changeScene(std::make_unique<SceneMain>());
+    }
 }
 
 void SceneTitle::checkButtonQuit() {

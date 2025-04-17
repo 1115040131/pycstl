@@ -122,6 +122,7 @@ private:
     SDL_MouseButtonFlags mouse_button_flags_;
 
     std::unique_ptr<Scene> current_scene_;
+    std::unique_ptr<Scene> next_scene_;
     std::unique_ptr<AssetStore> asset_store_;
 
     // 随机数生成器

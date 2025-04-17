@@ -1,4 +1,3 @@
-#include "ghost_escape/scene_main.h"
 #include "ghost_escape/scene_title.h"
 #include "sdl3/common/core/game.h"
 
