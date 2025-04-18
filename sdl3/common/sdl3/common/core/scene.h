@@ -28,6 +28,9 @@ public:
     const std::vector<std::unique_ptr<ObjectWorld>>& getChildrenWorld() const { return children_world_; }
     const std::vector<std::unique_ptr<ObjectScreen>>& getChildrenScreen() const { return children_screen_; }
 
+    void pause() { is_pause_ = true; }
+    void resume() { is_pause_ = false; }
+
     glm::vec2 worldToScreen(const glm::vec2& position) const { return position - camera_position_; }
     glm::vec2 screenToWorld(const glm::vec2& screen_position) const { return screen_position + camera_position_; }
 
@@ -54,6 +57,7 @@ protected:
     glm::vec2 camera_position_;
     std::vector<std::unique_ptr<ObjectWorld>> children_world_;
     std::vector<std::unique_ptr<ObjectScreen>> children_screen_;
+    bool is_pause_{};
 };
 
 }  // namespace sdl3

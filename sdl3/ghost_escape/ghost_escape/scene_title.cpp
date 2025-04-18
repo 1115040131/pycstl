@@ -8,9 +8,13 @@ namespace pyc {
 namespace sdl3 {
 
 void SceneTitle::init() {
+    Scene::init();
+    SDL_ShowCursor();
+
 #ifdef DEBUG_MODE
     name_ = "SceneTitle";
 #endif
+
     HUDText::CreateAndSet(this, "幽灵逃生", game_.getScreenSize() / 2.0f - glm::vec2(0, 100),
                           glm::vec2(game_.getScreenSize().x / 2.0f, game_.getScreenSize().y / 3.0f),
                           ASSET("font/VonwaonBitmap-16px.ttf"), 64, ASSET("UI/Textfield_01.png"));

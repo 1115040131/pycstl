@@ -4,7 +4,9 @@
 
 #include "ghost_escape/hud_stats.h"
 #include "ghost_escape/player.h"
+#include "ghost_escape/scene_title.h"
 #include "ghost_escape/spawner.h"
+#include "sdl3/common/screen/hud_button.h"
 #include "sdl3/common/screen/hud_text.h"
 #include "sdl3/common/screen/ui_mouse.h"
 
@@ -12,6 +14,7 @@ namespace pyc {
 namespace sdl3 {
 
 void SceneMain::init() {
+    Scene::init();
     SDL_HideCursor();
 
 #ifdef DEBUG_MODE
@@ -40,6 +43,15 @@ void SceneMain::init() {
     hud_text_score_ = HUDText::CreateAndSet(this, "Score: 0", glm::vec2(game_.getScreenSize().x - 120.f, 30.f),
                                             glm::vec2(200, 50), ASSET("font/VonwaonBitmap-16px.ttf"), 32,
                                             ASSET("UI/Textfield_01.png"));
+
+    buton_pause_ =
+        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(230, 30), ASSET("UI/A_Pause1.png"),
+                                ASSET("UI/A_Pause2.png"), ASSET("UI/A_Pause3.png"));
+    buton_restart_ =
+        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(140, 30), ASSET("UI/A_Restart1.png"),
+                                ASSET("UI/A_Restart2.png"), ASSET("UI/A_Restart3.png"));
+    buton_back_ = HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(50, 30), ASSET("UI/A_Back1.png"),
+                                          ASSET("UI/A_Back2.png"), ASSET("UI/A_Back3.png"));
     ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
 }
 
@@ -50,11 +62,36 @@ void SceneMain::handleEvents(const SDL_Event& event) { Scene::handleEvents(event
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
     updateScore();
+    checkButtonPause();
+    checkButtonRestart();
+    checkButtonBack();
 #ifdef DEBUG_MODE
     // fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
     //              children_screen_.size(), children_.size());
     // printChildren();
 #endif
+}
+
+void SceneMain::checkButtonPause() {
+    if (buton_pause_->getIsTrigger()) {
+        if (is_pause_) {
+            resume();
+        } else {
+            pause();
+        }
+    }
+}
+
+void SceneMain::checkButtonRestart() {
+    if (buton_restart_->getIsTrigger()) {
+        game_.changeScene(std::make_unique<SceneMain>());
+    }
+}
+
+void SceneMain::checkButtonBack() {
+    if (buton_back_->getIsTrigger()) {
+        game_.changeScene(std::make_unique<SceneTitle>());
+    }
 }
 
 void SceneMain::render() {

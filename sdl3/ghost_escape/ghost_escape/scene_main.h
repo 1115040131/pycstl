@@ -10,6 +10,7 @@ class Spawner;
 class UIMouse;
 class HUDStatus;
 class HUDText;
+class HUDButton;
 
 class SceneMain : public Scene {
 public:
@@ -23,6 +24,10 @@ public:
 private:
     void updateScore();
 
+    void checkButtonPause();
+    void checkButtonRestart();
+    void checkButtonBack();
+
     void renderBackground() const;
 
 private:
@@ -31,6 +36,9 @@ private:
     UIMouse* ui_mouse_{};
     HUDStatus* hud_stats_{};
     HUDText* hud_text_score_{};
+    HUDButton* buton_pause_{};
+    HUDButton* buton_restart_{};
+    HUDButton* buton_back_{};
 };
 
 }  // namespace sdl3

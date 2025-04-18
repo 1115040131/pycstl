@@ -10,9 +10,11 @@ void Scene::clean() {
 }
 
 void Scene::handleEvents(const SDL_Event& event) {
-    HandleEvents(children_, event);
     HandleEvents(children_screen_, event);
-    HandleEvents(children_world_, event);
+    if (!is_pause_) {
+        HandleEvents(children_, event);
+        HandleEvents(children_world_, event);
+    }
 }
 
 void Scene::update(std::chrono::duration<float> delta) {
@@ -20,8 +22,10 @@ void Scene::update(std::chrono::duration<float> delta) {
         addChild(std::move(child));
     }
     object_to_add_.clear();
-    Update(children_, delta);
-    Update(children_world_, delta);
+    if (!is_pause_) {
+        Update(children_, delta);
+        Update(children_world_, delta);
+    }
     Update(children_screen_, delta);
 }
 
