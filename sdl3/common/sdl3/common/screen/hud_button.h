@@ -12,7 +12,7 @@ public:
                                    const std::string& file_hover, const std::string& file_press,
                                    float scale = 1.0f, Anchor anchor = Anchor::kCenter);
 
-    virtual void handleEvents(const SDL_Event& event) override;
+    virtual bool handleEvents(const SDL_Event& event) override;
 
     virtual void update(std::chrono::duration<float> delta) override;
 

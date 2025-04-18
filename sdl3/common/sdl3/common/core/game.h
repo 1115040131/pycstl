@@ -57,8 +57,8 @@ public:
     }
     void stopMusic() const { Mix_HaltMusic(); }
     void stopSound() const { Mix_HaltChannel(-1); }
-    void pauseMusic() const { Mix_PausedMusic(); }
-    void pauseSound() const { Mix_Paused(-1); }
+    void pauseMusic() const { Mix_PauseMusic(); }
+    void pauseSound() const { Mix_Pause(-1); }
     void resumeMusic() const { Mix_ResumeMusic(); }
     void resumeSound() const { Mix_Resume(-1); }
 

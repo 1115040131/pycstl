@@ -5,7 +5,7 @@ namespace sdl3 {
 
 void Object::clean() { Clean(children_); }
 
-void Object::handleEvents(const SDL_Event& event) { HandleEvents(children_, event); }
+bool Object::handleEvents(const SDL_Event& event) { return HandleEvents(children_, event); }
 
 void Object::update(std::chrono::duration<float> delta) {
     for (auto& child : object_to_add_) {

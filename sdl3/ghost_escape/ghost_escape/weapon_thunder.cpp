@@ -28,7 +28,7 @@ void WeaponThunder::update(std::chrono::duration<float> delta) {
     }
 }
 
-void WeaponThunder::handleEvents(const SDL_Event& event) {
+bool WeaponThunder::handleEvents(const SDL_Event& event) {
     if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             if (canAttack()) {
@@ -36,9 +36,11 @@ void WeaponThunder::handleEvents(const SDL_Event& event) {
                 auto position = game_.getCurrentScene()->screenToWorld(game_.getMousePosition());
                 auto spell = Spell::Create(ASSET("effect/Thunderstrike w blur.png"), position, 40.F, 3.F);
                 attack(position, std::move(spell));
+                return true;
             }
         }
     }
+    return false;
 }
 
 }  // namespace sdl3

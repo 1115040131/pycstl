@@ -9,12 +9,19 @@ void Scene::clean() {
     Clean(children_screen_);
 }
 
-void Scene::handleEvents(const SDL_Event& event) {
-    HandleEvents(children_screen_, event);
-    if (!is_pause_) {
-        HandleEvents(children_, event);
-        HandleEvents(children_world_, event);
+bool Scene::handleEvents(const SDL_Event& event) {
+    if (HandleEvents(children_screen_, event)) {
+        return true;
     }
+    if (!is_pause_) {
+        if (HandleEvents(children_, event)) {
+            return true;
+        }
+        if (HandleEvents(children_world_, event)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void Scene::update(std::chrono::duration<float> delta) {
@@ -38,6 +45,18 @@ void Scene::render() {
 void Scene::setCameraPosition(const glm::vec2& camera_position) {
     constexpr auto kOffset = glm::vec2(30.F);
     camera_position_ = glm::clamp(camera_position, -kOffset, world_size_ - game_.getScreenSize() + kOffset);
+}
+
+void Scene::pause() {
+    is_pause_ = true;
+    game_.pauseSound();
+    game_.pauseMusic();
+}
+
+void Scene::resume() {
+    is_pause_ = false;
+    game_.resumeSound();
+    game_.resumeMusic();
 }
 
 Object* Scene::addChild(std::unique_ptr<Object> child) {

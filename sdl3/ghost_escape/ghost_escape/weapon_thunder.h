@@ -12,7 +12,7 @@ public:
 
     virtual void update(std::chrono::duration<float> delta) override;
 
-    virtual void handleEvents(const SDL_Event& event) override;
+    virtual bool handleEvents(const SDL_Event& event) override;
 
 private:
     HUDSkill* hud_skill_{};

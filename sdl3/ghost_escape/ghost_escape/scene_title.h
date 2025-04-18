@@ -11,7 +11,7 @@ class SceneTitle : public Scene {
 public:
     virtual void init() override;
 
-    virtual void handleEvents(const SDL_Event& event) override;
+    virtual bool handleEvents(const SDL_Event& event) override;
     virtual void update(std::chrono::duration<float> delta) override;
     virtual void render() override;
 

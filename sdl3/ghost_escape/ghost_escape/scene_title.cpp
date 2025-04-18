@@ -15,6 +15,8 @@ void SceneTitle::init() {
     name_ = "SceneTitle";
 #endif
 
+    game_.playMusic(ASSET("bgm/Spooky music.mp3"));
+
     HUDText::CreateAndSet(this, "幽灵逃生", game_.getScreenSize() / 2.0f - glm::vec2(0, 100),
                           glm::vec2(game_.getScreenSize().x / 2.0f, game_.getScreenSize().y / 3.0f),
                           ASSET("font/VonwaonBitmap-16px.ttf"), 64, ASSET("UI/Textfield_01.png"));
@@ -39,14 +41,14 @@ void SceneTitle::init() {
     credits_text_->setActive(false);
 }
 
-void SceneTitle::handleEvents(const SDL_Event& event) {
+bool SceneTitle::handleEvents(const SDL_Event& event) {
     if (credits_text_->isActive()) {
         if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
             credits_text_->setActive(false);
+            return true;
         }
-        return;
     }
-    Scene::handleEvents(event);
+    return Scene::handleEvents(event);
 }
 
 void SceneTitle::update(std::chrono::duration<float> delta) {

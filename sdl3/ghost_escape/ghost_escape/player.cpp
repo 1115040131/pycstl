@@ -28,8 +28,6 @@ void Player::init() {
 
 void Player::clean() { Actor::clean(); }
 
-void Player::handleEvents(const SDL_Event& event) { Actor::handleEvents(event); }
-
 void Player::update(std::chrono::duration<float> delta) {
     Actor::update(delta);
     keyboardControl();

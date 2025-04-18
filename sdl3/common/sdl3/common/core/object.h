@@ -49,7 +49,7 @@ public:
     virtual void init() {}
     virtual void clean();
 
-    virtual void handleEvents(const SDL_Event& event);
+    virtual bool handleEvents(const SDL_Event& event);
     virtual void update(std::chrono::duration<float> delta);
     virtual void render();
 
@@ -105,12 +105,15 @@ void Clean(std::vector<std::unique_ptr<T>>& children) {
 }
 
 template <DerivedFromObject T>
-void HandleEvents(std::vector<std::unique_ptr<T>>& children, const SDL_Event& event) {
+bool HandleEvents(std::vector<std::unique_ptr<T>>& children, const SDL_Event& event) {
     for (auto& child : children) {
         if (child->isActive()) {
-            child->handleEvents(event);
+            if (child->handleEvents(event)) {
+                return true;
+            }
         }
     }
+    return false;
 }
 
 template <DerivedFromObject T>
