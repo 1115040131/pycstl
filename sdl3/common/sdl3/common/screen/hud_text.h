@@ -17,6 +17,8 @@ public:
 
     void setSize(const glm::vec2& size);
 
+    void setSizeByText(float margin = 50.0f);
+
     void setBackground(const std::string& file_path);
 
 protected:

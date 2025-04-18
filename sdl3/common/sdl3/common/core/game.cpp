@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <thread>
+#include <fstream>
 
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
@@ -254,6 +255,19 @@ bool Game::isInRect(const glm::vec2& position, const glm::vec2& top_left, const 
 bool Game::isMouseInRect(const glm::vec2& top_left, const glm::vec2& bottom_right) const {
     return isInRect(getMousePosition(), top_left, bottom_right);
 }
+
+std::string Game::loadTextFile(std::string_view file_path) {
+    std::ifstream file(file_path.data());
+    if (!file.is_open()) {
+        fmt::println("file {} open failed", file_path);
+        return {};
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
 
 }  // namespace sdl3
 }  // namespace pyc

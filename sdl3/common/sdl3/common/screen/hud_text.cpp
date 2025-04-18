@@ -31,6 +31,8 @@ void HUDText::setSize(const glm::vec2& size) {
     }
 }
 
+void HUDText::setSizeByText(float margin) { setSize(text_label_->getSize() + glm::vec2(margin)); }
+
 void HUDText::setBackground(const std::string& file_path) {
     if (sprite_bg_) {
         sprite_bg_->setTexture(Texture::Create(file_path));

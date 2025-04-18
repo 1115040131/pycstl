@@ -97,6 +97,7 @@ public:
     // util
     bool isInRect(const glm::vec2& position, const glm::vec2& top_left, const glm::vec2& bottom_right) const;
     bool isMouseInRect(const glm::vec2& top_left, const glm::vec2& bottom_right) const;
+    std::string loadTextFile(std::string_view file_path);
 
 private:
     void clean();

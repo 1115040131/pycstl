@@ -3,7 +3,6 @@
 #include <fmt/format.h>
 
 #include "ghost_escape/scene_main.h"
-#include "sdl3/common/screen/hud_text.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -28,12 +27,33 @@ void SceneTitle::init() {
     button_quit_ =
         HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(200), ASSET("UI/A_Quit1.png"),
                                 ASSET("UI/A_Quit2.png"), ASSET("UI/A_Quit3.png"), 2.0f);
+
+    auto text = game_.loadTextFile(ASSET("credits.txt"));
+    credits_text_ = HUDText::CreateAndSet(this, text, game_.getScreenSize() / 2.0f, glm::vec2(500),
+                                          ASSET("font/VonwaonBitmap-16px.ttf"), 16, ASSET("UI/Textfield_01.png"));
+    credits_text_->setSizeByText();
+    credits_text_->setActive(false);
+}
+
+void SceneTitle::handleEvents(const SDL_Event& event) {
+    if (credits_text_->isActive()) {
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+            credits_text_->setActive(false);
+        }
+        return;
+    }
+    Scene::handleEvents(event);
 }
 
 void SceneTitle::update(std::chrono::duration<float> delta) {
-    Scene::update(delta);
     updateColor(delta);
+
+    if (credits_text_->isActive()) {
+        return;
+    }
+    Scene::update(delta);
     checkButtonStart();
+    checkButtonCredits();
     checkButtonQuit();
 
 #ifdef DEBUG_MODE
@@ -58,6 +78,12 @@ void SceneTitle::updateColor(std::chrono::duration<float> delta) {
 void SceneTitle::checkButtonStart() {
     if (button_start_->getIsTrigger()) {
         game_.changeScene(std::make_unique<SceneMain>());
+    }
+}
+
+void SceneTitle::checkButtonCredits() {
+    if (button_credits_->getIsTrigger()) {
+        credits_text_->setActive(!credits_text_->isActive());
     }
 }
 
