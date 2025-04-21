@@ -13,11 +13,11 @@ cc_library(
     copts = STRICT_COPTS,
     includes = ["include"],
     deps = [
-        "//boost:beast",
         "//common",
         "//network/proto:greeter_cc_grpc",
         "//network/proto:msg_cc_proto",
         "@boost.asio",
+        "@boost.beast",
         "@boost.uuid",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
