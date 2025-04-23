@@ -37,6 +37,9 @@ public:
     virtual Object* addChild(std::unique_ptr<Object> child) override;
     virtual void removeChild(Object* child_to_remove) override;
 
+    virtual void saveData(std::string_view) const {}
+    virtual void loadData(std::string_view) const {}
+
 #ifdef DEBUG_MODE
     virtual void printChildren(int indent = 0) override {
         fmt::println("{:{}}{}:", "", indent, name_);

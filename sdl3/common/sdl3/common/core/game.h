@@ -44,6 +44,8 @@ public:
     void setScore(int score);
     void addScore(int score);
     int getScore() const { return score_; }
+
+    void setHighScore(int high_score) { high_score_ = high_score; }
     int getHighScore() const { return high_score_; }
 
     void quit() { is_running_ = false; }

@@ -15,6 +15,8 @@ public:
     virtual void update(std::chrono::duration<float> delta) override;
     virtual void render() override;
 
+    virtual void loadData(std::string_view file_path) const override;
+
 private:
     void updateColor(std::chrono::duration<float> delta);
 

@@ -1,5 +1,7 @@
 #include "ghost_escape/scene_title.h"
 
+#include <fstream>
+
 #include <fmt/format.h>
 
 #include "ghost_escape/scene_main.h"
@@ -9,6 +11,7 @@ namespace sdl3 {
 
 void SceneTitle::init() {
     Scene::init();
+    loadData(ASSET("score.dat"));
     SDL_ShowCursor();
 
 #ifdef DEBUG_MODE
@@ -72,6 +75,18 @@ void SceneTitle::update(std::chrono::duration<float> delta) {
 void SceneTitle::render() {
     renderBackground();
     Scene::render();
+}
+
+void SceneTitle::loadData(std::string_view file_path) const {
+    int score = 0;
+
+    std::ifstream file(file_path.data(), std::ios::binary);
+    if (file.is_open()) {
+        file.read(reinterpret_cast<char*>(&score), sizeof(score));
+        file.close();
+    }
+
+    game_.setHighScore(score);
 }
 
 void SceneTitle::updateColor(std::chrono::duration<float> delta) {

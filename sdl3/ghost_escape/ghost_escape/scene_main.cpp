@@ -1,5 +1,7 @@
 #include "ghost_escape/scene_main.h"
 
+#include <fstream>
+
 #include <fmt/format.h>
 
 #include "ghost_escape/hud_stats.h"
@@ -60,7 +62,10 @@ void SceneMain::init() {
     end_timer_ = Timer::CreateAndSet(this);
 }
 
-void SceneMain::clean() { Scene::clean(); }
+void SceneMain::clean() {
+    Scene::clean();
+    saveData(ASSET("score.dat"));
+}
 
 void SceneMain::update(std::chrono::duration<float> delta) {
     Scene::update(delta);
@@ -79,6 +84,18 @@ void SceneMain::update(std::chrono::duration<float> delta) {
 void SceneMain::render() {
     renderBackground();
     Scene::render();
+}
+
+void SceneMain::saveData(std::string_view file_path) const {
+    std::ofstream file(file_path.data(), std::ios::binary);
+    if (!file.is_open()) {
+        fmt::println("file {} open failed", file_path);
+        return;
+    }
+
+    auto score = game_.getHighScore();
+    file.write(reinterpret_cast<const char*>(&score), sizeof(score));
+    file.close();
 }
 
 void SceneMain::checkButtonPause() {

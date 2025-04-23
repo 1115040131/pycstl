@@ -21,6 +21,8 @@ public:
     virtual void update(std::chrono::duration<float> delta) override;
     virtual void render() override;
 
+    virtual void saveData(std::string_view file_path) const override;
+
 private:
     void updateScore();
 
