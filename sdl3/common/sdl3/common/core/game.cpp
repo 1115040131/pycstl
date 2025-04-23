@@ -1,8 +1,8 @@
 #include "sdl3/common/core/game.h"
 
 #include <chrono>
-#include <thread>
 #include <fstream>
+#include <thread>
 
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
@@ -247,6 +247,14 @@ void Game::drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right
     SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
 }
 
+void Game::drawPoints(const std::vector<glm::vec2>& points, const glm::vec2& position, SDL_FColor color) const {
+    SDL_SetRenderDrawColorFloat(renderer_, color.r, color.g, color.b, color.a);
+    for (const auto& point : points) {
+        SDL_RenderPoint(renderer_, position.x + point.x, position.y + point.y);
+    }
+    SDL_SetRenderDrawColorFloat(renderer_, 0, 0, 0, 1);
+}
+
 bool Game::isInRect(const glm::vec2& position, const glm::vec2& top_left, const glm::vec2& bottom_right) const {
     return position.x >= top_left.x && position.x <= bottom_right.x && position.y >= top_left.y &&
            position.y <= bottom_right.y;
@@ -267,7 +275,6 @@ std::string Game::loadTextFile(std::string_view file_path) {
     buffer << file.rdbuf();
     return buffer.str();
 }
-
 
 }  // namespace sdl3
 }  // namespace pyc

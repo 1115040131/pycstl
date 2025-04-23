@@ -93,6 +93,8 @@ public:
     void drawBoundary(const glm::vec2& top_left, const glm::vec2& bottom_right, float boundary_width,
                       SDL_FColor color) const;
 
+    void drawPoints(const std::vector<glm::vec2>& points, const glm::vec2& position, SDL_FColor color) const;
+
     // text
     TTF_Text* createTTF_Text(std::string_view text, const std::string& font_path, int font_size) const;
 

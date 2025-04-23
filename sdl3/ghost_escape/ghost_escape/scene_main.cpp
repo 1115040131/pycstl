@@ -8,6 +8,7 @@
 #include "ghost_escape/player.h"
 #include "ghost_escape/scene_title.h"
 #include "ghost_escape/spawner.h"
+#include "sdl3/common/raw/bg_star.h"
 #include "sdl3/common/raw/timer.h"
 #include "sdl3/common/screen/hud_button.h"
 #include "sdl3/common/screen/hud_text.h"
@@ -29,6 +30,8 @@ void SceneMain::init() {
 
     world_size_ = game_.getScreenSize() * 3.0F;
     camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
+
+    BgStar::CreateAndSet(this, 2000, 0.2f, 0.5f, 0.7f);
 
     auto player = std::make_unique<Player>();
     player->init();
