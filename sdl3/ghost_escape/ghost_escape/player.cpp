@@ -24,6 +24,9 @@ void Player::init() {
     effect_ = Effect::Create(ASSET("effect/1764.png"), {}, 2.F);
 
     weapon_thunder_ = WeaponThunder::CreateAndSet(this, 2s, 40.F);
+
+    flash_timer_ = Timer::CreateAndSet(this, 0.4s);
+    flash_timer_->start();
 }
 
 void Player::clean() { Actor::clean(); }
@@ -37,7 +40,12 @@ void Player::update(std::chrono::duration<float> delta) {
     checkIsDead();
 }
 
-void Player::render() { Actor::render(); }
+void Player::render() {
+    if (stats_->isInvincible() && flash_timer_->getProgress() < 0.5f) {
+        return;
+    }
+    Actor::render();
+}
 
 void Player::takeDamage(double damage) {
     if (!stats_ || stats_->isInvincible()) {

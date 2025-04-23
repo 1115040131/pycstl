@@ -6,6 +6,7 @@
 #include "ghost_escape/player.h"
 #include "ghost_escape/scene_title.h"
 #include "ghost_escape/spawner.h"
+#include "sdl3/common/raw/timer.h"
 #include "sdl3/common/screen/hud_button.h"
 #include "sdl3/common/screen/hud_text.h"
 #include "sdl3/common/screen/ui_mouse.h"
@@ -22,6 +23,7 @@ void SceneMain::init() {
 #endif
 
     game_.playMusic(ASSET("bgm/OhMyGhost.ogg"));
+    game_.setScore(0);
 
     world_size_ = game_.getScreenSize() * 3.0F;
     camera_position_ = world_size_ / 2.F - game_.getScreenSize() / 2.F;
@@ -44,15 +46,18 @@ void SceneMain::init() {
                                             glm::vec2(200, 50), ASSET("font/VonwaonBitmap-16px.ttf"), 32,
                                             ASSET("UI/Textfield_01.png"));
 
-    buton_pause_ =
+    button_pause_ =
         HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(230, 30), ASSET("UI/A_Pause1.png"),
                                 ASSET("UI/A_Pause2.png"), ASSET("UI/A_Pause3.png"));
-    buton_restart_ =
+    button_restart_ =
         HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(140, 30), ASSET("UI/A_Restart1.png"),
                                 ASSET("UI/A_Restart2.png"), ASSET("UI/A_Restart3.png"));
-    buton_back_ = HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(50, 30), ASSET("UI/A_Back1.png"),
-                                          ASSET("UI/A_Back2.png"), ASSET("UI/A_Back3.png"));
+    button_back_ =
+        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(50, 30), ASSET("UI/A_Back1.png"),
+                                ASSET("UI/A_Back2.png"), ASSET("UI/A_Back3.png"));
     ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
+
+    end_timer_ = Timer::CreateAndSet(this);
 }
 
 void SceneMain::clean() { Scene::clean(); }
@@ -63,6 +68,7 @@ void SceneMain::update(std::chrono::duration<float> delta) {
     checkButtonPause();
     checkButtonRestart();
     checkButtonBack();
+    checkEndTimer();
 #ifdef DEBUG_MODE
     // fmt::println("children_world: {}, children_scrren: {}, children: {}", children_world_.size(),
     //              children_screen_.size(), children_.size());
@@ -70,8 +76,13 @@ void SceneMain::update(std::chrono::duration<float> delta) {
 #endif
 }
 
+void SceneMain::render() {
+    renderBackground();
+    Scene::render();
+}
+
 void SceneMain::checkButtonPause() {
-    if (buton_pause_->getIsTrigger()) {
+    if (button_pause_->getIsTrigger()) {
         if (is_pause_) {
             resume();
         } else {
@@ -81,20 +92,30 @@ void SceneMain::checkButtonPause() {
 }
 
 void SceneMain::checkButtonRestart() {
-    if (buton_restart_->getIsTrigger()) {
+    if (button_restart_->getIsTrigger()) {
         game_.changeScene(std::make_unique<SceneMain>());
     }
 }
 
 void SceneMain::checkButtonBack() {
-    if (buton_back_->getIsTrigger()) {
+    if (button_back_->getIsTrigger()) {
         game_.changeScene(std::make_unique<SceneTitle>());
     }
 }
 
-void SceneMain::render() {
-    renderBackground();
-    Scene::render();
+void SceneMain::checkEndTimer() {
+    if (player_ && !player_->isActive()) {
+        end_timer_->start();
+    }
+    if (end_timer_->isTimeOut()) {
+        pause();
+        button_restart_->setRenderPosition(game_.getScreenSize() / 2.0f - glm::vec2(200, 0));
+        button_restart_->setScale(4.0f);
+        button_back_->setRenderPosition(game_.getScreenSize() / 2.0f + glm::vec2(200, 0));
+        button_back_->setScale(4.0f);
+        button_pause_->setActive(false);
+        end_timer_->stop();
+    }
 }
 
 void SceneMain::updateScore() { hud_text_score_->setText(fmt::format("Score: {}", game_.getScore())); }

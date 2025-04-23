@@ -11,6 +11,7 @@ class UIMouse;
 class HUDStatus;
 class HUDText;
 class HUDButton;
+class Timer;
 
 class SceneMain : public Scene {
 public:
@@ -26,6 +27,7 @@ private:
     void checkButtonPause();
     void checkButtonRestart();
     void checkButtonBack();
+    void checkEndTimer();
 
     void renderBackground() const;
 
@@ -35,9 +37,10 @@ private:
     UIMouse* ui_mouse_{};
     HUDStatus* hud_stats_{};
     HUDText* hud_text_score_{};
-    HUDButton* buton_pause_{};
-    HUDButton* buton_restart_{};
-    HUDButton* buton_back_{};
+    HUDButton* button_pause_{};
+    HUDButton* button_restart_{};
+    HUDButton* button_back_{};
+    Timer* end_timer_{};
 };
 
 }  // namespace sdl3

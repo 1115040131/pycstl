@@ -4,6 +4,8 @@
 #include "sdl3/common/affiliate/sprite_anim.h"
 #include "sdl3/common/core/actor.h"
 #include "sdl3/common/world/effect.h"
+#include "sdl3/common/raw/timer.h"
+
 
 namespace pyc {
 namespace sdl3 {
@@ -29,6 +31,7 @@ private:
     SpriteAnim* anim_move_{};
     std::unique_ptr<Effect> effect_{};
     WeaponThunder* weapon_thunder_{};
+    Timer* flash_timer_{};
     bool is_moving_{};
 };
 
