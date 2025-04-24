@@ -1,0 +1,145 @@
+#pragma once
+
+#include <chrono>
+#include <memory>
+#include <vector>
+
+#include <SDL3/SDL.h>
+
+#include "sdl3/common/core/game.h"
+
+#ifdef DEBUG_MODE
+#include <fmt/format.h>
+
+#include "sdl3/common/core/util.h"
+
+#define SET_NAME(class_name) setName(fmt::format(#class_name " {}", GetCount<class_name>()));
+#endif
+
+namespace pyc {
+namespace sdl3 {
+
+using namespace std::chrono_literals;
+
+class Object {
+public:
+    enum class Type {
+        kCommon,
+        kScreen,
+        kWorld,
+        kEnemy,
+    };
+
+    enum class Anchor {
+        kNone,
+        kTopLeft,
+        kTopCenter,
+        kTopRight,
+        kCenterLeft,
+        kCenter,
+        kCenterRight,
+        kBottomLeft,
+        kBottomCenter,
+        kBottomRight,
+    };
+
+    Object() = default;
+    virtual ~Object() = default;
+
+    virtual void init() {}
+    virtual void clean();
+
+    virtual bool handleEvents(const SDL_Event& event);
+    virtual void update(std::chrono::duration<float> delta);
+    virtual void render();
+
+    Type getType() const { return type_; }
+
+    bool isActive() const { return is_active_; }
+    void setActive(bool active) { is_active_ = active; }
+
+    bool needRemove() const { return need_remove_; }
+    void setNeedRemove(bool need_remove) { need_remove_ = need_remove; }
+
+    virtual Object* getParent() const { return parent_; }
+    virtual void setParent(Object* parent) { parent_ = parent; }
+
+    Object* safeAddChild(std::unique_ptr<Object> child);
+    virtual Object* addChild(std::unique_ptr<Object> child);
+    virtual void removeChild(Object* child_to_remove);
+
+#ifdef DEBUG_MODE
+    void setName(const std::string& name) { name_ = name; }
+    const std::string& getName() const { return name_; }
+
+    virtual void printChildren(int indent = 0) {
+        fmt::println("{:{}}{}:", "", indent, name_);
+        for (const auto& child : children_) {
+            child->printChildren(indent + 4);
+        }
+    }
+#endif
+
+protected:
+#ifdef DEBUG_MODE
+    std::string name_;
+#endif
+    Type type_ = Type::kCommon;
+    Game& game_ = Game::GetInstance();
+    bool is_active_{true};
+    bool need_remove_{};
+    Object* parent_{};
+    std::vector<std::unique_ptr<Object>> children_;
+    std::vector<std::unique_ptr<Object>> object_to_add_;
+};
+
+template <typename T>
+concept DerivedFromObject = std::derived_from<T, Object>;
+
+template <DerivedFromObject T>
+void Clean(std::vector<std::unique_ptr<T>>& children) {
+    for (auto& child : children) {
+        child->clean();
+    }
+    children.clear();
+}
+
+template <DerivedFromObject T>
+bool HandleEvents(std::vector<std::unique_ptr<T>>& children, const SDL_Event& event) {
+    for (auto& child : children) {
+        if (child->isActive()) {
+            if (child->handleEvents(event)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+template <DerivedFromObject T>
+void Update(std::vector<std::unique_ptr<T>>& children, std::chrono::duration<float> delta) {
+    auto partition_it = std::partition(children.begin(), children.end(), [delta](const std::unique_ptr<T>& child) {
+        if (child->needRemove()) {
+            return false;
+        } else if (child->isActive()) {
+            child->update(delta);
+        }
+        return true;
+    });
+    for (auto iter = partition_it; iter != children.end(); ++iter) {
+        (*iter)->clean();
+    }
+    children.erase(partition_it, children.end());
+}
+
+template <DerivedFromObject T>
+void Render(std::vector<std::unique_ptr<T>>& children) {
+    for (auto& child : children) {
+        if (child->isActive()) {
+            child->render();
+        }
+    }
+}
+
+}  // namespace sdl3
+}  // namespace pyc

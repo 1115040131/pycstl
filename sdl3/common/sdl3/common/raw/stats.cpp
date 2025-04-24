@@ -1,0 +1,59 @@
+#include "sdl3/common/raw/stats.h"
+
+#include "sdl3/common/core/actor.h"
+
+namespace pyc {
+namespace sdl3 {
+
+Stats* Stats::CreateAndSet(Actor* parent, float max_health, float max_mana, float health_regen, float mana_regon,
+                           float damage) {
+    auto stats = std::make_unique<Stats>();
+    stats->init();
+#ifdef DEBUG_MODE
+    stats->SET_NAME(Stats);
+#endif
+    stats->health_.value = max_health;
+    stats->health_.max_value = max_health;
+    stats->health_.regen = health_regen;
+    stats->mana_.value = max_mana;
+    stats->mana_.max_value = max_mana;
+    stats->mana_.regen = mana_regon;
+    stats->damage_ = damage;
+    return static_cast<Stats*>(parent->addChild(std::move(stats)));
+}
+
+void Stats::update(std::chrono::duration<float> delta) {
+    Object::update(delta);
+    health_.update(delta);
+    mana_.update(delta);
+    invincibleUpdate(delta);
+}
+
+void Stats::takeDamage(float damage) {
+    if (is_alive_ && !is_invincible_) {
+        health_.value = std::max(0.F, health_.value - damage);
+
+        if (health_.value <= 0.0) {
+            is_alive_ = false;
+        } else {
+            is_invincible_ = true;
+            invincible_time_counter_ = std::chrono::duration<float>::zero();
+        }
+
+#ifdef DEBUG_MODE
+        fmt::println("{} health: {}, is alive: {}", parent_->getName(), getHealth(), isAlive());
+#endif
+    }
+}
+
+void Stats::invincibleUpdate(std::chrono::duration<float> delta) {
+    if (is_invincible_) {
+        invincible_time_counter_ += delta;
+        if (invincible_time_counter_ > invincible_time_) {
+            is_invincible_ = false;
+        }
+    }
+}
+
+}  // namespace sdl3
+}  // namespace pyc
