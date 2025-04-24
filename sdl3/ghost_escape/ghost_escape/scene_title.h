@@ -3,6 +3,7 @@
 #include "sdl3/common/core/scene.h"
 #include "sdl3/common/screen/hud_button.h"
 #include "sdl3/common/screen/hud_text.h"
+#include "sdl3/common/screen/ui_mouse.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -35,6 +36,8 @@ private:
     HUDButton* button_start_{};
     HUDButton* button_credits_{};
     HUDButton* button_quit_{};
+
+    UIMouse* ui_mouse_{};
 };
 
 }  // namespace sdl3

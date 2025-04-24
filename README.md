@@ -107,7 +107,7 @@ export QT_QPA_PLATFORM=xcb
 
 ```bash
 # 安装驱动
-sudo apt install libpulse-dev
+sudo apt install libpulse-dev libxext-dev
 
 # 强制使用无声驱动（dummy驱动）
 export SDL_AUDIODRIVER=dummy

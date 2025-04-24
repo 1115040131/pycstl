@@ -47,9 +47,13 @@ void HUDButton::update(std::chrono::duration<float>) {
 }
 
 bool HUDButton::getIsTrigger() {
-    auto tmp = is_trigger_;
-    is_trigger_ = false;
-    return tmp;
+    if (is_trigger_) {
+        is_hover_ = false;
+        is_press_ = false;
+        is_trigger_ = false;
+        return true;
+    }
+    return false;
 }
 
 void HUDButton::checkHover() {

@@ -10,6 +10,8 @@ public:
     static TextLabel* CreateAndSet(ObjectScreen* parent, std::string_view text, const std::string& font_path,
                                    int font_size, Anchor anchor = Anchor::kCenter);
 
+    virtual void clean() override;
+
     virtual void render() override;
 
     void setFont(const std::string& font_path, int font_size);

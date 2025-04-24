@@ -17,6 +17,11 @@ TextLabel* TextLabel::CreateAndSet(ObjectScreen* parent, std::string_view text, 
     return static_cast<TextLabel*>(parent->addChild(std::move(text_label)));
 }
 
+void TextLabel::clean() {
+    TTF_DestroyText(ttf_text_);
+    ObjectAffiliate::clean();
+}
+
 void TextLabel::render() {
     auto render_position = getRenderPosition();
     TTF_DrawRendererText(ttf_text_, render_position.x, render_position.y);

@@ -8,11 +8,10 @@ namespace sdl3 {
 
 class Effect : public ObjectWorld {
 public:
-    static std::unique_ptr<Effect> Create(const std::string& file_path, const glm::vec2& position,
-                                          float scale = 1.F, std::unique_ptr<ObjectWorld> next = nullptr);
-
     static Effect* CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& position,
                                 float scale = 1.F, std::unique_ptr<ObjectWorld> next = nullptr);
+
+    virtual void clean() override;
 
     virtual void update(std::chrono::duration<float> delta) override;
 

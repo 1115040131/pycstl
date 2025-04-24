@@ -29,7 +29,7 @@ private:
 private:
     SpriteAnim* anim_idle_{};
     SpriteAnim* anim_move_{};
-    std::unique_ptr<Effect> effect_{};
+    Effect* effect_{};
     WeaponThunder* weapon_thunder_{};
     Timer* flash_timer_{};
     bool is_moving_{};

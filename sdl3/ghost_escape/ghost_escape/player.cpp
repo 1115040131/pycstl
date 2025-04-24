@@ -21,7 +21,8 @@ void Player::init() {
 
     stats_ = Stats::CreateAndSet(this);
 
-    effect_ = Effect::Create(ASSET("effect/1764.png"), {}, 2.F);
+    effect_ = Effect::CreateAndSet(game_.getCurrentScene().get(), ASSET("effect/1764.png"), {}, 2.F);
+    effect_->setActive(false);
 
     weapon_thunder_ = WeaponThunder::CreateAndSet(this, 2s, 40.F);
 
@@ -102,7 +103,7 @@ void Player::checkState() {
 void Player::checkIsDead() {
     if (!stats_->isAlive()) {
         effect_->setPosition(getPosition());
-        game_.getCurrentScene()->safeAddChild(std::move(effect_));
+        effect_->setActive(true);
         setActive(false);
         game_.playSound(ASSET("sound/female-scream-02-89290.mp3"));
     }
