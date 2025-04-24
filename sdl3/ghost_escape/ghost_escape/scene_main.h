@@ -24,6 +24,8 @@ public:
     virtual void saveData(std::string_view file_path) const override;
 
 private:
+    float checkSlowDown();
+
     void updateScore();
 
     void checkButtonPause();

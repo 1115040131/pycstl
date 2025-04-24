@@ -144,8 +144,16 @@ void Game::handleEvents() {
     }
 }
 
-void Game::update(std::chrono::duration<float> delta) {
+void Game::updateMouse() {
     mouse_button_flags_ = SDL_GetMouseState(&mouse_position_.x, &mouse_position_.y);
+    // SDL_SetWindowAspectRatio(window_, screen_size_.x / screen_size_.y, screen_size_.x / screen_size_.y);
+    SDL_FRect rect{};
+    SDL_GetRenderLogicalPresentationRect(renderer_, &rect);
+    mouse_position_ = (mouse_position_ - glm::vec2(rect.x, rect.y)) * screen_size_ / glm::vec2(rect.w, rect.h);
+}
+
+void Game::update(std::chrono::duration<float> delta) {
+    updateMouse();
     current_scene_->update(delta);
 }
 

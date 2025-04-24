@@ -5,6 +5,7 @@
 #include <fmt/format.h>
 
 #include "ghost_escape/scene_main.h"
+#include "sdl3/common/screen/ui_mouse.h"
 
 namespace pyc {
 namespace sdl3 {
@@ -12,7 +13,7 @@ namespace sdl3 {
 void SceneTitle::init() {
     Scene::init();
     loadData(ASSET("score.dat"));
-    SDL_ShowCursor();
+    SDL_HideCursor();
 
 #ifdef DEBUG_MODE
     name_ = "SceneTitle";
@@ -42,6 +43,9 @@ void SceneTitle::init() {
                                           ASSET("font/VonwaonBitmap-16px.ttf"), 16, ASSET("UI/Textfield_01.png"));
     credits_text_->setSizeByText();
     credits_text_->setActive(false);
+
+    UIMouse::CreateAndSet(this, ASSET("UI/pointer_c_shaded.png"), ASSET("UI/pointer_c_shaded.png"), 1.0F,
+                          Anchor::kTopLeft);
 }
 
 bool SceneTitle::handleEvents(const SDL_Event& event) {

@@ -71,6 +71,7 @@ void SceneMain::clean() {
 }
 
 void SceneMain::update(std::chrono::duration<float> delta) {
+    delta *= checkSlowDown();
     Scene::update(delta);
     updateScore();
     checkButtonPause();
@@ -99,6 +100,13 @@ void SceneMain::saveData(std::string_view file_path) const {
     auto score = game_.getHighScore();
     file.write(reinterpret_cast<const char*>(&score), sizeof(score));
     file.close();
+}
+
+float SceneMain::checkSlowDown() {
+    if (game_.getMouseButtonFlags() & SDL_BUTTON_RMASK) {
+        return 0.4f;
+    }
+    return 1.0f;
 }
 
 void SceneMain::checkButtonPause() {

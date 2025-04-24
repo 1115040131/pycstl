@@ -110,6 +110,8 @@ private:
     void update(std::chrono::duration<float> delta);
     void render();
 
+    void updateMouse();
+
 public:
     static constexpr double kFps = 60;
 
