@@ -3,6 +3,9 @@
 #include <map>
 #include <string_view>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 namespace pyc {
 namespace monkey {
 
@@ -58,7 +61,7 @@ static const std::map<std::string_view, Token::Type> kKeywords{
     {"return", Token::Type::kReturn},
 };
 
-std::string_view toString(Token::Type type) {
+inline constexpr std::string_view toString(Token::Type type) {
     switch (type) {
         case Token::Type::kIllegal:
             return "ILLEGAL";
@@ -121,3 +124,16 @@ std::string_view toString(Token::Type type) {
 
 }  // namespace monkey
 }  // namespace pyc
+
+namespace fmt {
+
+template <>
+struct formatter<pyc::monkey::Token> : formatter<std::string> {
+    template <typename FormatContext>
+    auto format(const pyc::monkey::Token& token, FormatContext& ctx) const {
+        return fmt::format_to(ctx.out(), "Token{{type: \"{}\", literal: \"{}\"}}",
+                              pyc::monkey::toString(token.type), token.literal);
+    }
+};
+
+}  // namespace fmt

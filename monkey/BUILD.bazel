@@ -6,13 +6,22 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
-cc_binary(
-    name = "monkey",
-    srcs = glob([
-        "monkey/**/*.cpp",
+cc_library(
+    name = "monkey_lib",
+    srcs = glob(
+        ["monkey/**/*.cpp"],
+        exclude = ["monkey/monkey.cpp"],
+    ),
+    hdrs = glob([
         "monkey/**/*.h",
     ]),
     copts = STRICT_COPTS,
     includes = ["."],
     deps = ["@fmt"],
+)
+
+cc_binary(
+    name = "monkey",
+    srcs = ["monkey/monkey.cpp"],
+    deps = [":monkey_lib"],
 )
