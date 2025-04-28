@@ -2,15 +2,10 @@
 #include <gtest/gtest.h>
 
 #include "monkey/lexer/lexer.h"
+#include "monkey/test/test_define.h"
 
 namespace pyc {
 namespace monkey {
-
-bool operator==(const Token& lhs, const Token& rhs) { return lhs.type == rhs.type && lhs.literal == rhs.literal; }
-
-std::ostream& operator<<(std::ostream& os, const Token& token) {
-    return os << "Token{type: \"" << toString(token.type) << "\", literal: \"" << token.literal << "\"}";
-}
 
 TEST(LexerTest, ToStringTest) {
     EXPECT_EQ(std::string(toString(Token::Type::kIllegal)), "ILLEGAL");
