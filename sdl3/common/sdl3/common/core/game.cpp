@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <sstream>
 #include <thread>
 
 #include <SDL3_image/SDL_image.h>

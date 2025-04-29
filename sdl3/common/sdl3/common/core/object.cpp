@@ -1,5 +1,7 @@
 #include "sdl3/common/core/object.h"
 
+#include <algorithm>
+
 namespace pyc {
 namespace sdl3 {
 

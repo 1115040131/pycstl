@@ -1,5 +1,7 @@
 #include "sdl3/common/core/scene.h"
 
+#include <algorithm>
+
 namespace pyc {
 namespace sdl3 {
 
