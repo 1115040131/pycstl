@@ -5,6 +5,29 @@
 namespace pyc {
 namespace monkey {
 
+std::string_view toString(Node::Type type) {
+    switch (type) {
+        TO_STRING_CASE(Node::Type, Base);
+        TO_STRING_CASE(Node::Type, Statement);
+        TO_STRING_CASE(Node::Type, Expression);
+        TO_STRING_CASE(Node::Type, LetStatement);
+        TO_STRING_CASE(Node::Type, ReturnStatement);
+        TO_STRING_CASE(Node::Type, ExpressionStatement);
+        TO_STRING_CASE(Node::Type, BlockStatement);
+        TO_STRING_CASE(Node::Type, Identifier);
+        TO_STRING_CASE(Node::Type, Boolean);
+        TO_STRING_CASE(Node::Type, IntegerLiteral);
+        TO_STRING_CASE(Node::Type, PrefixExpression);
+        TO_STRING_CASE(Node::Type, InfixExpression);
+        TO_STRING_CASE(Node::Type, IfExpression);
+        TO_STRING_CASE(Node::Type, FunctionLiteral);
+        TO_STRING_CASE(Node::Type, CallExpression);
+        TO_STRING_CASE(Node::Type, Program);
+        default:
+            return "UNKNOWN";
+    }
+}
+
 std::string LetStatement::toString() const {
     return fmt::format("{} {} = {};", token_.literal, name_->toString(), value_->toString());
 }

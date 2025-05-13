@@ -8,9 +8,6 @@ namespace monkey {
 class Repl {
 public:
     static void Start();
-
-private:
-    static constexpr std::string_view kPrompt = ">> ";
 };
 
 }  // namespace monkey

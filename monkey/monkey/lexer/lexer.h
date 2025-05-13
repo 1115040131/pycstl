@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <string>
+#include <string_view>
 
 #include "monkey/token/token.h"
 
@@ -26,7 +26,7 @@ private:
     void skipWhitespace();
 
 private:
-    std::string input_;
+    std::string_view input_;
     size_t position_{};
 };
 

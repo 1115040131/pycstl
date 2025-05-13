@@ -66,8 +66,8 @@ private:
     std::unique_ptr<Expression> parseFunctionLiteral();
     std::unique_ptr<Expression> parseCallExpression(std::unique_ptr<Expression> function);
 
-    std::vector<std::unique_ptr<Identifier>> parseFunctionParameters();
-    std::vector<std::unique_ptr<Expression>> parseCallArguments();
+    std::vector<std::shared_ptr<Identifier>> parseFunctionParameters();
+    std::vector<std::shared_ptr<Expression>> parseCallArguments();
 
 private:
     std::unique_ptr<Lexer> lexer_;

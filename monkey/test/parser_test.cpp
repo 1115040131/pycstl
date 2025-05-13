@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <ranges>
-
 #include "monkey/parser/parser.h"
 
 namespace fmt {
@@ -26,15 +24,15 @@ inline std::ostream& operator<<(std::ostream& os, const ValueType& value) {
     return os;
 }
 
-inline bool operator==(const std::unique_ptr<Expression>& expression, const ValueType& value) {
+inline bool operator==(const std::shared_ptr<Expression>& expression, const ValueType& value) {
     if (expression->type() == Statement::Type::Identifier) {
-        auto identifier = reinterpret_cast<Identifier*>(expression.get());
+        auto identifier = std::dynamic_pointer_cast<Identifier>(expression);
         return identifier && identifier->tokenLiteral() == std::get<std::string>(value);
     } else if (expression->type() == Statement::Type::Boolean) {
-        auto boolean = reinterpret_cast<Boolean*>(expression.get());
+        auto boolean = std::dynamic_pointer_cast<Boolean>(expression);
         return boolean && boolean->value() == std::get<bool>(value);
     } else if (expression->type() == Statement::Type::IntegerLiteral) {
-        auto integer_literal = reinterpret_cast<IntegerLiteral*>(expression.get());
+        auto integer_literal = std::dynamic_pointer_cast<IntegerLiteral>(expression);
         return integer_literal && integer_literal->tokenLiteral() == std::to_string(std::get<long long>(value));
     }
     return false;
@@ -604,7 +602,7 @@ TEST(ParserTest, CallExpressionParameterTest) {
 
         // arguments
         EXPECT_EQ(call_expression->arguments().size(), input.args.size());
-        for (size_t i = 0; i < call_expression->arguments().size();i++) {
+        for (size_t i = 0; i < call_expression->arguments().size(); i++) {
             EXPECT_EQ(call_expression->arguments()[i]->toString(), input.args[i]);
         }
     }

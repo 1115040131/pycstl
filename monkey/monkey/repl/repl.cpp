@@ -4,29 +4,67 @@
 
 #include <fmt/base.h>
 
+#include "monkey/evaluator/evaluator.h"
 #include "monkey/lexer/lexer.h"
+#include "monkey/object/environment.h"
+#include "monkey/parser/parser.h"
 
 namespace pyc {
 namespace monkey {
 
+inline constexpr std::string_view kPrompt = ">> ";
+
+inline constexpr std::string_view kMonkeyFace = R""(
+   .--.  .-"     "-.  .--.
+  / .. \/  .-. .-.  \/ .. \
+ | |  '|  /   Y   \  |'  | |
+ | \   \  \ 0 | 0 /  /   / |
+  \ '- ,\.-"""""""-./, -' /
+   ''-' /_   ^ ^   _\ '-''
+       |  \._   _./  |
+       \   \ '~' /   /
+        '._ '-=-' _.'
+           '-----'
+                              )"";
+
+void printParserErrors(const std::vector<std::string>& errors) {
+    fmt::println("{}", kMonkeyFace);
+    fmt::println("Woops! We ran into some monkey business here!");
+    fmt::println(" parser errors:");
+    for (const auto& error : errors) {
+        fmt::println("\t{}", error);
+    }
+}
+
 void Repl::Start() {
+    // std::vector<std::string> lines;
+    // lines.reserve(10);
     std::string line;
+    auto env = Environment::New();
     while (true) {
         fmt::print("{}", kPrompt);
+
+        // lines.emplace_back();
+        // auto& line = lines.back();
 
         std::getline(std::cin, line);
 
         if (line.empty()) {
-            break;
+            continue;
         }
 
         auto lexer = Lexer::New(line);
-        while (true) {
-            auto token = lexer->nextToken();
-            if (token.type == Token::Type::kEof) {
-                break;
-            }
-            fmt::println("{}", token);
+        auto parser = Parser::New(std::move(lexer));
+        auto program = parser->parseProgram();
+
+        if (!parser->errors().empty()) {
+            printParserErrors(parser->errors());
+            continue;
+        }
+
+        auto evaluated = Eval(std::move(program), env);
+        if (evaluated) {
+            fmt::println("{}", evaluated->inspect());
         }
     }
 }

@@ -4,13 +4,11 @@
 #include <string>
 #include <vector>
 
+#include "monkey/macro.h"
 #include "monkey/token/token.h"
 
 namespace pyc {
 namespace monkey {
-
-#define TYPE(x) \
-    virtual Type type() const override { return Type::x; }
 
 class Node {
 public:
@@ -46,6 +44,8 @@ public:
     virtual std::string toString() const { return ""; }
 };
 
+std::string_view toString(Node::Type type);
+
 class Statement : public Node {
 public:
     TYPE(Statement)
@@ -77,12 +77,12 @@ public:
     void setName(std::unique_ptr<Identifier> name) { name_ = std::move(name); }
     const std::unique_ptr<Identifier>& name() const { return name_; }
     void setValue(std::unique_ptr<Expression> value) { value_ = std::move(value); }
-    const std::unique_ptr<Expression>& value() const { return value_; }
+    const std::shared_ptr<Expression>& value() const { return value_; }
 
 private:
     Token token_;  // let 关键字
     std::unique_ptr<Identifier> name_;
-    std::unique_ptr<Expression> value_;
+    std::shared_ptr<Expression> value_;
 };
 
 class ReturnStatement : public Statement {
@@ -98,11 +98,11 @@ public:
     }
 
     void setValue(std::unique_ptr<Expression> value) { value_ = std::move(value); }
-    const std::unique_ptr<Expression>& value() const { return value_; }
+    const std::shared_ptr<Expression>& value() const { return value_; }
 
 private:
     Token token_;  // return  关键字
-    std::unique_ptr<Expression> value_;
+    std::shared_ptr<Expression> value_;
 };
 
 class ExpressionStatement : public Statement {
@@ -121,11 +121,11 @@ public:
     }
 
     void setExpression(std::unique_ptr<Expression> expression) { expression_ = std::move(expression); }
-    const std::unique_ptr<Expression>& expression() const { return expression_; }
+    const std::shared_ptr<Expression>& expression() const { return expression_; }
 
 private:
     Token token_;  // 表达式第一个 token
-    std::unique_ptr<Expression> expression_;
+    std::shared_ptr<Expression> expression_;
 };
 
 class BlockStatement : public Statement {
@@ -139,11 +139,11 @@ public:
     virtual std::string toString() const override;
 
     void addStatement(std::unique_ptr<Statement> statement) { statements_.emplace_back(std::move(statement)); }
-    const std::vector<std::unique_ptr<Statement>>& statements() const { return statements_; }
+    const std::vector<std::shared_ptr<Statement>>& statements() const { return statements_; }
 
 private:
     Token token_;  // {
-    std::vector<std::unique_ptr<Statement>> statements_;
+    std::vector<std::shared_ptr<Statement>> statements_;
 };
 
 #pragma endregion
@@ -192,6 +192,7 @@ public:
     virtual std::string toString() const override { return std::string(token_.literal); }
 
     void setValue(long long value) { value_ = value; }
+    long long value() const { return value_; }
 
 private:
     Token token_;
@@ -211,11 +212,11 @@ public:
     }
 
     void setRight(std::unique_ptr<Expression> right) { right_ = std::move(right); }
-    const std::unique_ptr<Expression>& right() const { return right_; }
+    const std::shared_ptr<Expression>& right() const { return right_; }
 
 private:
     Token token_;
-    std::unique_ptr<Expression> right_;
+    std::shared_ptr<Expression> right_;
 };
 
 class InfixExpression : public Expression {
@@ -231,15 +232,15 @@ public:
                            right_ ? right_->toString() : "");
     }
 
-    const std::unique_ptr<Expression>& left() const { return left_; }
+    const std::shared_ptr<Expression>& left() const { return left_; }
 
     void setRight(std::unique_ptr<Expression> right) { right_ = std::move(right); }
-    const std::unique_ptr<Expression>& right() const { return right_; }
+    const std::shared_ptr<Expression>& right() const { return right_; }
 
 private:
     Token token_;
-    std::unique_ptr<Expression> left_;
-    std::unique_ptr<Expression> right_;
+    std::shared_ptr<Expression> left_;
+    std::shared_ptr<Expression> right_;
 };
 
 class IfExpression : public Expression {
@@ -257,19 +258,19 @@ public:
     }
 
     void setCondition(std::unique_ptr<Expression> condition) { condition_ = std::move(condition); }
-    const std::unique_ptr<Expression>& condition() const { return condition_; }
+    const std::shared_ptr<Expression>& condition() const { return condition_; }
 
     void setConsequence(std::unique_ptr<BlockStatement> consequence) { consequence_ = std::move(consequence); }
-    const std::unique_ptr<BlockStatement>& consequence() const { return consequence_; }
+    const std::shared_ptr<BlockStatement>& consequence() const { return consequence_; }
 
     void setAlternative(std::unique_ptr<BlockStatement> alternative) { alternative_ = std::move(alternative); }
-    const std::unique_ptr<BlockStatement>& alternative() const { return alternative_; }
+    const std::shared_ptr<BlockStatement>& alternative() const { return alternative_; }
 
 private:
     Token token_;
-    std::unique_ptr<Expression> condition_;
-    std::unique_ptr<BlockStatement> consequence_;
-    std::unique_ptr<BlockStatement> alternative_;
+    std::shared_ptr<Expression> condition_;
+    std::shared_ptr<BlockStatement> consequence_;
+    std::shared_ptr<BlockStatement> alternative_;
 };
 
 class FunctionLiteral : public Expression {
@@ -282,18 +283,18 @@ public:
     virtual std::string_view tokenLiteral() const override { return token_.literal; }
     virtual std::string toString() const override;
 
-    void setParameters(std::vector<std::unique_ptr<Identifier>> parameters) {
+    void setParameters(std::vector<std::shared_ptr<Identifier>> parameters) {
         parameters_ = std::move(parameters);
     }
-    const std::vector<std::unique_ptr<Identifier>>& parameters() const { return parameters_; }
+    const std::vector<std::shared_ptr<Identifier>>& parameters() const { return parameters_; }
 
-    void setBody(std::unique_ptr<BlockStatement> body) { body_ = std::move(body); }
-    const std::unique_ptr<BlockStatement>& body() const { return body_; }
+    void setBody(std::shared_ptr<BlockStatement> body) { body_ = std::move(body); }
+    const std::shared_ptr<BlockStatement>& body() const { return body_; }
 
 private:
     Token token_;  // fn 关键字
-    std::vector<std::unique_ptr<Identifier>> parameters_;
-    std::unique_ptr<BlockStatement> body_;
+    std::vector<std::shared_ptr<Identifier>> parameters_;
+    std::shared_ptr<BlockStatement> body_;
 };
 
 class CallExpression : public Expression {
@@ -307,15 +308,15 @@ public:
     virtual std::string_view tokenLiteral() const override { return token_.literal; }
     virtual std::string toString() const override;
 
-    const std::unique_ptr<Expression>& function() const { return function_; }
+    const std::shared_ptr<Expression>& function() const { return function_; }
 
-    void setArguments(std::vector<std::unique_ptr<Expression>> argument) { arguments_ = std::move(argument); }
-    const std::vector<std::unique_ptr<Expression>>& arguments() const { return arguments_; }
+    void setArguments(std::vector<std::shared_ptr<Expression>> argument) { arguments_ = std::move(argument); }
+    const std::vector<std::shared_ptr<Expression>>& arguments() const { return arguments_; }
 
 private:
     Token token_;  // ( 关键字
-    std::unique_ptr<Expression> function_;
-    std::vector<std::unique_ptr<Expression>> arguments_;
+    std::shared_ptr<Expression> function_;
+    std::vector<std::shared_ptr<Expression>> arguments_;
 };
 
 #pragma endregion
@@ -331,10 +332,10 @@ public:
     virtual Type type() const override { return Type::Program; }
 
     void addStatement(std::unique_ptr<Statement> statement) { statements_.emplace_back(std::move(statement)); }
-    const std::vector<std::unique_ptr<Statement>>& statements() const { return statements_; }
+    const std::vector<std::shared_ptr<Statement>>& statements() const { return statements_; }
 
 private:
-    std::vector<std::unique_ptr<Statement>> statements_;
+    std::vector<std::shared_ptr<Statement>> statements_;
 };
 
 #pragma endregion

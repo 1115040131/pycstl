@@ -233,8 +233,8 @@ std::unique_ptr<Expression> Parser::parseCallExpression(std::unique_ptr<Expressi
     return expression;
 }
 
-std::vector<std::unique_ptr<Identifier>> Parser::parseFunctionParameters() {
-    std::vector<std::unique_ptr<Identifier>> parameters;
+std::vector<std::shared_ptr<Identifier>> Parser::parseFunctionParameters() {
+    std::vector<std::shared_ptr<Identifier>> parameters;
     if (peek_token_.type == Token::Type::kRParen) {
         nextToken();
         return parameters;
@@ -256,8 +256,8 @@ std::vector<std::unique_ptr<Identifier>> Parser::parseFunctionParameters() {
     return parameters;
 }
 
-std::vector<std::unique_ptr<Expression>> Parser::parseCallArguments() {
-    std::vector<std::unique_ptr<Expression>> args;
+std::vector<std::shared_ptr<Expression>> Parser::parseCallArguments() {
+    std::vector<std::shared_ptr<Expression>> args;
     if (peek_token_.type == Token::Type::kRParen) {
         nextToken();
         return args;
