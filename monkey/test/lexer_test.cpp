@@ -35,6 +35,8 @@ TEST(LexerTest, NextTokenTest) {
 
         10 == 10;
         10 != 9;
+        "foobar"
+        "foo bar"
     )"";
 
     std::vector<Token> tests{
@@ -62,7 +64,8 @@ TEST(LexerTest, NextTokenTest) {
         {Token::Type::kSemicolon, ";"},  {Token::Type::kRBrace, "}"},      {Token::Type::kInt, "10"},
         {Token::Type::kEq, "=="},        {Token::Type::kInt, "10"},        {Token::Type::kSemicolon, ";"},
         {Token::Type::kInt, "10"},       {Token::Type::kNotEq, "!="},      {Token::Type::kInt, "9"},
-        {Token::Type::kSemicolon, ";"},  {Token::Type::kEof, ""}};
+        {Token::Type::kSemicolon, ";"},  {Token::Type::kString, "foobar"}, {Token::Type::kString, "foo bar"},
+        {Token::Type::kEof, ""}};
 
     auto lexer = Lexer::New(input);
     for (const auto& test : tests) {

@@ -185,6 +185,29 @@ TEST(ParserTest, IntegerLiteralTest) {
     TEST_INTEGER_LITERAL(expression, "5");
 }
 
+#define TEST_STRING_LITERAL(expression, literal)                                  \
+    {                                                                             \
+        auto string_literal = reinterpret_cast<StringLiteral*>(expression.get()); \
+        EXPECT_EQ(string_literal->tokenLiteral(), literal);                      \
+        EXPECT_EQ(string_literal->toString(), literal);                          \
+    }
+
+TEST(ParserTest, StringLiteralTest) {
+    std::string input = "\"hello world\";";
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
+    const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
+    EXPECT_EQ(expression->type(), Expression::Type::StringLiteral);
+
+    TEST_STRING_LITERAL(expression, "hello world");
+}
+
 #define TEST_PREFIX_EXPRESSION(expression, operator_str, right_)                               \
     {                                                                                          \
         auto prefix_expression = reinterpret_cast<PrefixExpression*>(expression.get());        \

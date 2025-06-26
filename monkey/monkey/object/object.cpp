@@ -11,6 +11,7 @@ std::string_view toString(Object::Type type) {
         TO_STRING_CASE(Object::Type, ERROR);
         TO_STRING_CASE(Object::Type, INTEGER);
         TO_STRING_CASE(Object::Type, BOOLEAN);
+        TO_STRING_CASE(Object::Type, STRING);
         TO_STRING_CASE(Object::Type, RETURN_VALUE);
         TO_STRING_CASE(Object::Type, FUNCTION);
         default:

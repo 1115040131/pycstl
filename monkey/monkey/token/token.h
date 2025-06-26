@@ -6,6 +6,8 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
+#include "monkey/macro.h"
+
 namespace pyc {
 namespace monkey {
 
@@ -15,8 +17,9 @@ struct Token {
         kEof,
 
         // Identifiers + literals
-        kIdent,  // add, foobar, x, y, ...
-        kInt,    // 123456
+        kIdent,   // add, foobar, x, y, ...
+        kInt,     // 123456
+        kString,  // "hello world"
 
         // Operators
         kAssign,    // =
@@ -71,6 +74,8 @@ inline constexpr std::string_view toString(Token::Type type) {
             return "IDENT";
         case Token::Type::kInt:
             return "INT";
+        case Token::Type::kString:
+            return "STRING";
         case Token::Type::kAssign:
             return "=";
         case Token::Type::kPlus:

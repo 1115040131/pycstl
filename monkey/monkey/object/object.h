@@ -11,7 +11,7 @@ namespace monkey {
 
 class Object {
 public:
-    enum class Type { Null, ERROR, INTEGER, BOOLEAN, RETURN_VALUE, FUNCTION };
+    enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION };
 
     virtual ~Object() = default;
     virtual Type type() const { return Type::Null; }
@@ -73,6 +73,21 @@ public:
 
 private:
     bool value_;
+};
+
+class String : public Object {
+public:
+    TYPE(STRING)
+
+    String(std::string value) : value_(std::move(value)) {}
+    virtual ~String() override = default;
+
+    virtual std::string inspect() const override { return fmt::format("\"{}\"", value_); }
+
+    const std::string& value() const { return value_; }
+
+private:
+    std::string value_;
 };
 
 class ReturnValue : public Object {

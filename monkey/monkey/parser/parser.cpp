@@ -12,6 +12,7 @@ std::unique_ptr<Parser> Parser::New(std::unique_ptr<Lexer> lexer) {
 Parser::Parser() {
     prefix_parse_fns_.emplace(Token::Type::kIdent, &Parser::parseIdentifier);
     prefix_parse_fns_.emplace(Token::Type::kInt, &Parser::parseIntegerLiteral);
+    prefix_parse_fns_.emplace(Token::Type::kString, &Parser::parseStringLiteral);
     prefix_parse_fns_.emplace(Token::Type::kBang, &Parser::parsePrefixExpression);
     prefix_parse_fns_.emplace(Token::Type::kMinus, &Parser::parsePrefixExpression);
     prefix_parse_fns_.emplace(Token::Type::kTrue, &Parser::parseBoolean);
@@ -173,6 +174,10 @@ std::unique_ptr<Expression> Parser::parseIntegerLiteral() {
         }
     }
     return literal;
+}
+
+std::unique_ptr<Expression> Parser::parseStringLiteral() {
+    return std::make_unique<StringLiteral>(current_token_);
 }
 
 std::unique_ptr<Expression> Parser::parsePrefixExpression() {

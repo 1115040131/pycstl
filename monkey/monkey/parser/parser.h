@@ -13,7 +13,7 @@ class Parser {
 public:
     static std::unique_ptr<Parser> New(std::unique_ptr<Lexer> lexer);
 
-    Parser();
+    explicit Parser();
 
     std::unique_ptr<Program> parseProgram();
 
@@ -60,6 +60,7 @@ private:
     std::unique_ptr<Expression> parseIdentifier();
     std::unique_ptr<Expression> parseBoolean();
     std::unique_ptr<Expression> parseIntegerLiteral();
+    std::unique_ptr<Expression> parseStringLiteral();
     std::unique_ptr<Expression> parsePrefixExpression();
     std::unique_ptr<Expression> parseInfixExpression(std::unique_ptr<Expression> left);
     std::unique_ptr<Expression> parseIfExpression();

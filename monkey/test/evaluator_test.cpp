@@ -41,6 +41,13 @@ std::shared_ptr<Object> EvalInput(std::string_view input) {
         EXPECT_EQ(boolean->value(), expected) << "Input: " << input;                           \
     }
 
+#define TEST_STRING_OBJECT(object, expected, input)                                                             \
+    {                                                                                                           \
+        auto str = std::dynamic_pointer_cast<String>(evaluated);                                                \
+        ASSERT_TRUE(str != nullptr) << "Input: " << input << "\nExpected String, got " << evaluated->typeStr(); \
+        EXPECT_EQ(str->value(), expected) << "Input: " << input;                                                \
+    }
+
 TEST(EvaluatorTest, EvalIntegerExpression) {
     struct Input {
         std::string input;
@@ -102,6 +109,42 @@ TEST(EvaluatorTest, EvalBoolExpression) {
         auto evaluated = EvalInput(input.input);
         ASSERT_TRUE(evaluated != nullptr) << "Input: " << input.input;
         TEST_BOOLEAN_OBJECT(evaluated, input.expected, input.input);
+    }
+}
+
+TEST(EvaluatorTest, EvalStringExpression) {
+    struct Input {
+        std::string input;
+        std::string expected;
+    };
+    Input inputs[] = {
+        {"\"5\"", "5"},                      //
+        {"\"10\"", "10"},                    //
+        {"\"-5\"", "-5"},                    //
+        {"\"-10\"", "-10"},                  //
+        {"\"hello\"", "hello"},              //
+        {"\"hello world\"", "hello world"},  //
+    };
+
+    for (const auto& input : inputs) {
+        auto evaluated = EvalInput(input.input);
+        ASSERT_TRUE(evaluated != nullptr) << "Input: " << input.input;
+        TEST_STRING_OBJECT(evaluated, input.expected, input.input);
+    }
+}
+
+TEST(EvaluatorTest, EvalStringConcat) {
+    struct Input {
+        std::string input;
+        std::string expected;
+    };
+    Input inputs[] = {{"\"hello\" + \" \" + \"world!\"", "hello world!"},
+                      {"\"hello world\" + \"!\"", "hello world!"}};
+
+    for (const auto& input : inputs) {
+        auto evaluated = EvalInput(input.input);
+        ASSERT_TRUE(evaluated != nullptr) << "Input: " << input.input;
+        TEST_STRING_OBJECT(evaluated, input.expected, input.input);
     }
 }
 
@@ -324,6 +367,10 @@ if (10 > 1) {
         {
             "foobar",
             "identifier not found: foobar",
+        },
+        {
+            "\"Hello\" - \"World\"",
+            "unknown operator: STRING - STRING",
         },
     };
 

@@ -71,6 +71,13 @@ Token Lexer::nextToken() {
         case '\0':
             token.type = Token::Type::kEof;
             break;
+        case '"':
+            begin++;  // skip the first "
+            while (peekChar() != '"' && peekChar() != '\0') {
+                position_++;
+            }
+            token.type = Token::Type::kString;
+            break;
         default:
             if (std::isalpha(ch)) {
                 while (std::isalpha(peekChar()) || std::isdigit(peekChar())) {
@@ -96,6 +103,9 @@ Token Lexer::nextToken() {
         token.literal = "";
     } else {
         token.literal = std::string_view(input_.data() + begin, position_ - begin);
+        if (token.type == Token::Type::kString && peekChar() == '"') {
+            position_++;  // skip the last "
+        }
     }
 
     return token;

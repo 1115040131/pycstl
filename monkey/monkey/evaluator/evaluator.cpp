@@ -60,6 +60,8 @@ std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environ
             return EvalIdentifier(std::dynamic_pointer_cast<Identifier>(node), env);
         case Node::Type::Boolean:
             return EvalBool(std::dynamic_pointer_cast<Boolean>(node)->value());
+        case Node::Type::StringLiteral:
+            return std::make_shared<String>(std::dynamic_pointer_cast<StringLiteral>(node)->toString());
         case Node::Type::IntegerLiteral:
             return std::make_shared<Integer>(std::dynamic_pointer_cast<IntegerLiteral>(node)->value());
         case Node::Type::PrefixExpression:
@@ -182,6 +184,13 @@ std::shared_ptr<Object> EvalInfixExpression(std::shared_ptr<InfixExpression> inf
                                 std::dynamic_pointer_cast<BooleanObject>(right)->value());
             }
             break;
+        case Object::Type::STRING:
+            if (operator_str != "+") {
+                return std::make_shared<Error>(
+                    fmt::format("unknown operator: {} {} {}", left->typeStr(), operator_str, right->typeStr()));
+            }
+            return std::make_shared<String>(fmt::format("{}{}", std::dynamic_pointer_cast<String>(left)->value(),
+                                                        std::dynamic_pointer_cast<String>(right)->value()));
         default:
             break;
     }

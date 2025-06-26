@@ -26,6 +26,7 @@ public:
         Identifier,        // 标志符
         Boolean,           // 布尔
         IntegerLiteral,    // 整数
+        StringLiteral,     // 字符串
         PrefixExpression,  // 前缀表达式
         InfixExpression,   // 中缀表达式
         IfExpression,      // If表达式
@@ -197,6 +198,20 @@ public:
 private:
     Token token_;
     long long value_;
+};
+
+class StringLiteral : public Expression {
+public:
+    TYPE(StringLiteral)
+
+    StringLiteral(Token token) : token_(token) {}
+    virtual ~StringLiteral() override = default;
+
+    virtual std::string_view tokenLiteral() const override { return token_.literal; }
+    virtual std::string toString() const override { return std::string(token_.literal); }
+
+private:
+    Token token_;
 };
 
 class PrefixExpression : public Expression {

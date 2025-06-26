@@ -17,6 +17,7 @@ std::string_view toString(Node::Type type) {
         TO_STRING_CASE(Node::Type, Identifier);
         TO_STRING_CASE(Node::Type, Boolean);
         TO_STRING_CASE(Node::Type, IntegerLiteral);
+        TO_STRING_CASE(Node::Type, StringLiteral);
         TO_STRING_CASE(Node::Type, PrefixExpression);
         TO_STRING_CASE(Node::Type, InfixExpression);
         TO_STRING_CASE(Node::Type, IfExpression);
