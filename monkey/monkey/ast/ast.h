@@ -27,6 +27,7 @@ public:
         Boolean,           // 布尔
         IntegerLiteral,    // 整数
         StringLiteral,     // 字符串
+        ArrayLiteral,      // 数组
         PrefixExpression,  // 前缀表达式
         InfixExpression,   // 中缀表达式
         IfExpression,      // If表达式
@@ -212,6 +213,24 @@ public:
 
 private:
     Token token_;
+};
+
+class ArrayLiteral : public Expression {
+public:
+    TYPE(ArrayLiteral)
+
+    ArrayLiteral(Token token) : token_(token) {}
+    virtual ~ArrayLiteral() override = default;
+
+    virtual std::string_view tokenLiteral() const override { return token_.literal; }
+    virtual std::string toString() const override;
+
+    void setElements(std::vector<std::shared_ptr<Expression>> elements) { elements_ = std::move(elements); }
+    const std::vector<std::shared_ptr<Expression>>& elements() const { return elements_; }
+
+private:
+    Token token_;
+    std::vector<std::shared_ptr<Expression>> elements_;
 };
 
 class PrefixExpression : public Expression {

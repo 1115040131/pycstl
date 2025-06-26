@@ -13,6 +13,7 @@ Parser::Parser() {
     prefix_parse_fns_.emplace(Token::Type::kIdent, &Parser::parseIdentifier);
     prefix_parse_fns_.emplace(Token::Type::kInt, &Parser::parseIntegerLiteral);
     prefix_parse_fns_.emplace(Token::Type::kString, &Parser::parseStringLiteral);
+    prefix_parse_fns_.emplace(Token::Type::kLBracket, &Parser::parseArrayLiteral);
     prefix_parse_fns_.emplace(Token::Type::kBang, &Parser::parsePrefixExpression);
     prefix_parse_fns_.emplace(Token::Type::kMinus, &Parser::parsePrefixExpression);
     prefix_parse_fns_.emplace(Token::Type::kTrue, &Parser::parseBoolean);
@@ -180,6 +181,12 @@ std::unique_ptr<Expression> Parser::parseStringLiteral() {
     return std::make_unique<StringLiteral>(current_token_);
 }
 
+std::unique_ptr<Expression> Parser::parseArrayLiteral() {
+    auto array = std::make_unique<ArrayLiteral>(current_token_);
+    array->setElements(parseExpressionList(Token::Type::kRBracket));
+    return array;
+}
+
 std::unique_ptr<Expression> Parser::parsePrefixExpression() {
     auto expression = std::make_unique<PrefixExpression>(current_token_);
     nextToken();
@@ -234,7 +241,7 @@ std::unique_ptr<Expression> Parser::parseFunctionLiteral() {
 
 std::unique_ptr<Expression> Parser::parseCallExpression(std::unique_ptr<Expression> function) {
     auto expression = std::make_unique<CallExpression>(current_token_, std::move(function));
-    expression->setArguments(parseCallArguments());
+    expression->setArguments(parseExpressionList(Token::Type::kRParen));
     return expression;
 }
 
@@ -261,23 +268,22 @@ std::vector<std::shared_ptr<Identifier>> Parser::parseFunctionParameters() {
     return parameters;
 }
 
-std::vector<std::shared_ptr<Expression>> Parser::parseCallArguments() {
-    std::vector<std::shared_ptr<Expression>> args;
-    if (peek_token_.type == Token::Type::kRParen) {
-        nextToken();
-        return args;
-    }
+std::vector<std::shared_ptr<Expression>> Parser::parseExpressionList(Token::Type end_token) {
+    std::vector<std::shared_ptr<Expression>> list;
     nextToken();
-    args.emplace_back(parseExpression(Priority::LOWEST));
+    if (current_token_.type == end_token) {
+        return list;
+    }
+    list.emplace_back(parseExpression(Priority::LOWEST));
     while (peek_token_.type == Token::Type::kComma) {
         nextToken();
         nextToken();
-        args.emplace_back(parseExpression(Priority::LOWEST));
+        list.emplace_back(parseExpression(Priority::LOWEST));
     }
-    if (!expectPeek(Token::Type::kRParen)) {
+    if (!expectPeek(end_token)) {
         return {};
     }
-    return args;
+    return list;
 }
 
 }  // namespace monkey

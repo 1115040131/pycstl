@@ -44,6 +44,9 @@ struct Token {
         kLBrace,  // {
         kRBrace,  // }
 
+        kLBracket,  // [
+        kRBracket,  // ]
+
         // Keywords
         kFunction,  // fn
         kLet,       // let
@@ -66,62 +69,36 @@ static const std::map<std::string_view, Token::Type> kKeywords{
 
 inline constexpr std::string_view toString(Token::Type type) {
     switch (type) {
-        case Token::Type::kIllegal:
-            return "ILLEGAL";
-        case Token::Type::kEof:
-            return "EOF";
-        case Token::Type::kIdent:
-            return "IDENT";
-        case Token::Type::kInt:
-            return "INT";
-        case Token::Type::kString:
-            return "STRING";
-        case Token::Type::kAssign:
-            return "=";
-        case Token::Type::kPlus:
-            return "+";
-        case Token::Type::kMinus:
-            return "-";
-        case Token::Type::kBang:
-            return "!";
-        case Token::Type::kAsterisk:
-            return "*";
-        case Token::Type::kSlash:
-            return "/";
-        case Token::Type::kLt:
-            return "<";
-        case Token::Type::kGt:
-            return ">";
-        case Token::Type::kEq:
-            return "==";
-        case Token::Type::kNotEq:
-            return "!=";
-        case Token::Type::kComma:
-            return ",";
-        case Token::Type::kSemicolon:
-            return ";";
-        case Token::Type::kLParen:
-            return "(";
-        case Token::Type::kRParen:
-            return ")";
-        case Token::Type::kLBrace:
-            return "{";
-        case Token::Type::kRBrace:
-            return "}";
-        case Token::Type::kFunction:
-            return "FUNCTION";
-        case Token::Type::kLet:
-            return "LET";
-        case Token::Type::kTrue:
-            return "TRUE";
-        case Token::Type::kFalse:
-            return "FALSE";
-        case Token::Type::kIf:
-            return "IF";
-        case Token::Type::kElse:
-            return "ELSE";
-        case Token::Type::kReturn:
-            return "RETURN";
+        TO_STRING_CASE1(Token::Type, kIllegal, "ILLEGAL");
+        TO_STRING_CASE1(Token::Type, kEof, "EOF");
+        TO_STRING_CASE1(Token::Type, kIdent, "IDENT");
+        TO_STRING_CASE1(Token::Type, kInt, "INT");
+        TO_STRING_CASE1(Token::Type, kString, "STRING");
+        TO_STRING_CASE1(Token::Type, kAssign, "=");
+        TO_STRING_CASE1(Token::Type, kPlus, "+");
+        TO_STRING_CASE1(Token::Type, kMinus, "-");
+        TO_STRING_CASE1(Token::Type, kBang, "!");
+        TO_STRING_CASE1(Token::Type, kAsterisk, "*");
+        TO_STRING_CASE1(Token::Type, kSlash, "/");
+        TO_STRING_CASE1(Token::Type, kLt, "<");
+        TO_STRING_CASE1(Token::Type, kGt, ">");
+        TO_STRING_CASE1(Token::Type, kEq, "==");
+        TO_STRING_CASE1(Token::Type, kNotEq, "!=");
+        TO_STRING_CASE1(Token::Type, kComma, ",");
+        TO_STRING_CASE1(Token::Type, kSemicolon, ";");
+        TO_STRING_CASE1(Token::Type, kLParen, "(");
+        TO_STRING_CASE1(Token::Type, kRParen, ")");
+        TO_STRING_CASE1(Token::Type, kLBrace, "{");
+        TO_STRING_CASE1(Token::Type, kRBrace, "}");
+        TO_STRING_CASE1(Token::Type, kLBracket, "[");
+        TO_STRING_CASE1(Token::Type, kRBracket, "]");
+        TO_STRING_CASE1(Token::Type, kFunction, "FUNCTION");
+        TO_STRING_CASE1(Token::Type, kLet, "LET");
+        TO_STRING_CASE1(Token::Type, kTrue, "TRUE");
+        TO_STRING_CASE1(Token::Type, kFalse, "FALSE");
+        TO_STRING_CASE1(Token::Type, kIf, "IF");
+        TO_STRING_CASE1(Token::Type, kElse, "ELSE");
+        TO_STRING_CASE1(Token::Type, kReturn, "RETURN");
         default:
             return "UNKNOWN";
     }

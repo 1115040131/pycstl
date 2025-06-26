@@ -61,6 +61,7 @@ private:
     std::unique_ptr<Expression> parseBoolean();
     std::unique_ptr<Expression> parseIntegerLiteral();
     std::unique_ptr<Expression> parseStringLiteral();
+    std::unique_ptr<Expression> parseArrayLiteral();
     std::unique_ptr<Expression> parsePrefixExpression();
     std::unique_ptr<Expression> parseInfixExpression(std::unique_ptr<Expression> left);
     std::unique_ptr<Expression> parseIfExpression();
@@ -68,7 +69,7 @@ private:
     std::unique_ptr<Expression> parseCallExpression(std::unique_ptr<Expression> function);
 
     std::vector<std::shared_ptr<Identifier>> parseFunctionParameters();
-    std::vector<std::shared_ptr<Expression>> parseCallArguments();
+    std::vector<std::shared_ptr<Expression>> parseExpressionList(Token::Type end_token);
 
 private:
     std::unique_ptr<Lexer> lexer_;

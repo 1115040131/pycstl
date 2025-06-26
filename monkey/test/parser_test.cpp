@@ -47,6 +47,59 @@ inline bool operator==(const std::shared_ptr<Expression>& expression, const Valu
         EXPECT_EQ(let_statement->toString(), str_);                            \
     }
 
+#define TEST_RETURN_STATEMENT(statement, value_, str_)                               \
+    {                                                                                \
+        auto return_statement = reinterpret_cast<ReturnStatement*>(statement.get()); \
+        EXPECT_EQ(return_statement->tokenLiteral(), "return");                       \
+        EXPECT_EQ(return_statement->value(), value_);                                \
+        EXPECT_EQ(return_statement->toString(), str_);                               \
+    }
+
+#define TEST_IDENTIFIER(expression, literal)                                            \
+    {                                                                                   \
+        const auto& identifier = reinterpret_cast<const Identifier*>(expression.get()); \
+        EXPECT_EQ(identifier->tokenLiteral(), literal);                                 \
+        EXPECT_EQ(identifier->toString(), literal);                                     \
+    }
+
+#define TEST_BOOLEAN(expression, value_, literal)                    \
+    {                                                                \
+        auto boolean = reinterpret_cast<Boolean*>(expression.get()); \
+        EXPECT_EQ(boolean->value(), value_);                         \
+        EXPECT_EQ(boolean->toString(), literal);                     \
+    }
+
+#define TEST_INTEGER_LITERAL(expression, literal)                                   \
+    {                                                                               \
+        auto integer_literal = reinterpret_cast<IntegerLiteral*>(expression.get()); \
+        EXPECT_EQ(integer_literal->tokenLiteral(), literal);                        \
+        EXPECT_EQ(integer_literal->toString(), literal);                            \
+    }
+
+#define TEST_STRING_LITERAL(expression, literal)                                  \
+    {                                                                             \
+        auto string_literal = reinterpret_cast<StringLiteral*>(expression.get()); \
+        EXPECT_EQ(string_literal->tokenLiteral(), literal);                       \
+        EXPECT_EQ(string_literal->toString(), literal);                           \
+    }
+
+#define TEST_PREFIX_EXPRESSION(expression, operator_str, right_)                               \
+    {                                                                                          \
+        auto prefix_expression = reinterpret_cast<PrefixExpression*>(expression.get());        \
+        EXPECT_EQ(prefix_expression->tokenLiteral(), operator_str);                            \
+        EXPECT_EQ(prefix_expression->right(), right_);                                         \
+        EXPECT_EQ(prefix_expression->toString(), fmt::format("({}{})", operator_str, right_)); \
+    }
+
+#define TEST_INFIX_EXPRESSION(expression, left_, operator_str, right_)                                   \
+    {                                                                                                    \
+        auto infix_expression = reinterpret_cast<InfixExpression*>(expression.get());                    \
+        EXPECT_EQ(infix_expression->left(), left_);                                                      \
+        EXPECT_EQ(infix_expression->tokenLiteral(), operator_str);                                       \
+        EXPECT_EQ(infix_expression->right(), right_);                                                    \
+        EXPECT_EQ(infix_expression->toString(), fmt::format("({} {} {})", left_, operator_str, right_)); \
+    }
+
 TEST(ParserTest, LetStatementTest) {
     struct Input {
         std::string input;
@@ -73,14 +126,6 @@ TEST(ParserTest, LetStatementTest) {
     }
 }
 
-#define TEST_RETURN_STATEMENT(statement, value_, str_)                               \
-    {                                                                                \
-        auto return_statement = reinterpret_cast<ReturnStatement*>(statement.get()); \
-        EXPECT_EQ(return_statement->tokenLiteral(), "return");                       \
-        EXPECT_EQ(return_statement->value(), value_);                                \
-        EXPECT_EQ(return_statement->toString(), str_);                               \
-    }
-
 TEST(ParserTest, ReturnStatementTest) {
     struct Input {
         std::string input;
@@ -106,13 +151,6 @@ TEST(ParserTest, ReturnStatementTest) {
     }
 }
 
-#define TEST_IDENTIFIER(expression, literal)                                            \
-    {                                                                                   \
-        const auto& identifier = reinterpret_cast<const Identifier*>(expression.get()); \
-        EXPECT_EQ(identifier->tokenLiteral(), literal);                                 \
-        EXPECT_EQ(identifier->toString(), literal);                                     \
-    }
-
 TEST(ParserTest, IdentifierTest) {
     std::string input = "foobar;";
 
@@ -128,13 +166,6 @@ TEST(ParserTest, IdentifierTest) {
 
     TEST_IDENTIFIER(expression, "foobar");
 }
-
-#define TEST_BOOLEAN(expression, value_, literal)                    \
-    {                                                                \
-        auto boolean = reinterpret_cast<Boolean*>(expression.get()); \
-        EXPECT_EQ(boolean->value(), value_);                         \
-        EXPECT_EQ(boolean->toString(), literal);                     \
-    }
 
 TEST(ParserTest, BooleanTest) {
     struct Input {
@@ -162,13 +193,6 @@ TEST(ParserTest, BooleanTest) {
     }
 }
 
-#define TEST_INTEGER_LITERAL(expression, literal)                                   \
-    {                                                                               \
-        auto integer_literal = reinterpret_cast<IntegerLiteral*>(expression.get()); \
-        EXPECT_EQ(integer_literal->tokenLiteral(), literal);                        \
-        EXPECT_EQ(integer_literal->toString(), literal);                            \
-    }
-
 TEST(ParserTest, IntegerLiteralTest) {
     std::string input = "5;";
 
@@ -184,13 +208,6 @@ TEST(ParserTest, IntegerLiteralTest) {
 
     TEST_INTEGER_LITERAL(expression, "5");
 }
-
-#define TEST_STRING_LITERAL(expression, literal)                                  \
-    {                                                                             \
-        auto string_literal = reinterpret_cast<StringLiteral*>(expression.get()); \
-        EXPECT_EQ(string_literal->tokenLiteral(), literal);                      \
-        EXPECT_EQ(string_literal->toString(), literal);                          \
-    }
 
 TEST(ParserTest, StringLiteralTest) {
     std::string input = "\"hello world\";";
@@ -208,13 +225,25 @@ TEST(ParserTest, StringLiteralTest) {
     TEST_STRING_LITERAL(expression, "hello world");
 }
 
-#define TEST_PREFIX_EXPRESSION(expression, operator_str, right_)                               \
-    {                                                                                          \
-        auto prefix_expression = reinterpret_cast<PrefixExpression*>(expression.get());        \
-        EXPECT_EQ(prefix_expression->tokenLiteral(), operator_str);                            \
-        EXPECT_EQ(prefix_expression->right(), right_);                                         \
-        EXPECT_EQ(prefix_expression->toString(), fmt::format("({}{})", operator_str, right_)); \
-    }
+TEST(ParserTest, ArrayLiteralTest) {
+    std::string input = "[1, 2 * 2, 3 + 3]";
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
+    const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
+    EXPECT_EQ(expression->type(), Expression::Type::ArrayLiteral);
+
+    auto array_literal = reinterpret_cast<ArrayLiteral*>(expression.get());
+    EXPECT_EQ(array_literal->elements().size(), 3);
+    TEST_INTEGER_LITERAL(array_literal->elements()[0], "1");
+    TEST_INFIX_EXPRESSION(array_literal->elements()[1], 2, "*", 2);
+    TEST_INFIX_EXPRESSION(array_literal->elements()[2], 3, "+", 3);
+}
 
 TEST(ParserTest, PrefixExpressionTest) {
     struct Input {
@@ -242,15 +271,6 @@ TEST(ParserTest, PrefixExpressionTest) {
         TEST_PREFIX_EXPRESSION(expression, input.operator_str, input.right);
     }
 }
-
-#define TEST_INFIX_EXPRESSION(expression, left_, operator_str, right_)                                   \
-    {                                                                                                    \
-        auto infix_expression = reinterpret_cast<InfixExpression*>(expression.get());                    \
-        EXPECT_EQ(infix_expression->left(), left_);                                                      \
-        EXPECT_EQ(infix_expression->tokenLiteral(), operator_str);                                       \
-        EXPECT_EQ(infix_expression->right(), right_);                                                    \
-        EXPECT_EQ(infix_expression->toString(), fmt::format("({} {} {})", left_, operator_str, right_)); \
-    }
 
 TEST(ParserTest, InfixExpressionTest) {
     struct Input {

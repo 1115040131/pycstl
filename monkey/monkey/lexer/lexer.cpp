@@ -68,6 +68,12 @@ Token Lexer::nextToken() {
         case '}':
             token.type = Token::Type::kRBrace;
             break;
+        case '[':
+            token.type = Token::Type::kLBracket;
+            break;
+        case ']':
+            token.type = Token::Type::kRBracket;
+            break;
         case '\0':
             token.type = Token::Type::kEof;
             break;

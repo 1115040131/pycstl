@@ -318,7 +318,7 @@ ourFunction(20) + first + second;)"";
     TEST_INTEGER_OBJECT(evaluated, 70, input);
 }
 
-TEST(BuiltinTest, EnclosingEnvironments) {
+TEST(EvaluatorTest, BuiltinTest) {
     struct Input {
         std::string input;
         std::variant<int, std::string> expected;

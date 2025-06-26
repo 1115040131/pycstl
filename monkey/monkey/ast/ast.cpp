@@ -5,6 +5,19 @@
 namespace pyc {
 namespace monkey {
 
+template <std::derived_from<Node> T>
+static std::string Join(const std::vector<std::shared_ptr<T>>& nodes, std::string dim) {
+    std::string connect;
+    for (const auto& node : nodes) {
+        connect += node->toString() + dim;
+    }
+    if (!connect.empty()) {
+        connect.pop_back();
+        connect.pop_back();
+    }
+    return connect;
+}
+
 std::string_view toString(Node::Type type) {
     switch (type) {
         TO_STRING_CASE(Node::Type, Base);
@@ -42,6 +55,8 @@ std::string BlockStatement::toString() const {
     ss << " }";
     return ss.str();
 }
+
+std::string ArrayLiteral::toString() const { return fmt::format("{}[{}]", token_.literal, Join(elements_, ", ")); }
 
 std::string FunctionLiteral::toString() const {
     std::string params;
