@@ -1,5 +1,6 @@
 #include "monkey/evaluator/evaluator.h"
 
+#include "monkey/evaluator/builtins.h"
 #include "monkey/object/environment.h"
 
 namespace pyc {
@@ -116,11 +117,12 @@ std::shared_ptr<Object> EvalBlockStatement(std::shared_ptr<BlockStatement> block
 #pragma region Expression
 
 std::shared_ptr<Object> EvalIdentifier(std::shared_ptr<Identifier> identifier, std::shared_ptr<Environment> env) {
-    auto value = env->get(identifier->tokenLiteral());
-    if (!value) {
-        return std::make_shared<Error>(fmt::format("identifier not found: {}", identifier->tokenLiteral()));
+    if (auto value = env->get(identifier->tokenLiteral())) {
+        return value;
+    } else if (auto fit = GetBuiltin(identifier->tokenLiteral())) {
+        return fit;
     }
-    return value;
+    return std::make_shared<Error>(fmt::format("identifier not found: {}", identifier->tokenLiteral()));
 }
 
 std::shared_ptr<Object> EvalPrefixExpression(std::shared_ptr<PrefixExpression> prefix_expression,
@@ -231,7 +233,7 @@ std::shared_ptr<Object> EvalCallExpression(std::shared_ptr<CallExpression> call_
     if (args.size() == 1 && IsError(args[0])) {
         return args[0];
     }
-    return ApplyFunction(std::dynamic_pointer_cast<Function>(function), args);
+    return ApplyFunction(function, args);
 }
 
 #pragma endregion
@@ -276,18 +278,20 @@ std::vector<std::shared_ptr<Object>> EvalExpressions(const std::vector<std::shar
     return result;
 }
 
-std::shared_ptr<Object> ApplyFunction(std::shared_ptr<Function> function,
+std::shared_ptr<Object> ApplyFunction(std::shared_ptr<Object> object,
                                       const std::vector<std::shared_ptr<Object>>& args) {
-    if (!function) {
-        return std::make_shared<Error>(fmt::format("not a function: {}", function->typeStr()));
+    if (auto function = std::dynamic_pointer_cast<Function>(object)) {
+        auto extended_env = ExtendFunctionEnv(function, args);
+        auto evaluated = Eval(function->body(), extended_env);
+        auto return_value = std::dynamic_pointer_cast<ReturnValue>(evaluated);
+        if (return_value) {
+            return return_value->value();
+        }
+        return evaluated;
+    } else if(auto builtin = std::dynamic_pointer_cast<Builtin>(object)) {
+        return builtin->function()(args);
     }
-    auto extended_env = ExtendFunctionEnv(function, args);
-    auto evaluated = Eval(function->body(), extended_env);
-    auto return_value = std::dynamic_pointer_cast<ReturnValue>(evaluated);
-    if (return_value) {
-        return return_value->value();
-    }
-    return evaluated;
+    return std::make_shared<Error>(fmt::format("not a function: {}", object->typeStr()));
 }
 
 std::shared_ptr<Environment> ExtendFunctionEnv(std::shared_ptr<Function> function,

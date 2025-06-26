@@ -318,6 +318,33 @@ ourFunction(20) + first + second;)"";
     TEST_INTEGER_OBJECT(evaluated, 70, input);
 }
 
+TEST(BuiltinTest, EnclosingEnvironments) {
+    struct Input {
+        std::string input;
+        std::variant<int, std::string> expected;
+    };
+
+    struct Input inputs[]{
+        {"len(\"\")", 0},
+        {"len(\"four\")", 4},
+        {"len(\"hello world\")", 11},
+        {"len(1)", "argument to 'len' not supported, got INTEGER"},
+        {"len(\"one\", \"two\")", "wrong number of arguments. got=2, want=1"},
+    };
+
+    for (const auto& input : inputs) {
+        auto evaluated = EvalInput(input.input);
+        ASSERT_TRUE(evaluated != nullptr) << "Input: " << input.input;
+        if (std::holds_alternative<int>(input.expected)) {
+            TEST_INTEGER_OBJECT(evaluated, std::get<int>(input.expected), input.input);
+        } else {
+            auto error = std::dynamic_pointer_cast<Error>(evaluated);
+            ASSERT_TRUE(error != nullptr) << "Input: " << input.input;
+            EXPECT_EQ(error->inspect(), std::get<std::string>(input.expected)) << "Input: " << input.input;
+        }
+    }
+}
+
 TEST(EvaluatorTest, ErrorHandling) {
     struct Input {
         std::string input;

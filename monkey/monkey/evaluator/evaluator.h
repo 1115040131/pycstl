@@ -43,7 +43,7 @@ std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object
 
 std::vector<std::shared_ptr<Object>> EvalExpressions(const std::vector<std::shared_ptr<Expression>>& expressions,
                                                      std::shared_ptr<Environment> env);
-std::shared_ptr<Object> ApplyFunction(std::shared_ptr<Function> function,
+std::shared_ptr<Object> ApplyFunction(std::shared_ptr<Object> object,
                                       const std::vector<std::shared_ptr<Object>>& args);
 std::shared_ptr<Environment> ExtendFunctionEnv(std::shared_ptr<Function> function,
                                                const std::vector<std::shared_ptr<Object>>& args);
