@@ -18,6 +18,10 @@ std::shared_ptr<Object> EvalBlockStatement(std::shared_ptr<BlockStatement> block
 #pragma region Expression
 
 std::shared_ptr<Object> EvalIdentifier(std::shared_ptr<Identifier> identifier, std::shared_ptr<Environment> env);
+std::shared_ptr<Object> EvalArrayLiteral(std::shared_ptr<ArrayLiteral> array_literal,
+                                         std::shared_ptr<Environment> env);
+std::shared_ptr<Object> EvalIndexExpression(std::shared_ptr<IndexExpression> index_expression,
+                                            std::shared_ptr<Environment> env);
 std::shared_ptr<Object> EvalPrefixExpression(std::shared_ptr<PrefixExpression> prefix_expression,
                                              std::shared_ptr<Environment> env);
 std::shared_ptr<Object> EvalInfixExpression(std::shared_ptr<InfixExpression> infix_expression,
@@ -36,6 +40,12 @@ std::shared_ptr<Object> EvalCallExpression(std::shared_ptr<CallExpression> call_
 std::shared_ptr<BooleanObject> EvalBool(bool value);
 std::shared_ptr<Object> EvalBangOperatorExpression(std::shared_ptr<Object> right);
 std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object> right);
+
+#pragma endregion
+
+#pragma region Index
+
+std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index);
 
 #pragma endregion
 

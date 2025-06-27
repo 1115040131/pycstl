@@ -28,6 +28,7 @@ public:
         IntegerLiteral,    // 整数
         StringLiteral,     // 字符串
         ArrayLiteral,      // 数组
+        IndexExpression,   // 索引表达式
         PrefixExpression,  // 前缀表达式
         InfixExpression,   // 中缀表达式
         IfExpression,      // If表达式
@@ -231,6 +232,29 @@ public:
 private:
     Token token_;
     std::vector<std::shared_ptr<Expression>> elements_;
+};
+
+class IndexExpression : public Expression {
+public:
+    TYPE(IndexExpression)
+
+    IndexExpression(Token token, std::unique_ptr<Expression> left) : token_(token), left_(std::move(left)) {}
+    virtual ~IndexExpression() override = default;
+
+    virtual std::string_view tokenLiteral() const override { return token_.literal; }
+    virtual std::string toString() const override {
+        return fmt::format("({} [{}])", left_ ? left_->toString() : "", index_ ? index_->toString() : "");
+    }
+
+    const std::shared_ptr<Expression>& left() const { return left_; }
+
+    void setIndex(std::unique_ptr<Expression> index) { index_ = std::move(index); }
+    const std::shared_ptr<Expression>& index() const { return index_; }
+
+private:
+    Token token_;
+    std::shared_ptr<Expression> left_;   // 左侧表达式
+    std::shared_ptr<Expression> index_;  // 索引表达式
 };
 
 class PrefixExpression : public Expression {

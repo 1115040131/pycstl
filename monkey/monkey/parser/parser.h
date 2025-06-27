@@ -36,6 +36,7 @@ private:
         PRODUCT,      // *
         PREFIX,       // -X or !X
         CALL,         // myFunction(X)
+        INDEX,        // array[index]
     };
 
     void nextToken();
@@ -62,6 +63,7 @@ private:
     std::unique_ptr<Expression> parseIntegerLiteral();
     std::unique_ptr<Expression> parseStringLiteral();
     std::unique_ptr<Expression> parseArrayLiteral();
+    std::unique_ptr<Expression> parseIndexExpression(std::unique_ptr<Expression> left);
     std::unique_ptr<Expression> parsePrefixExpression();
     std::unique_ptr<Expression> parseInfixExpression(std::unique_ptr<Expression> left);
     std::unique_ptr<Expression> parseIfExpression();
@@ -89,7 +91,7 @@ private:
         {Token::Type::kLt, Priority::LESSGREATER}, {Token::Type::kGt, Priority::LESSGREATER},
         {Token::Type::kPlus, Priority::SUM},       {Token::Type::kMinus, Priority::SUM},
         {Token::Type::kSlash, Priority::PRODUCT},  {Token::Type::kAsterisk, Priority::PRODUCT},
-        {Token::Type::kLParen, Priority::CALL},
+        {Token::Type::kLParen, Priority::CALL},    {Token::Type::kLBracket, Priority::INDEX},
     };
 };
 

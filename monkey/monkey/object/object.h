@@ -11,7 +11,7 @@ namespace monkey {
 
 class Object {
 public:
-    enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION, BUILTIN };
+    enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION, ARRAY, BUILTIN };
 
     virtual ~Object() = default;
     virtual Type type() const { return Type::Null; }
@@ -132,6 +132,22 @@ private:
     std::vector<std::shared_ptr<Identifier>> parameters_;
     std::shared_ptr<BlockStatement> body_;
     std::shared_ptr<Environment> env_;
+};
+
+class Array : public Object {
+public:
+    TYPE(ARRAY)
+
+    Array(std::vector<std::shared_ptr<Object>> elements) : elements_(std::move(elements)) {}
+
+    virtual ~Array() override = default;
+
+    virtual std::string inspect() const override;
+
+    const std::vector<std::shared_ptr<Object>>& elements() const { return elements_; }
+
+private:
+    std::vector<std::shared_ptr<Object>> elements_;
 };
 
 class Builtin : public Object {

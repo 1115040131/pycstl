@@ -31,6 +31,7 @@ Parser::Parser() {
     infix_parse_fns_.emplace(Token::Type::kLt, &Parser::parseInfixExpression);
     infix_parse_fns_.emplace(Token::Type::kGt, &Parser::parseInfixExpression);
     infix_parse_fns_.emplace(Token::Type::kLParen, &Parser::parseCallExpression);
+    infix_parse_fns_.emplace(Token::Type::kLBracket, &Parser::parseIndexExpression);
 }
 
 void Parser::nextToken() {
@@ -185,6 +186,16 @@ std::unique_ptr<Expression> Parser::parseArrayLiteral() {
     auto array = std::make_unique<ArrayLiteral>(current_token_);
     array->setElements(parseExpressionList(Token::Type::kRBracket));
     return array;
+}
+
+std::unique_ptr<Expression> Parser::parseIndexExpression(std::unique_ptr<Expression> left) {
+    auto expression = std::make_unique<IndexExpression>(current_token_, std::move(left));
+    nextToken();
+    expression->setIndex(parseExpression(Priority::LOWEST));
+    if (!expectPeek(Token::Type::kRBracket)) {
+        return nullptr;
+    }
+    return expression;
 }
 
 std::unique_ptr<Expression> Parser::parsePrefixExpression() {

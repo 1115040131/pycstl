@@ -61,10 +61,14 @@ std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environ
             return EvalIdentifier(std::dynamic_pointer_cast<Identifier>(node), env);
         case Node::Type::Boolean:
             return EvalBool(std::dynamic_pointer_cast<Boolean>(node)->value());
-        case Node::Type::StringLiteral:
-            return std::make_shared<String>(std::dynamic_pointer_cast<StringLiteral>(node)->toString());
         case Node::Type::IntegerLiteral:
             return std::make_shared<Integer>(std::dynamic_pointer_cast<IntegerLiteral>(node)->value());
+        case Node::Type::StringLiteral:
+            return std::make_shared<String>(std::dynamic_pointer_cast<StringLiteral>(node)->toString());
+        case Node::Type::ArrayLiteral:
+            return EvalArrayLiteral(std::dynamic_pointer_cast<ArrayLiteral>(node), env);
+        case Node::Type::IndexExpression:
+            return EvalIndexExpression(std::dynamic_pointer_cast<IndexExpression>(node), env);
         case Node::Type::PrefixExpression:
             return EvalPrefixExpression(std::dynamic_pointer_cast<PrefixExpression>(node), env);
         case Node::Type::InfixExpression:
@@ -123,6 +127,32 @@ std::shared_ptr<Object> EvalIdentifier(std::shared_ptr<Identifier> identifier, s
         return fit;
     }
     return std::make_shared<Error>(fmt::format("identifier not found: {}", identifier->tokenLiteral()));
+}
+
+std::shared_ptr<Object> EvalArrayLiteral(std::shared_ptr<ArrayLiteral> array_literal,
+                                         std::shared_ptr<Environment> env) {
+    auto elements = EvalExpressions(array_literal->elements(), env);
+    if (elements.size() == 1 && IsError(elements[0])) {
+        return elements[0];
+    }
+    return std::make_shared<Array>(std::move(elements));
+}
+
+std::shared_ptr<Object> EvalIndexExpression(std::shared_ptr<IndexExpression> index_expression,
+                                            std::shared_ptr<Environment> env) {
+    auto left = Eval(index_expression->left(), env);
+    if (IsError(left)) {
+        return left;
+    }
+    auto index = Eval(index_expression->index(), env);
+    if (IsError(index)) {
+        return index;
+    }
+    if (left->type() == Object::Type::ARRAY && index->type() == Object::Type::INTEGER) {
+        return EvalArrayIndex(std::dynamic_pointer_cast<Array>(left), std::dynamic_pointer_cast<Integer>(index));
+    }
+    return std::make_shared<Error>(
+        fmt::format("index operator not supported: {}[{}]", left->typeStr(), index->typeStr()));
 }
 
 std::shared_ptr<Object> EvalPrefixExpression(std::shared_ptr<PrefixExpression> prefix_expression,
@@ -263,6 +293,18 @@ std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object
 
 #pragma endregion
 
+#pragma region Index
+
+std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index) {
+    if (index->value() < 0 || index->value() >= static_cast<long long>(array->elements().size())) {
+        return std::make_shared<Error>(
+            fmt::format("index {} out of bounds: {}", index->value(), array->elements().size()));
+    }
+    return array->elements()[index->value()];
+}
+
+#pragma endregion
+
 #pragma region function
 
 std::vector<std::shared_ptr<Object>> EvalExpressions(const std::vector<std::shared_ptr<Expression>>& expressions,
@@ -288,7 +330,7 @@ std::shared_ptr<Object> ApplyFunction(std::shared_ptr<Object> object,
             return return_value->value();
         }
         return evaluated;
-    } else if(auto builtin = std::dynamic_pointer_cast<Builtin>(object)) {
+    } else if (auto builtin = std::dynamic_pointer_cast<Builtin>(object)) {
         return builtin->function()(args);
     }
     return std::make_shared<Error>(fmt::format("not a function: {}", object->typeStr()));

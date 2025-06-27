@@ -245,6 +245,24 @@ TEST(ParserTest, ArrayLiteralTest) {
     TEST_INFIX_EXPRESSION(array_literal->elements()[2], 3, "+", 3);
 }
 
+TEST(ParserTest, IndexExpressionTest) {
+    std::string input = "myArray[1 + 1]";
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
+    const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
+    EXPECT_EQ(expression->type(), Expression::Type::IndexExpression);
+
+    auto index_expression = reinterpret_cast<IndexExpression*>(expression.get());
+    EXPECT_EQ(index_expression->left(), "myArray");
+    TEST_INFIX_EXPRESSION(index_expression->index(), 1, "+", 1);
+}
+
 TEST(ParserTest, PrefixExpressionTest) {
     struct Input {
         std::string input;
