@@ -6,10 +6,6 @@
 namespace pyc {
 namespace monkey {
 
-inline auto kNullObj = std::make_shared<Null>();
-inline auto kTrueObj = std::make_shared<BooleanObject>(true);
-inline auto kFalseObj = std::make_shared<BooleanObject>(false);
-
 bool IsError(const std::shared_ptr<Object>& obj) { return obj && obj->type() == Object::Type::ERROR; }
 
 bool IsTruthy(const std::shared_ptr<Object>& obj) {

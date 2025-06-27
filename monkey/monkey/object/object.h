@@ -144,7 +144,7 @@ public:
 
     virtual std::string inspect() const override;
 
-    const std::vector<std::shared_ptr<Object>>& elements() const { return elements_; }
+    std::vector<std::shared_ptr<Object>>& elements() { return elements_; }
 
 private:
     std::vector<std::shared_ptr<Object>> elements_;
@@ -167,6 +167,10 @@ public:
 private:
     BuiltinFunction function_;
 };
+
+inline auto kNullObj = std::make_shared<Null>();
+inline auto kTrueObj = std::make_shared<BooleanObject>(true);
+inline auto kFalseObj = std::make_shared<BooleanObject>(false);
 
 }  // namespace monkey
 }  // namespace pyc

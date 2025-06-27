@@ -372,6 +372,59 @@ TEST(EvaluatorTest, BuiltinTest) {
         {"len(\"hello world\")", 11},
         {"len(1)", "argument to 'len' not supported, got INTEGER"},
         {"len(\"one\", \"two\")", "wrong number of arguments. got=2, want=1"},
+        {"first([1,2,3])", 1},
+        {"let myArray=[1,2,3]; first(myArray);", 1},
+        {"first(2)", "argument to 'first' must be ARRAY, got INTEGER"},
+        {"last([1,2,3]);", 3},
+        {"let myArray=[1,2,3]; last(myArray);", 3},
+        {"last(2)", "argument to 'last' must be ARRAY, got INTEGER"},
+        {"let a = [1, 2, 3, 4]; rest(a);", "[2, 3, 4]"},
+        {"let a = [1, 2, 3, 4]; rest(rest(a));", "[3, 4]"},
+        {"let a = [1, 2, 3, 4]; rest(rest(rest(a)));", "[4]"},
+        {"let a = [1, 2, 3, 4]; rest(rest(rest(rest(a))));", "[]"},
+        {"let a = [1, 2, 3, 4]; rest(rest(rest(rest(rest(a)))));", "null"},
+        {"let a = [1, 2, 3, 4]; rest(rest(rest(rest(rest(a))))); a;", "[1, 2, 3, 4]"},
+        {"let a = [1, 2, 3, 4]; let b = push(a, 5); a;", "[1, 2, 3, 4]"},
+        {"let a = [1, 2, 3, 4]; let b = push(a, 5); b;", "[1, 2, 3, 4, 5]"},
+        {R""(
+let map = fn(arr,f){
+    let iter=fn(arr,accumulated){
+        if(len(arr) == 0){
+            return accumulated;
+        } else {
+            iter(rest(arr),push(accumulated,f(first(arr))));
+        }
+    };
+    iter(arr,[]);
+};
+
+let a = [1, 2, 3, 4];
+let double = fn(x){ x * 2 };
+map(a, double);
+)"",
+         "[2, 4, 6, 8]"},
+        {R""(
+let reduce = fn(arr, initial, f) {
+    let iter = fn(arr, result) {
+        if(len(arr) == 0){
+            result;
+        } else {
+            iter(rest(arr), f(result, first(arr)));
+        }
+    };
+
+    iter(arr, initial);
+};
+
+let sum = fn(arr){
+    reduce(arr, 0, fn(initial, el) {
+        initial + el;
+    });
+};
+
+sum([1, 2, 3, 4, 5]);
+)"",
+         15},
     };
 
     for (const auto& input : inputs) {
@@ -380,9 +433,13 @@ TEST(EvaluatorTest, BuiltinTest) {
         if (std::holds_alternative<int>(input.expected)) {
             TEST_INTEGER_OBJECT(evaluated, std::get<int>(input.expected), input.input);
         } else {
-            auto error = std::dynamic_pointer_cast<Error>(evaluated);
-            ASSERT_TRUE(error != nullptr) << "Input: " << input.input;
-            EXPECT_EQ(error->inspect(), std::get<std::string>(input.expected)) << "Input: " << input.input;
+            if (auto array = std::dynamic_pointer_cast<Array>(evaluated)) {
+                ASSERT_TRUE(array != nullptr) << "Input: " << input.input;
+                EXPECT_EQ(array->inspect(), std::get<std::string>(input.expected)) << "Input: " << input.input;
+            } else if (auto error = std::dynamic_pointer_cast<Error>(evaluated)) {
+                ASSERT_TRUE(error != nullptr) << "Input: " << input.input;
+                EXPECT_EQ(error->inspect(), std::get<std::string>(input.expected)) << "Input: " << input.input;
+            }
         }
     }
 }
