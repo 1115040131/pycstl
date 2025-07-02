@@ -38,6 +38,7 @@ struct Token {
         // Delimiters
         kComma,      // ,
         kSemicolon,  // ;
+        kColon,      // :
 
         kLParen,  // (
         kRParen,  // )

@@ -14,6 +14,7 @@ Parser::Parser() {
     prefix_parse_fns_.emplace(Token::Type::kInt, &Parser::parseIntegerLiteral);
     prefix_parse_fns_.emplace(Token::Type::kString, &Parser::parseStringLiteral);
     prefix_parse_fns_.emplace(Token::Type::kLBracket, &Parser::parseArrayLiteral);
+    prefix_parse_fns_.emplace(Token::Type::kLBrace, &Parser::parseHashLiteral);
     prefix_parse_fns_.emplace(Token::Type::kBang, &Parser::parsePrefixExpression);
     prefix_parse_fns_.emplace(Token::Type::kMinus, &Parser::parsePrefixExpression);
     prefix_parse_fns_.emplace(Token::Type::kTrue, &Parser::parseBoolean);
@@ -186,6 +187,31 @@ std::unique_ptr<Expression> Parser::parseArrayLiteral() {
     auto array = std::make_unique<ArrayLiteral>(current_token_);
     array->setElements(parseExpressionList(Token::Type::kRBracket));
     return array;
+}
+
+std::unique_ptr<Expression> Parser::parseHashLiteral() {
+    auto hash = std::make_unique<HashLiteral>(current_token_);
+    while (peek_token_.type != Token::Type::kRBrace) {
+        nextToken();
+        auto key = parseExpression(Priority::LOWEST);
+        if (!expectPeek(Token::Type::kColon)) {
+            return nullptr;
+        }
+
+        nextToken();
+        auto value = parseExpression(Priority::LOWEST);
+        hash->pairs().emplace(std::move(key), std::move(value));
+
+        if (peek_token_.type != Token::Type::kRBrace && !expectPeek(Token::Type::kComma)) {
+            return nullptr;
+        }
+    }
+
+    if (!expectPeek(Token::Type::kRBrace)) {
+        return nullptr;
+    }
+
+    return hash;
 }
 
 std::unique_ptr<Expression> Parser::parseIndexExpression(std::unique_ptr<Expression> left) {

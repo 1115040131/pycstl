@@ -245,6 +245,75 @@ TEST(ParserTest, ArrayLiteralTest) {
     TEST_INFIX_EXPRESSION(array_literal->elements()[2], 3, "+", 3);
 }
 
+TEST(ParserTest, HashLiteralTest) {
+    std::string input = "{\"one\": 1, \"two\": 2, \"three\": 3}";
+    std::map<std::string_view, int64_t> expected{{"one", 1}, {"two", 2}, {"three", 3}};
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
+    const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
+    EXPECT_EQ(expression->type(), Expression::Type::HashLiteral);
+
+    auto hash_literal = reinterpret_cast<HashLiteral*>(expression.get());
+    EXPECT_EQ(hash_literal->pairs().size(), 3);
+    for (const auto& [key, value] : hash_literal->pairs()) {
+        auto key_str = std::dynamic_pointer_cast<StringLiteral>(key);
+        ASSERT_TRUE(key_str);
+        EXPECT_TRUE(expected.count(key_str->tokenLiteral()) > 0);
+        TEST_INTEGER_LITERAL(value, std::to_string(expected[key_str->tokenLiteral()]));
+    }
+}
+
+TEST(ParserTest, EmptyHashLiteralTest) {
+    std::string input = "{}";
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
+    const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
+    EXPECT_EQ(expression->type(), Expression::Type::HashLiteral);
+
+    auto hash_literal = reinterpret_cast<HashLiteral*>(expression.get());
+    EXPECT_TRUE(hash_literal->pairs().empty());
+}
+
+TEST(ParserTest, HashLiteralWithExpressionTest) {
+    std::string input = "{\"one\": 0+1, \"two\": 10-8, \"three\": 15/5}";
+    using func = std::function<void(std::shared_ptr<Expression>)>;
+    std::map<std::string_view, func> expected{
+        {"one", [](std::shared_ptr<Expression> e) { TEST_INFIX_EXPRESSION(e, 0, "+", 1); }},
+        {"two", [](std::shared_ptr<Expression> e) { TEST_INFIX_EXPRESSION(e, 10, "-", 8); }},
+        {"three", [](std::shared_ptr<Expression> e) { TEST_INFIX_EXPRESSION(e, 15, "/", 5); }}};
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
+    const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
+    EXPECT_EQ(expression->type(), Expression::Type::HashLiteral);
+
+    auto hash_literal = reinterpret_cast<HashLiteral*>(expression.get());
+    EXPECT_EQ(hash_literal->pairs().size(), 3);
+    for (const auto& [key, value] : hash_literal->pairs()) {
+        auto key_str = std::dynamic_pointer_cast<StringLiteral>(key);
+        ASSERT_TRUE(key_str);
+        EXPECT_TRUE(expected.count(key_str->tokenLiteral()) > 0);
+        expected[key_str->tokenLiteral()](value);
+    }
+}
+
 TEST(ParserTest, IndexExpressionTest) {
     std::string input = "myArray[1 + 1]";
 

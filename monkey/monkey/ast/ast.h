@@ -28,6 +28,7 @@ public:
         IntegerLiteral,    // 整数
         StringLiteral,     // 字符串
         ArrayLiteral,      // 数组
+        HashLiteral,       // 哈希
         IndexExpression,   // 索引表达式
         PrefixExpression,  // 前缀表达式
         InfixExpression,   // 中缀表达式
@@ -232,6 +233,23 @@ public:
 private:
     Token token_;
     std::vector<std::shared_ptr<Expression>> elements_;
+};
+
+class HashLiteral : public Expression {
+public:
+    TYPE(HashLiteral)
+
+    HashLiteral(Token token) : token_(token) {}
+    virtual ~HashLiteral() override = default;
+
+    virtual std::string_view tokenLiteral() const override { return token_.literal; }
+    virtual std::string toString() const override;
+
+    std::map<std::shared_ptr<Expression>, std::shared_ptr<Expression>>& pairs() { return pairs_; }
+
+private:
+    Token token_;
+    std::map<std::shared_ptr<Expression>, std::shared_ptr<Expression>> pairs_;
 };
 
 class IndexExpression : public Expression {

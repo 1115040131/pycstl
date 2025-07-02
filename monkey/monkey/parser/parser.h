@@ -63,6 +63,7 @@ private:
     std::unique_ptr<Expression> parseIntegerLiteral();
     std::unique_ptr<Expression> parseStringLiteral();
     std::unique_ptr<Expression> parseArrayLiteral();
+    std::unique_ptr<Expression> parseHashLiteral();
     std::unique_ptr<Expression> parseIndexExpression(std::unique_ptr<Expression> left);
     std::unique_ptr<Expression> parsePrefixExpression();
     std::unique_ptr<Expression> parseInfixExpression(std::unique_ptr<Expression> left);
