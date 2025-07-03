@@ -13,7 +13,7 @@ struct HashKey;
 
 class Object {
 public:
-    enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION, ARRAY, BUILTIN };
+    enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION, ARRAY, HASH, BUILTIN };
 
     virtual ~Object() = default;
     virtual Type type() const { return Type::Null; }
@@ -169,6 +169,25 @@ public:
 
 private:
     std::vector<std::shared_ptr<Object>> elements_;
+};
+
+struct HashPair {
+    std::shared_ptr<Object> key;
+    std::shared_ptr<Object> value;
+};
+
+class Hash : public Object {
+public:
+    TYPE(HASH)
+
+    virtual ~Hash() override = default;
+
+    virtual std::string inspect() const override;
+
+    std::map<HashKey, HashPair>& pairs() { return pairs_; }
+
+private:
+    std::map<HashKey, HashPair> pairs_;
 };
 
 class Builtin : public Object {

@@ -190,6 +190,39 @@ TEST(EvaluatorTest, EvalArrayIndex) {
     }
 }
 
+TEST(EvaluatorTest, EvalHashLiteral) {
+    std::string input = R""(
+let two = "two";
+
+{
+    "one": 10 - 9,
+    two: 1 + 1,
+    "thr" + "ee": 6 / 2,
+    4: 4,
+    true: 5,
+    false: 6
+}
+    )"";
+
+    std::map<HashKey, uint64_t> expected{
+        {String("one").getHashKey(), 1}, {String("two").getHashKey(), 2}, {String("three").getHashKey(), 3},
+        {Integer(4).getHashKey(), 4},    {kTrueObj->getHashKey(), 5},     {kFalseObj->getHashKey(), 6},
+    };
+
+    auto evaluated = EvalInput(input);
+    ASSERT_TRUE(evaluated != nullptr) << "Input: " << input;
+
+    auto hash = std::dynamic_pointer_cast<Hash>(evaluated);
+    ASSERT_TRUE(hash != nullptr) << "Input: " << input;
+    ASSERT_EQ(hash->pairs().size(), 6) << "Input: " << input;
+    for (const auto& [key, value] : expected) {
+        auto iter = hash->pairs().find(key);
+        ASSERT_TRUE(iter != hash->pairs().end());
+        TEST_INTEGER_OBJECT(iter->second.value, value,
+                            fmt::format("{}: {}", iter->second.key->inspect(), iter->second.value->inspect()));
+    }
+}
+
 TEST(EvaluatorTest, EvalBangOperator) {
     struct Input {
         std::string input;

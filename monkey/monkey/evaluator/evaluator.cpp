@@ -63,6 +63,8 @@ std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environ
             return std::make_shared<String>(std::dynamic_pointer_cast<StringLiteral>(node)->toString());
         case Node::Type::ArrayLiteral:
             return EvalArrayLiteral(std::dynamic_pointer_cast<ArrayLiteral>(node), env);
+        case Node::Type::HashLiteral:
+            return EvalHashLiteral(std::dynamic_pointer_cast<HashLiteral>(node), env);
         case Node::Type::IndexExpression:
             return EvalIndexExpression(std::dynamic_pointer_cast<IndexExpression>(node), env);
         case Node::Type::PrefixExpression:
@@ -132,6 +134,26 @@ std::shared_ptr<Object> EvalArrayLiteral(std::shared_ptr<ArrayLiteral> array_lit
         return elements[0];
     }
     return std::make_shared<Array>(std::move(elements));
+}
+
+std::shared_ptr<Object> EvalHashLiteral(std::shared_ptr<HashLiteral> hash_literal,
+                                        std::shared_ptr<Environment> env) {
+    auto hash = std::make_shared<Hash>();
+    for (const auto& [key_expression, value_expression] : hash_literal->pairs()) {
+        auto key = Eval(key_expression, env);
+        if (IsError(key)) {
+            return key;
+        }
+        if (!key->hashable()) {
+            return std::make_shared<Error>(fmt::format("unusable as hash key: {}", key->typeStr()));
+        }
+        auto value = Eval(value_expression, env);
+        if (IsError(value)) {
+            return value;
+        }
+        hash->pairs()[key->getHashKey()] = {key, value};
+    }
+    return hash;
 }
 
 std::shared_ptr<Object> EvalIndexExpression(std::shared_ptr<IndexExpression> index_expression,

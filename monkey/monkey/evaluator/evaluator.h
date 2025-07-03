@@ -20,6 +20,8 @@ std::shared_ptr<Object> EvalBlockStatement(std::shared_ptr<BlockStatement> block
 std::shared_ptr<Object> EvalIdentifier(std::shared_ptr<Identifier> identifier, std::shared_ptr<Environment> env);
 std::shared_ptr<Object> EvalArrayLiteral(std::shared_ptr<ArrayLiteral> array_literal,
                                          std::shared_ptr<Environment> env);
+std::shared_ptr<Object> EvalHashLiteral(std::shared_ptr<HashLiteral> hash_literal,
+                                        std::shared_ptr<Environment> env);
 std::shared_ptr<Object> EvalIndexExpression(std::shared_ptr<IndexExpression> index_expression,
                                             std::shared_ptr<Environment> env);
 std::shared_ptr<Object> EvalPrefixExpression(std::shared_ptr<PrefixExpression> prefix_expression,
