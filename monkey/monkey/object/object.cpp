@@ -5,6 +5,8 @@ namespace monkey {
 
 std::string_view Object::typeStr() const { return toString(type()); }
 
+HashKey Object::getHashKey() const { return {type(), 0}; }
+
 std::string_view toString(Object::Type type) {
     switch (type) {
         TO_STRING_CASE(Object::Type, Null);

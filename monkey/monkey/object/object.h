@@ -9,6 +9,8 @@
 namespace pyc {
 namespace monkey {
 
+struct HashKey;
+
 class Object {
 public:
     enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION, ARRAY, BUILTIN };
@@ -18,9 +20,19 @@ public:
     virtual std::string inspect() const { return ""; }
 
     std::string_view typeStr() const;
+
+    virtual bool hashable() const { return false; }
+    virtual HashKey getHashKey() const;
 };
 
 std::string_view toString(Object::Type type);
+
+struct HashKey {
+    Object::Type type;
+    uint64_t value;
+
+    constexpr auto operator<=>(const HashKey&) const noexcept = default;
+};
 
 class Null : public Object {
 public:
@@ -54,6 +66,9 @@ public:
 
     virtual std::string inspect() const override { return std::to_string(value_); }
 
+    virtual bool hashable() const override { return true; }
+    virtual HashKey getHashKey() const override { return {type(), static_cast<uint64_t>(value_)}; }
+
     long long value() const { return value_; }
 
 private:
@@ -69,6 +84,9 @@ public:
 
     virtual std::string inspect() const override { return value_ ? "true" : "false"; }
 
+    virtual bool hashable() const override { return true; }
+    virtual HashKey getHashKey() const override { return {type(), static_cast<uint64_t>(value_)}; }
+
     bool value() const { return value_; }
 
 private:
@@ -83,6 +101,9 @@ public:
     virtual ~String() override = default;
 
     virtual std::string inspect() const override { return fmt::format("\"{}\"", value_); }
+
+    virtual bool hashable() const override { return true; }
+    virtual HashKey getHashKey() const override { return {type(), std::hash<std::string>{}(value_)}; }
 
     const std::string& value() const { return value_; }
 
