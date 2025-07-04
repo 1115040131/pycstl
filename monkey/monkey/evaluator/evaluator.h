@@ -48,6 +48,7 @@ std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object
 #pragma region Index
 
 std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index);
+std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index);
 
 #pragma endregion
 

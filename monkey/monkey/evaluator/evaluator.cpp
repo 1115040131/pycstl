@@ -168,6 +168,8 @@ std::shared_ptr<Object> EvalIndexExpression(std::shared_ptr<IndexExpression> ind
     }
     if (left->type() == Object::Type::ARRAY && index->type() == Object::Type::INTEGER) {
         return EvalArrayIndex(std::dynamic_pointer_cast<Array>(left), std::dynamic_pointer_cast<Integer>(index));
+    } else if (left->type() == Object::Type::HASH) {
+        return EvalHashIndex(std::dynamic_pointer_cast<Hash>(left), index);
     }
     return std::make_shared<Error>(
         fmt::format("index operator not supported: {}[{}]", left->typeStr(), index->typeStr()));
@@ -319,6 +321,17 @@ std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared
             fmt::format("index {} out of bounds: {}", index->value(), array->elements().size()));
     }
     return array->elements()[index->value()];
+}
+
+std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index) {
+    if (!index->hashable()) {
+        return std::make_shared<Error>(fmt::format("unusable as hash key: {}", index->typeStr()));
+    }
+    auto iter = hash->pairs().find(index->getHashKey());
+    if (iter == hash->pairs().end()) {
+        return kNullObj;  // Return null if the key is not found
+    }
+    return iter->second.value;  // Return the value associated with the key
 }
 
 #pragma endregion

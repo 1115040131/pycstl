@@ -223,6 +223,60 @@ let two = "two";
     }
 }
 
+TEST(EvaluatorTest, EvalHashIndex) {
+    struct Input {
+        std::string input;
+        std::optional<int> expected;
+    };
+    Input inputs[] = {
+        {
+            R""(
+                {"foo": 5}["foo"]
+            )"",
+            5},
+        {
+            R""(
+                {"foo": 5}["bar"]
+            )"",
+            {}},
+        {
+            R""(
+                let key = "foo";
+                {"foo": 5}[key]
+            )"",
+            5},
+        {
+            R""(
+                {}["foo"]
+            )"",
+            {}},
+        {
+            R""(
+                {5: 5}[5]
+            )"",
+            5},
+        {
+            R""(
+                {true: 5}[true]
+            )"",
+            5},
+        {
+            R""(
+                {false: 5}[false]
+            )"",
+            5},
+    };
+    for (const auto& input : inputs) {
+        auto evaluated = EvalInput(input.input);
+        ASSERT_TRUE(evaluated != nullptr) << "Input: " << input.input;
+        if (input.expected) {
+            TEST_INTEGER_OBJECT(evaluated, input.expected.value(), input.input);
+        } else {
+            TEST_NULL_OBJECT(evaluated, input.input);
+        }
+    }
+}
+
 TEST(EvaluatorTest, EvalBangOperator) {
     struct Input {
         std::string input;
@@ -530,6 +584,10 @@ if (10 > 1) {
         {
             "\"Hello\" - \"World\"",
             "unknown operator: STRING - STRING",
+        },
+        {
+            R""({"name": "Monkey"}[fn(x){ x }];)"",
+            "unusable as hash key: FUNCTION",
         },
     };
 
