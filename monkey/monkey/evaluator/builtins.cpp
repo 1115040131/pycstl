@@ -5,7 +5,12 @@
 namespace pyc {
 namespace monkey {
 
-std::shared_ptr<Object> Builtin_len(const std::vector<std::shared_ptr<Object>>& args) {
+#define DEF_BUILTIN(name) \
+    static std::shared_ptr<Object> Builtin_##name(const std::vector<std::shared_ptr<Object>>& args)
+
+#define ADD_BUILTIN(name) {#name, std::make_shared<Builtin>(&Builtin_##name)}
+
+DEF_BUILTIN(len) {
     if (args.size() != 1) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
     }
@@ -17,7 +22,7 @@ std::shared_ptr<Object> Builtin_len(const std::vector<std::shared_ptr<Object>>& 
     return std::make_shared<Error>(fmt::format("argument to 'len' not supported, got {}", args[0]->typeStr()));
 }
 
-std::shared_ptr<Object> Builtin_first(const std::vector<std::shared_ptr<Object>>& args) {
+DEF_BUILTIN(first) {
     if (args.size() != 1) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
     }
@@ -30,7 +35,7 @@ std::shared_ptr<Object> Builtin_first(const std::vector<std::shared_ptr<Object>>
     return std::make_shared<Error>(fmt::format("argument to 'first' must be ARRAY, got {}", args[0]->typeStr()));
 }
 
-std::shared_ptr<Object> Builtin_last(const std::vector<std::shared_ptr<Object>>& args) {
+DEF_BUILTIN(last) {
     if (args.size() != 1) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
     }
@@ -43,7 +48,7 @@ std::shared_ptr<Object> Builtin_last(const std::vector<std::shared_ptr<Object>>&
     return std::make_shared<Error>(fmt::format("argument to 'last' must be ARRAY, got {}", args[0]->typeStr()));
 }
 
-std::shared_ptr<Object> Builtin_rest(const std::vector<std::shared_ptr<Object>>& args) {
+DEF_BUILTIN(rest) {
     if (args.size() != 1) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
     }
@@ -57,7 +62,7 @@ std::shared_ptr<Object> Builtin_rest(const std::vector<std::shared_ptr<Object>>&
     return std::make_shared<Error>(fmt::format("argument to 'rest' must be ARRAY, got {}", args[0]->typeStr()));
 }
 
-std::shared_ptr<Object> Builtin_push(const std::vector<std::shared_ptr<Object>>& args) {
+DEF_BUILTIN(push) {
     if (args.size() != 2) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
     }
@@ -69,11 +74,17 @@ std::shared_ptr<Object> Builtin_push(const std::vector<std::shared_ptr<Object>>&
     return std::make_shared<Error>(fmt::format("argument to 'push' must be ARRAY, got {}", args[0]->typeStr()));
 }
 
+DEF_BUILTIN(puts) {
+    for (const auto& arg : args) {
+        fmt::println("{}", arg->inspect());
+    }
+    return kNullObj;  // Puts does not return a value, so we return null
+}
+
 std::shared_ptr<Builtin> GetBuiltin(std::string_view name) {
     static std::unordered_map<std::string_view, std::shared_ptr<Builtin>> builtins{
-        {"len", std::make_shared<Builtin>(&Builtin_len)},   {"first", std::make_shared<Builtin>(&Builtin_first)},
-        {"last", std::make_shared<Builtin>(&Builtin_last)}, {"rest", std::make_shared<Builtin>(&Builtin_rest)},
-        {"push", std::make_shared<Builtin>(&Builtin_push)},
+        ADD_BUILTIN(len),  ADD_BUILTIN(first), ADD_BUILTIN(last),
+        ADD_BUILTIN(rest), ADD_BUILTIN(push),  ADD_BUILTIN(puts),
     };
 
     auto iter = builtins.find(name);
