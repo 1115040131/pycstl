@@ -3,6 +3,7 @@
 #include "monkey/evaluator/evaluator.h"
 #include "monkey/object/environment.h"
 #include "monkey/parser/parser.h"
+#include "monkey/test/test_define.h"
 
 namespace pyc {
 namespace monkey {
@@ -18,34 +19,6 @@ std::shared_ptr<Object> EvalInput(std::string_view input) {
     auto env = Environment::New();
     return Eval(std::move(program), env);
 }
-
-#define TEST_NULL_OBJECT(object, input)                                                                     \
-    {                                                                                                       \
-        auto null = std::dynamic_pointer_cast<Null>(object);                                                \
-        ASSERT_TRUE(null != nullptr) << "Input: " << input << "\nExpected Null, got " << object->typeStr(); \
-    }
-
-#define TEST_INTEGER_OBJECT(object, expected, input)                                                              \
-    {                                                                                                             \
-        auto integer = std::dynamic_pointer_cast<Integer>(object);                                                \
-        ASSERT_TRUE(integer != nullptr) << "Input: " << input << "\nExpected Integer, got " << object->typeStr(); \
-        EXPECT_EQ(integer->value(), expected) << "Input: " << input;                                              \
-    }
-
-#define TEST_BOOLEAN_OBJECT(object, expected, input)                                        \
-    {                                                                                       \
-        auto boolean = std::dynamic_pointer_cast<BooleanObject>(object);                    \
-        ASSERT_TRUE(boolean != nullptr)                                                     \
-            << "Input: " << input << "\nExpected BooleanObject, got " << object->typeStr(); \
-        EXPECT_EQ(boolean->value(), expected) << "Input: " << input;                        \
-    }
-
-#define TEST_STRING_OBJECT(object, expected, input)                                                          \
-    {                                                                                                        \
-        auto str = std::dynamic_pointer_cast<String>(object);                                                \
-        ASSERT_TRUE(str != nullptr) << "Input: " << input << "\nExpected String, got " << object->typeStr(); \
-        EXPECT_EQ(str->value(), expected) << "Input: " << input;                                             \
-    }
 
 TEST(EvaluatorTest, EvalIntegerExpression) {
     struct Input {

@@ -66,8 +66,8 @@ TEST(CodeTest, InstructionsToStringTest) {
 )";
 
     Instructions concated;
-    for (const auto& instr : instructions) {
-        concated.insert(concated.end(), instr.begin(), instr.end());
+    for (const auto& instruction : instructions) {
+        concated.insert(concated.end(), instruction.begin(), instruction.end());
     }
 
     EXPECT_STREQ(toString(concated).c_str(), expected.c_str());
