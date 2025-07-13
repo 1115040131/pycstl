@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "monkey/parser/parser.h"
 #include "monkey/token/token.h"
 
 namespace pyc {
@@ -42,6 +43,24 @@ inline std::ostream& operator<<(std::ostream& os, const Token& token) {
         ASSERT_TRUE(str != nullptr) << "Input: " << input << "\nExpected String, got " << object->typeStr(); \
         EXPECT_EQ(str->value(), expected) << "Input: " << input;                                             \
     }
+
+#define TEST_EXPECTED_OBJECT(object, expected, input)                    \
+    {                                                                    \
+        if (std::holds_alternative<int>(expected)) {                     \
+            TEST_INTEGER_OBJECT(object, std::get<int>(expected), input); \
+        }                                                                \
+    }
+
+inline std::unique_ptr<Node> processInput(std::string_view input) {
+    auto lexer = Lexer::New(input);
+    auto parser = Parser::New(std::move(lexer));
+    auto program = parser->parseProgram();
+    if (parser->errors().size() > 0) {
+        std::cerr << "Parser errors: " << parser->errorsToString() << std::endl;
+        return nullptr;
+    }
+    return program;
+}
 
 }  // namespace monkey
 }  // namespace pyc

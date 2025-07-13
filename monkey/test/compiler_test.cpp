@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "monkey/compiler/compiler.h"
-#include "monkey/parser/parser.h"
 #include "monkey/test/test_define.h"
 
 namespace pyc {
@@ -12,17 +11,6 @@ struct CompilerTestCase {
     std::vector<std::variant<int>> expected_constants;
     std::vector<Instructions> expected_instructions;
 };
-
-std::unique_ptr<Node> processInput(std::string_view input) {
-    auto lexer = Lexer::New(input);
-    auto parser = Parser::New(std::move(lexer));
-    auto program = parser->parseProgram();
-    if (parser->errors().size() > 0) {
-        std::cerr << "Parser errors: " << parser->errorsToString() << std::endl;
-        return nullptr;
-    }
-    return program;
-}
 
 Instructions concateInstructions(const std::vector<Instructions>& instructions) {
     Instructions concated;
