@@ -6,8 +6,9 @@
 
 #include "monkey/evaluator/evaluator.h"
 #include "monkey/lexer/lexer.h"
-#include "monkey/object/environment.h"
+// #include "monkey/object/environment.h"
 #include "monkey/parser/parser.h"
+#include "monkey/vm/vm.h"
 
 namespace pyc {
 namespace monkey {
@@ -40,7 +41,7 @@ void Repl::Start() {
     // std::vector<std::string> lines;
     // lines.reserve(10);
     std::string line;
-    auto env = Environment::New();
+    // auto env = Environment::New();
     while (true) {
         fmt::print("{}", kPrompt);
 
@@ -62,10 +63,24 @@ void Repl::Start() {
             continue;
         }
 
-        auto evaluated = Eval(std::move(program), env);
-        if (evaluated) {
-            fmt::println("{}", evaluated->inspect());
+        // auto evaluated = Eval(std::move(program), env);
+        // if (evaluated) {
+        //     fmt::println("{}", evaluated->inspect());
+        // }
+
+        auto compiler = Compiler::New();
+        if (auto result = compiler->compile(std::move(program)); IsError(result)) {
+            fmt::println("Woops! Compilation failed: \n{}", result->inspect());
+            continue;
         }
+
+        auto vm = VM::New(compiler);
+        if (auto result = vm->run(); IsError(result)) {
+            fmt::println("Woops! Executing bytecode failed: \n{}", result->inspect());
+            continue;
+        }
+
+        fmt::println("{}", vm->top()->inspect());
     }
 }
 
