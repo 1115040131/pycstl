@@ -1,5 +1,7 @@
 #include "monkey/compiler/compiler.h"
 
+#include "monkey/evaluator/evaluator.h"
+
 namespace pyc {
 namespace monkey {
 
@@ -8,16 +10,14 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
         case Node::Type::Program: {
             auto program = std::dynamic_pointer_cast<Program>(node);
             for (const auto& statement : program->statements()) {
-                auto err = compile(statement);
-                if (err) {
+                if (auto err = compile(statement); IsError(err)) {
                     return err;
                 }
             }
         } break;
         case Node::Type::ExpressionStatement: {
             auto expression = std::dynamic_pointer_cast<ExpressionStatement>(node);
-            auto err = compile(expression->expression());
-            if (err) {
+            if (auto err = compile(expression->expression()); IsError(err)) {
                 return err;
             }
         } break;
@@ -29,13 +29,16 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
         } break;
         case Node::Type::InfixExpression: {
             auto infix = std::dynamic_pointer_cast<InfixExpression>(node);
-            auto err = compile(infix->left());
-            if (err) {
+            if (auto err = compile(infix->left()); IsError(err)) {
                 return err;
             }
-            err = compile(infix->right());
-            if (err) {
+            if (auto err = compile(infix->right()); IsError(err)) {
                 return err;
+            }
+            if (infix->tokenLiteral() == "+") {
+                emit(OpcodeType::OpAdd, {});
+            } else {
+                return std::make_shared<Error>(fmt::format("unknown operator: {}", infix->tokenLiteral()));
             }
         } break;
         default:

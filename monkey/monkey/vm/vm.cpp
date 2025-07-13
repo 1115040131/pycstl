@@ -23,6 +23,16 @@ std::shared_ptr<Object> VM::push(std::shared_ptr<Object> object) {
     return object;
 }
 
+std::shared_ptr<Object> VM::pop() {
+    auto object = top();
+    if (object == nullptr) {
+        return std::make_shared<Error>("Stack underflow");
+    }
+    sp_--;
+    stack_[sp_] = nullptr;  // 清除引用以避免悬空指
+    return object;
+}
+
 std::shared_ptr<Object> VM::run() {
     size_t ip = 0;
     while (ip < instructions_.size()) {
@@ -30,11 +40,16 @@ std::shared_ptr<Object> VM::run() {
         auto [operands, next_offset] = ByteCode::ReadOperands(instructions_, ip);
 
         switch (op) {
-            case OpcodeType::OpConstant:
+            case OpcodeType::OpConstant: {
                 auto result = push(constants_[operands[0]]);
                 if (IsError(result)) {
                     return result;
                 }
+            } break;
+            case OpcodeType::OpAdd:
+                auto right = std::dynamic_pointer_cast<Integer>(pop());
+                auto left = std::dynamic_pointer_cast<Integer>(pop());
+                push(std::make_shared<Integer>(left->value() + right->value()));
                 break;
         }
 

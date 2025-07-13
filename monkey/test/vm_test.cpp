@@ -15,8 +15,8 @@ TEST(VMTest, IntegerArithmeticTest) {
     VMTestCase tests[] = {
         {"1", 1},
         {"2", 2},
-        {"1 + 2", 2},
-        {"1 + 2 + 1", 1},
+        {"1 + 2", 3},
+        {"1 + 2 + 1", 4},
     };
 
     for (const auto& test : tests) {

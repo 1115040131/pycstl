@@ -44,7 +44,11 @@ TEST(CompilerTest, IntegerArithmeticTest) {
         {
             "1+2",
             {1, 2},
-            {ByteCode::Make(OpcodeType::OpConstant, {0}), ByteCode::Make(OpcodeType::OpConstant, {1})},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpAdd, {}),
+            },
         },
     };
 

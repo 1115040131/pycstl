@@ -19,6 +19,8 @@ public:
 
     std::shared_ptr<Object> push(std::shared_ptr<Object> object);
 
+    std::shared_ptr<Object> pop();
+
     std::shared_ptr<Object> run();
 
 private:

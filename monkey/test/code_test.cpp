@@ -37,6 +37,7 @@ TEST(CodeTest, ReadOperandsTest) {
 
     Input inputs[] = {
         {OpcodeType::OpConstant, {65534}, 3},
+        {OpcodeType::OpAdd, {}, 1},
     };
 
     size_t offset = 0;
@@ -53,22 +54,24 @@ TEST(CodeTest, ReadOperandsTest) {
 
 TEST(CodeTest, InstructionsToStringTest) {
     std::vector<Instructions> instructions{
-        ByteCode::Make(OpcodeType::OpConstant, {1}),
+        ByteCode::Make(OpcodeType::OpAdd, {}),
         ByteCode::Make(OpcodeType::OpConstant, {2}),
         ByteCode::Make(OpcodeType::OpConstant, {65534}),
         ByteCode::Make(OpcodeType::OpConstant, {65535}),
     };
 
-    std::string expected = R"(0000 OpConstant 1
-0003 OpConstant 2
-0006 OpConstant 65534
-0009 OpConstant 65535
+    std::string expected = R"(0000 OpAdd
+0001 OpConstant 2
+0004 OpConstant 65534
+0007 OpConstant 65535
 )";
 
     Instructions concated;
     for (const auto& instruction : instructions) {
         concated.insert(concated.end(), instruction.begin(), instruction.end());
     }
+
+    // fmt::println("Concatenated instructions: {}", toString(concated));
 
     EXPECT_STREQ(toString(concated).c_str(), expected.c_str());
 }
