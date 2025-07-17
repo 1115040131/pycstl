@@ -16,6 +16,7 @@ using Instructions = std::vector<Opcode>;
 enum class OpcodeType : Opcode {
     OpConstant,
     OpAdd,
+    OpPop,
 };
 
 std::string_view toString(OpcodeType type);

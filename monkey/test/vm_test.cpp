@@ -28,7 +28,7 @@ TEST(VMTest, IntegerArithmeticTest) {
         auto result = vm->run();
         ASSERT_FALSE(result);
 
-        TEST_EXPECTED_OBJECT(vm->top(), test.expected, test.input);
+        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
     }
 }
 

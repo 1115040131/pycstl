@@ -20,6 +20,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             if (auto err = compile(expression->expression()); IsError(err)) {
                 return err;
             }
+            emit(OpcodeType::OpPop, {});
         } break;
         case Node::Type::IntegerLiteral: {
             auto integer_literal = std::dynamic_pointer_cast<IntegerLiteral>(node);

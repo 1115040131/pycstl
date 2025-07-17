@@ -17,6 +17,7 @@ std::string_view toString(OpcodeType type) {
     switch (type) {
         TO_STRING_CASE1(OpcodeType, OpConstant, "OpConstant");
         TO_STRING_CASE1(OpcodeType, OpAdd, "OpAdd");
+        TO_STRING_CASE1(OpcodeType, OpPop, "OpPop");
         default:
             return "Unknown OpcodeType";
     }
@@ -31,6 +32,7 @@ struct Definition {
 inline const std::map<OpcodeType, Definition> definitions{
     {OpcodeType::OpConstant, {"OpConstant", {2}}},
     {OpcodeType::OpAdd, {"OpAdd", {}}},
+    {OpcodeType::OpPop, {"OpPop", {}}},
 };
 
 // 整数版本

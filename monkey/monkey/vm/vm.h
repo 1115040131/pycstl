@@ -17,6 +17,8 @@ public:
 public:
     std::shared_ptr<Object> top() const;
 
+    std::shared_ptr<Object> lastPoppedElement() const;
+
     std::shared_ptr<Object> push(std::shared_ptr<Object> object);
 
     std::shared_ptr<Object> pop();

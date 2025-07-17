@@ -12,6 +12,8 @@ std::shared_ptr<Object> VM::top() const {
     return stack_[sp_ - 1];
 }
 
+std::shared_ptr<Object> VM::lastPoppedElement() const { return stack_[sp_]; }
+
 std::shared_ptr<Object> VM::push(std::shared_ptr<Object> object) {
     if (sp_ >= kStackSize) {
         return std::make_shared<Error>("Stack overflow");
@@ -29,7 +31,6 @@ std::shared_ptr<Object> VM::pop() {
         return std::make_shared<Error>("Stack underflow");
     }
     sp_--;
-    stack_[sp_] = nullptr;  // 清除引用以避免悬空指
     return object;
 }
 
@@ -46,10 +47,13 @@ std::shared_ptr<Object> VM::run() {
                     return result;
                 }
             } break;
-            case OpcodeType::OpAdd:
+            case OpcodeType::OpAdd: {
                 auto right = std::dynamic_pointer_cast<Integer>(pop());
                 auto left = std::dynamic_pointer_cast<Integer>(pop());
                 push(std::make_shared<Integer>(left->value() + right->value()));
+            } break;
+            case OpcodeType::OpPop:
+                pop();
                 break;
         }
 

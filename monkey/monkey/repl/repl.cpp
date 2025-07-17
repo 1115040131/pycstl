@@ -80,7 +80,7 @@ void Repl::Start() {
             continue;
         }
 
-        fmt::println("{}", vm->top()->inspect());
+        fmt::println("{}", vm->lastPoppedElement()->inspect());
     }
 }
 
