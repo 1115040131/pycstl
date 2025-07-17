@@ -26,6 +26,12 @@ public:
     std::shared_ptr<Object> run();
 
 private:
+    std::shared_ptr<Object> excuteBinaryOperation(OpcodeType op);
+
+    std::shared_ptr<Object> excuteBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
+                                                         std::shared_ptr<Integer> right);
+
+private:
     static constexpr size_t kStackSize = 2048;
 
     Instructions instructions_;

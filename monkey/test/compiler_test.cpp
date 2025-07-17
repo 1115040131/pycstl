@@ -51,6 +51,56 @@ TEST(CompilerTest, IntegerArithmeticTest) {
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
+        {
+            "1;2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1-2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpSub, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1*2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpMul, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1 / 2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpMul, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "2 / 1",
+            {2, 1},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpMul, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
     };
 
     for (const auto& test : tests) {

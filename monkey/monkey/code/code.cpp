@@ -15,9 +15,14 @@ namespace monkey {
 
 std::string_view toString(OpcodeType type) {
     switch (type) {
-        TO_STRING_CASE1(OpcodeType, OpConstant, "OpConstant");
-        TO_STRING_CASE1(OpcodeType, OpAdd, "OpAdd");
-        TO_STRING_CASE1(OpcodeType, OpPop, "OpPop");
+        TO_STRING_CASE(OpcodeType, OpConstant);
+
+        TO_STRING_CASE(OpcodeType, OpPop);
+
+        TO_STRING_CASE(OpcodeType, OpAdd);
+        TO_STRING_CASE(OpcodeType, OpSub);
+        TO_STRING_CASE(OpcodeType, OpMul);
+        TO_STRING_CASE(OpcodeType, OpDiv);
         default:
             return "Unknown OpcodeType";
     }
@@ -31,8 +36,13 @@ struct Definition {
 
 inline const std::map<OpcodeType, Definition> definitions{
     {OpcodeType::OpConstant, {"OpConstant", {2}}},
-    {OpcodeType::OpAdd, {"OpAdd", {}}},
+
     {OpcodeType::OpPop, {"OpPop", {}}},
+
+    {OpcodeType::OpAdd, {"OpAdd", {}}},
+    {OpcodeType::OpSub, {"OpSub", {}}},
+    {OpcodeType::OpMul, {"OpMul", {}}},
+    {OpcodeType::OpDiv, {"OpDiv", {}}},
 };
 
 // 整数版本

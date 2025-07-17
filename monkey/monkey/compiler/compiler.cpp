@@ -38,6 +38,12 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             }
             if (infix->tokenLiteral() == "+") {
                 emit(OpcodeType::OpAdd, {});
+            } else if (infix->tokenLiteral() == "-") {
+                emit(OpcodeType::OpSub, {});
+            } else if (infix->tokenLiteral() == "*") {
+                emit(OpcodeType::OpMul, {});
+            } else if (infix->tokenLiteral() == "/") {
+                emit(OpcodeType::OpDiv, {});
             } else {
                 return std::make_shared<Error>(fmt::format("unknown operator: {}", infix->tokenLiteral()));
             }

@@ -47,13 +47,19 @@ std::shared_ptr<Object> VM::run() {
                     return result;
                 }
             } break;
-            case OpcodeType::OpAdd: {
-                auto right = std::dynamic_pointer_cast<Integer>(pop());
-                auto left = std::dynamic_pointer_cast<Integer>(pop());
-                push(std::make_shared<Integer>(left->value() + right->value()));
-            } break;
+
             case OpcodeType::OpPop:
                 pop();
+                break;
+
+            case OpcodeType::OpAdd:
+            case OpcodeType::OpSub:
+            case OpcodeType::OpMul:
+            case OpcodeType::OpDiv:
+                excuteBinaryOperation(op);
+                break;
+
+            default:
                 break;
         }
 
@@ -61,6 +67,38 @@ std::shared_ptr<Object> VM::run() {
     }
 
     return nullptr;
+}
+
+std::shared_ptr<Object> VM::excuteBinaryOperation(OpcodeType op) {
+    auto right = pop();
+    auto left = pop();
+
+    if (left->type() == Object::Type::INTEGER && right->type() == Object::Type::INTEGER) {
+        excuteBinaryIntegerOperation(op, std::dynamic_pointer_cast<Integer>(left),
+                                     std::dynamic_pointer_cast<Integer>(right));
+    }
+    return std::make_shared<Error>(fmt::format("unsupported types for binary operaction: {} {} {}",
+                                               left->typeStr(), toString(op), right->typeStr()));
+}
+
+std::shared_ptr<Object> VM::excuteBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
+                                                         std::shared_ptr<Integer> right) {
+    switch (op) {
+        case OpcodeType::OpAdd:
+            return push(std::make_shared<Integer>(left->value() + right->value()));
+        case OpcodeType::OpSub:
+            return push(std::make_shared<Integer>(left->value() - right->value()));
+        case OpcodeType::OpMul:
+            return push(std::make_shared<Integer>(left->value() * right->value()));
+        case OpcodeType::OpDiv:
+            if (right->value() == 0) {
+                return std::make_shared<Error>("Division by zero");
+            }
+            return push(std::make_shared<Integer>(left->value() / right->value()));
+        default:
+            break;
+    }
+    return std::make_shared<Error>(fmt::format("unknow integer operator: {}", toString(op)));
 }
 
 }  // namespace monkey
