@@ -26,6 +26,10 @@ std::string_view toString(OpcodeType type) {
 
         TO_STRING_CASE(OpcodeType, OpTrue);
         TO_STRING_CASE(OpcodeType, OpFalse);
+
+        TO_STRING_CASE(OpcodeType, OpEqual);
+        TO_STRING_CASE(OpcodeType, OpNotEqual);
+        TO_STRING_CASE(OpcodeType, OpGreaterThan);
     }
     return "Unknown OpcodeType";
 }
@@ -48,6 +52,10 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpTrue, {"OpTrue", {}}},
     {OpcodeType::OpFalse, {"OpFalse", {}}},
+
+    {OpcodeType::OpEqual, {"OpEqual", {}}},
+    {OpcodeType::OpNotEqual, {"OpNotEqual", {}}},
+    {OpcodeType::OpGreaterThan, {"OpGreaterThan", {}}},
 };
 
 // 整数版本

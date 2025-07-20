@@ -38,6 +38,18 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
         } break;
         case Node::Type::InfixExpression: {
             auto infix = std::dynamic_pointer_cast<InfixExpression>(node);
+
+            if (infix->tokenLiteral() == "<") {
+                if (auto err = compile(infix->right()); IsError(err)) {
+                    return err;
+                }
+                if (auto err = compile(infix->left()); IsError(err)) {
+                    return err;
+                }
+                emit(OpcodeType::OpGreaterThan, {});
+                return nullptr;
+            }
+
             if (auto err = compile(infix->left()); IsError(err)) {
                 return err;
             }
@@ -52,6 +64,12 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 emit(OpcodeType::OpMul, {});
             } else if (infix->tokenLiteral() == "/") {
                 emit(OpcodeType::OpDiv, {});
+            } else if (infix->tokenLiteral() == ">") {
+                emit(OpcodeType::OpGreaterThan, {});
+            } else if (infix->tokenLiteral() == "==") {
+                emit(OpcodeType::OpEqual, {});
+            } else if (infix->tokenLiteral() == "!=") {
+                emit(OpcodeType::OpNotEqual, {});
             } else {
                 return std::make_shared<Error>(fmt::format("unknown operator: {}", infix->tokenLiteral()));
             }

@@ -72,6 +72,12 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpGreaterThan:
+            case OpcodeType::OpEqual:
+            case OpcodeType::OpNotEqual:
+                excuteComparison(op);
+                break;
+
             default:
                 break;
         }
@@ -111,7 +117,42 @@ std::shared_ptr<Object> VM::excuteBinaryIntegerOperation(OpcodeType op, std::sha
         default:
             break;
     }
-    return std::make_shared<Error>(fmt::format("unknow integer operator: {}", toString(op)));
+    return std::make_shared<Error>(fmt::format("unknown integer operator: {}", toString(op)));
+}
+
+std::shared_ptr<Object> VM::excuteComparison(OpcodeType op) {
+    auto right = pop();
+    auto left = pop();
+
+    if (left->type() == Object::Type::INTEGER && right->type() == Object::Type::INTEGER) {
+        return excuteIntegerComparison(op, std::dynamic_pointer_cast<Integer>(left),
+                                       std::dynamic_pointer_cast<Integer>(right));
+    }
+    switch (op) {
+        case OpcodeType::OpEqual:
+            return push(EvalBool(left == right));
+        case OpcodeType::OpNotEqual:
+            return push(EvalBool(left != right));
+        default:
+            break;
+    }
+    return std::make_shared<Error>(fmt::format("unsupported types for binary operaction: {} {} {}",
+                                               left->typeStr(), toString(op), right->typeStr()));
+}
+
+std::shared_ptr<Object> VM::excuteIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,
+                                                    std::shared_ptr<Integer> right) {
+    switch (op) {
+        case OpcodeType::OpGreaterThan:
+            return push(EvalBool(left->value() > right->value()));
+        case OpcodeType::OpEqual:
+            return push(EvalBool(left->value() == right->value()));
+        case OpcodeType::OpNotEqual:
+            return push(EvalBool(left->value() != right->value()));
+        default:
+            break;
+    }
+    return std::make_shared<Error>(fmt::format("unknown integer operator: {}", toString(op)));
 }
 
 }  // namespace monkey

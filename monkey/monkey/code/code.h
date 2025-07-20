@@ -25,6 +25,10 @@ enum class OpcodeType : Opcode {
 
     OpTrue,   // true
     OpFalse,  // false
+
+    OpEqual,        // ==
+    OpNotEqual,     // !=
+    OpGreaterThan,  // >
 };
 
 std::string_view toString(OpcodeType type);

@@ -101,6 +101,20 @@ TEST(CompilerTest, IntegerArithmeticTest) {
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err);
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions());
+        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
+    }
+}
+
+TEST(CompilerTest, BooleanExpressionTest) {
+    CompilerTestCase tests[] = {
+
         {
             "true",
             {},
@@ -114,6 +128,66 @@ TEST(CompilerTest, IntegerArithmeticTest) {
             {},
             {
                 ByteCode::Make(OpcodeType::OpFalse, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1 > 2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpGreaterThan, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1 < 2",
+            {2, 1},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpGreaterThan, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1 == 2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpEqual, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "1 != 2",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpNotEqual, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "true == false",
+            {},
+            {
+                ByteCode::Make(OpcodeType::OpTrue, {}),
+                ByteCode::Make(OpcodeType::OpFalse, {}),
+                ByteCode::Make(OpcodeType::OpEqual, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "true != false",
+            {},
+            {
+                ByteCode::Make(OpcodeType::OpTrue, {}),
+                ByteCode::Make(OpcodeType::OpFalse, {}),
+                ByteCode::Make(OpcodeType::OpNotEqual, {}),
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
