@@ -23,9 +23,11 @@ std::string_view toString(OpcodeType type) {
         TO_STRING_CASE(OpcodeType, OpSub);
         TO_STRING_CASE(OpcodeType, OpMul);
         TO_STRING_CASE(OpcodeType, OpDiv);
-        default:
-            return "Unknown OpcodeType";
+
+        TO_STRING_CASE(OpcodeType, OpTrue);
+        TO_STRING_CASE(OpcodeType, OpFalse);
     }
+    return "Unknown OpcodeType";
 }
 
 // 操作码
@@ -43,6 +45,9 @@ inline const std::map<OpcodeType, Definition> definitions{
     {OpcodeType::OpSub, {"OpSub", {}}},
     {OpcodeType::OpMul, {"OpMul", {}}},
     {OpcodeType::OpDiv, {"OpDiv", {}}},
+
+    {OpcodeType::OpTrue, {"OpTrue", {}}},
+    {OpcodeType::OpFalse, {"OpFalse", {}}},
 };
 
 // 整数版本

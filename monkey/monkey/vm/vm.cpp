@@ -59,6 +59,19 @@ std::shared_ptr<Object> VM::run() {
                 excuteBinaryOperation(op);
                 break;
 
+            case OpcodeType::OpTrue: {
+                auto result = push(kTrueObj);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+            case OpcodeType::OpFalse: {
+                auto result = push(kFalseObj);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }

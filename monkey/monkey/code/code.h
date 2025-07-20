@@ -22,6 +22,9 @@ enum class OpcodeType : Opcode {
     OpSub,  // '-'
     OpMul,  // '*'
     OpDiv,  // '/'
+
+    OpTrue,   // true
+    OpFalse,  // false
 };
 
 std::string_view toString(OpcodeType type);

@@ -22,6 +22,14 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             }
             emit(OpcodeType::OpPop, {});
         } break;
+        case Node::Type::Boolean: {
+            auto boolean = std::dynamic_pointer_cast<Boolean>(node);
+            if (boolean->value()) {
+                emit(OpcodeType::OpTrue, {});
+            } else {
+                emit(OpcodeType::OpFalse, {});
+            }
+        } break;
         case Node::Type::IntegerLiteral: {
             auto integer_literal = std::dynamic_pointer_cast<IntegerLiteral>(node);
             auto integer = std::make_shared<Integer>(integer_literal->value());

@@ -101,6 +101,22 @@ TEST(CompilerTest, IntegerArithmeticTest) {
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
+        {
+            "true",
+            {},
+            {
+                ByteCode::Make(OpcodeType::OpTrue, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "false",
+            {},
+            {
+                ByteCode::Make(OpcodeType::OpFalse, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
     };
 
     for (const auto& test : tests) {
