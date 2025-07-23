@@ -29,6 +29,9 @@ enum class OpcodeType : Opcode {
     OpEqual,        // ==
     OpNotEqual,     // !=
     OpGreaterThan,  // >
+
+    OpBang,   // !
+    OpMinus,  // -
 };
 
 std::string_view toString(OpcodeType type);

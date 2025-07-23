@@ -36,6 +36,10 @@ private:
     std::shared_ptr<Object> excuteIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,
                                                     std::shared_ptr<Integer> right);
 
+    std::shared_ptr<Object> excuteBangOperation();
+
+    std::shared_ptr<Object> excuteMinusOperation();
+
 private:
     static constexpr size_t kStackSize = 2048;
 

@@ -55,9 +55,12 @@ std::shared_ptr<Object> VM::run() {
             case OpcodeType::OpAdd:
             case OpcodeType::OpSub:
             case OpcodeType::OpMul:
-            case OpcodeType::OpDiv:
-                excuteBinaryOperation(op);
-                break;
+            case OpcodeType::OpDiv: {
+                auto result = excuteBinaryOperation(op);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
 
             case OpcodeType::OpTrue: {
                 auto result = push(kTrueObj);
@@ -72,11 +75,28 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
-            case OpcodeType::OpGreaterThan:
             case OpcodeType::OpEqual:
             case OpcodeType::OpNotEqual:
-                excuteComparison(op);
-                break;
+            case OpcodeType::OpGreaterThan: {
+                auto result = excuteComparison(op);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
+            case OpcodeType::OpBang: {
+                auto result = excuteBangOperation();
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
+            case OpcodeType::OpMinus: {
+                auto result = excuteMinusOperation();
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
 
             default:
                 break;
@@ -93,8 +113,8 @@ std::shared_ptr<Object> VM::excuteBinaryOperation(OpcodeType op) {
     auto left = pop();
 
     if (left->type() == Object::Type::INTEGER && right->type() == Object::Type::INTEGER) {
-        excuteBinaryIntegerOperation(op, std::dynamic_pointer_cast<Integer>(left),
-                                     std::dynamic_pointer_cast<Integer>(right));
+        return excuteBinaryIntegerOperation(op, std::dynamic_pointer_cast<Integer>(left),
+                                            std::dynamic_pointer_cast<Integer>(right));
     }
     return std::make_shared<Error>(fmt::format("unsupported types for binary operaction: {} {} {}",
                                                left->typeStr(), toString(op), right->typeStr()));
@@ -153,6 +173,25 @@ std::shared_ptr<Object> VM::excuteIntegerComparison(OpcodeType op, std::shared_p
             break;
     }
     return std::make_shared<Error>(fmt::format("unknown integer operator: {}", toString(op)));
+}
+
+std::shared_ptr<Object> VM::excuteBangOperation() {
+    auto operand = pop();
+    if (operand == kTrueObj) {
+        return push(kFalseObj);
+    } else if (operand == kFalseObj) {
+        return push(kTrueObj);
+    }
+    return push(kFalseObj);
+}
+
+std::shared_ptr<Object> VM::excuteMinusOperation() {
+    auto operand = pop();
+    if (operand->type() != Object::Type::INTEGER) {
+        return std::make_shared<Error>(fmt::format("unsupported type for negation: {}", operand->typeStr()));
+    }
+    auto integer = std::dynamic_pointer_cast<Integer>(operand);
+    return push(std::make_shared<Integer>(-integer->value()));
 }
 
 }  // namespace monkey

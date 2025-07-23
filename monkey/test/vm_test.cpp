@@ -26,16 +26,20 @@ TEST(VMTest, IntegerArithmeticTest) {
         {"5 * 2 + 10", 20},
         {"5 + 2 * 10", 25},
         {"5 * (2 + 10)", 60},
+        {"-5", -5},
+        {"-10", -10},
+        {"-50 + 100 + -50", 0},
+        {"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
     };
 
     for (const auto& test : tests) {
         auto compiler = Compiler::New();
         auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
+        ASSERT_FALSE(err) << "Input: " << test.input;
 
         auto vm = VM::New(compiler);
         auto result = vm->run();
-        ASSERT_FALSE(result);
+        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect();
 
         TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
     }
@@ -62,6 +66,12 @@ TEST(VMTest, BooleanExpressionTest) {
         {"(1 < 2) == false", false},
         {"(1 > 2) == true", false},
         {"(1 > 2) == false", true},
+        {"!true", false},
+        {"!false", true},
+        {"!5", false},
+        {"!!true", true},
+        {"!!false", false},
+        {"!!5", true},
     };
 
     for (const auto& test : tests) {

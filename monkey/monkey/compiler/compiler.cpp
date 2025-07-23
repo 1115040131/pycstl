@@ -36,6 +36,19 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             auto pos = addConstant(integer);
             emit(OpcodeType::OpConstant, {static_cast<int>(pos)});
         } break;
+        case Node::Type::PrefixExpression: {
+            auto prefix = std::dynamic_pointer_cast<PrefixExpression>(node);
+            if (auto err = compile(prefix->right()); IsError(err)) {
+                return err;
+            }
+            if (prefix->tokenLiteral() == "!") {
+                emit(OpcodeType::OpBang, {});
+            } else if (prefix->tokenLiteral() == "-") {
+                emit(OpcodeType::OpMinus, {});
+            } else {
+                return std::make_shared<Error>(fmt::format("unknown operator: {}", prefix->tokenLiteral()));
+            }
+        } break;
         case Node::Type::InfixExpression: {
             auto infix = std::dynamic_pointer_cast<InfixExpression>(node);
 

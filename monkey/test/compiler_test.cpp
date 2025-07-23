@@ -101,6 +101,15 @@ TEST(CompilerTest, IntegerArithmeticTest) {
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
+        {
+            "-1",
+            {1},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpMinus, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
     };
 
     for (const auto& test : tests) {
@@ -188,6 +197,15 @@ TEST(CompilerTest, BooleanExpressionTest) {
                 ByteCode::Make(OpcodeType::OpTrue, {}),
                 ByteCode::Make(OpcodeType::OpFalse, {}),
                 ByteCode::Make(OpcodeType::OpNotEqual, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "!true",
+            {},
+            {
+                ByteCode::Make(OpcodeType::OpTrue, {}),
+                ByteCode::Make(OpcodeType::OpBang, {}),
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
