@@ -74,6 +74,12 @@ std::shared_ptr<Object> VM::run() {
                     return result;
                 }
             } break;
+            case OpcodeType::OpNull: {
+                auto result = push(kNullObj);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
 
             case OpcodeType::OpEqual:
             case OpcodeType::OpNotEqual:
@@ -103,7 +109,7 @@ std::shared_ptr<Object> VM::run() {
                 break;
 
             case OpcodeType::OpJumpNotTruthy:
-                if (pop() == kFalseObj) {
+                if (!IsTruthy(pop())) {
                     next_offset = operands[0];
                 }
                 break;

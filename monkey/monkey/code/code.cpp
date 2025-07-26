@@ -26,6 +26,7 @@ std::string_view toString(OpcodeType type) {
 
         TO_STRING_CASE(OpcodeType, OpTrue);
         TO_STRING_CASE(OpcodeType, OpFalse);
+        TO_STRING_CASE(OpcodeType, OpNull);
 
         TO_STRING_CASE(OpcodeType, OpEqual);
         TO_STRING_CASE(OpcodeType, OpNotEqual);
@@ -58,6 +59,7 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpTrue, {"OpTrue", {}}},
     {OpcodeType::OpFalse, {"OpFalse", {}}},
+    {OpcodeType::OpNull, {"OpNull", {}}},
 
     {OpcodeType::OpEqual, {"OpEqual", {}}},
     {OpcodeType::OpNotEqual, {"OpNotEqual", {}}},

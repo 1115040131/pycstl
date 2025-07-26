@@ -8,7 +8,7 @@ namespace monkey {
 
 struct VMTestCase {
     std::string input;
-    std::variant<int, bool> expected;
+    std::variant<int, bool, void*> expected;
 };
 
 TEST(VMTest, IntegerArithmeticTest) {
@@ -96,6 +96,9 @@ TEST(VMTest, ConditionTest) {
         {"if(1 < 2){ 10}", 10},
         {"if(1 < 2){ 10 } else { 20 }", 10},
         {"if(1 > 2){ 10 } else { 20 }", 20},
+        {"if( 1 > 2) { 10 }", nullptr},
+        {"if( false ){ 10 }", nullptr},
+        {"if((if (false) { 10 })){ 10 } else { 20 }", 20},
     };
 
     for (const auto& test : tests) {

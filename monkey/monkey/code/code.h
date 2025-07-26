@@ -25,6 +25,7 @@ enum class OpcodeType : Opcode {
 
     OpTrue,   // true
     OpFalse,  // false
+    OpNull,  // null
 
     OpEqual,        // ==
     OpNotEqual,     // !=
@@ -35,6 +36,7 @@ enum class OpcodeType : Opcode {
 
     OpJumpNotTruthy,
     OpJump,
+
 };
 
 std::string_view toString(OpcodeType type);

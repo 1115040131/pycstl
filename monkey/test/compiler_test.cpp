@@ -20,13 +20,14 @@ Instructions concateInstructions(const std::vector<Instructions>& instructions) 
     return concated;
 }
 
-#define TEST_INSTRUCTIONS(expected, actual, input)                   \
-    {                                                                \
-        auto concated = concateInstructions(expected);               \
-        ASSERT_EQ(concated.size(), actual.size());                   \
-        for (size_t i = 0; i < concated.size(); i++) {               \
-            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input; \
-        }                                                            \
+#define TEST_INSTRUCTIONS(expected, actual, input)                                                               \
+    {                                                                                                            \
+        auto concated = concateInstructions(expected);                                                           \
+        ASSERT_EQ(concated.size(), actual.size());                                                               \
+        for (size_t i = 0; i < concated.size(); i++) {                                                           \
+            EXPECT_EQ(concated[i], actual[i])                                                                    \
+                << "Input: " << input << "\nconcated:\n" << toString(concated) << "actual:\n" << toString(actual); \
+        }                                                                                                        \
     }
 
 #define TEST_CONSTANTS(expected, actual, input)                                    \
@@ -228,14 +229,18 @@ TEST(CompilerTest, IfExpressionTest) {
                 // 0000
                 ByteCode::Make(OpcodeType::OpTrue, {}),
                 // 0001
-                ByteCode::Make(OpcodeType::OpJumpNotTruthy, {7}),
+                ByteCode::Make(OpcodeType::OpJumpNotTruthy, {10}),
                 // 0004
                 ByteCode::Make(OpcodeType::OpConstant, {0}),
                 // 0007
-                ByteCode::Make(OpcodeType::OpPop, {}),
-                // 0008
-                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpJump, {11}),
+                // 0010
+                ByteCode::Make(OpcodeType::OpNull, {}),
                 // 0011
+                ByteCode::Make(OpcodeType::OpPop, {}),
+                // 0012
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                // 0015
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },

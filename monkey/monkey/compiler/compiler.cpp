@@ -113,15 +113,14 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 removeLastPop();
             }
 
+            auto jump_pos = emit(OpcodeType::OpJump, {9999});
+
+            auto after_consequence_pos = instructions_.size();
+            changeOperand(jump_not_true_pos, after_consequence_pos);
+
             if (!if_expression->alternative()) {
-                auto after_consequence_pos = instructions_.size();
-                changeOperand(jump_not_true_pos, after_consequence_pos);
+                emit(OpcodeType::OpNull, {});
             } else {
-                auto jump_pos = emit(OpcodeType::OpJump, {9999});
-
-                auto after_consequence_pos = instructions_.size();
-                changeOperand(jump_not_true_pos, after_consequence_pos);
-
                 if (auto err = compile(if_expression->alternative()); IsError(err)) {
                     return err;
                 }
@@ -129,10 +128,10 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 if (isLastInstructionPop()) {
                     removeLastPop();
                 }
-
-                auto after_alternative_pos = instructions_.size();
-                changeOperand(jump_pos, after_alternative_pos);
             }
+
+            auto after_alternative_pos = instructions_.size();
+            changeOperand(jump_pos, after_alternative_pos);
         } break;
         default:
             break;

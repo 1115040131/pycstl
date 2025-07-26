@@ -50,6 +50,8 @@ inline std::ostream& operator<<(std::ostream& os, const Token& token) {
             TEST_INTEGER_OBJECT(object, std::get<int>(expected), input);  \
         } else if (std::holds_alternative<bool>(expected)) {              \
             TEST_BOOLEAN_OBJECT(object, std::get<bool>(expected), input); \
+        } else {                                                          \
+            TEST_NULL_OBJECT(object, input);                              \
         }                                                                 \
     }
 

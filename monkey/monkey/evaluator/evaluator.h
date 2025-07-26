@@ -6,6 +6,7 @@ namespace pyc {
 namespace monkey {
 
 inline bool IsError(const std::shared_ptr<Object>& obj) { return obj && obj->type() == Object::Type::ERROR; }
+bool IsTruthy(const std::shared_ptr<Object>& obj);
 
 std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environment> env);
 
