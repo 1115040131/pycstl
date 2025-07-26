@@ -20,13 +20,13 @@ Instructions concateInstructions(const std::vector<Instructions>& instructions) 
     return concated;
 }
 
-#define TEST_INSTRUCTIONS(expected, actual)            \
-    {                                                  \
-        auto concated = concateInstructions(expected); \
-        ASSERT_EQ(concated.size(), actual.size());     \
-        for (size_t i = 0; i < expected.size(); i++) { \
-            EXPECT_EQ(concated[i], actual[i]);         \
-        }                                              \
+#define TEST_INSTRUCTIONS(expected, actual, input)                   \
+    {                                                                \
+        auto concated = concateInstructions(expected);               \
+        ASSERT_EQ(concated.size(), actual.size());                   \
+        for (size_t i = 0; i < concated.size(); i++) {               \
+            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input; \
+        }                                                            \
     }
 
 #define TEST_CONSTANTS(expected, actual, input)                                    \
@@ -87,7 +87,7 @@ TEST(CompilerTest, IntegerArithmeticTest) {
             {
                 ByteCode::Make(OpcodeType::OpConstant, {0}),
                 ByteCode::Make(OpcodeType::OpConstant, {1}),
-                ByteCode::Make(OpcodeType::OpMul, {}),
+                ByteCode::Make(OpcodeType::OpDiv, {}),
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
@@ -97,7 +97,7 @@ TEST(CompilerTest, IntegerArithmeticTest) {
             {
                 ByteCode::Make(OpcodeType::OpConstant, {0}),
                 ByteCode::Make(OpcodeType::OpConstant, {1}),
-                ByteCode::Make(OpcodeType::OpMul, {}),
+                ByteCode::Make(OpcodeType::OpDiv, {}),
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
@@ -116,14 +116,13 @@ TEST(CompilerTest, IntegerArithmeticTest) {
         auto compiler = Compiler::New();
         auto err = compiler->compile(processInput(test.input));
         ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions());
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
         TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
     }
 }
 
 TEST(CompilerTest, BooleanExpressionTest) {
     CompilerTestCase tests[] = {
-
         {
             "true",
             {},
@@ -215,7 +214,60 @@ TEST(CompilerTest, BooleanExpressionTest) {
         auto compiler = Compiler::New();
         auto err = compiler->compile(processInput(test.input));
         ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions());
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
+        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
+    }
+}
+
+TEST(CompilerTest, IfExpressionTest) {
+    CompilerTestCase tests[] = {
+        {
+            "if( true ){ 10 }; 3333;",
+            {10, 3333},
+            {
+                // 0000
+                ByteCode::Make(OpcodeType::OpTrue, {}),
+                // 0001
+                ByteCode::Make(OpcodeType::OpJumpNotTruthy, {7}),
+                // 0004
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                // 0007
+                ByteCode::Make(OpcodeType::OpPop, {}),
+                // 0008
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                // 0011
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            "if( true ){ 10 } else { 20 }; 3333;",
+            {10, 20, 3333},
+            {
+                // 0000
+                ByteCode::Make(OpcodeType::OpTrue, {}),
+                // 0001
+                ByteCode::Make(OpcodeType::OpJumpNotTruthy, {10}),
+                // 0004
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                // 0007
+                ByteCode::Make(OpcodeType::OpJump, {13}),
+                // 0010
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                // 0013
+                ByteCode::Make(OpcodeType::OpPop, {}),
+                // 0014
+                ByteCode::Make(OpcodeType::OpConstant, {2}),
+                // 0017
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err);
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
         TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
     }
 }

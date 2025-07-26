@@ -33,6 +33,9 @@ std::string_view toString(OpcodeType type) {
 
         TO_STRING_CASE(OpcodeType, OpMinus);
         TO_STRING_CASE(OpcodeType, OpBang);
+
+        TO_STRING_CASE(OpcodeType, OpJumpNotTruthy);
+        TO_STRING_CASE(OpcodeType, OpJump);
     }
     return "Unknown OpcodeType";
 }
@@ -62,6 +65,9 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpMinus, {"OpMinus", {}}},
     {OpcodeType::OpBang, {"OpBang", {}}},
+
+    {OpcodeType::OpJumpNotTruthy, {"OpJumpNotTruthy", {2}}},
+    {OpcodeType::OpJump, {"OpJump", {2}}},
 };
 
 // 整数版本

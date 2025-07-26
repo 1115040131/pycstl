@@ -22,6 +22,14 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             }
             emit(OpcodeType::OpPop, {});
         } break;
+        case Node::Type::BlockStatement: {
+            auto block = std::dynamic_pointer_cast<BlockStatement>(node);
+            for (const auto& statement : block->statements()) {
+                if (auto err = compile(statement); IsError(err)) {
+                    return err;
+                }
+            }
+        } break;
         case Node::Type::Boolean: {
             auto boolean = std::dynamic_pointer_cast<Boolean>(node);
             if (boolean->value()) {
@@ -87,6 +95,45 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 return std::make_shared<Error>(fmt::format("unknown operator: {}", infix->tokenLiteral()));
             }
         } break;
+        case Node::Type::IfExpression: {
+            auto if_expression = std::dynamic_pointer_cast<IfExpression>(node);
+
+            if (auto err = compile(if_expression->condition()); IsError(err)) {
+                return err;
+            }
+
+            // 预设一个偏移量方便后续回填
+            auto jump_not_true_pos = emit(OpcodeType::OpJumpNotTruthy, {9999});
+
+            if (auto err = compile(if_expression->consequence()); IsError(err)) {
+                return err;
+            }
+
+            if (isLastInstructionPop()) {
+                removeLastPop();
+            }
+
+            if (!if_expression->alternative()) {
+                auto after_consequence_pos = instructions_.size();
+                changeOperand(jump_not_true_pos, after_consequence_pos);
+            } else {
+                auto jump_pos = emit(OpcodeType::OpJump, {9999});
+
+                auto after_consequence_pos = instructions_.size();
+                changeOperand(jump_not_true_pos, after_consequence_pos);
+
+                if (auto err = compile(if_expression->alternative()); IsError(err)) {
+                    return err;
+                }
+
+                if (isLastInstructionPop()) {
+                    removeLastPop();
+                }
+
+                auto after_alternative_pos = instructions_.size();
+                changeOperand(jump_pos, after_alternative_pos);
+            }
+        } break;
         default:
             break;
     }
@@ -100,13 +147,42 @@ size_t Compiler::addConstant(std::shared_ptr<Object> object) {
 
 size_t Compiler::emit(OpcodeType op, const std::vector<int>& operands) {
     auto instructions = ByteCode::Make(op, operands);
-    return addInstruction(instructions);
+    auto position = addInstruction(instructions);
+    setLastInstruction(op, position);
+    return position;
 }
 
 size_t Compiler::addInstruction(const Instructions& instructions) {
     auto pos = instructions_.size();
     instructions_.insert(instructions_.end(), instructions.begin(), instructions.end());
     return pos;
+}
+
+void Compiler::setLastInstruction(OpcodeType op, size_t position) {
+    prev_instruction_ = last_instruction_;
+    last_instruction_ = {op, position};
+}
+
+bool Compiler::isLastInstructionPop() const { return last_instruction_.opcode == OpcodeType::OpPop; }
+
+void Compiler::removeLastPop() {
+    instructions_.resize(last_instruction_.position);
+    last_instruction_ = prev_instruction_;
+}
+
+void Compiler::replaceInstruction(size_t position, const Instructions& new_instructions) {
+    if (position + new_instructions.size() > instructions_.size()) {
+        fmt::println("Cannot replace instruction at position {} with size {}, current instructions size: {}",
+                     position, new_instructions.size(), instructions_.size());
+        return;
+    }
+    std::copy(new_instructions.begin(), new_instructions.end(), instructions_.begin() + position);
+    setLastInstruction(static_cast<OpcodeType>(instructions_[position]), position);
+}
+
+void Compiler::changeOperand(size_t position, int operand) {
+    auto new_instruction = ByteCode::Make(static_cast<OpcodeType>(instructions_[position]), {operand});
+    replaceInstruction(position, new_instruction);
 }
 
 }  // namespace monkey

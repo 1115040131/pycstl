@@ -98,6 +98,16 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpJump:
+                next_offset = operands[0];
+                break;
+
+            case OpcodeType::OpJumpNotTruthy:
+                if (pop() == kFalseObj) {
+                    next_offset = operands[0];
+                }
+                break;
+
             default:
                 break;
         }

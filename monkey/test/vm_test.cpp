@@ -87,5 +87,29 @@ TEST(VMTest, BooleanExpressionTest) {
     }
 }
 
+TEST(VMTest, ConditionTest) {
+    VMTestCase tests[] = {
+        {"if(true) { 10 }", 10},
+        {"if(true) { 10 } else { 20 }", 10},
+        {"if(false) { 10 } else { 20 }", 20},
+        {"if(1) { 10 }", 10},
+        {"if(1 < 2){ 10}", 10},
+        {"if(1 < 2){ 10 } else { 20 }", 10},
+        {"if(1 > 2){ 10 } else { 20 }", 20},
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err) << "Input: " << test.input;
+
+        auto vm = VM::New(compiler);
+        auto result = vm->run();
+        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect();
+
+        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
+    }
+}
+
 }  // namespace monkey
 }  // namespace pyc

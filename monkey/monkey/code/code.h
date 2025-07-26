@@ -32,6 +32,9 @@ enum class OpcodeType : Opcode {
 
     OpBang,   // !
     OpMinus,  // -
+
+    OpJumpNotTruthy,
+    OpJump,
 };
 
 std::string_view toString(OpcodeType type);

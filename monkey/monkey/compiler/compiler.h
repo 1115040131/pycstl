@@ -6,6 +6,11 @@
 namespace pyc {
 namespace monkey {
 
+struct EmittedInstruction {
+    OpcodeType opcode;
+    size_t position;
+};
+
 class Compiler {
 public:
     static std::shared_ptr<Compiler> New() { return std::make_shared<Compiler>(); }
@@ -22,9 +27,22 @@ private:
 
     size_t addInstruction(const Instructions& instructions);
 
+    void setLastInstruction(OpcodeType op, size_t position);
+
+    bool isLastInstructionPop() const;
+
+    void removeLastPop();
+
+    void replaceInstruction(size_t position, const Instructions& new_instructions);
+
+    void changeOperand(size_t position, int operand);
+
 private:
     Instructions instructions_;
     std::vector<std::shared_ptr<Object>> constants_;
+
+    EmittedInstruction last_instruction_;
+    EmittedInstruction prev_instruction_;
 };
 
 }  // namespace monkey
