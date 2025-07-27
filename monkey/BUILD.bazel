@@ -20,6 +20,21 @@ cc_library(
     deps = ["@fmt"],
 )
 
+cc_library(
+    name = "monkey_lib_with_sorted_hash",
+    srcs = glob(
+        ["monkey/**/*.cpp"],
+        exclude = ["monkey/monkey.cpp"],
+    ),
+    hdrs = glob([
+        "monkey/**/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    defines = ["SORTED_HASH"],
+    includes = ["."],
+    deps = ["@fmt"],
+)
+
 cc_binary(
     name = "monkey",
     srcs = ["monkey/monkey.cpp"],

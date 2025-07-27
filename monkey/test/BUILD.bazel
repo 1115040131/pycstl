@@ -8,7 +8,7 @@ cc_test(
     ]),
     copts = STRICT_COPTS,
     deps = [
-        "//monkey:monkey_lib",
+        "//monkey:monkey_lib_with_sorted_hash",
         "@googletest//:gtest_main",
     ],
 )

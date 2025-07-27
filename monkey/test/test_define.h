@@ -57,6 +57,8 @@ using Expected = std::variant<int, bool, std::string, void*>;
             auto expected_str = std::get<std::string>(expected);                 \
             if (auto array = std::dynamic_pointer_cast<Array>(object)) {         \
                 EXPECT_EQ(array->inspect(), expected_str) << "Input: " << input; \
+            } else if (auto hash = std::dynamic_pointer_cast<Hash>(object)) {    \
+                EXPECT_EQ(hash->inspect(), expected_str) << "Input: " << input;  \
             } else {                                                             \
                 TEST_STRING_OBJECT(object, expected_str, input);                 \
             }                                                                    \

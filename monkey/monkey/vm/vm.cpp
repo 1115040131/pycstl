@@ -140,7 +140,21 @@ std::shared_ptr<Object> VM::run() {
 
             case OpcodeType::OpArray: {
                 auto array = buildArray(operands[0]);
+                if (IsError(array)) {
+                    return array;
+                }
                 auto result = push(array);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
+            case OpcodeType::OpHash: {
+                auto hash = buildHash(operands[0]);
+                if (IsError(hash)) {
+                    return hash;
+                }
+                auto result = push(hash);
                 if (IsError(result)) {
                     return result;
                 }
@@ -267,6 +281,22 @@ std::shared_ptr<Object> VM::buildArray(size_t size) {
     }
     std::ranges::reverse(elements);
     return std::make_shared<Array>(std::move(elements));
+}
+
+std::shared_ptr<Object> VM::buildHash(size_t size) {
+    if (sp_ < size * 2) {
+        return std::make_shared<Error>("Stack underflow for hash creation");
+    }
+    auto hash = std::make_shared<Hash>();
+    for (size_t i = 0; i < size; i++) {
+        auto value = pop();
+        auto key = pop();
+        if (!key->hashable()) {
+            return std::make_shared<Error>(fmt::format("unhashable type: {}", key->typeStr()));
+        }
+        hash->pairs()[key->getHashKey()] = {key, value};
+    }
+    return hash;
 }
 
 }  // namespace monkey

@@ -42,6 +42,7 @@ std::string_view toString(OpcodeType type) {
         TO_STRING_CASE(OpcodeType, OpSetGlobal);
 
         TO_STRING_CASE(OpcodeType, OpArray);
+        TO_STRING_CASE(OpcodeType, OpHash);
     }
     return "Unknown OpcodeType";
 }
@@ -80,6 +81,7 @@ inline const std::map<OpcodeType, Definition> definitions{
     {OpcodeType::OpSetGlobal, {"OpSetGlobal", {2}}},
 
     {OpcodeType::OpArray, {"OpArray", {2}}},
+    {OpcodeType::OpHash, {"OpHash", {2}}},
 };
 
 // 整数版本

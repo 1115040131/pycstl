@@ -1,5 +1,7 @@
 #include "monkey/compiler/compiler.h"
 
+#include <algorithm>
+
 #include "monkey/evaluator/evaluator.h"
 
 namespace pyc {
@@ -75,6 +77,38 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 }
             }
             emit(OpcodeType::OpArray, {array_literal->elements().size()});
+        } break;
+        case Node::Type::HashLiteral: {
+            auto hash_literal = std::dynamic_pointer_cast<HashLiteral>(node);
+
+#ifdef SORTED_HASH
+            std::vector<std::shared_ptr<Expression>> keys;
+            for (const auto& [key, _] : hash_literal->pairs()) {
+                keys.push_back(key);
+            }
+            std::ranges::sort(keys,
+                              [](const std::shared_ptr<Expression>& lhs, const std::shared_ptr<Expression>& rhs) {
+                                  return lhs->toString() < rhs->toString();
+                              });
+            for (const auto& key : keys) {
+                if (auto err = compile(key); IsError(err)) {
+                    return err;
+                }
+                if (auto err = compile(hash_literal->pairs().at(key)); IsError(err)) {
+                    return err;
+                }
+            }
+#else
+            for (const auto& [key, value] : hash_literal->pairs()) {
+                if (auto err = compile(key); IsError(err)) {
+                    return err;
+                }
+                if (auto err = compile(value); IsError(err)) {
+                    return err;
+                }
+            }
+#endif
+            emit(OpcodeType::OpHash, {hash_literal->pairs().size()});
         } break;
         case Node::Type::PrefixExpression: {
             auto prefix = std::dynamic_pointer_cast<PrefixExpression>(node);

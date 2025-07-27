@@ -98,6 +98,16 @@ TEST(VMTest, ArrayLiteralTest) {
     RUN_VM_TESTS(tests);
 }
 
+TEST(VMTest, HashLiteralTest) {
+    VMTestCase tests[] = {
+        {"{}", "{}"},
+        {"{1: 2, 2: 3}", "{1: 2, 2: 3}"},
+        {"{1 + 1: 2 * 2, 3 + 3: 4 * 4}", "{2: 4, 6: 16}"},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
 TEST(VMTest, ConditionTest) {
     VMTestCase tests[] = {
         {"if(true) { 10 }", 10},
