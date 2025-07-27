@@ -24,7 +24,7 @@ public:
 private:
     size_t addConstant(std::shared_ptr<Object> object);
 
-    size_t emit(OpcodeType op, const std::vector<int>& operands);
+    size_t emit(OpcodeType op, const std::vector<size_t>& operands);
 
     size_t addInstruction(const Instructions& instructions);
 
@@ -36,7 +36,7 @@ private:
 
     void replaceInstruction(size_t position, const Instructions& new_instructions);
 
-    void changeOperand(size_t position, int operand);
+    void changeOperand(size_t position, size_t operand);
 
 private:
     Instructions instructions_;

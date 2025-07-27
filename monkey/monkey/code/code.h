@@ -48,10 +48,10 @@ std::string toString(const Instructions& instructions);
 class ByteCode {
 public:
     // 生成字节码
-    static Instructions Make(OpcodeType op, const std::vector<int>& operands);
+    static Instructions Make(OpcodeType op, const std::vector<size_t>& operands);
 
     // 读取字节码(反汇编)
-    static std::pair<std::vector<int>, size_t> ReadOperands(const Instructions& instructions, size_t offset);
+    static std::pair<std::vector<size_t>, size_t> ReadOperands(const Instructions& instructions, size_t offset);
 };
 
 }  // namespace monkey

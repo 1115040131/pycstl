@@ -114,6 +114,28 @@ std::shared_ptr<Object> VM::run() {
                 }
                 break;
 
+            case OpcodeType::OpSetGlobal:
+                if (operands[0] >= globals_.size()) {
+                    return std::make_shared<Error>("Global index out of range");
+                }
+                globals_[operands[0]] = pop();
+                break;
+
+            case OpcodeType::OpGetGlobal: {
+                if (operands[0] >= globals_.size()) {
+                    return std::make_shared<Error>("Global index out of range");
+                }
+                auto global = globals_[operands[0]];
+                if (global == nullptr) {
+                    return std::make_shared<Error>(
+                        fmt::format("undefined global variable at index {}", operands[0]));
+                }
+                auto result = push(global);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }

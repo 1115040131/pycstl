@@ -16,7 +16,7 @@ inline constexpr SymbolScope kGlobal = "GLOBAL";
 struct Symbol {
     std::string_view name;
     SymbolScope scope;
-    int index;
+    size_t index;
 
     inline constexpr auto operator<=>(const Symbol&) const = default;
 };
@@ -31,7 +31,7 @@ public:
 
 private:
     std::unordered_map<std::string_view, std::shared_ptr<Symbol>> store_;
-    int next_index_ = 0;
+    size_t next_index_ = 0;
 };
 
 }  // namespace monkey

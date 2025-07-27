@@ -47,7 +47,7 @@ std::string_view toString(OpcodeType type) {
 // 操作码
 struct Definition {
     std::string name;
-    std::vector<int> operand_widths;
+    std::vector<size_t> operand_widths;
 };
 
 inline const std::map<OpcodeType, Definition> definitions{
@@ -119,7 +119,7 @@ constexpr T to_big_endian(T value) {
     }
 }
 
-Instructions ByteCode::Make(OpcodeType op, const std::vector<int>& operands) {
+Instructions ByteCode::Make(OpcodeType op, const std::vector<size_t>& operands) {
     auto iter = definitions.find(op);
     if (iter == definitions.end()) {
         return {};
@@ -160,7 +160,7 @@ Instructions ByteCode::Make(OpcodeType op, const std::vector<int>& operands) {
     return instructions;
 }
 
-std::pair<std::vector<int>, size_t> ByteCode::ReadOperands(const Instructions& instructions, size_t offset) {
+std::pair<std::vector<size_t>, size_t> ByteCode::ReadOperands(const Instructions& instructions, size_t offset) {
     if (offset >= instructions.size()) {
         fmt::println("Offset {} out of range for instructions size {}", offset, instructions.size());
         return {{}, offset};
@@ -172,7 +172,7 @@ std::pair<std::vector<int>, size_t> ByteCode::ReadOperands(const Instructions& i
         return {{}, offset + 1};
     }
     const auto& definition = iter->second;
-    std::vector<int> operands;
+    std::vector<size_t> operands;
     operands.reserve(definition.operand_widths.size());
 
     offset += 1;  // 跳过操作码

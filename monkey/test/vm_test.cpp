@@ -114,5 +114,25 @@ TEST(VMTest, ConditionTest) {
     }
 }
 
+TEST(VMTest, GlobalLetStatementTest) {
+    VMTestCase tests[] = {
+        {"let one = 1; one", 1},
+        {"let one = 1; let two = 2; one + two;", 3},
+        {"let one = 1; let two = one + one; one + two;", 3},
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err) << "Input: " << test.input;
+
+        auto vm = VM::New(compiler);
+        auto result = vm->run();
+        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect();
+
+        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
+    }
+}
+
 }  // namespace monkey
 }  // namespace pyc

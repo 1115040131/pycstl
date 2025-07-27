@@ -9,7 +9,7 @@ namespace monkey {
 TEST(CodeTest, MakerTest) {
     struct Input {
         OpcodeType op;
-        std::vector<int> operands;
+        std::vector<size_t> operands;
         Instructions expected;
     };
 
@@ -31,7 +31,7 @@ TEST(CodeTest, MakerTest) {
 TEST(CodeTest, ReadOperandsTest) {
     struct Input {
         OpcodeType op;
-        std::vector<int> operands;
+        std::vector<size_t> operands;
         size_t byte_read;
     };
 

@@ -59,7 +59,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             auto integer_literal = std::dynamic_pointer_cast<IntegerLiteral>(node);
             auto integer = std::make_shared<Integer>(integer_literal->value());
             auto pos = addConstant(integer);
-            emit(OpcodeType::OpConstant, {static_cast<int>(pos)});
+            emit(OpcodeType::OpConstant, {pos});
         } break;
         case Node::Type::PrefixExpression: {
             auto prefix = std::dynamic_pointer_cast<PrefixExpression>(node);
@@ -161,7 +161,7 @@ size_t Compiler::addConstant(std::shared_ptr<Object> object) {
     return constants_.size() - 1;
 }
 
-size_t Compiler::emit(OpcodeType op, const std::vector<int>& operands) {
+size_t Compiler::emit(OpcodeType op, const std::vector<size_t>& operands) {
     auto instructions = ByteCode::Make(op, operands);
     auto position = addInstruction(instructions);
     setLastInstruction(op, position);
@@ -196,7 +196,7 @@ void Compiler::replaceInstruction(size_t position, const Instructions& new_instr
     setLastInstruction(static_cast<OpcodeType>(instructions_[position]), position);
 }
 
-void Compiler::changeOperand(size_t position, int operand) {
+void Compiler::changeOperand(size_t position, size_t operand) {
     auto new_instruction = ByteCode::Make(static_cast<OpcodeType>(instructions_[position]), {operand});
     replaceInstruction(position, new_instruction);
 }
