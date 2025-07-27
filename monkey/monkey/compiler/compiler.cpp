@@ -61,6 +61,12 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             auto pos = addConstant(integer);
             emit(OpcodeType::OpConstant, {pos});
         } break;
+        case Node::Type::StringLiteral: {
+            auto string_literal = std::dynamic_pointer_cast<StringLiteral>(node);
+            auto str = std::make_shared<String>(string_literal->toString());
+            auto pos = addConstant(str);
+            emit(OpcodeType::OpConstant, {pos});
+        } break;
         case Node::Type::PrefixExpression: {
             auto prefix = std::dynamic_pointer_cast<PrefixExpression>(node);
             if (auto err = compile(prefix->right()); IsError(err)) {

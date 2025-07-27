@@ -43,6 +43,9 @@ private:
     std::shared_ptr<Object> excuteBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
                                                          std::shared_ptr<Integer> right);
 
+    std::shared_ptr<Object> excuteBinaryStringOperation(OpcodeType op, std::shared_ptr<String> left,
+                                                        std::shared_ptr<String> right);
+
     std::shared_ptr<Object> excuteComparison(OpcodeType op);
 
     std::shared_ptr<Object> excuteIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,

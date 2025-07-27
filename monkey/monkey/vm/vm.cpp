@@ -153,6 +153,9 @@ std::shared_ptr<Object> VM::excuteBinaryOperation(OpcodeType op) {
     if (left->type() == Object::Type::INTEGER && right->type() == Object::Type::INTEGER) {
         return excuteBinaryIntegerOperation(op, std::dynamic_pointer_cast<Integer>(left),
                                             std::dynamic_pointer_cast<Integer>(right));
+    } else if (left->type() == Object::Type::STRING && right->type() == Object::Type::STRING) {
+        return excuteBinaryStringOperation(op, std::dynamic_pointer_cast<String>(left),
+                                           std::dynamic_pointer_cast<String>(right));
     }
     return std::make_shared<Error>(fmt::format("unsupported types for binary operaction: {} {} {}",
                                                left->typeStr(), toString(op), right->typeStr()));
@@ -176,6 +179,17 @@ std::shared_ptr<Object> VM::excuteBinaryIntegerOperation(OpcodeType op, std::sha
             break;
     }
     return std::make_shared<Error>(fmt::format("unknown integer operator: {}", toString(op)));
+}
+
+std::shared_ptr<Object> VM::excuteBinaryStringOperation(OpcodeType op, std::shared_ptr<String> left,
+                                                        std::shared_ptr<String> right) {
+    switch (op) {
+        case OpcodeType::OpAdd:
+            return push(std::make_shared<String>(left->value() + right->value()));
+        default:
+            break;
+    }
+    return std::make_shared<Error>(fmt::format("unknown string operator: {}", toString(op)));
 }
 
 std::shared_ptr<Object> VM::excuteComparison(OpcodeType op) {

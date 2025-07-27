@@ -8,7 +8,7 @@ namespace monkey {
 
 struct VMTestCase {
     std::string input;
-    std::variant<int, bool, void*> expected;
+    Expected expected;
 };
 
 TEST(VMTest, IntegerArithmeticTest) {
@@ -72,6 +72,26 @@ TEST(VMTest, BooleanExpressionTest) {
         {"!!true", true},
         {"!!false", false},
         {"!!5", true},
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err);
+
+        auto vm = VM::New(compiler);
+        auto result = vm->run();
+        ASSERT_FALSE(result);
+
+        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
+    }
+}
+
+TEST(VMTest, StringExpressionTest) {
+    VMTestCase tests[] = {
+        {"\"monkey\"", "monkey"},
+        {"\"mon\" + \"key\";", "monkey"},
+        {"\"mon\" + \"key\" + \"banana\";", "monkeybanana"},
     };
 
     for (const auto& test : tests) {

@@ -8,7 +8,7 @@ namespace monkey {
 
 struct CompilerTestCase {
     std::string input;
-    std::vector<std::variant<int>> expected_constants;
+    std::vector<Expected> expected_constants;
     std::vector<Instructions> expected_instructions;
 };
 
@@ -31,14 +31,12 @@ Instructions concateInstructions(const std::vector<Instructions>& instructions) 
         }                                                                              \
     }
 
-#define TEST_CONSTANTS(expected, actual, input)                                    \
-    {                                                                              \
-        ASSERT_EQ(expected.size(), actual.size());                                 \
-        for (size_t i = 0; i < expected.size(); i++) {                             \
-            if (std::holds_alternative<int>(expected[i])) {                        \
-                TEST_INTEGER_OBJECT(actual[i], std::get<int>(expected[i]), input); \
-            }                                                                      \
-        }                                                                          \
+#define TEST_CONSTANTS(expected, actual, input)                  \
+    {                                                            \
+        ASSERT_EQ(expected.size(), actual.size());               \
+        for (size_t i = 0; i < expected.size(); i++) {           \
+            TEST_EXPECTED_OBJECT(actual[i], expected[i], input); \
+        }                                                        \
     }
 
 TEST(CompilerTest, IntegerArithmeticTest) {
@@ -207,6 +205,37 @@ TEST(CompilerTest, BooleanExpressionTest) {
             {
                 ByteCode::Make(OpcodeType::OpTrue, {}),
                 ByteCode::Make(OpcodeType::OpBang, {}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err);
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
+        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
+    }
+}
+
+TEST(CompilerTest, StringTest) {
+    CompilerTestCase tests[] = {
+        {
+            R"("monkey")",
+            {"monkey"},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+        {
+            R"("mon" + "key")",
+            {"mon","key"},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpAdd, {}),
                 ByteCode::Make(OpcodeType::OpPop, {}),
             },
         },
