@@ -20,7 +20,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             if (auto err = compile(let_statement->value()); IsError(err)) {
                 return err;
             }
-            auto symbol = symbol_table_->Define(let_statement->name()->tokenLiteral());
+            auto symbol = symbol_table_->Define(let_statement->name()->toString());
             emit(OpcodeType::OpSetGlobal, {symbol->index});
         } break;
         case Node::Type::ExpressionStatement: {
@@ -40,7 +40,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
         } break;
         case Node::Type::Identifier: {
             auto identifier = std::dynamic_pointer_cast<Identifier>(node);
-            auto symbol = symbol_table_->Resolve(identifier->tokenLiteral());
+            auto symbol = symbol_table_->Resolve(identifier->toString());
             if (!symbol) {
                 return std::make_shared<Error>(
                     fmt::format("Undefined identifier: {}", identifier->tokenLiteral()));

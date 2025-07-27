@@ -42,6 +42,11 @@ void Repl::Start() {
     // lines.reserve(10);
     std::string line;
     // auto env = Environment::New();
+
+    std::vector<std::shared_ptr<Object>> constants;
+    std::vector<std::shared_ptr<Object>> globals(VM::kGlobalSize);
+    auto symbol_table = SymbolTable::New();
+
     while (true) {
         fmt::print("{}", kPrompt);
 
@@ -68,19 +73,22 @@ void Repl::Start() {
         //     fmt::println("{}", evaluated->inspect());
         // }
 
-        auto compiler = Compiler::New();
+        auto compiler = Compiler::NewWithState(constants, symbol_table);
         if (auto result = compiler->compile(std::move(program)); IsError(result)) {
             fmt::println("Woops! Compilation failed: \n{}", result->inspect());
             continue;
         }
 
-        auto vm = VM::New(compiler);
+        auto vm = VM::NewWithState(compiler, globals);
         if (auto result = vm->run(); IsError(result)) {
             fmt::println("Woops! Executing bytecode failed: \n{}", result->inspect());
             continue;
         }
 
         fmt::println("{}", vm->lastPoppedElement()->inspect());
+
+        constants = compiler->constants();
+        globals = vm->globals();
     }
 }
 

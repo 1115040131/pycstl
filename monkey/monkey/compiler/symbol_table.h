@@ -1,20 +1,20 @@
 #pragma once
 
 #include <memory>
-#include <string_view>
+#include <string>
 #include <unordered_map>
 
 namespace pyc {
 namespace monkey {
 
-using SymbolScope = std::string_view;
+using SymbolScope = std::string;
 
 namespace SymbolScopeType {
 inline constexpr SymbolScope kGlobal = "GLOBAL";
 }
 
 struct Symbol {
-    std::string_view name;
+    std::string name;
     SymbolScope scope;
     size_t index;
 
@@ -25,12 +25,12 @@ class SymbolTable {
 public:
     static std::shared_ptr<SymbolTable> New() { return std::make_shared<SymbolTable>(); }
 
-    std::shared_ptr<Symbol> Define(std::string_view name);
+    std::shared_ptr<Symbol> Define(const std::string& name);
 
-    std::shared_ptr<Symbol> Resolve(std::string_view name) const;
+    std::shared_ptr<Symbol> Resolve(const std::string& name) const;
 
-private:
-    std::unordered_map<std::string_view, std::shared_ptr<Symbol>> store_;
+// private:
+    std::unordered_map<std::string, std::shared_ptr<Symbol>> store_;
     size_t next_index_ = 0;
 };
 

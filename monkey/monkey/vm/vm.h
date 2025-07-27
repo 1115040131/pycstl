@@ -7,12 +7,24 @@ namespace monkey {
 
 class VM {
 public:
+    static constexpr size_t kStackSize = 2048;
+    static constexpr size_t kGlobalSize = 65536;
+
     static std::shared_ptr<VM> New(std::shared_ptr<Compiler> compiler) {
         return std::make_shared<VM>(compiler->instructions(), compiler->constants());
     }
 
+    static std::shared_ptr<VM> NewWithState(std::shared_ptr<Compiler> compiler,
+                                            const std::vector<std::shared_ptr<Object>>& globals) {
+        auto vm = New(compiler);
+        vm->globals_ = globals;
+        return vm;
+    }
+
     VM(const Instructions& instructions, const std::vector<std::shared_ptr<Object>>& constants)
         : instructions_(instructions), constants_(constants), globals_(kGlobalSize), stack_(kStackSize) {}
+
+    const std::vector<std::shared_ptr<Object>>& globals() const { return globals_; }
 
 public:
     std::shared_ptr<Object> top() const;
@@ -41,9 +53,6 @@ private:
     std::shared_ptr<Object> excuteMinusOperation();
 
 private:
-    static constexpr size_t kStackSize = 2048;
-    static constexpr size_t kGlobalSize = 65536;
-
     Instructions instructions_;
     std::vector<std::shared_ptr<Object>> constants_;  // 常量
     std::vector<std::shared_ptr<Object>> globals_;    // 全局变量

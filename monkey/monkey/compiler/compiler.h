@@ -16,6 +16,14 @@ class Compiler {
 public:
     static std::shared_ptr<Compiler> New() { return std::make_shared<Compiler>(); }
 
+    static std::shared_ptr<Compiler> NewWithState(const std::vector<std::shared_ptr<Object>>& constants,
+                                                  std::shared_ptr<SymbolTable> symbol_table) {
+        auto compiler = New();
+        compiler->constants_ = constants;
+        compiler->symbol_table_ = symbol_table;
+        return compiler;
+    }
+
     std::shared_ptr<Error> compile(std::shared_ptr<Node> node);
 
     const Instructions& instructions() const { return instructions_; }
