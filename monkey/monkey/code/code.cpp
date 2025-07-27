@@ -37,6 +37,9 @@ std::string_view toString(OpcodeType type) {
 
         TO_STRING_CASE(OpcodeType, OpJumpNotTruthy);
         TO_STRING_CASE(OpcodeType, OpJump);
+
+        TO_STRING_CASE(OpcodeType, OpGetGlobal);
+        TO_STRING_CASE(OpcodeType, OpSetGlobal);
     }
     return "Unknown OpcodeType";
 }
@@ -70,6 +73,9 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpJumpNotTruthy, {"OpJumpNotTruthy", {2}}},
     {OpcodeType::OpJump, {"OpJump", {2}}},
+
+    {OpcodeType::OpGetGlobal, {"OpGetGlobal", {2}}},
+    {OpcodeType::OpSetGlobal, {"OpSetGlobal", {2}}},
 };
 
 // 整数版本

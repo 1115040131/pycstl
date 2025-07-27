@@ -20,14 +20,15 @@ Instructions concateInstructions(const std::vector<Instructions>& instructions) 
     return concated;
 }
 
-#define TEST_INSTRUCTIONS(expected, actual, input)                                                               \
-    {                                                                                                            \
-        auto concated = concateInstructions(expected);                                                           \
-        ASSERT_EQ(concated.size(), actual.size());                                                               \
-        for (size_t i = 0; i < concated.size(); i++) {                                                           \
-            EXPECT_EQ(concated[i], actual[i])                                                                    \
-                << "Input: " << input << "\nconcated:\n" << toString(concated) << "actual:\n" << toString(actual); \
-        }                                                                                                        \
+#define TEST_INSTRUCTIONS(expected, actual, input)                                     \
+    {                                                                                  \
+        auto concated = concateInstructions(expected);                                 \
+        ASSERT_EQ(concated.size(), actual.size());                                     \
+        for (size_t i = 0; i < concated.size(); i++) {                                 \
+            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input << "\nconcated:\n" \
+                                              << toString(concated) << "actual:\n"     \
+                                              << toString(actual);                     \
+        }                                                                              \
     }
 
 #define TEST_CONSTANTS(expected, actual, input)                                    \
@@ -264,6 +265,39 @@ TEST(CompilerTest, IfExpressionTest) {
                 ByteCode::Make(OpcodeType::OpConstant, {2}),
                 // 0017
                 ByteCode::Make(OpcodeType::OpPop, {}),
+            },
+        },
+    };
+
+    for (const auto& test : tests) {
+        auto compiler = Compiler::New();
+        auto err = compiler->compile(processInput(test.input));
+        ASSERT_FALSE(err);
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
+        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
+    }
+}
+
+TEST(CompilerTest, CompileGlobalStatementsTest) {
+    CompilerTestCase tests[] = {
+        {
+            "let one = 1; let two = 2;",
+            {1, 2},
+            {
+                ByteCode::Make(OpcodeType::OpConstant, {0}),
+                ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
+                ByteCode::Make(OpcodeType::OpConstant, {1}),
+                ByteCode::Make(OpcodeType::OpSetGlobal, {1}),
+            },
+        },
+        {
+            "let one = 1; one;",
+            {1},
+            {
+                {ByteCode::Make(OpcodeType::OpConstant, {0})},
+                {ByteCode::Make(OpcodeType::OpSetGlobal, {0})},
+                {ByteCode::Make(OpcodeType::OpGetGlobal, {0})},
+                {ByteCode::Make(OpcodeType::OpPop, {})},
             },
         },
     };

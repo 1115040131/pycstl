@@ -1,6 +1,7 @@
 #pragma once
 
 #include "monkey/code/code.h"
+#include "monkey/compiler/symbol_table.h"
 #include "monkey/object/object.h"
 
 namespace pyc {
@@ -43,6 +44,8 @@ private:
 
     EmittedInstruction last_instruction_;
     EmittedInstruction prev_instruction_;
+
+    std::shared_ptr<SymbolTable> symbol_table_ = SymbolTable::New();
 };
 
 }  // namespace monkey

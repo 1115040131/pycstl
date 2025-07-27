@@ -15,6 +15,14 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 }
             }
         } break;
+        case Node::Type::LetStatement: {
+            auto let_statement = std::dynamic_pointer_cast<LetStatement>(node);
+            if (auto err = compile(let_statement->value()); IsError(err)) {
+                return err;
+            }
+            auto symbol = symbol_table_->Define(let_statement->name()->tokenLiteral());
+            emit(OpcodeType::OpSetGlobal, {symbol->index});
+        } break;
         case Node::Type::ExpressionStatement: {
             auto expression = std::dynamic_pointer_cast<ExpressionStatement>(node);
             if (auto err = compile(expression->expression()); IsError(err)) {
@@ -29,6 +37,15 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                     return err;
                 }
             }
+        } break;
+        case Node::Type::Identifier: {
+            auto identifier = std::dynamic_pointer_cast<Identifier>(node);
+            auto symbol = symbol_table_->Resolve(identifier->tokenLiteral());
+            if (!symbol) {
+                return std::make_shared<Error>(
+                    fmt::format("Undefined identifier: {}", identifier->tokenLiteral()));
+            }
+            emit(OpcodeType::OpGetGlobal, {symbol->index});
         } break;
         case Node::Type::Boolean: {
             auto boolean = std::dynamic_pointer_cast<Boolean>(node);
