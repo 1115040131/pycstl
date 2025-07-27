@@ -47,17 +47,22 @@ inline std::ostream& operator<<(std::ostream& os, const Token& token) {
 
 using Expected = std::variant<int, bool, std::string, void*>;
 
-#define TEST_EXPECTED_OBJECT(object, expected, input)                           \
-    {                                                                           \
-        if (std::holds_alternative<int>(expected)) {                            \
-            TEST_INTEGER_OBJECT(object, std::get<int>(expected), input);        \
-        } else if (std::holds_alternative<bool>(expected)) {                    \
-            TEST_BOOLEAN_OBJECT(object, std::get<bool>(expected), input);       \
-        } else if (std::holds_alternative<std::string>(expected)) {             \
-            TEST_STRING_OBJECT(object, std::get<std::string>(expected), input); \
-        } else {                                                                \
-            TEST_NULL_OBJECT(object, input);                                    \
-        }                                                                       \
+#define TEST_EXPECTED_OBJECT(object, expected, input)                            \
+    {                                                                            \
+        if (std::holds_alternative<int>(expected)) {                             \
+            TEST_INTEGER_OBJECT(object, std::get<int>(expected), input);         \
+        } else if (std::holds_alternative<bool>(expected)) {                     \
+            TEST_BOOLEAN_OBJECT(object, std::get<bool>(expected), input);        \
+        } else if (std::holds_alternative<std::string>(expected)) {              \
+            auto expected_str = std::get<std::string>(expected);                 \
+            if (auto array = std::dynamic_pointer_cast<Array>(object)) {         \
+                EXPECT_EQ(array->inspect(), expected_str) << "Input: " << input; \
+            } else {                                                             \
+                TEST_STRING_OBJECT(object, expected_str, input);                 \
+            }                                                                    \
+        } else {                                                                 \
+            TEST_NULL_OBJECT(object, input);                                     \
+        }                                                                        \
     }
 
 inline std::unique_ptr<Node> processInput(std::string_view input) {

@@ -39,6 +39,15 @@ Instructions concateInstructions(const std::vector<Instructions>& instructions) 
         }                                                        \
     }
 
+#define RUN_COMPILER_TESTS(tests)                                                            \
+    for (const auto& test : tests) {                                                         \
+        auto compiler = Compiler::New();                                                     \
+        auto err = compiler->compile(processInput(test.input));                              \
+        ASSERT_FALSE(err) << "Input: " << test.input;                                        \
+        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input); \
+        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);          \
+    }
+
 TEST(CompilerTest, IntegerArithmeticTest) {
     CompilerTestCase tests[] = {
         {
@@ -112,13 +121,7 @@ TEST(CompilerTest, IntegerArithmeticTest) {
         },
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
-        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
-    }
+    RUN_COMPILER_TESTS(tests);
 }
 
 TEST(CompilerTest, BooleanExpressionTest) {
@@ -210,13 +213,7 @@ TEST(CompilerTest, BooleanExpressionTest) {
         },
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
-        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
-    }
+    RUN_COMPILER_TESTS(tests);
 }
 
 TEST(CompilerTest, StringTest) {
@@ -231,7 +228,7 @@ TEST(CompilerTest, StringTest) {
         },
         {
             R"("mon" + "key")",
-            {"mon","key"},
+            {"mon", "key"},
             {
                 ByteCode::Make(OpcodeType::OpConstant, {0}),
                 ByteCode::Make(OpcodeType::OpConstant, {1}),
@@ -241,13 +238,50 @@ TEST(CompilerTest, StringTest) {
         },
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
-        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
-    }
+    RUN_COMPILER_TESTS(tests);
+}
+
+TEST(CompilerTest, ArrayLiteralTest) {
+    CompilerTestCase tests[] = {
+        {
+            "[]",
+            {},
+            {
+                {ByteCode::Make(OpcodeType::OpArray, {0})},
+                {ByteCode::Make(OpcodeType::OpPop, {})},
+            },
+        },
+        {
+            "[1, 2, 3]",
+            {1, 2, 3},
+            {
+                {ByteCode::Make(OpcodeType::OpConstant, {0})},
+                {ByteCode::Make(OpcodeType::OpConstant, {1})},
+                {ByteCode::Make(OpcodeType::OpConstant, {2})},
+                {ByteCode::Make(OpcodeType::OpArray, {3})},
+                {ByteCode::Make(OpcodeType::OpPop, {})},
+            },
+        },
+        {
+            "[1+2, 3-4, 5*6]",
+            {1, 2, 3, 4, 5, 6},
+            {
+                {ByteCode::Make(OpcodeType::OpConstant, {0})},
+                {ByteCode::Make(OpcodeType::OpConstant, {1})},
+                {ByteCode::Make(OpcodeType::OpAdd, {})},
+                {ByteCode::Make(OpcodeType::OpConstant, {2})},
+                {ByteCode::Make(OpcodeType::OpConstant, {3})},
+                {ByteCode::Make(OpcodeType::OpSub, {})},
+                {ByteCode::Make(OpcodeType::OpConstant, {4})},
+                {ByteCode::Make(OpcodeType::OpConstant, {5})},
+                {ByteCode::Make(OpcodeType::OpMul, {})},
+                {ByteCode::Make(OpcodeType::OpArray, {3})},
+                {ByteCode::Make(OpcodeType::OpPop, {})},
+            },
+        },
+    };
+
+    RUN_COMPILER_TESTS(tests);
 }
 
 TEST(CompilerTest, IfExpressionTest) {
@@ -298,13 +332,7 @@ TEST(CompilerTest, IfExpressionTest) {
         },
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
-        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
-    }
+    RUN_COMPILER_TESTS(tests);
 }
 
 TEST(CompilerTest, CompileGlobalStatementsTest) {
@@ -331,13 +359,7 @@ TEST(CompilerTest, CompileGlobalStatementsTest) {
         },
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
-        TEST_INSTRUCTIONS(test.expected_instructions, compiler->instructions(), test.input);
-        TEST_CONSTANTS(test.expected_constants, compiler->constants(), test.input);
-    }
+    RUN_COMPILER_TESTS(tests);
 }
 
 }  // namespace monkey

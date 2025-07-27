@@ -11,6 +11,17 @@ struct VMTestCase {
     Expected expected;
 };
 
+#define RUN_VM_TESTS(tests)                                                                  \
+    for (const auto& test : tests) {                                                         \
+        auto compiler = Compiler::New();                                                     \
+        auto err = compiler->compile(processInput(test.input));                              \
+        ASSERT_FALSE(err) << "Input: " << test.input;                                        \
+        auto vm = VM::New(compiler);                                                         \
+        auto result = vm->run();                                                             \
+        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect(); \
+        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);            \
+    }
+
 TEST(VMTest, IntegerArithmeticTest) {
     VMTestCase tests[] = {
         {"1", 1},
@@ -32,17 +43,7 @@ TEST(VMTest, IntegerArithmeticTest) {
         {"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err) << "Input: " << test.input;
-
-        auto vm = VM::New(compiler);
-        auto result = vm->run();
-        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect();
-
-        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
-    }
+    RUN_VM_TESTS(tests);
 }
 
 TEST(VMTest, BooleanExpressionTest) {
@@ -74,17 +75,7 @@ TEST(VMTest, BooleanExpressionTest) {
         {"!!5", true},
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
-
-        auto vm = VM::New(compiler);
-        auto result = vm->run();
-        ASSERT_FALSE(result);
-
-        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
-    }
+    RUN_VM_TESTS(tests);
 }
 
 TEST(VMTest, StringExpressionTest) {
@@ -94,17 +85,17 @@ TEST(VMTest, StringExpressionTest) {
         {"\"mon\" + \"key\" + \"banana\";", "monkeybanana"},
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err);
+    RUN_VM_TESTS(tests);
+}
 
-        auto vm = VM::New(compiler);
-        auto result = vm->run();
-        ASSERT_FALSE(result);
+TEST(VMTest, ArrayLiteralTest) {
+    VMTestCase tests[] = {
+        {"[]", "[]"},
+        {"[1, 2, 3]", "[1, 2, 3]"},
+        {"[1+2, 3*4, 5+6]", "[3, 12, 11]"},
+    };
 
-        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
-    }
+    RUN_VM_TESTS(tests);
 }
 
 TEST(VMTest, ConditionTest) {
@@ -121,17 +112,7 @@ TEST(VMTest, ConditionTest) {
         {"if((if (false) { 10 })){ 10 } else { 20 }", 20},
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err) << "Input: " << test.input;
-
-        auto vm = VM::New(compiler);
-        auto result = vm->run();
-        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect();
-
-        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
-    }
+    RUN_VM_TESTS(tests);
 }
 
 TEST(VMTest, GlobalLetStatementTest) {
@@ -141,17 +122,7 @@ TEST(VMTest, GlobalLetStatementTest) {
         {"let one = 1; let two = one + one; one + two;", 3},
     };
 
-    for (const auto& test : tests) {
-        auto compiler = Compiler::New();
-        auto err = compiler->compile(processInput(test.input));
-        ASSERT_FALSE(err) << "Input: " << test.input;
-
-        auto vm = VM::New(compiler);
-        auto result = vm->run();
-        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect();
-
-        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);
-    }
+    RUN_VM_TESTS(tests);
 }
 
 }  // namespace monkey

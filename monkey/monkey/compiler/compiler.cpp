@@ -67,6 +67,15 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             auto pos = addConstant(str);
             emit(OpcodeType::OpConstant, {pos});
         } break;
+        case Node::Type::ArrayLiteral: {
+            auto array_literal = std::dynamic_pointer_cast<ArrayLiteral>(node);
+            for (const auto& element : array_literal->elements()) {
+                if (auto err = compile(element); IsError(err)) {
+                    return err;
+                }
+            }
+            emit(OpcodeType::OpArray, {array_literal->elements().size()});
+        } break;
         case Node::Type::PrefixExpression: {
             auto prefix = std::dynamic_pointer_cast<PrefixExpression>(node);
             if (auto err = compile(prefix->right()); IsError(err)) {

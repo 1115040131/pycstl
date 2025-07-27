@@ -1,5 +1,7 @@
 #include "monkey/vm/vm.h"
 
+#include <algorithm>
+
 #include "monkey/evaluator/evaluator.h"
 
 namespace pyc {
@@ -136,6 +138,14 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpArray: {
+                auto array = buildArray(operands[0]);
+                auto result = push(array);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }
@@ -244,6 +254,19 @@ std::shared_ptr<Object> VM::excuteMinusOperation() {
     }
     auto integer = std::dynamic_pointer_cast<Integer>(operand);
     return push(std::make_shared<Integer>(-integer->value()));
+}
+
+std::shared_ptr<Object> VM::buildArray(size_t size) {
+    if (sp_ < size) {
+        return std::make_shared<Error>("Stack underflow for array creation");
+    }
+    std::vector<std::shared_ptr<Object>> elements;
+    elements.reserve(size);
+    for (size_t i = 0; i < size; i++) {
+        elements.push_back(pop());
+    }
+    std::ranges::reverse(elements);
+    return std::make_shared<Array>(std::move(elements));
 }
 
 }  // namespace monkey

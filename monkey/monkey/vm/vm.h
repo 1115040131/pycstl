@@ -55,6 +55,8 @@ private:
 
     std::shared_ptr<Object> excuteMinusOperation();
 
+    std::shared_ptr<Object> buildArray(size_t size);
+
 private:
     Instructions instructions_;
     std::vector<std::shared_ptr<Object>> constants_;  // 常量

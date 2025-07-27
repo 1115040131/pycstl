@@ -39,6 +39,8 @@ enum class OpcodeType : Opcode {
 
     OpGetGlobal,
     OpSetGlobal,
+
+    OpArray,
 };
 
 std::string_view toString(OpcodeType type);
