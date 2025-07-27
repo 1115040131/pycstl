@@ -160,6 +160,13 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpIndex: {
+                auto result = executeIndexExpression();
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }
@@ -268,6 +275,27 @@ std::shared_ptr<Object> VM::excuteMinusOperation() {
     }
     auto integer = std::dynamic_pointer_cast<Integer>(operand);
     return push(std::make_shared<Integer>(-integer->value()));
+}
+
+std::shared_ptr<Object> VM::executeIndexExpression() {
+    auto index = pop();
+    auto left = pop();
+    if (left->type() == Object::Type::ARRAY && index->type() == Object::Type::INTEGER) {
+        auto result =
+            EvalArrayIndex(std::dynamic_pointer_cast<Array>(left), std::dynamic_pointer_cast<Integer>(index));
+        if (IsError(result)) {
+            return result;
+        }
+        return push(result);
+    } else if (left->type() == Object::Type::HASH) {
+        auto result = EvalHashIndex(std::dynamic_pointer_cast<Hash>(left), index);
+        if (IsError(result)) {
+            return result;
+        }
+        return push(result);
+    }
+    return std::make_shared<Error>(
+        fmt::format("index operator not supported: {}[{}]", left->typeStr(), index->typeStr()));
 }
 
 std::shared_ptr<Object> VM::buildArray(size_t size) {

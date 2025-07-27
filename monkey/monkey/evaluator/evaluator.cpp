@@ -315,8 +315,7 @@ std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object
 
 std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index) {
     if (index->value() < 0 || index->value() >= static_cast<long long>(array->elements().size())) {
-        return std::make_shared<Error>(
-            fmt::format("index {} out of bounds: {}", index->value(), array->elements().size()));
+        return kNullObj;
     }
     return array->elements()[index->value()];
 }

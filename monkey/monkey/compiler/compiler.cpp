@@ -110,6 +110,16 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
 #endif
             emit(OpcodeType::OpHash, {hash_literal->pairs().size()});
         } break;
+        case Node::Type::IndexExpression: {
+            auto index_expression = std::dynamic_pointer_cast<IndexExpression>(node);
+            if (auto err = compile(index_expression->left()); IsError(err)) {
+                return err;
+            }
+            if (auto err = compile(index_expression->index()); IsError(err)) {
+                return err;
+            }
+            emit(OpcodeType::OpIndex, {});
+        } break;
         case Node::Type::PrefixExpression: {
             auto prefix = std::dynamic_pointer_cast<PrefixExpression>(node);
             if (auto err = compile(prefix->right()); IsError(err)) {

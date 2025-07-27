@@ -108,6 +108,16 @@ TEST(VMTest, HashLiteralTest) {
     RUN_VM_TESTS(tests);
 }
 
+TEST(VMTest, IndexExpressionTest) {
+    VMTestCase tests[] = {
+        {"[1,2,3][1]", 2},        {"[1,2,3][0 + 2]", 3}, {"[[1,1,1]][0][0]", 1}, {"[][0]", nullptr},
+        {"[1,2,3][99]", nullptr}, {"[1][-1]", nullptr},  {"{1: 1, 2:2}[1]", 1},  {"{1: 1, 2:2}[2]", 2},
+        {"{1: 1}[0]", nullptr},   {"{}[0]", nullptr},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
 TEST(VMTest, ConditionTest) {
     VMTestCase tests[] = {
         {"if(true) { 10 }", 10},

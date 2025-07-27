@@ -42,6 +42,7 @@ enum class OpcodeType : Opcode {
 
     OpArray,
     OpHash,
+    OpIndex,
 };
 
 std::string_view toString(OpcodeType type);

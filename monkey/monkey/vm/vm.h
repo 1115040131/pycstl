@@ -55,6 +55,8 @@ private:
 
     std::shared_ptr<Object> excuteMinusOperation();
 
+    std::shared_ptr<Object> executeIndexExpression();
+
     std::shared_ptr<Object> buildArray(size_t size);
 
     std::shared_ptr<Object> buildHash(size_t size);

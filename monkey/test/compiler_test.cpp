@@ -281,6 +281,38 @@ TEST(CompilerTest, HashLiteralTest) {
     RUN_COMPILER_TESTS(tests);
 }
 
+TEST(CompilerTest, IndexExpressionTest) {
+    CompilerTestCase tests[] = {
+        {"[1, 2, 3][1 + 1]",
+         {1, 2, 3, 1, 1},
+         {
+             {ByteCode::Make(OpcodeType::OpConstant, {0})},
+             {ByteCode::Make(OpcodeType::OpConstant, {1})},
+             {ByteCode::Make(OpcodeType::OpConstant, {2})},
+             {ByteCode::Make(OpcodeType::OpArray, {3})},
+             {ByteCode::Make(OpcodeType::OpConstant, {3})},
+             {ByteCode::Make(OpcodeType::OpConstant, {4})},
+             {ByteCode::Make(OpcodeType::OpAdd, {})},
+             {ByteCode::Make(OpcodeType::OpIndex, {})},
+             {ByteCode::Make(OpcodeType::OpPop, {})},
+         }},
+        {"{1: 2}[2 - 1]",
+         {1, 2, 2, 1},
+         {
+             {ByteCode::Make(OpcodeType::OpConstant, {0})},
+             {ByteCode::Make(OpcodeType::OpConstant, {1})},
+             {ByteCode::Make(OpcodeType::OpHash, {1})},
+             {ByteCode::Make(OpcodeType::OpConstant, {2})},
+             {ByteCode::Make(OpcodeType::OpConstant, {3})},
+             {ByteCode::Make(OpcodeType::OpSub, {})},
+             {ByteCode::Make(OpcodeType::OpIndex, {})},
+             {ByteCode::Make(OpcodeType::OpPop, {})},
+         }},
+    };
+
+    RUN_COMPILER_TESTS(tests);
+}
+
 TEST(CompilerTest, IfExpressionTest) {
     CompilerTestCase tests[] = {
         {"if( true ){ 10 }; 3333;",

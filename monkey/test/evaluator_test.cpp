@@ -136,7 +136,7 @@ TEST(EvaluatorTest, EvalArrayLiteral) {
 TEST(EvaluatorTest, EvalArrayIndex) {
     struct Input {
         std::string input;
-        std::variant<int, std::string> expected;
+        std::variant<int, std::string, void*> expected;
     };
     Input inputs[] = {
         {"[1, 2, 3][0]", 1},
@@ -147,18 +147,20 @@ TEST(EvaluatorTest, EvalArrayIndex) {
         {"let myArray = [1, 2, 3]; myArray[2];", 3},
         {"let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", 6},
         {"let myArray = [1, 2, 3]; let i = myArray[0]; myArray[i]", 2},
-        {"[1, 2, 3][3]", "index 3 out of bounds: 3"},
-        {"[1, 2, 3][-1]", "index -1 out of bounds: 3"},
+        {"[1, 2, 3][3]", nullptr},
+        {"[1, 2, 3][-1]", nullptr},
     };
     for (const auto& input : inputs) {
         auto evaluated = EvalInput(input.input);
         ASSERT_TRUE(evaluated != nullptr) << "Input: " << input.input;
         if (std::holds_alternative<int>(input.expected)) {
             TEST_INTEGER_OBJECT(evaluated, std::get<int>(input.expected), input.input);
-        } else {
+        } else if (std::holds_alternative<std::string>(input.expected)) {
             auto error = std::dynamic_pointer_cast<Error>(evaluated);
             ASSERT_TRUE(error != nullptr) << "Input: " << input.input;
             EXPECT_EQ(error->inspect(), std::get<std::string>(input.expected)) << "Input: " << input.input;
+        } else {
+            TEST_NULL_OBJECT(evaluated, input.input);
         }
     }
 }

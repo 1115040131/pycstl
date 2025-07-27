@@ -43,6 +43,7 @@ std::string_view toString(OpcodeType type) {
 
         TO_STRING_CASE(OpcodeType, OpArray);
         TO_STRING_CASE(OpcodeType, OpHash);
+        TO_STRING_CASE(OpcodeType, OpIndex);
     }
     return "Unknown OpcodeType";
 }
@@ -82,6 +83,7 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpArray, {"OpArray", {2}}},
     {OpcodeType::OpHash, {"OpHash", {2}}},
+    {OpcodeType::OpIndex, {"OpIndex", {}}},
 };
 
 // 整数版本
