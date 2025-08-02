@@ -40,6 +40,9 @@ enum class OpcodeType : Opcode {
     OpGetGlobal,
     OpSetGlobal,
 
+    OpGetLocal,
+    OpSetLocal,
+
     OpArray,
     OpHash,
     OpIndex,

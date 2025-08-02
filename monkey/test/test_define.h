@@ -4,7 +4,6 @@
 #include <variant>
 
 #include "monkey/code/code.h"
-#include "monkey/object/object.h"
 #include "monkey/parser/parser.h"
 #include "monkey/token/token.h"
 
