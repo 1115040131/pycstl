@@ -191,7 +191,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
 
             auto jump_pos = emit(OpcodeType::OpJump, {9999});
 
-            auto after_consequence_pos = instructions_.size();
+            auto after_consequence_pos = currentInstructions().size();
             changeOperand(jump_not_true_pos, after_consequence_pos);
 
             if (!if_expression->alternative()) {
@@ -206,7 +206,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 }
             }
 
-            auto after_alternative_pos = instructions_.size();
+            auto after_alternative_pos = currentInstructions().size();
             changeOperand(jump_pos, after_alternative_pos);
         } break;
         default:
@@ -228,36 +228,54 @@ size_t Compiler::emit(OpcodeType op, const std::vector<size_t>& operands) {
 }
 
 size_t Compiler::addInstruction(const Instructions& instructions) {
-    auto pos = instructions_.size();
-    instructions_.insert(instructions_.end(), instructions.begin(), instructions.end());
+    auto pos = currentInstructions().size();
+    currentInstructions().insert(currentInstructions().end(), instructions.begin(), instructions.end());
     return pos;
 }
 
 void Compiler::setLastInstruction(OpcodeType op, size_t position) {
-    prev_instruction_ = last_instruction_;
-    last_instruction_ = {op, position};
+    currentScope().prev_instruction_ = currentScope().last_instruction_;
+    currentScope().last_instruction_ = {op, position};
 }
 
-bool Compiler::isLastInstructionPop() const { return last_instruction_.opcode == OpcodeType::OpPop; }
+bool Compiler::isLastInstrction(OpcodeType op) const { return scope().last_instruction_.opcode == op; }
+
+bool Compiler::isLastInstructionPop() const { return isLastInstrction(OpcodeType::OpPop); }
 
 void Compiler::removeLastPop() {
-    instructions_.resize(last_instruction_.position);
-    last_instruction_ = prev_instruction_;
+    currentInstructions().resize(currentScope().last_instruction_.position);
+    currentScope().last_instruction_ = currentScope().prev_instruction_;
 }
 
 void Compiler::replaceInstruction(size_t position, const Instructions& new_instructions) {
-    if (position + new_instructions.size() > instructions_.size()) {
+    if (position + new_instructions.size() > currentInstructions().size()) {
         fmt::println("Cannot replace instruction at position {} with size {}, current instructions size: {}",
-                     position, new_instructions.size(), instructions_.size());
+                     position, new_instructions.size(), currentInstructions().size());
         return;
     }
-    std::copy(new_instructions.begin(), new_instructions.end(), instructions_.begin() + position);
-    setLastInstruction(static_cast<OpcodeType>(instructions_[position]), position);
+    std::copy(new_instructions.begin(), new_instructions.end(), currentInstructions().begin() + position);
+    setLastInstruction(static_cast<OpcodeType>(currentInstructions()[position]), position);
 }
 
 void Compiler::changeOperand(size_t position, size_t operand) {
-    auto new_instruction = ByteCode::Make(static_cast<OpcodeType>(instructions_[position]), {operand});
+    auto new_instruction = ByteCode::Make(static_cast<OpcodeType>(currentInstructions()[position]), {operand});
     replaceInstruction(position, new_instruction);
+}
+
+void Compiler::enterScope() {
+    scopes_.emplace_back();
+    scope_index_++;
+}
+
+Instructions Compiler::leaveScope() {
+    if (scope_index_ == 0) {
+        fmt::println("Cannot leave global scope");
+        return {};
+    }
+    auto instructions = currentInstructions();
+    scopes_.pop_back();
+    scope_index_--;
+    return instructions;
 }
 
 }  // namespace monkey

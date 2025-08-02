@@ -12,6 +12,12 @@ struct EmittedInstruction {
     size_t position;
 };
 
+struct CompilationScope {
+    Instructions instructions_;
+    EmittedInstruction last_instruction_;
+    EmittedInstruction prev_instruction_;
+};
+
 class Compiler {
 public:
     static std::shared_ptr<Compiler> New() { return std::make_shared<Compiler>(); }
@@ -26,8 +32,10 @@ public:
 
     std::shared_ptr<Error> compile(std::shared_ptr<Node> node);
 
-    const Instructions& instructions() const { return instructions_; }
     const std::vector<std::shared_ptr<Object>>& constants() const { return constants_; }
+
+    const CompilationScope& scope() const { return scopes_[scope_index_]; }
+    const Instructions& instructions() const { return scope().instructions_; }
 
 private:
     size_t addConstant(std::shared_ptr<Object> object);
@@ -38,6 +46,8 @@ private:
 
     void setLastInstruction(OpcodeType op, size_t position);
 
+    bool isLastInstrction(OpcodeType op) const;
+
     bool isLastInstructionPop() const;
 
     void removeLastPop();
@@ -46,14 +56,18 @@ private:
 
     void changeOperand(size_t position, size_t operand);
 
+    CompilationScope& currentScope() { return scopes_[scope_index_]; }
+    Instructions& currentInstructions() { return currentScope().instructions_; }
+
+    void enterScope();
+    Instructions leaveScope();
+
 private:
-    Instructions instructions_;
     std::vector<std::shared_ptr<Object>> constants_;
-
-    EmittedInstruction last_instruction_;
-    EmittedInstruction prev_instruction_;
-
     std::shared_ptr<SymbolTable> symbol_table_ = SymbolTable::New();
+
+    std::vector<CompilationScope> scopes_ = std::vector<CompilationScope>(1);
+    size_t scope_index_{};
 };
 
 }  // namespace monkey
