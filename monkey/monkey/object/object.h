@@ -4,6 +4,7 @@
 #include <string>
 
 #include "monkey/ast/ast.h"
+#include "monkey/code/code.h"
 #include "monkey/macro.h"
 
 namespace pyc {
@@ -13,7 +14,19 @@ struct HashKey;
 
 class Object {
 public:
-    enum class Type { Null, ERROR, INTEGER, BOOLEAN, STRING, RETURN_VALUE, FUNCTION, ARRAY, HASH, BUILTIN };
+    enum class Type {
+        Null,
+        ERROR,
+        INTEGER,
+        BOOLEAN,
+        STRING,
+        RETURN_VALUE,
+        FUNCTION,
+        ARRAY,
+        HASH,
+        BUILTIN,
+        COMPILED_FUNCTION,
+    };
 
     virtual ~Object() = default;
     virtual Type type() const { return Type::Null; }
@@ -206,6 +219,22 @@ public:
 
 private:
     BuiltinFunction function_;
+};
+
+class CompiledFunction : public Object {
+public:
+    TYPE(COMPILED_FUNCTION)
+
+    CompiledFunction(Instructions instructions) : instructions_(std::move(instructions)) {}
+
+    virtual ~CompiledFunction() override = default;
+
+    virtual std::string inspect() const override { return fmt::format("{}", reinterpret_cast<uintptr_t>(this)); }
+
+    const Instructions& instructions() const { return instructions_; }
+
+private:
+    Instructions instructions_;
 };
 
 inline auto kNullObj = std::make_shared<Null>();

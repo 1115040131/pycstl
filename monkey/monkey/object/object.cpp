@@ -30,10 +30,11 @@ std::string_view toString(Object::Type type) {
         TO_STRING_CASE(Object::Type, RETURN_VALUE);
         TO_STRING_CASE(Object::Type, FUNCTION);
         TO_STRING_CASE(Object::Type, ARRAY);
+        TO_STRING_CASE(Object::Type, HASH);
         TO_STRING_CASE(Object::Type, BUILTIN);
-        default:
-            return "UNKNOWN";
+        TO_STRING_CASE(Object::Type, COMPILED_FUNCTION);
     }
+    return "Unknown Object Type";
 }
 
 std::string Function::inspect() const {
