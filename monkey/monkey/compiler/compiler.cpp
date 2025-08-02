@@ -316,8 +316,7 @@ void Compiler::enterScope() {
 
 Instructions Compiler::leaveScope() {
     if (scope_index_ == 0) {
-        fmt::println("Cannot leave global scope");
-        return {};
+        throw std::runtime_error("Cannot leave global scope");
     }
     auto instructions = currentInstructions();
     scopes_.pop_back();

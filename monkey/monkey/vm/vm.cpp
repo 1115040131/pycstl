@@ -37,10 +37,14 @@ std::shared_ptr<Object> VM::pop() {
 }
 
 std::shared_ptr<Object> VM::run() {
-    size_t ip = 0;
-    while (ip < instructions_.size()) {
-        auto op = static_cast<OpcodeType>(instructions_[ip]);
-        auto [operands, next_offset] = ByteCode::ReadOperands(instructions_, ip);
+    auto frame = currentFrame();
+    auto instructions_ = frame->instructions();
+
+    while (frame->ip < instructions_.size()) {
+        auto op = static_cast<OpcodeType>(instructions_[frame->ip]);
+        auto [operands, next_offset] = ByteCode::ReadOperands(instructions_, frame->ip);
+
+        frame->ip = next_offset;
 
         switch (op) {
             case OpcodeType::OpConstant: {
@@ -107,12 +111,12 @@ std::shared_ptr<Object> VM::run() {
             } break;
 
             case OpcodeType::OpJump:
-                next_offset = operands[0];
+                frame->ip = operands[0];
                 break;
 
             case OpcodeType::OpJumpNotTruthy:
                 if (!IsTruthy(pop())) {
-                    next_offset = operands[0];
+                    frame->ip = operands[0];
                 }
                 break;
 
@@ -167,11 +171,50 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpCall: {
+                auto function_obj = top();
+                if (function_obj->type() != Object::Type::COMPILED_FUNCTION) {
+                    return std::make_shared<Error>(
+                        fmt::format("calling non-function: {}", function_obj->typeStr()));
+                }
+
+                pushFrame(Frame::New(std::dynamic_pointer_cast<CompiledFunction>(function_obj)));
+
+                frame = currentFrame();
+                instructions_ = frame->instructions();
+            } break;
+            case OpcodeType::OpReturnValue: {
+                auto return_value = pop();
+
+                popFrame();
+
+                frame = currentFrame();
+                instructions_ = frame->instructions();
+
+                pop();  // 函数本体出栈
+
+                auto result = push(return_value);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+            case OpcodeType::OpReturn: {
+                popFrame();
+
+                frame = currentFrame();
+                instructions_ = frame->instructions();
+
+                pop();  // 函数本体出栈
+
+                auto result = push(kNullObj);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }
-
-        ip = next_offset;
     }
 
     return nullptr;
@@ -325,6 +368,23 @@ std::shared_ptr<Object> VM::buildHash(size_t size) {
         hash->pairs()[key->getHashKey()] = {key, value};
     }
     return hash;
+}
+
+void VM::pushFrame(std::shared_ptr<Frame> frame) {
+    if (frame_index_ >= kFrameSize) {
+        throw std::runtime_error("Frame overflow");
+    }
+    frame_index_++;
+    frames_[frame_index_] = frame;
+}
+
+std::shared_ptr<Frame> VM::popFrame() {
+    if (frame_index_ == 0) {
+        throw std::runtime_error("No frames to pop");
+    }
+    auto frame = frames_[frame_index_];
+    frame_index_--;
+    return frame;
 }
 
 }  // namespace monkey
