@@ -51,6 +51,7 @@ private:
     bool isLastInstructionPop() const;
 
     void removeLastPop();
+    void removeLastPopWithReturn();
 
     void replaceInstruction(size_t position, const Instructions& new_instructions);
 

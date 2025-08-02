@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 
+#define private public
 #include "monkey/compiler/compiler.h"
+#undef private
+
 #include "monkey/test/test_define.h"
 
 namespace pyc {
@@ -11,14 +14,6 @@ struct CompilerTestCase {
     std::vector<Expected> expected_constants;
     std::vector<Instructions> expected_instructions;
 };
-
-Instructions concateInstructions(const std::vector<Instructions>& instructions) {
-    Instructions concated;
-    for (const auto& instruction : instructions) {
-        concated.insert(concated.end(), instruction.begin(), instruction.end());
-    }
-    return concated;
-}
 
 #define TEST_INSTRUCTIONS(expected, actual, input)                                     \
     {                                                                                  \
@@ -381,6 +376,134 @@ TEST(CompilerTest, CompileGlobalStatementsTest) {
     };
 
     RUN_COMPILER_TESTS(tests);
+}
+
+TEST(CompilerTest, CompileFunctionTest) {
+    CompilerTestCase tests[] = {
+        {"fn(){ return 5 + 10}",
+         {
+             5,
+             10,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpConstant, {1}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {"fn(){ 5 + 10}",
+         {
+             5,
+             10,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpConstant, {1}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {"fn(){ 1; 2}",
+         {
+             1,
+             2,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpPop, {}),
+                 ByteCode::Make(OpcodeType::OpConstant, {1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {"fn(){}",
+         {
+             std::vector<Instructions>{
+                 {ByteCode::Make(OpcodeType::OpReturn, {})},
+             },
+         },
+         {
+             {ByteCode::Make(OpcodeType::OpConstant, {0})},
+             {ByteCode::Make(OpcodeType::OpPop, {})},
+         }},
+        {"fn(){ 24 }()",
+         {
+             24,
+             std::vector<Instructions>{
+                 {ByteCode::Make(OpcodeType::OpConstant, {0})},
+                 {ByteCode::Make(OpcodeType::OpReturnValue, {})},
+             },
+         },
+         {
+             {ByteCode::Make(OpcodeType::OpConstant, {1})},
+             {ByteCode::Make(OpcodeType::OpCall, {})},
+             {ByteCode::Make(OpcodeType::OpPop, {})},
+         }},
+        {"let noArg = fn(){ 24 }; noArg();",
+         {
+             24,
+             std::vector<Instructions>{
+                 {ByteCode::Make(OpcodeType::OpConstant, {0})},
+                 {ByteCode::Make(OpcodeType::OpReturnValue, {})},
+             },
+         },
+         {
+             {ByteCode::Make(OpcodeType::OpConstant, {1})},
+             {ByteCode::Make(OpcodeType::OpSetGlobal, {0})},
+             {ByteCode::Make(OpcodeType::OpGetGlobal, {0})},
+             {ByteCode::Make(OpcodeType::OpCall, {})},
+             {ByteCode::Make(OpcodeType::OpPop, {})},
+         }},
+    };
+
+    RUN_COMPILER_TESTS(tests);
+}
+
+TEST(CompilerTest, CompileScopeTest) {
+    auto compiler = Compiler::New();
+
+    EXPECT_EQ(compiler->scope_index_, 0);
+    TEST_INSTRUCTIONS({}, compiler->instructions(), "");
+
+    compiler->emit(OpcodeType::OpMul, {});
+
+    EXPECT_EQ(compiler->scope_index_, 0);
+    TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpMul, {})}, compiler->instructions(), "");
+
+    compiler->enterScope();
+
+    EXPECT_EQ(compiler->scope_index_, 1);
+    TEST_INSTRUCTIONS({}, compiler->instructions(), "");
+
+    compiler->emit(OpcodeType::OpSub, {});
+
+    EXPECT_EQ(compiler->scope_index_, 1);
+    TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpSub, {})}, compiler->instructions(), "");
+
+    compiler->leaveScope();
+
+    EXPECT_EQ(compiler->scope_index_, 0);
+    TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpMul, {})}, compiler->instructions(), "");
+
+    compiler->emit(OpcodeType::OpAdd, {});
+
+    EXPECT_EQ(compiler->scope_index_, 0);
+    {
+        auto expected_instructions = {ByteCode::Make(OpcodeType::OpMul, {}),
+                                      ByteCode::Make(OpcodeType::OpAdd, {})};
+        TEST_INSTRUCTIONS(expected_instructions, compiler->instructions(), "");
+    }
+    EXPECT_EQ(compiler->scope().last_instruction_.opcode, OpcodeType::OpAdd);
+    EXPECT_EQ(compiler->scope().prev_instruction_.opcode, OpcodeType::OpMul);
 }
 
 }  // namespace monkey

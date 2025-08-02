@@ -209,6 +209,49 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             auto after_alternative_pos = currentInstructions().size();
             changeOperand(jump_pos, after_alternative_pos);
         } break;
+        case Node::Type::FunctionLiteral: {
+            auto function_literal = std::dynamic_pointer_cast<FunctionLiteral>(node);
+
+            // 在新编译作用域编译函数
+            enterScope();
+
+            if (auto err = compile(function_literal->body()); IsError(err)) {
+                return err;
+            }
+
+            // 隐式返回
+            if (isLastInstructionPop()) {
+                removeLastPopWithReturn();
+            }
+
+            // 无返回则强制返回null
+            if (!isLastInstrction(OpcodeType::OpReturnValue)) {
+                emit(OpcodeType::OpReturn, {});
+            }
+
+            // 回到上一层作用域并获取编译字节码
+            auto instructions = leaveScope();
+            auto pos = addConstant(std::make_shared<CompiledFunction>(instructions));
+            emit(OpcodeType::OpConstant, {pos});
+        } break;
+        case Node::Type::ReturnStatement: {
+            auto return_statement = std::dynamic_pointer_cast<ReturnStatement>(node);
+
+            if (auto err = compile(return_statement->value()); IsError(err)) {
+                return err;
+            }
+
+            emit(OpcodeType::OpReturnValue, {});
+        } break;
+        case Node::Type::CallExpression: {
+            auto call_expression = std::dynamic_pointer_cast<CallExpression>(node);
+
+            if (auto err = compile(call_expression->function()); IsError(err)) {
+                return err;
+            }
+
+            emit(OpcodeType::OpCall, {});
+        } break;
         default:
             break;
     }
@@ -245,6 +288,10 @@ bool Compiler::isLastInstructionPop() const { return isLastInstrction(OpcodeType
 void Compiler::removeLastPop() {
     currentInstructions().resize(currentScope().last_instruction_.position);
     currentScope().last_instruction_ = currentScope().prev_instruction_;
+}
+
+void Compiler::removeLastPopWithReturn() {
+    replaceInstruction(currentScope().last_instruction_.position, ByteCode::Make(OpcodeType::OpReturnValue, {}));
 }
 
 void Compiler::replaceInstruction(size_t position, const Instructions& new_instructions) {
