@@ -23,7 +23,11 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 return err;
             }
             auto symbol = symbol_table_->Define(let_statement->name()->toString());
-            emit(OpcodeType::OpSetGlobal, {symbol->index});
+            if (symbol->scope == SymbolScopeType::kGlobal) {
+                emit(OpcodeType::OpSetGlobal, {symbol->index});
+            } else {
+                emit(OpcodeType::OpSetLocal, {symbol->index});
+            }
         } break;
         case Node::Type::ExpressionStatement: {
             auto expression = std::dynamic_pointer_cast<ExpressionStatement>(node);
@@ -47,7 +51,11 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 return std::make_shared<Error>(
                     fmt::format("Undefined identifier: {}", identifier->tokenLiteral()));
             }
-            emit(OpcodeType::OpGetGlobal, {symbol->index});
+            if (symbol->scope == SymbolScopeType::kGlobal) {
+                emit(OpcodeType::OpGetGlobal, {symbol->index});
+            } else {
+                emit(OpcodeType::OpGetLocal, {symbol->index});
+            }
         } break;
         case Node::Type::Boolean: {
             auto boolean = std::dynamic_pointer_cast<Boolean>(node);
@@ -312,6 +320,7 @@ void Compiler::changeOperand(size_t position, size_t operand) {
 void Compiler::enterScope() {
     scopes_.emplace_back();
     scope_index_++;
+    symbol_table_ = SymbolTable::NewEnclosed(symbol_table_);
 }
 
 Instructions Compiler::leaveScope() {
@@ -321,6 +330,7 @@ Instructions Compiler::leaveScope() {
     auto instructions = currentInstructions();
     scopes_.pop_back();
     scope_index_--;
+    symbol_table_ = symbol_table_->outer();
     return instructions;
 }
 

@@ -428,40 +428,94 @@ TEST(CompilerTest, CompileFunctionTest) {
         {"fn(){}",
          {
              std::vector<Instructions>{
-                 {ByteCode::Make(OpcodeType::OpReturn, {})},
+                 ByteCode::Make(OpcodeType::OpReturn, {}),
              },
          },
          {
-             {ByteCode::Make(OpcodeType::OpConstant, {0})},
-             {ByteCode::Make(OpcodeType::OpPop, {})},
+             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){ 24 }()",
          {
              24,
              std::vector<Instructions>{
-                 {ByteCode::Make(OpcodeType::OpConstant, {0})},
-                 {ByteCode::Make(OpcodeType::OpReturnValue, {})},
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
              },
          },
          {
-             {ByteCode::Make(OpcodeType::OpConstant, {1})},
-             {ByteCode::Make(OpcodeType::OpCall, {})},
-             {ByteCode::Make(OpcodeType::OpPop, {})},
+             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpCall, {}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"let noArg = fn(){ 24 }; noArg();",
          {
              24,
              std::vector<Instructions>{
-                 {ByteCode::Make(OpcodeType::OpConstant, {0})},
-                 {ByteCode::Make(OpcodeType::OpReturnValue, {})},
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
              },
          },
          {
-             {ByteCode::Make(OpcodeType::OpConstant, {1})},
-             {ByteCode::Make(OpcodeType::OpSetGlobal, {0})},
-             {ByteCode::Make(OpcodeType::OpGetGlobal, {0})},
-             {ByteCode::Make(OpcodeType::OpCall, {})},
-             {ByteCode::Make(OpcodeType::OpPop, {})},
+             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpCall, {}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+    };
+
+    RUN_COMPILER_TESTS(tests);
+}
+
+TEST(CompilerTest, LetStatementScopeTest) {
+    CompilerTestCase tests[] = {
+        {"let num = 55; fn(){ num }",
+         {
+             55,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {"fn(){ let num = 55; num }",
+         {
+             55,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {"fn(){ let a = 55; let b = 77; a + b",
+         {
+             55,
+             77,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpConstant, {1}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {1}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {1}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
          }},
     };
 
@@ -470,6 +524,7 @@ TEST(CompilerTest, CompileFunctionTest) {
 
 TEST(CompilerTest, CompileScopeTest) {
     auto compiler = Compiler::New();
+    auto global_symbol_table = compiler->symbol_table_;
 
     EXPECT_EQ(compiler->scope_index_, 0);
     TEST_INSTRUCTIONS({}, compiler->instructions(), "");
@@ -480,6 +535,7 @@ TEST(CompilerTest, CompileScopeTest) {
     TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpMul, {})}, compiler->instructions(), "");
 
     compiler->enterScope();
+    EXPECT_EQ(compiler->symbol_table_->outer_, global_symbol_table);
 
     EXPECT_EQ(compiler->scope_index_, 1);
     TEST_INSTRUCTIONS({}, compiler->instructions(), "");
@@ -490,6 +546,8 @@ TEST(CompilerTest, CompileScopeTest) {
     TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpSub, {})}, compiler->instructions(), "");
 
     compiler->leaveScope();
+    EXPECT_EQ(compiler->symbol_table_, global_symbol_table);
+    EXPECT_EQ(compiler->symbol_table_->outer_, nullptr);
 
     EXPECT_EQ(compiler->scope_index_, 0);
     TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpMul, {})}, compiler->instructions(), "");

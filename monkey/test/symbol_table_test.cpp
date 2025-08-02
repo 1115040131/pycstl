@@ -12,18 +12,30 @@ struct SymbolTableTestCase {
 };
 
 TEST(SymbolTableTest, DefineTest) {
-    std::vector<SymbolTableTestCase> tests = {
-        {"a", {"a", SymbolScopeType::kGlobal, 0}},
-        {"b", {"b", SymbolScopeType::kGlobal, 1}},
-        {"c", {"c", SymbolScopeType::kGlobal, 2}},
+    std::map<std::string, Symbol> expected = {
+        {"a", {"a", SymbolScopeType::kGlobal, 0}}, {"b", {"b", SymbolScopeType::kGlobal, 1}},
+        {"c", {"c", SymbolScopeType::kLocal, 0}},  {"d", {"d", SymbolScopeType::kLocal, 1}},
+        {"e", {"e", SymbolScopeType::kLocal, 0}},  {"f", {"f", SymbolScopeType::kLocal, 1}},
     };
 
-    auto symbol_table = SymbolTable::New();
-    for (const auto& test : tests) {
-        auto symbol = symbol_table->Define(test.name);
-        ASSERT_TRUE(symbol) << "Failed to define symbol: " << test.name;
-        EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
-    }
+    auto global = SymbolTable::New();
+    auto first_local = SymbolTable::NewEnclosed(global);
+    auto second_local = SymbolTable::NewEnclosed(first_local);
+
+    auto a = global->Define("a");
+    EXPECT_EQ(*a, expected["a"]);
+    auto b = global->Define("b");
+    EXPECT_EQ(*b, expected["b"]);
+
+    auto c = first_local->Define("c");
+    EXPECT_EQ(*c, expected["c"]);
+    auto d = first_local->Define("d");
+    EXPECT_EQ(*d, expected["d"]);
+
+    auto e = second_local->Define("e");
+    EXPECT_EQ(*e, expected["e"]);
+    auto f = second_local->Define("f");
+    EXPECT_EQ(*f, expected["f"]);
 }
 
 TEST(SymbolTableTest, ResolveTest) {
@@ -40,6 +52,70 @@ TEST(SymbolTableTest, ResolveTest) {
 
     for (const auto& test : tests) {
         auto symbol = symbol_table->Resolve(test.name);
+        ASSERT_TRUE(symbol) << "Failed to resolve symbol: " << test.name;
+        EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
+    }
+}
+
+TEST(SymbolTableTest, ResolveLocalTest) {
+    auto global = SymbolTable::New();
+    global->Define("a");
+    global->Define("b");
+
+    auto local = SymbolTable::NewEnclosed(global);
+    local->Define("c");
+    local->Define("d");
+
+    std::vector<SymbolTableTestCase> tests = {
+        {"a", {"a", SymbolScopeType::kGlobal, 0}},
+        {"b", {"b", SymbolScopeType::kGlobal, 1}},
+        {"c", {"c", SymbolScopeType::kLocal, 0}},
+        {"d", {"d", SymbolScopeType::kLocal, 1}},
+    };
+
+    for (const auto& test : tests) {
+        auto symbol = local->Resolve(test.name);
+        ASSERT_TRUE(symbol) << "Failed to resolve symbol: " << test.name;
+        EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
+    }
+}
+
+TEST(SymbolTableTest, ResolveNestedLocalTest) {
+    auto global = SymbolTable::New();
+    global->Define("a");
+    global->Define("b");
+
+    auto first_local = SymbolTable::NewEnclosed(global);
+    first_local->Define("c");
+    first_local->Define("d");
+
+    auto second_local = SymbolTable::NewEnclosed(first_local);
+    second_local->Define("e");
+    second_local->Define("f");
+
+    std::vector<SymbolTableTestCase> first_local_tests = {
+        {"a", {"a", SymbolScopeType::kGlobal, 0}},
+        {"b", {"b", SymbolScopeType::kGlobal, 1}},
+        {"c", {"c", SymbolScopeType::kLocal, 0}},
+        {"d", {"d", SymbolScopeType::kLocal, 1}},
+    };
+
+    for (const auto& test : first_local_tests) {
+        auto symbol = first_local->Resolve(test.name);
+        ASSERT_TRUE(symbol) << "Failed to resolve symbol: " << test.name;
+        EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
+    }
+    EXPECT_FALSE(first_local->Resolve("e"));
+    EXPECT_FALSE(first_local->Resolve("f"));
+
+    std::vector<SymbolTableTestCase> second_local_tests = {
+        {"a", {"a", SymbolScopeType::kGlobal, 0}}, {"b", {"b", SymbolScopeType::kGlobal, 1}},
+        {"c", {"c", SymbolScopeType::kLocal, 0}},  {"d", {"d", SymbolScopeType::kLocal, 1}},
+        {"e", {"e", SymbolScopeType::kLocal, 0}},  {"f", {"f", SymbolScopeType::kLocal, 1}},
+    };
+
+    for (const auto& test : second_local_tests) {
+        auto symbol = second_local->Resolve(test.name);
         ASSERT_TRUE(symbol) << "Failed to resolve symbol: " << test.name;
         EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
     }

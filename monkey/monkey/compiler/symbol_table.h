@@ -11,7 +11,8 @@ using SymbolScope = std::string;
 
 namespace SymbolScopeType {
 inline constexpr SymbolScope kGlobal = "GLOBAL";
-}
+inline constexpr SymbolScope kLocal = "LOCAL";
+}  // namespace SymbolScopeType
 
 struct Symbol {
     std::string name;
@@ -25,11 +26,20 @@ class SymbolTable {
 public:
     static std::shared_ptr<SymbolTable> New() { return std::make_shared<SymbolTable>(); }
 
+    static std::shared_ptr<SymbolTable> NewEnclosed(std::shared_ptr<SymbolTable> outer) {
+        auto symbol_table = std::make_shared<SymbolTable>();
+        symbol_table->outer_ = std::move(outer);
+        return symbol_table;
+    }
+
     std::shared_ptr<Symbol> Define(const std::string& name);
 
     std::shared_ptr<Symbol> Resolve(const std::string& name) const;
 
-// private:
+    std::shared_ptr<SymbolTable> outer() const { return outer_; }
+
+private:
+    std::shared_ptr<SymbolTable> outer_;
     std::unordered_map<std::string, std::shared_ptr<Symbol>> store_;
     size_t next_index_ = 0;
 };
