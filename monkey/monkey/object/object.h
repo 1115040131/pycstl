@@ -248,5 +248,15 @@ inline auto kNullObj = std::make_shared<Null>();
 inline auto kTrueObj = std::make_shared<BooleanObject>(true);
 inline auto kFalseObj = std::make_shared<BooleanObject>(false);
 
+inline bool IsError(const std::shared_ptr<Object>& obj) { return obj && obj->type() == Object::Type::ERROR; }
+
+bool IsTruthy(const std::shared_ptr<Object>& obj);
+
+std::shared_ptr<BooleanObject> EvalBool(bool value);
+
+std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index);
+
+std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index);
+
 }  // namespace monkey
 }  // namespace pyc

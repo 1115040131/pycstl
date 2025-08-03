@@ -4,7 +4,7 @@
 
 #include <fmt/base.h>
 
-#include "monkey/evaluator/evaluator.h"
+// #include "monkey/evaluator/evaluator.h"
 #include "monkey/lexer/lexer.h"
 // #include "monkey/object/environment.h"
 #include "monkey/parser/parser.h"

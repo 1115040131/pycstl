@@ -6,20 +6,6 @@
 namespace pyc {
 namespace monkey {
 
-bool IsTruthy(const std::shared_ptr<Object>& obj) {
-    if (!obj) {
-        return false;
-    }
-    if (obj->type() == Object::Type::BOOLEAN) {
-        return std::dynamic_pointer_cast<BooleanObject>(obj)->value();
-    } else if (obj->type() == Object::Type::INTEGER) {
-        return std::dynamic_pointer_cast<Integer>(obj)->value() != 0;
-    } else if (obj->type() == Object::Type::Null) {
-        return false;
-    }
-    return true;
-}
-
 std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environment> env) {
     if (!node) {
         return nullptr;
@@ -288,13 +274,6 @@ std::shared_ptr<Object> EvalCallExpression(std::shared_ptr<CallExpression> call_
 
 #pragma region Object
 
-std::shared_ptr<BooleanObject> EvalBool(bool value) {
-    if (value) {
-        return kTrueObj;
-    }
-    return kFalseObj;
-}
-
 std::shared_ptr<Object> EvalBangOperatorExpression(std::shared_ptr<Object> right) {
     if (IsTruthy(right)) {
         return kFalseObj;
@@ -307,28 +286,6 @@ std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object
         return std::make_shared<Error>(fmt::format("unknown operator: -{}", toString(right->type())));
     }
     return std::make_shared<Integer>(-std::dynamic_pointer_cast<Integer>(right)->value());
-}
-
-#pragma endregion
-
-#pragma region Index
-
-std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index) {
-    if (index->value() < 0 || index->value() >= static_cast<long long>(array->elements().size())) {
-        return kNullObj;
-    }
-    return array->elements()[index->value()];
-}
-
-std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index) {
-    if (!index->hashable()) {
-        return std::make_shared<Error>(fmt::format("unusable as hash key: {}", index->typeStr()));
-    }
-    auto iter = hash->pairs().find(index->getHashKey());
-    if (iter == hash->pairs().end()) {
-        return kNullObj;  // Return null if the key is not found
-    }
-    return iter->second.value;  // Return the value associated with the key
 }
 
 #pragma endregion

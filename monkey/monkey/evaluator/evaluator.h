@@ -5,9 +5,6 @@
 namespace pyc {
 namespace monkey {
 
-inline bool IsError(const std::shared_ptr<Object>& obj) { return obj && obj->type() == Object::Type::ERROR; }
-bool IsTruthy(const std::shared_ptr<Object>& obj);
-
 std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environment> env);
 
 #pragma region Statement
@@ -42,16 +39,8 @@ std::shared_ptr<Object> EvalCallExpression(std::shared_ptr<CallExpression> call_
 
 #pragma region Object
 
-std::shared_ptr<BooleanObject> EvalBool(bool value);
 std::shared_ptr<Object> EvalBangOperatorExpression(std::shared_ptr<Object> right);
 std::shared_ptr<Object> EvalMinusPrefixOperatorExpression(std::shared_ptr<Object> right);
-
-#pragma endregion
-
-#pragma region Index
-
-std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index);
-std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index);
 
 #pragma endregion
 

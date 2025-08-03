@@ -2,8 +2,6 @@
 
 #include <algorithm>
 
-#include "monkey/evaluator/evaluator.h"
-
 namespace pyc {
 namespace monkey {
 

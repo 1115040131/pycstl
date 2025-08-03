@@ -55,5 +55,44 @@ std::string Hash::inspect() const {
     return fmt::format("{{{}}}", Join(items, ", "));
 }
 
+bool IsTruthy(const std::shared_ptr<Object>& obj) {
+    if (!obj) {
+        return false;
+    }
+    if (obj->type() == Object::Type::BOOLEAN) {
+        return std::dynamic_pointer_cast<BooleanObject>(obj)->value();
+    } else if (obj->type() == Object::Type::INTEGER) {
+        return std::dynamic_pointer_cast<Integer>(obj)->value() != 0;
+    } else if (obj->type() == Object::Type::Null) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<BooleanObject> EvalBool(bool value) {
+    if (value) {
+        return kTrueObj;
+    }
+    return kFalseObj;
+}
+
+std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared_ptr<Integer> index) {
+    if (index->value() < 0 || index->value() >= static_cast<long long>(array->elements().size())) {
+        return kNullObj;
+    }
+    return array->elements()[index->value()];
+}
+
+std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index) {
+    if (!index->hashable()) {
+        return std::make_shared<Error>(fmt::format("unusable as hash key: {}", index->typeStr()));
+    }
+    auto iter = hash->pairs().find(index->getHashKey());
+    if (iter == hash->pairs().end()) {
+        return kNullObj;  // Return null if the key is not found
+    }
+    return iter->second.value;  // Return the value associated with the key
+}
+
 }  // namespace monkey
 }  // namespace pyc
