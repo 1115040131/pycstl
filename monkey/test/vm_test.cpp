@@ -11,15 +11,18 @@ struct VMTestCase {
     Expected expected;
 };
 
-#define RUN_VM_TESTS(tests)                                                                  \
-    for (const auto& test : tests) {                                                         \
-        auto compiler = Compiler::New();                                                     \
-        auto err = compiler->compile(processInput(test.input));                              \
-        ASSERT_FALSE(err) << "Input: " << test.input;                                        \
-        auto vm = VM::New(compiler);                                                         \
-        auto result = vm->run();                                                             \
-        ASSERT_FALSE(result) << "Input: " << test.input << "\nError: " << result->inspect(); \
-        TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input);            \
+#define RUN_VM_TESTS(tests)                                                           \
+    for (const auto& test : tests) {                                                  \
+        auto compiler = Compiler::New();                                              \
+        auto err = compiler->compile(processInput(test.input));                       \
+        ASSERT_FALSE(err) << "Input: " << test.input << "Error: " << err->inspect();  \
+        auto vm = VM::New(compiler);                                                  \
+        auto result = vm->run();                                                      \
+        if (result) {                                                                 \
+            TEST_EXPECTED_OBJECT(result, test.expected, test.input);                  \
+        } else {                                                                      \
+            TEST_EXPECTED_OBJECT(vm->lastPoppedElement(), test.expected, test.input); \
+        }                                                                             \
     }
 
 TEST(VMTest, IntegerArithmeticTest) {
@@ -260,6 +263,86 @@ TEST(VMTest, CallingFirstFunctionTest) {
                 returnsOneReturner()();
             )"",
          1},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
+TEST(VMTest, CallingFunctionWithArgumentsTest) {
+    VMTestCase tests[] = {
+        {R""(
+                let identify = fn(a) { a; }
+                identify(4);
+            )"",
+         4},
+        {R""(
+                let sum = fn(a, b){ a + b; }
+                sum(1,2);
+            )"",
+         3},
+        {R""(
+                let sum = fn(a, b){
+                    let c = a + b;
+                    c;
+                }
+
+                sum(1,2);
+            )"",
+         3},
+        {R""(
+                let sum = fn(a, b) {
+                    let c = a + b;
+                    c;
+                }
+
+                sum(1, 2) + sum(3, 4)
+            )"",
+         10},
+        {R""(
+                let sum = fn(a, b){
+                    let c = a + b;
+                    c;
+                }
+
+                let outer = fn(){
+                    sum(1, 2) + sum(3, 4);
+                }
+
+                outer();
+            )"",
+         10},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
+TEST(VMTest, CallingFunctionWithWrongArgumentsTest) {
+    VMTestCase tests[] = {
+        {R""(
+                1 + "123";
+            )"",
+         "unsupported types for binary operaction: INTEGER OpAdd STRING"},
+        {R""(
+                1 / 0;
+            )"",
+         "Division by zero"},
+        {R""(
+                let a = 2;
+                a();
+            )"",
+         "calling non-function: INTEGER"},
+        {R""(
+                fn(){ 1; }(1)
+            )"",
+         "wrong number of arguments: want=0, got=1"},
+        {R""(
+                fn(a){ a; }()
+            )"",
+         "wrong number of arguments: want=1, got=0"},
+        {R""(
+                fn(a, b){ a + b; }(1)
+            )"",
+         "wrong number of arguments: want=2, got=1"},
     };
 
     RUN_VM_TESTS(tests);

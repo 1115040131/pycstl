@@ -14,7 +14,7 @@ public:
 
     static std::shared_ptr<VM> New(std::shared_ptr<Compiler> compiler) {
         std::vector<std::shared_ptr<Frame>> frames(kFrameSize);
-        auto main_func = std::make_shared<CompiledFunction>(compiler->instructions(), 0);
+        auto main_func = std::make_shared<CompiledFunction>(compiler->instructions(), 0, 0);
         frames[0] = Frame::New(main_func, 0);
         return std::make_shared<VM>(compiler->constants(), frames);
     }
@@ -65,6 +65,8 @@ private:
     std::shared_ptr<Object> buildArray(size_t size);
 
     std::shared_ptr<Object> buildHash(size_t size);
+
+    std::shared_ptr<Object> callFunction(size_t num_args);
 
     std::shared_ptr<Frame> currentFrame() { return frames_[frame_index_]; }
 

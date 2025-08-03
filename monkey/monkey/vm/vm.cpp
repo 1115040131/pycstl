@@ -183,20 +183,13 @@ std::shared_ptr<Object> VM::run() {
             } break;
 
             case OpcodeType::OpCall: {
-                auto function_obj = top();
-                if (function_obj->type() != Object::Type::COMPILED_FUNCTION) {
-                    return std::make_shared<Error>(
-                        fmt::format("calling non-function: {}", function_obj->typeStr()));
+                auto result = callFunction(operands[0]);
+                if (IsError(result)) {
+                    return result;
                 }
-
-                auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(function_obj);
-                pushFrame(Frame::New(compiled_function, sp_));
 
                 frame = currentFrame();
                 instructions_ = frame->instructions();
-
-                // 借用一段调用栈空间
-                sp_ = frame->bp + compiled_function->localNum();
             } break;
             case OpcodeType::OpReturnValue: {
                 auto return_value = pop();
@@ -385,6 +378,32 @@ std::shared_ptr<Object> VM::buildHash(size_t size) {
         hash->pairs()[key->getHashKey()] = {key, value};
     }
     return hash;
+}
+
+std::shared_ptr<Object> VM::callFunction(size_t num_args) {
+    if (sp_ < 1 + num_args) {
+        return std::make_shared<Error>("Stack underflow");
+    }
+
+    auto function_obj = stack_[sp_ - 1 - num_args];
+    if (function_obj->type() != Object::Type::COMPILED_FUNCTION) {
+        return std::make_shared<Error>(fmt::format("calling non-function: {}", function_obj->typeStr()));
+    }
+
+    auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(function_obj);
+    if (compiled_function->parametersNum() != num_args) {
+        return std::make_shared<Error>(fmt::format("wrong number of arguments: want={}, got={}",
+                                                   compiled_function->parametersNum(), num_args));
+    }
+
+    auto function_frame = Frame::New(compiled_function, sp_ - num_args);
+
+    pushFrame(function_frame);
+
+    // 借用一段调用栈空间
+    sp_ = function_frame->bp + compiled_function->localNum();
+
+    return nullptr;
 }
 
 void VM::pushFrame(std::shared_ptr<Frame> frame) {

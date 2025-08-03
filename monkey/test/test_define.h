@@ -73,6 +73,8 @@ using Expected = std::variant<int, bool, std::string, std::vector<Instructions>,
                 EXPECT_EQ(array->inspect(), expected_str) << "Input: " << input;                  \
             } else if (auto hash = std::dynamic_pointer_cast<Hash>(object)) {                     \
                 EXPECT_EQ(hash->inspect(), expected_str) << "Input: " << input;                   \
+            } else if (auto error = std::dynamic_pointer_cast<Error>(object)) {                   \
+                EXPECT_EQ(error->inspect(), expected_str) << "Input: " << input;                  \
             } else {                                                                              \
                 TEST_STRING_OBJECT(object, expected_str, input);                                  \
             }                                                                                     \

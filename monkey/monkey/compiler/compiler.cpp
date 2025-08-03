@@ -223,6 +223,10 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             // 在新编译作用域编译函数
             enterScope();
 
+            for (const auto& param : function_literal->parameters()) {
+                symbol_table_->Define(param->toString());
+            }
+
             if (auto err = compile(function_literal->body()); IsError(err)) {
                 return err;
             }
@@ -239,8 +243,9 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
 
             // 回到上一层作用域并获取编译字节码
             auto local_num = symbol_table_->nextIndex();
+            auto parameters_num = function_literal->parameters().size();
             auto instructions = leaveScope();
-            auto pos = addConstant(std::make_shared<CompiledFunction>(instructions, local_num));
+            auto pos = addConstant(std::make_shared<CompiledFunction>(instructions, local_num, parameters_num));
             emit(OpcodeType::OpConstant, {pos});
         } break;
         case Node::Type::ReturnStatement: {
@@ -259,7 +264,13 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 return err;
             }
 
-            emit(OpcodeType::OpCall, {});
+            for (const auto& argument : call_expression->arguments()) {
+                if (auto err = compile(argument); IsError(err)) {
+                    return err;
+                }
+            }
+
+            emit(OpcodeType::OpCall, {call_expression->arguments().size()});
         } break;
         default:
             break;

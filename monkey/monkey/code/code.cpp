@@ -95,7 +95,7 @@ inline const std::map<OpcodeType, Definition> definitions{
     {OpcodeType::OpHash, {"OpHash", {2}}},
     {OpcodeType::OpIndex, {"OpIndex", {}}},
 
-    {OpcodeType::OpCall, {"OpCall", {}}},
+    {OpcodeType::OpCall, {"OpCall", {1}}},
     {OpcodeType::OpReturnValue, {"OpReturnValue", {}}},
     {OpcodeType::OpReturn, {"OpReturn", {}}},
 };
