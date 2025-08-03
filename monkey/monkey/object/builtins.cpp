@@ -1,4 +1,4 @@
-#include "monkey/evaluator/builtins.h"
+#include "monkey/object/builtins.h"
 
 #include <unordered_map>
 
@@ -6,7 +6,7 @@ namespace pyc {
 namespace monkey {
 
 #define DEF_BUILTIN(name) \
-    static std::shared_ptr<Object> Builtin_##name(const std::vector<std::shared_ptr<Object>>& args)
+    inline static std::shared_ptr<Object> Builtin_##name(const std::vector<std::shared_ptr<Object>>& args)
 
 #define ADD_BUILTIN(name) {#name, std::make_shared<Builtin>(&Builtin_##name)}
 
@@ -20,6 +20,13 @@ DEF_BUILTIN(len) {
         return std::make_shared<Integer>(array->elements().size());
     }
     return std::make_shared<Error>(fmt::format("argument to 'len' not supported, got {}", args[0]->typeStr()));
+}
+
+DEF_BUILTIN(puts) {
+    for (const auto& arg : args) {
+        fmt::println("{}", arg->inspect());
+    }
+    return kNullObj;  // Puts does not return a value, so we return null
 }
 
 DEF_BUILTIN(first) {
@@ -74,21 +81,19 @@ DEF_BUILTIN(push) {
     return std::make_shared<Error>(fmt::format("argument to 'push' must be ARRAY, got {}", args[0]->typeStr()));
 }
 
-DEF_BUILTIN(puts) {
-    for (const auto& arg : args) {
-        fmt::println("{}", arg->inspect());
-    }
-    return kNullObj;  // Puts does not return a value, so we return null
-}
+#define ALL_BUILTINS                                                                               \
+    ADD_BUILTIN(len), ADD_BUILTIN(puts), ADD_BUILTIN(first), ADD_BUILTIN(last), ADD_BUILTIN(rest), \
+        ADD_BUILTIN(push),
 
-std::shared_ptr<Builtin> GetBuiltin(std::string_view name) {
-    static std::unordered_map<std::string_view, std::shared_ptr<Builtin>> builtins{
-        ADD_BUILTIN(len),  ADD_BUILTIN(first), ADD_BUILTIN(last),
-        ADD_BUILTIN(rest), ADD_BUILTIN(push),  ADD_BUILTIN(puts),
-    };
+inline static std::vector<BuiltinWithName> BuiltinList{ALL_BUILTINS};
 
-    auto iter = builtins.find(name);
-    if (iter != builtins.end()) {
+inline static std::unordered_map<std::string_view, std::shared_ptr<Builtin>> BuiltinMap{ALL_BUILTINS};
+
+const std::vector<BuiltinWithName>& GetBuiltinList() { return BuiltinList; }
+
+std::shared_ptr<Builtin> GetBuiltinByName(std::string_view name) {
+    auto iter = BuiltinMap.find(name);
+    if (iter != BuiltinMap.end()) {
         return iter->second;
     }
     return nullptr;

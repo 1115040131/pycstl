@@ -12,6 +12,7 @@ using SymbolScope = std::string;
 namespace SymbolScopeType {
 inline constexpr SymbolScope kGlobal = "GLOBAL";
 inline constexpr SymbolScope kLocal = "LOCAL";
+inline constexpr SymbolScope kBuiltin = "BUILTIN";
 }  // namespace SymbolScopeType
 
 struct Symbol {
@@ -33,6 +34,8 @@ public:
     }
 
     std::shared_ptr<Symbol> Define(const std::string& name);
+
+    std::shared_ptr<Symbol> DefineBuiltin(const std::string& name, size_t index);
 
     std::shared_ptr<Symbol> Resolve(const std::string& name) const;
 

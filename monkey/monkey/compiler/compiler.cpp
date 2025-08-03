@@ -2,8 +2,25 @@
 
 #include <algorithm>
 
+#include "monkey/object/builtins.h"
+
 namespace pyc {
 namespace monkey {
+
+std::shared_ptr<Compiler> Compiler::New() {
+    auto symbol_table = SymbolTable::New();
+
+    size_t index{};
+    for (const auto& [name, builtin] : GetBuiltinList()) {
+        symbol_table->DefineBuiltin(std::string(name), index);
+        index++;
+    }
+
+    auto compiler = std::make_shared<Compiler>();
+    compiler->symbol_table_ = symbol_table;
+
+    return compiler;
+}
 
 std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
     switch (node->type()) {
@@ -49,11 +66,8 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 return std::make_shared<Error>(
                     fmt::format("Undefined identifier: {}", identifier->tokenLiteral()));
             }
-            if (symbol->scope == SymbolScopeType::kGlobal) {
-                emit(OpcodeType::OpGetGlobal, {symbol->index});
-            } else {
-                emit(OpcodeType::OpGetLocal, {symbol->index});
-            }
+
+            loadSymbol(symbol);
         } break;
         case Node::Type::Boolean: {
             auto boolean = std::dynamic_pointer_cast<Boolean>(node);
@@ -286,6 +300,16 @@ size_t Compiler::emit(OpcodeType op, const std::vector<size_t>& operands) {
     auto position = addInstruction(instructions);
     setLastInstruction(op, position);
     return position;
+}
+
+void Compiler::loadSymbol(std::shared_ptr<Symbol> symbol) {
+    if (symbol->scope == SymbolScopeType::kGlobal) {
+        emit(OpcodeType::OpGetGlobal, {symbol->index});
+    } else if (symbol->scope == SymbolScopeType::kLocal) {
+        emit(OpcodeType::OpGetLocal, {symbol->index});
+    } else if (symbol->scope == SymbolScopeType::kBuiltin) {
+        emit(OpcodeType::OpGetBuiltin, {symbol->index});
+    }
 }
 
 size_t Compiler::addInstruction(const Instructions& instructions) {

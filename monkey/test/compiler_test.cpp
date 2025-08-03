@@ -638,5 +638,40 @@ TEST(CompilerTest, CompileScopeTest) {
     EXPECT_EQ(compiler->scope().prev_instruction_.opcode, OpcodeType::OpMul);
 }
 
+TEST(CompilerTest, CompileBuiltinsTest) {
+    CompilerTestCase tests[] = {
+        {"len([]); push([], 1);",
+         {
+             1,
+         },
+         {
+             ByteCode::Make(OpcodeType::OpGetBuiltin, {0}),
+             ByteCode::Make(OpcodeType::OpArray, {0}),
+             ByteCode::Make(OpcodeType::OpCall, {1}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+             ByteCode::Make(OpcodeType::OpGetBuiltin, {5}),
+             ByteCode::Make(OpcodeType::OpArray, {0}),
+             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpCall, {2}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {"fn(){ len([]) };",
+         {
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetBuiltin, {0}),
+                 ByteCode::Make(OpcodeType::OpArray, {0}),
+                 ByteCode::Make(OpcodeType::OpCall, {1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+    };
+
+    RUN_COMPILER_TESTS(tests);
+}
+
 }  // namespace monkey
 }  // namespace pyc

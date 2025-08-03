@@ -121,5 +121,32 @@ TEST(SymbolTableTest, ResolveNestedLocalTest) {
     }
 }
 
+TEST(SymbolTableTest, ResolveBuiltinsTest) {
+    std::map<std::string, Symbol> expected = {
+        {"a", {"a", SymbolScopeType::kBuiltin, 0}},
+        {"b", {"b", SymbolScopeType::kBuiltin, 1}},
+        {"c", {"c", SymbolScopeType::kBuiltin, 2}},
+        {"d", {"d", SymbolScopeType::kBuiltin, 3}},
+    };
+
+    auto global = SymbolTable::New();
+    auto first_local = SymbolTable::NewEnclosed(global);
+    auto second_local = SymbolTable::NewEnclosed(first_local);
+
+    auto tests = std::vector{global, first_local, second_local};
+
+    for (const auto& [name, expect] : expected) {
+        global->DefineBuiltin(expect.name, expect.index);
+    }
+
+    for (const auto& test : tests) {
+        for (const auto& [name, expect] : expected) {
+            auto result = test->Resolve(name);
+            ASSERT_TRUE(result);
+            EXPECT_EQ(*result, expect);
+        }
+    }
+}
+
 }  // namespace monkey
 }  // namespace pyc

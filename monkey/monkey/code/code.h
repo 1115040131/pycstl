@@ -43,6 +43,8 @@ enum class OpcodeType : Opcode {
     OpGetLocal,
     OpSetLocal,
 
+    OpGetBuiltin,
+
     OpArray,
     OpHash,
     OpIndex,

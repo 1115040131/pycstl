@@ -44,6 +44,8 @@ std::string_view toString(OpcodeType type) {
         TO_STRING_CASE(OpcodeType, OpGetLocal);
         TO_STRING_CASE(OpcodeType, OpSetLocal);
 
+        TO_STRING_CASE(OpcodeType, OpGetBuiltin);
+
         TO_STRING_CASE(OpcodeType, OpArray);
         TO_STRING_CASE(OpcodeType, OpHash);
         TO_STRING_CASE(OpcodeType, OpIndex);
@@ -90,6 +92,8 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpGetLocal, {"OpGetLocal", {1}}},
     {OpcodeType::OpSetLocal, {"OpSetLocal", {1}}},
+
+    {OpcodeType::OpGetBuiltin, {"OpGetBuiltin", {1}}},
 
     {OpcodeType::OpArray, {"OpArray", {2}}},
     {OpcodeType::OpHash, {"OpHash", {2}}},

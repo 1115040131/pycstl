@@ -1,6 +1,6 @@
 #include "monkey/evaluator/evaluator.h"
 
-#include "monkey/evaluator/builtins.h"
+#include "monkey/object/builtins.h"
 #include "monkey/object/environment.h"
 
 namespace pyc {
@@ -105,7 +105,7 @@ std::shared_ptr<Object> EvalBlockStatement(std::shared_ptr<BlockStatement> block
 std::shared_ptr<Object> EvalIdentifier(std::shared_ptr<Identifier> identifier, std::shared_ptr<Environment> env) {
     if (auto value = env->get(identifier->tokenLiteral())) {
         return value;
-    } else if (auto fit = GetBuiltin(identifier->tokenLiteral())) {
+    } else if (auto fit = GetBuiltinByName(identifier->tokenLiteral())) {
         return fit;
     }
     return std::make_shared<Error>(fmt::format("identifier not found: {}", identifier->tokenLiteral()));
@@ -316,7 +316,12 @@ std::shared_ptr<Object> ApplyFunction(std::shared_ptr<Object> object,
         }
         return evaluated;
     } else if (auto builtin = std::dynamic_pointer_cast<Builtin>(object)) {
-        return builtin->function()(args);
+        auto result = builtin->function()(args);
+        if (result) {
+            return result;
+        } else {
+            return kNullObj;
+        }
     }
     return std::make_shared<Error>(fmt::format("not a function: {}", object->typeStr()));
 }

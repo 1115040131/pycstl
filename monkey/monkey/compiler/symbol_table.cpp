@@ -13,6 +13,12 @@ std::shared_ptr<Symbol> SymbolTable::Define(const std::string& name) {
     return symbol;
 }
 
+std::shared_ptr<Symbol> SymbolTable::DefineBuiltin(const std::string& name, size_t index) {
+    auto symbol = std::make_shared<Symbol>(Symbol{name, SymbolScopeType::kBuiltin, index});
+    store_[name] = symbol;
+    return symbol;
+}
+
 std::shared_ptr<Symbol> SymbolTable::Resolve(const std::string& name) const {
     auto it = store_.find(name);
     if (it != store_.end()) {

@@ -20,7 +20,7 @@ struct CompilationScope {
 
 class Compiler {
 public:
-    static std::shared_ptr<Compiler> New() { return std::make_shared<Compiler>(); }
+    static std::shared_ptr<Compiler> New();
 
     static std::shared_ptr<Compiler> NewWithState(const std::vector<std::shared_ptr<Object>>& constants,
                                                   std::shared_ptr<SymbolTable> symbol_table) {
@@ -41,6 +41,8 @@ private:
     size_t addConstant(std::shared_ptr<Object> object);
 
     size_t emit(OpcodeType op, const std::vector<size_t>& operands);
+
+    void loadSymbol(std::shared_ptr<Symbol> symbol);
 
     size_t addInstruction(const Instructions& instructions);
 
