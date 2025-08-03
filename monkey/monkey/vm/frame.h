@@ -9,12 +9,11 @@ namespace monkey {
 struct Frame {
     std::shared_ptr<CompiledFunction> function;
     size_t ip{};
+    size_t bp{};
 
-    static std::shared_ptr<Frame> New(std::shared_ptr<CompiledFunction> function_) {
-        return std::make_shared<Frame>(std::move(function_));
+    static std::shared_ptr<Frame> New(std::shared_ptr<CompiledFunction> function_, size_t bp_) {
+        return std::make_shared<Frame>(std::move(function_), 0, bp_);
     }
-
-    Frame(std::shared_ptr<CompiledFunction> function_) : function(std::move(function_)) {}
 
     const Instructions& instructions() const { return function->instructions(); }
 };

@@ -225,16 +225,19 @@ class CompiledFunction : public Object {
 public:
     TYPE(COMPILED_FUNCTION)
 
-    CompiledFunction(Instructions instructions) : instructions_(std::move(instructions)) {}
+    CompiledFunction(Instructions instructions, size_t local_num)
+        : instructions_(std::move(instructions)), local_num_(local_num) {}
 
     virtual ~CompiledFunction() override = default;
 
     virtual std::string inspect() const override { return fmt::format("{}", reinterpret_cast<uintptr_t>(this)); }
 
     const Instructions& instructions() const { return instructions_; }
+    size_t localNum() const { return local_num_; }
 
 private:
     Instructions instructions_;
+    size_t local_num_;
 };
 
 inline auto kNullObj = std::make_shared<Null>();

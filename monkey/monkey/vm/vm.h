@@ -14,7 +14,8 @@ public:
 
     static std::shared_ptr<VM> New(std::shared_ptr<Compiler> compiler) {
         std::vector<std::shared_ptr<Frame>> frames(kFrameSize);
-        frames[0] = std::make_shared<Frame>(std::make_shared<CompiledFunction>(compiler->instructions()));
+        auto main_func = std::make_shared<CompiledFunction>(compiler->instructions(), 0);
+        frames[0] = Frame::New(main_func, 0);
         return std::make_shared<VM>(compiler->constants(), frames);
     }
 

@@ -142,6 +142,17 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpSetLocal:
+                stack_[frame->bp + operands[0]] = pop();
+                break;
+
+            case OpcodeType::OpGetLocal: {
+                auto result = push(stack_[frame->bp + operands[0]]);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             case OpcodeType::OpArray: {
                 auto array = buildArray(operands[0]);
                 if (IsError(array)) {
@@ -178,20 +189,25 @@ std::shared_ptr<Object> VM::run() {
                         fmt::format("calling non-function: {}", function_obj->typeStr()));
                 }
 
-                pushFrame(Frame::New(std::dynamic_pointer_cast<CompiledFunction>(function_obj)));
+                auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(function_obj);
+                pushFrame(Frame::New(compiled_function, sp_));
 
                 frame = currentFrame();
                 instructions_ = frame->instructions();
+
+                // 借用一段调用栈空间
+                sp_ = frame->bp + compiled_function->localNum();
             } break;
             case OpcodeType::OpReturnValue: {
                 auto return_value = pop();
 
-                popFrame();
+                auto call_frame = popFrame();
+                sp_ = call_frame->bp - 1;
 
                 frame = currentFrame();
                 instructions_ = frame->instructions();
 
-                pop();  // 函数本体出栈
+                // pop();  // 函数本体出栈
 
                 auto result = push(return_value);
                 if (IsError(result)) {
@@ -199,12 +215,13 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
             case OpcodeType::OpReturn: {
-                popFrame();
+                auto call_frame = popFrame();
+                sp_ = call_frame->bp - 1;
 
                 frame = currentFrame();
                 instructions_ = frame->instructions();
 
-                pop();  // 函数本体出栈
+                // pop();  // 函数本体出栈
 
                 auto result = push(kNullObj);
                 if (IsError(result)) {

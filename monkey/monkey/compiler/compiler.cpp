@@ -238,8 +238,9 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             }
 
             // 回到上一层作用域并获取编译字节码
+            auto local_num = symbol_table_->nextIndex();
             auto instructions = leaveScope();
-            auto pos = addConstant(std::make_shared<CompiledFunction>(instructions));
+            auto pos = addConstant(std::make_shared<CompiledFunction>(instructions, local_num));
             emit(OpcodeType::OpConstant, {pos});
         } break;
         case Node::Type::ReturnStatement: {

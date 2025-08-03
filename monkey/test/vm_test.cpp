@@ -145,7 +145,7 @@ TEST(VMTest, GlobalLetStatementTest) {
     RUN_VM_TESTS(tests);
 }
 
-TEST(VMTest, CallingFunctionWIthoutArgumentsTest) {
+TEST(VMTest, CallingFunctionWithoutArgumentsTest) {
     VMTestCase tests[] = {
         {R""(
                 let fivePlusTen = fn(){ 5 + 10; }
@@ -200,6 +200,66 @@ TEST(VMTest, CallingFunctionWIthoutArgumentsTest) {
                 returnOneReturner()();
             )"",
             1},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
+TEST(VMTest, CallingFunctionWithLocalArgumentTest) {
+    VMTestCase tests[] = {
+        {R""(
+                let one = fn(){ let one = 1; one }
+                one();
+            )"",
+         1},
+        {R""(
+                let oneAndTwo = fn(){ let one = 1; let two = 2; one + two; }
+                oneAndTwo();
+            )"",
+         3},
+        {R""(
+                let oneAndTwo = fn(){ let one=1; let two=2; one + two; }
+                let threeAndFour = fn(){ let three = 3; let four = 4; three + four; }
+                oneAndTwo() + threeAndFour();
+            )"",
+         10},
+        {R""(
+                let firstFoobar = fn(){ let foobar = 50; foobar; }
+                let secondFoobar = fn(){ let foobar = 100; foobar; }
+                firstFoobar() + secondFoobar();
+            )"",
+         150},
+        {R""(
+                let globalSeed = 50;
+                let minusOne = fn(){
+                    let num = 1;
+                    globalSeed - num;
+                }
+
+                let minusTwo = fn(){
+                    let num = 2;
+                    globalSeed - num;
+                }
+
+                minusOne() + minusTwo();
+            )"",
+         97},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
+TEST(VMTest, CallingFirstFunctionTest) {
+    VMTestCase tests[] = {
+        {R""(
+                let returnsOneReturner = fn(){
+                    let returnsOne = fn(){ 1 ; };
+                    returnsOne;
+                }
+
+                returnsOneReturner()();
+            )"",
+         1},
     };
 
     RUN_VM_TESTS(tests);

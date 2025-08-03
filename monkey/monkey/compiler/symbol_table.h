@@ -37,6 +37,7 @@ public:
     std::shared_ptr<Symbol> Resolve(const std::string& name) const;
 
     std::shared_ptr<SymbolTable> outer() const { return outer_; }
+    size_t nextIndex() const { return next_index_; }
 
 private:
     std::shared_ptr<SymbolTable> outer_;
