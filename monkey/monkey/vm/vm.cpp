@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "monkey/object/builtins.h"
+
 namespace pyc {
 namespace monkey {
 
@@ -151,6 +153,14 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpGetBuiltin: {
+                auto definition = GetBuiltinList()[operands[0]];
+                auto result = push(definition.Builtin);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             case OpcodeType::OpArray: {
                 auto array = buildArray(operands[0]);
                 if (IsError(array)) {
@@ -181,7 +191,7 @@ std::shared_ptr<Object> VM::run() {
             } break;
 
             case OpcodeType::OpCall: {
-                auto result = callFunction(operands[0]);
+                auto result = executeCall(operands[0]);
                 if (IsError(result)) {
                     return result;
                 }
@@ -378,17 +388,22 @@ std::shared_ptr<Object> VM::buildHash(size_t size) {
     return hash;
 }
 
-std::shared_ptr<Object> VM::callFunction(size_t num_args) {
-    if (sp_ < 1 + num_args) {
-        return std::make_shared<Error>("Stack underflow");
+std::shared_ptr<Object> VM::executeCall(size_t num_args) {
+    if (sp_ < num_args + 1) {
+        return std::make_shared<Error>("Stack underflow for function call");
     }
 
     auto function_obj = stack_[sp_ - 1 - num_args];
-    if (function_obj->type() != Object::Type::COMPILED_FUNCTION) {
-        return std::make_shared<Error>(fmt::format("calling non-function: {}", function_obj->typeStr()));
+    if (function_obj->type() == Object::Type::COMPILED_FUNCTION) {
+        return callFunction(std::dynamic_pointer_cast<CompiledFunction>(function_obj), num_args);
+    } else if (function_obj->type() == Object::Type::BUILTIN) {
+        return callBuiltin(std::dynamic_pointer_cast<Builtin>(function_obj), num_args);
     }
+    return std::make_shared<Error>(
+        fmt::format("calling non-function and non-built-in: {}", function_obj->typeStr()));
+}
 
-    auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(function_obj);
+std::shared_ptr<Object> VM::callFunction(std::shared_ptr<CompiledFunction> compiled_function, size_t num_args) {
     if (compiled_function->parametersNum() != num_args) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments: want={}, got={}",
                                                    compiled_function->parametersNum(), num_args));
@@ -402,6 +417,19 @@ std::shared_ptr<Object> VM::callFunction(size_t num_args) {
     sp_ = function_frame->bp + compiled_function->localNum();
 
     return nullptr;
+}
+
+std::shared_ptr<Object> VM::callBuiltin(std::shared_ptr<Builtin> builtin, size_t num_args) {
+    std::vector<std::shared_ptr<Object>> args(stack_.begin() + sp_ - num_args, stack_.begin() + sp_);
+
+    sp_ = sp_ - num_args - 1;  // 函数调用后，栈顶元素是返回值
+
+    auto result = builtin->function()(args);
+    if (result) {
+        return push(result);
+    } else {
+        return push(kNullObj);
+    }
 }
 
 void VM::pushFrame(std::shared_ptr<Frame> frame) {

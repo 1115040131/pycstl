@@ -330,7 +330,7 @@ TEST(VMTest, CallingFunctionWithWrongArgumentsTest) {
                 let a = 2;
                 a();
             )"",
-         "calling non-function: INTEGER"},
+         "calling non-function and non-built-in: INTEGER"},
         {R""(
                 fn(){ 1; }(1)
             )"",
@@ -343,6 +343,46 @@ TEST(VMTest, CallingFunctionWithWrongArgumentsTest) {
                 fn(a, b){ a + b; }(1)
             )"",
          "wrong number of arguments: want=2, got=1"},
+    };
+
+    RUN_VM_TESTS(tests);
+}
+
+TEST(VMTest, CallingBuiltinFunctionTest) {
+    VMTestCase tests[] = {
+        {R""(
+                len("")
+            )"",
+         0},
+        {R""(
+                len("four")
+            )"",
+         4},
+        {R""(
+                len("hello world")
+            )"",
+         11},
+        {"last([1, 2, 3])", 3},
+        {"len([1, 2, 3])", 3},
+        {"first([1, 2, 3])", 1},
+        {"len([])", 0},
+        {"len(1)", "argument to `len` not supported, got INTEGER"},
+        {R""(
+                len("one", "two")
+            )"",
+         "wrong number of arguments. got=2, want=1"},
+        {"first(1)", "argument to `first` must be ARRAY, got INTEGER"},
+        {"last(1)", "argument to `last` must be ARRAY, got INTEGER"},
+        {"push(1, 1)", "argument to `push` must be ARRAY, got INTEGER"},
+        {R""(
+                puts("hello", "world!")
+            )"",
+         nullptr},
+        {"first([])", nullptr},
+        {"last([])", nullptr},
+        {"rest([])", nullptr},
+        {"rest([1,2,3])", "[2, 3]"},
+        {"push([], 1)", "[1]"},
     };
 
     RUN_VM_TESTS(tests);

@@ -19,7 +19,7 @@ DEF_BUILTIN(len) {
     } else if (auto array = std::dynamic_pointer_cast<Array>(args[0])) {
         return std::make_shared<Integer>(array->elements().size());
     }
-    return std::make_shared<Error>(fmt::format("argument to 'len' not supported, got {}", args[0]->typeStr()));
+    return std::make_shared<Error>(fmt::format("argument to `len` not supported, got {}", args[0]->typeStr()));
 }
 
 DEF_BUILTIN(puts) {
@@ -39,7 +39,7 @@ DEF_BUILTIN(first) {
         }
         return array->elements().front();
     }
-    return std::make_shared<Error>(fmt::format("argument to 'first' must be ARRAY, got {}", args[0]->typeStr()));
+    return std::make_shared<Error>(fmt::format("argument to `first` must be ARRAY, got {}", args[0]->typeStr()));
 }
 
 DEF_BUILTIN(last) {
@@ -52,7 +52,7 @@ DEF_BUILTIN(last) {
         }
         return array->elements().back();
     }
-    return std::make_shared<Error>(fmt::format("argument to 'last' must be ARRAY, got {}", args[0]->typeStr()));
+    return std::make_shared<Error>(fmt::format("argument to `last` must be ARRAY, got {}", args[0]->typeStr()));
 }
 
 DEF_BUILTIN(rest) {
@@ -66,7 +66,7 @@ DEF_BUILTIN(rest) {
         return std::make_shared<Array>(
             std::vector<std::shared_ptr<Object>>(array->elements().begin() + 1, array->elements().end()));
     }
-    return std::make_shared<Error>(fmt::format("argument to 'rest' must be ARRAY, got {}", args[0]->typeStr()));
+    return std::make_shared<Error>(fmt::format("argument to `rest` must be ARRAY, got {}", args[0]->typeStr()));
 }
 
 DEF_BUILTIN(push) {
@@ -78,7 +78,7 @@ DEF_BUILTIN(push) {
         elements.push_back(args[1]);
         return std::make_shared<Array>(std::move(elements));  // Return a new array with the element pushed
     }
-    return std::make_shared<Error>(fmt::format("argument to 'push' must be ARRAY, got {}", args[0]->typeStr()));
+    return std::make_shared<Error>(fmt::format("argument to `push` must be ARRAY, got {}", args[0]->typeStr()));
 }
 
 #define ALL_BUILTINS                                                                               \

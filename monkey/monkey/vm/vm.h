@@ -66,7 +66,11 @@ private:
 
     std::shared_ptr<Object> buildHash(size_t size);
 
-    std::shared_ptr<Object> callFunction(size_t num_args);
+    std::shared_ptr<Object> executeCall(size_t num_args);
+
+    std::shared_ptr<Object> callFunction(std::shared_ptr<CompiledFunction> compiled_function, size_t num_args);
+
+    std::shared_ptr<Object> callBuiltin(std::shared_ptr<Builtin> builtin, size_t num_args);
 
     std::shared_ptr<Frame> currentFrame() { return frames_[frame_index_]; }
 

@@ -4,6 +4,7 @@
 
 #include <fmt/base.h>
 
+#include "monkey/object/builtins.h"
 // #include "monkey/evaluator/evaluator.h"
 #include "monkey/lexer/lexer.h"
 // #include "monkey/object/environment.h"
@@ -46,6 +47,12 @@ void Repl::Start() {
     std::vector<std::shared_ptr<Object>> constants;
     std::vector<std::shared_ptr<Object>> globals(VM::kGlobalSize);
     auto symbol_table = SymbolTable::New();
+
+    size_t index{};
+    for (const auto& [name, builtin] : GetBuiltinList()) {
+        symbol_table->DefineBuiltin(std::string(name), index);
+        index++;
+    }
 
     while (true) {
         fmt::print("{}", kPrompt);
