@@ -26,6 +26,7 @@ public:
         HASH,
         BUILTIN,
         COMPILED_FUNCTION,
+        CLOSURE,
     };
 
     virtual ~Object() = default;
@@ -242,6 +243,27 @@ private:
     Instructions instructions_;
     size_t local_num_;
     size_t parameters_num_;
+};
+
+class Closure : public Object {
+public:
+    TYPE(CLOSURE)
+
+    Closure(std::shared_ptr<CompiledFunction> compiled_function)
+        : compiled_function_(std::move(compiled_function)) {}
+
+    virtual ~Closure() override = default;
+
+    virtual std::string inspect() const override {
+        return fmt::format("Closure[{}]", reinterpret_cast<uintptr_t>(this));
+    }
+
+    const auto& compiledFunction() const { return compiled_function_; }
+    auto& free() { return free_; }
+
+private:
+    std::shared_ptr<CompiledFunction> compiled_function_;
+    std::vector<std::shared_ptr<Object>> free_;
 };
 
 inline auto kNullObj = std::make_shared<Null>();

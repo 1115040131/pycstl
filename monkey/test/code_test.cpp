@@ -14,13 +14,26 @@ TEST(CodeTest, MakerTest) {
     };
 
     Input inputs[] = {
-        {OpcodeType::OpConstant,
-         {65534},
-         {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpConstant), 0xFF, 0xFE}},
-        {OpcodeType::OpAdd, {}, {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpAdd)}},
-        {OpcodeType::OpGetLocal,
-         {255},
-         {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpGetLocal), 0xFF}},
+        {
+            OpcodeType::OpConstant,
+            {65534},
+            {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpConstant), 0xFF, 0xFE},
+        },
+        {
+            OpcodeType::OpAdd,
+            {},
+            {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpAdd)},
+        },
+        {
+            OpcodeType::OpGetLocal,
+            {255},
+            {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpGetLocal), 0xFF},
+        },
+        {
+            OpcodeType::OpClosure,
+            {65534, 255},
+            {static_cast<std::underlying_type_t<OpcodeType>>(OpcodeType::OpClosure), 0xFF, 0xFE, 0xFF},
+        },
     };
 
     for (const auto& input : inputs) {
@@ -43,6 +56,7 @@ TEST(CodeTest, ReadOperandsTest) {
         {OpcodeType::OpConstant, {65534}, 3},
         {OpcodeType::OpAdd, {}, 1},
         {OpcodeType::OpGetLocal, {255}, 2},
+        {OpcodeType::OpClosure, {65535, 255}, 4},
     };
 
     size_t offset = 0;
@@ -85,6 +99,19 @@ TEST(CodeTest, InstructionsToStringTest) {
 0001 OpGetLocal 1
 0003 OpConstant 2
 0006 OpConstant 65535
+)""},
+        {{
+             ByteCode::Make(OpcodeType::OpAdd, {}),
+             ByteCode::Make(OpcodeType::OpGetLocal, {1}),
+             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpConstant, {65535}),
+             ByteCode::Make(OpcodeType::OpClosure, {65535, 255}),
+         },
+         R""(0000 OpAdd
+0001 OpGetLocal 1
+0003 OpConstant 2
+0006 OpConstant 65535
+0009 OpClosure 65535 255
 )""},
     };
 

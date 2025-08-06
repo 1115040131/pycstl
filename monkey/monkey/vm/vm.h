@@ -12,12 +12,7 @@ public:
     static constexpr size_t kStackSize = 2048;
     static constexpr size_t kGlobalSize = 65536;
 
-    static std::shared_ptr<VM> New(std::shared_ptr<Compiler> compiler) {
-        std::vector<std::shared_ptr<Frame>> frames(kFrameSize);
-        auto main_func = std::make_shared<CompiledFunction>(compiler->instructions(), 0, 0);
-        frames[0] = Frame::New(main_func, 0);
-        return std::make_shared<VM>(compiler->constants(), frames);
-    }
+    static std::shared_ptr<VM> New(std::shared_ptr<Compiler> compiler);
 
     static std::shared_ptr<VM> NewWithState(std::shared_ptr<Compiler> compiler,
                                             const std::vector<std::shared_ptr<Object>>& globals) {
@@ -68,9 +63,11 @@ private:
 
     std::shared_ptr<Object> executeCall(size_t num_args);
 
-    std::shared_ptr<Object> callFunction(std::shared_ptr<CompiledFunction> compiled_function, size_t num_args);
+    std::shared_ptr<Object> callClosure(std::shared_ptr<Closure> closure, size_t num_args);
 
     std::shared_ptr<Object> callBuiltin(std::shared_ptr<Builtin> builtin, size_t num_args);
+
+    std::shared_ptr<Object> pushClosure(size_t const_index);
 
     std::shared_ptr<Frame> currentFrame() { return frames_[frame_index_]; }
 

@@ -53,6 +53,8 @@ std::string_view toString(OpcodeType type) {
         TO_STRING_CASE(OpcodeType, OpCall);
         TO_STRING_CASE(OpcodeType, OpReturnValue);
         TO_STRING_CASE(OpcodeType, OpReturn);
+
+        TO_STRING_CASE(OpcodeType, OpClosure);
     }
     return "Unknown OpcodeType";
 }
@@ -102,6 +104,8 @@ inline const std::map<OpcodeType, Definition> definitions{
     {OpcodeType::OpCall, {"OpCall", {1}}},
     {OpcodeType::OpReturnValue, {"OpReturnValue", {}}},
     {OpcodeType::OpReturn, {"OpReturn", {}}},
+
+    {OpcodeType::OpClosure, {"OpClosure", {2, 1}}},
 };
 
 // 整数版本

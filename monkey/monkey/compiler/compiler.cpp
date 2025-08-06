@@ -258,7 +258,7 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             auto parameters_num = function_literal->parameters().size();
             auto instructions = leaveScope();
             auto pos = addConstant(std::make_shared<CompiledFunction>(instructions, local_num, parameters_num));
-            emit(OpcodeType::OpConstant, {pos});
+            emit(OpcodeType::OpClosure, {pos, 0});
         } break;
         case Node::Type::ReturnStatement: {
             auto return_statement = std::dynamic_pointer_cast<ReturnStatement>(node);

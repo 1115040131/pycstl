@@ -33,6 +33,7 @@ std::string_view toString(Object::Type type) {
         TO_STRING_CASE(Object::Type, HASH);
         TO_STRING_CASE(Object::Type, BUILTIN);
         TO_STRING_CASE(Object::Type, COMPILED_FUNCTION);
+        TO_STRING_CASE(Object::Type, CLOSURE);
     }
     return "Unknown Object Type";
 }

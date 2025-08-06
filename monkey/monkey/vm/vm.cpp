@@ -7,6 +7,16 @@
 namespace pyc {
 namespace monkey {
 
+std::shared_ptr<VM> VM::New(std::shared_ptr<Compiler> compiler) {
+    auto main_func = std::make_shared<CompiledFunction>(compiler->instructions(), 0, 0);
+    auto main_closure = std::make_shared<Closure>(main_func);
+
+    std::vector<std::shared_ptr<Frame>> frames(kFrameSize);
+    frames[0] = Frame::New(main_closure, 0);
+
+    return std::make_shared<VM>(compiler->constants(), frames);
+}
+
 std::shared_ptr<Object> VM::top() const {
     if (sp_ == 0) {
         return nullptr;
@@ -230,6 +240,13 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpClosure: {
+                auto result = pushClosure(operands[0]);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }
@@ -394,8 +411,8 @@ std::shared_ptr<Object> VM::executeCall(size_t num_args) {
     }
 
     auto function_obj = stack_[sp_ - 1 - num_args];
-    if (function_obj->type() == Object::Type::COMPILED_FUNCTION) {
-        return callFunction(std::dynamic_pointer_cast<CompiledFunction>(function_obj), num_args);
+    if (function_obj->type() == Object::Type::CLOSURE) {
+        return callClosure(std::dynamic_pointer_cast<Closure>(function_obj), num_args);
     } else if (function_obj->type() == Object::Type::BUILTIN) {
         return callBuiltin(std::dynamic_pointer_cast<Builtin>(function_obj), num_args);
     }
@@ -403,18 +420,18 @@ std::shared_ptr<Object> VM::executeCall(size_t num_args) {
         fmt::format("calling non-function and non-built-in: {}", function_obj->typeStr()));
 }
 
-std::shared_ptr<Object> VM::callFunction(std::shared_ptr<CompiledFunction> compiled_function, size_t num_args) {
-    if (compiled_function->parametersNum() != num_args) {
+std::shared_ptr<Object> VM::callClosure(std::shared_ptr<Closure> closure, size_t num_args) {
+    if (closure->compiledFunction()->parametersNum() != num_args) {
         return std::make_shared<Error>(fmt::format("wrong number of arguments: want={}, got={}",
-                                                   compiled_function->parametersNum(), num_args));
+                                                   closure->compiledFunction()->parametersNum(), num_args));
     }
 
-    auto function_frame = Frame::New(compiled_function, sp_ - num_args);
+    auto function_frame = Frame::New(closure, sp_ - num_args);
 
     pushFrame(function_frame);
 
     // 借用一段调用栈空间
-    sp_ = function_frame->bp + compiled_function->localNum();
+    sp_ = function_frame->bp + closure->compiledFunction()->localNum();
 
     return nullptr;
 }
@@ -430,6 +447,15 @@ std::shared_ptr<Object> VM::callBuiltin(std::shared_ptr<Builtin> builtin, size_t
     } else {
         return push(kNullObj);
     }
+}
+
+std::shared_ptr<Object> VM::pushClosure(size_t const_index) {
+    auto constant = constants_[const_index];
+    auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(constant);
+    if (!compiled_function) {
+        return std::make_shared<Error>(fmt::format("not a function: {}", constant->typeStr()));
+    }
+    return push(std::make_shared<Closure>(compiled_function));
 }
 
 void VM::pushFrame(std::shared_ptr<Frame> frame) {

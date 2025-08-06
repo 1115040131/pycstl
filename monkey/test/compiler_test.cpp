@@ -18,7 +18,7 @@ struct CompilerTestCase {
 #define TEST_INSTRUCTIONS(expected, actual, input)                                     \
     {                                                                                  \
         auto concated = concateInstructions(expected);                                 \
-        ASSERT_EQ(concated.size(), actual.size());                                     \
+        ASSERT_EQ(concated.size(), actual.size()) << "Input: " << input;               \
         for (size_t i = 0; i < concated.size(); i++) {                                 \
             EXPECT_EQ(concated[i], actual[i]) << "Input: " << input << "\nconcated:\n" \
                                               << toString(concated) << "actual:\n"     \
@@ -26,12 +26,12 @@ struct CompilerTestCase {
         }                                                                              \
     }
 
-#define TEST_CONSTANTS(expected, actual, input)                  \
-    {                                                            \
-        ASSERT_EQ(expected.size(), actual.size());               \
-        for (size_t i = 0; i < expected.size(); i++) {           \
-            TEST_EXPECTED_OBJECT(actual[i], expected[i], input); \
-        }                                                        \
+#define TEST_CONSTANTS(expected, actual, input)                          \
+    {                                                                    \
+        ASSERT_EQ(expected.size(), actual.size()) << "Input: " << input; \
+        for (size_t i = 0; i < expected.size(); i++) {                   \
+            TEST_EXPECTED_OBJECT(actual[i], expected[i], input);         \
+        }                                                                \
     }
 
 #define RUN_COMPILER_TESTS(tests)                                                            \
@@ -392,7 +392,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpClosure, {2, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){ 5 + 10}",
@@ -407,7 +407,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpClosure, {2, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){ 1; 2}",
@@ -422,7 +422,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpClosure, {2, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){}",
@@ -432,7 +432,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){ 24 }()",
@@ -444,7 +444,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
              ByteCode::Make(OpcodeType::OpCall, {0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
@@ -457,7 +457,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
              ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpCall, {0}),
@@ -471,7 +471,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              24,
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
              ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpConstant, {1}),
@@ -488,7 +488,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              26,
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
              ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpConstant, {1}),
@@ -506,7 +506,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              24,
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
              ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpConstant, {1}),
@@ -528,7 +528,7 @@ TEST(CompilerTest, CompileFunctionTest) {
              26,
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
              ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
              ByteCode::Make(OpcodeType::OpConstant, {1}),
@@ -555,7 +555,7 @@ TEST(CompilerTest, LetStatementScopeTest) {
          {
              ByteCode::Make(OpcodeType::OpConstant, {0}),
              ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
-             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){ let num = 55; num }",
@@ -569,7 +569,7 @@ TEST(CompilerTest, LetStatementScopeTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {1}),
+             ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
         {"fn(){ let a = 55; let b = 77; a + b",
@@ -588,7 +588,7 @@ TEST(CompilerTest, LetStatementScopeTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpClosure, {2, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
     };
@@ -665,7 +665,7 @@ TEST(CompilerTest, CompileBuiltinsTest) {
              },
          },
          {
-             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
     };

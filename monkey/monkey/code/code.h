@@ -52,6 +52,8 @@ enum class OpcodeType : Opcode {
     OpCall,
     OpReturnValue,
     OpReturn,  // return null
+
+    OpClosure,
 };
 
 std::string_view toString(OpcodeType type);
