@@ -46,17 +46,19 @@ inline std::ostream& operator<<(std::ostream& os, const Token& token) {
         EXPECT_EQ(str->value(), expected) << "Input: " << input;                                             \
     }
 
-#define TEST_COMPILED_FUNCTION(object, expected, input)                                \
-    {                                                                                  \
-        auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(object);  \
-        auto actual = compiled_function->instructions();                               \
-        auto concated = concateInstructions(expected);                                 \
-        ASSERT_EQ(concated.size(), actual.size());                                     \
-        for (size_t i = 0; i < concated.size(); i++) {                                 \
-            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input << "\nconcated:\n" \
-                                              << toString(concated) << "actual:\n"     \
-                                              << toString(actual);                     \
-        }                                                                              \
+#define TEST_COMPILED_FUNCTION(object, expected, input)                                    \
+    {                                                                                      \
+        auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(object);      \
+        auto actual = compiled_function->instructions();                                   \
+        auto concated = concateInstructions(expected);                                     \
+        ASSERT_EQ(concated.size(), actual.size()) << "Input: " << input << "\nconcated:\n" \
+                                                  << toString(concated) << "actual:\n"     \
+                                                  << toString(actual);                     \
+        for (size_t i = 0; i < concated.size(); i++) {                                     \
+            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input << "\nconcated:\n"     \
+                                              << toString(concated) << "actual:\n"         \
+                                              << toString(actual);                         \
+        }                                                                                  \
     }
 
 using Expected = std::variant<int, bool, std::string, std::vector<Instructions>, void*>;

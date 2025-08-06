@@ -110,7 +110,7 @@ TEST(SymbolTableTest, ResolveNestedLocalTest) {
 
     std::vector<SymbolTableTestCase> second_local_tests = {
         {"a", {"a", SymbolScopeType::kGlobal, 0}}, {"b", {"b", SymbolScopeType::kGlobal, 1}},
-        {"c", {"c", SymbolScopeType::kLocal, 0}},  {"d", {"d", SymbolScopeType::kLocal, 1}},
+        {"c", {"c", SymbolScopeType::kFree, 0}},   {"d", {"d", SymbolScopeType::kFree, 1}},
         {"e", {"e", SymbolScopeType::kLocal, 0}},  {"f", {"f", SymbolScopeType::kLocal, 1}},
     };
 
@@ -146,6 +146,48 @@ TEST(SymbolTableTest, ResolveBuiltinsTest) {
             EXPECT_EQ(*result, expect);
         }
     }
+}
+
+TEST(SymbolTableTest, ResolveUnresolveableFreeTest) {
+    auto global = SymbolTable::New();
+    global->Define("a");
+
+    auto first_local = SymbolTable::NewEnclosed(global);
+    first_local->Define("c");
+
+    auto second_local = SymbolTable::NewEnclosed(first_local);
+    second_local->Define("e");
+    second_local->Define("f");
+
+    std::vector<SymbolTableTestCase> first_local_tests = {
+        {"a", {"a", SymbolScopeType::kGlobal, 0}},
+        {"c", {"c", SymbolScopeType::kLocal, 0}},
+    };
+
+    for (const auto& test : first_local_tests) {
+        auto symbol = first_local->Resolve(test.name);
+        ASSERT_TRUE(symbol) << "Failed to resolve symbol: " << test.name;
+        EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
+    }
+    EXPECT_FALSE(first_local->Resolve("b"));
+    EXPECT_FALSE(first_local->Resolve("d"));
+    EXPECT_FALSE(first_local->Resolve("e"));
+    EXPECT_FALSE(first_local->Resolve("f"));
+
+    std::vector<SymbolTableTestCase> second_local_tests = {
+        {"a", {"a", SymbolScopeType::kGlobal, 0}},
+        {"c", {"c", SymbolScopeType::kFree, 0}},
+        {"e", {"e", SymbolScopeType::kLocal, 0}},
+        {"f", {"f", SymbolScopeType::kLocal, 1}},
+    };
+
+    for (const auto& test : second_local_tests) {
+        auto symbol = second_local->Resolve(test.name);
+        ASSERT_TRUE(symbol) << "Failed to resolve symbol: " << test.name;
+        EXPECT_EQ(*symbol, test.expected) << "Symbol mismatch for: " << test.name;
+    }
+    EXPECT_FALSE(second_local->Resolve("b"));
+    EXPECT_FALSE(second_local->Resolve("d"));
 }
 
 }  // namespace monkey

@@ -15,15 +15,17 @@ struct CompilerTestCase {
     std::vector<Instructions> expected_instructions;
 };
 
-#define TEST_INSTRUCTIONS(expected, actual, input)                                     \
-    {                                                                                  \
-        auto concated = concateInstructions(expected);                                 \
-        ASSERT_EQ(concated.size(), actual.size()) << "Input: " << input;               \
-        for (size_t i = 0; i < concated.size(); i++) {                                 \
-            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input << "\nconcated:\n" \
-                                              << toString(concated) << "actual:\n"     \
-                                              << toString(actual);                     \
-        }                                                                              \
+#define TEST_INSTRUCTIONS(expected, actual, input)                                         \
+    {                                                                                      \
+        auto concated = concateInstructions(expected);                                     \
+        ASSERT_EQ(concated.size(), actual.size()) << "Input: " << input << "\nconcated:\n" \
+                                                  << toString(concated) << "actual:\n"     \
+                                                  << toString(actual);                     \
+        for (size_t i = 0; i < concated.size(); i++) {                                     \
+            EXPECT_EQ(concated[i], actual[i]) << "Input: " << input << "\nconcated:\n"     \
+                                              << toString(concated) << "actual:\n"         \
+                                              << toString(actual);                         \
+        }                                                                                  \
     }
 
 #define TEST_CONSTANTS(expected, actual, input)                          \
@@ -666,6 +668,127 @@ TEST(CompilerTest, CompileBuiltinsTest) {
          },
          {
              ByteCode::Make(OpcodeType::OpClosure, {0, 0}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+    };
+
+    RUN_COMPILER_TESTS(tests);
+}
+
+TEST(CompilerTest, CompileClosureTest) {
+    CompilerTestCase tests[] = {
+        {R""(
+                fn(a){
+                    fn(b){
+                        a+b
+                    }
+                }
+            )"",
+         {
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetFree, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpClosure, {0, 1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {R""(
+                fn(a){
+                    fn(b){
+                        fn(c){
+                            a + b + c;
+                        }
+                    }
+                };
+            )"",
+         {
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetFree, {0}),
+                 ByteCode::Make(OpcodeType::OpGetFree, {1}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetFree, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpClosure, {0, 2}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpClosure, {1, 1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpClosure, {2, 0}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {R""(
+                let global = 55;
+
+                fn(){
+                    let a = 66;
+
+                    fn(){
+                        let b = 77;
+
+                        fn(){
+                            let c = 88;
+
+                            global + a + b + c;
+                        }
+                    }
+                };
+            )"",
+         {
+             55,
+             66,
+             77,
+             88,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {3}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetFree, {0}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpGetFree, {1}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpAdd, {}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {2}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetFree, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpClosure, {4, 2}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpConstant, {1}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpClosure, {5, 1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpConstant, {0}),
+             ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpClosure, {6, 0}),
              ByteCode::Make(OpcodeType::OpPop, {}),
          }},
     };

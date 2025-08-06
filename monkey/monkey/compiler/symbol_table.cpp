@@ -19,12 +19,26 @@ std::shared_ptr<Symbol> SymbolTable::DefineBuiltin(const std::string& name, size
     return symbol;
 }
 
-std::shared_ptr<Symbol> SymbolTable::Resolve(const std::string& name) const {
+std::shared_ptr<Symbol> SymbolTable::DefineFree(std::shared_ptr<Symbol> original) {
+    free_symbols_.push_back(original);
+    auto symbol =
+        std::make_shared<Symbol>(Symbol{original->name, SymbolScopeType::kFree, free_symbols_.size() - 1});
+    store_[original->name] = symbol;
+    return symbol;
+}
+
+std::shared_ptr<Symbol> SymbolTable::Resolve(const std::string& name) {
     auto it = store_.find(name);
     if (it != store_.end()) {
         return it->second;
     } else if (outer_) {
-        return outer_->Resolve(name);
+        auto object = outer_->Resolve(name);
+
+        if (!object || object->scope == SymbolScopeType::kGlobal || object->scope == SymbolScopeType::kBuiltin) {
+            return object;
+        }
+
+        return DefineFree(object);
     }
     return nullptr;
 }

@@ -253,12 +253,21 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
                 emit(OpcodeType::OpReturn, {});
             }
 
-            // 回到上一层作用域并获取编译字节码
+            // 获取编译好的函数自由变量
+            auto free_symbols = symbol_table_->freeSymbols();
             auto local_num = symbol_table_->nextIndex();
             auto parameters_num = function_literal->parameters().size();
+
+            // 回到上一层作用域并获取编译字节码
             auto instructions = leaveScope();
+
+            // 首先编码自由变量
+            for (const auto& free : free_symbols) {
+                loadSymbol(free);
+            }
+
             auto pos = addConstant(std::make_shared<CompiledFunction>(instructions, local_num, parameters_num));
-            emit(OpcodeType::OpClosure, {pos, 0});
+            emit(OpcodeType::OpClosure, {pos, free_symbols.size()});
         } break;
         case Node::Type::ReturnStatement: {
             auto return_statement = std::dynamic_pointer_cast<ReturnStatement>(node);
@@ -309,6 +318,8 @@ void Compiler::loadSymbol(std::shared_ptr<Symbol> symbol) {
         emit(OpcodeType::OpGetLocal, {symbol->index});
     } else if (symbol->scope == SymbolScopeType::kBuiltin) {
         emit(OpcodeType::OpGetBuiltin, {symbol->index});
+    } else if (symbol->scope == SymbolScopeType::kFree) {
+        emit(OpcodeType::OpGetFree, {symbol->index});
     }
 }
 
