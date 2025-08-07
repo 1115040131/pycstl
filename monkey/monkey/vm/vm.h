@@ -67,7 +67,7 @@ private:
 
     std::shared_ptr<Object> callBuiltin(std::shared_ptr<Builtin> builtin, size_t num_args);
 
-    std::shared_ptr<Object> pushClosure(size_t const_index);
+    std::shared_ptr<Object> pushClosure(size_t const_index, size_t free_num);
 
     std::shared_ptr<Frame> currentFrame() { return frames_[frame_index_]; }
 

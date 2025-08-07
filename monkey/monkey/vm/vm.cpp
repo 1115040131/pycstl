@@ -241,7 +241,14 @@ std::shared_ptr<Object> VM::run() {
             } break;
 
             case OpcodeType::OpClosure: {
-                auto result = pushClosure(operands[0]);
+                auto result = pushClosure(operands[0], operands[1]);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
+            case OpcodeType::OpGetFree: {
+                auto result = push(currentFrame()->closure->free()[operands[0]]);
                 if (IsError(result)) {
                     return result;
                 }
@@ -449,13 +456,18 @@ std::shared_ptr<Object> VM::callBuiltin(std::shared_ptr<Builtin> builtin, size_t
     }
 }
 
-std::shared_ptr<Object> VM::pushClosure(size_t const_index) {
+std::shared_ptr<Object> VM::pushClosure(size_t const_index, size_t free_num) {
     auto constant = constants_[const_index];
     auto compiled_function = std::dynamic_pointer_cast<CompiledFunction>(constant);
     if (!compiled_function) {
         return std::make_shared<Error>(fmt::format("not a function: {}", constant->typeStr()));
     }
-    return push(std::make_shared<Closure>(compiled_function));
+    auto closure = std::make_shared<Closure>(compiled_function);
+    for (size_t i = 0; i < free_num; i++) {
+        closure->free().push_back(stack_[sp_ - free_num + i]);
+    }
+    sp_ -= free_num;
+    return push(closure);
 }
 
 void VM::pushFrame(std::shared_ptr<Frame> frame) {
