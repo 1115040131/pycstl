@@ -1,0 +1,42 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "monkey_lib",
+    srcs = glob(
+        ["monkey/**/*.cpp"],
+        exclude = ["monkey/monkey.cpp"],
+    ),
+    hdrs = glob([
+        "monkey/**/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    includes = ["."],
+    deps = ["@fmt"],
+)
+
+cc_library(
+    name = "monkey_lib_with_sorted_hash",
+    srcs = glob(
+        ["monkey/**/*.cpp"],
+        exclude = ["monkey/monkey.cpp"],
+    ),
+    hdrs = glob([
+        "monkey/**/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    defines = ["SORTED_HASH"],
+    includes = ["."],
+    deps = ["@fmt"],
+)
+
+cc_binary(
+    name = "monkey",
+    srcs = ["monkey/monkey.cpp"],
+    deps = [":monkey_lib"],
+)

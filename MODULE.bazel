@@ -19,6 +19,7 @@ bazel_dep(name = "boost.property_tree", version = BOOST_VERSION)
 bazel_dep(name = "boost.uuid", version = BOOST_VERSION)
 bazel_dep(name = "eigen", version = "4.0.0-20241125.bcr.1")
 bazel_dep(name = "fmt", version = "11.1.4")
+bazel_dep(name = "gflags", version = "2.2.2")
 bazel_dep(name = "glm", version = "1.0.0.bcr.1")
 bazel_dep(name = "grpc", version = "1.70.1", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "nasm", version = "2.14.02")  # aom dav1d need it

@@ -1,0 +1,14 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_test(
+    name = "monkey_all_test",
+    srcs = glob([
+        "*_test.cpp",
+        "*.h",
+    ]),
+    copts = STRICT_COPTS,
+    deps = [
+        "//monkey:monkey_lib_with_sorted_hash",
+        "@googletest//:gtest_main",
+    ],
+)
