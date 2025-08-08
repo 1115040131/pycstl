@@ -7,19 +7,38 @@ ColumnLimit: 115
 DerivePointerAlignment: false
 # 可以定义负数优先级从而保证某些#include永远在最前面
 IncludeCategories:
-  # first, non system headers that are included like <> - these are all
-  # local carveouts, and get sorted below c++ but before non grpc "" files
+  # queue 需要保证不被当成 Qt 头文件, 因此写在最前
+  - Regex: '^<(queue)>'
+    Priority: 20
+
+  # 3. 第三方库
   - Regex: '^<(boost/|Eigen/|fmt/|gmock/|glm/|grpcpp/|gtest/|hiredis|mysqlx|nlohmann/|SDL|spdlog/|yaml-cpp|zlib)'
     Priority: 30
-  # first C system headers - they have a . in the filename
+
+  # 3.1 Qt 模块头文件（如 QtCore, QtWidgets）
+  - Regex: '^<Qt[A-Z][a-zA-Z]*>'
+    Priority: 30
+
+  # 3.2 Qt 类头文件（如 QWidget, QString）
+  - Regex: '^<Q[A-Z][a-zA-Z0-9]*>'
+    Priority: 30
+
+  # 3.3 Qt 具体头文件（如 QtCore/qstring.h）
+  - Regex: '^<Qt[A-Z][a-zA-Z]*/.*\.h>'
+    Priority: 30
+
+  # 1. C 标准库
   - Regex: '^<.*\.'
     Priority: 10
-  # then C++ system headers - no ., the only thing that will match now
+
+  # 2. C++ 标准库
   - Regex: '^<'
     Priority: 20
+
   # finally other "" includes go between system headers and our headers
   - Regex: '^"'
     Priority: 40
+
 IncludeIsMainRegex: '(Test)?$'
 # 缩进宽度
 IndentWidth: 4

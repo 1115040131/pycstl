@@ -1,0 +1,9 @@
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v17.0.6  # 使用最新版本
+    hooks:
+      - id: clang-format
+        types: [c++]
+        args: [--style=file]  # 使用项目中的 .clang-format 文件
+        exclude: ^third_party/.*$  # 排除第三方代码

@@ -90,6 +90,66 @@ pip install mysql-connector-python --break-system-packages
 sudo apt update && sudo apt install acl
 ```
 
+### pre-commit
+
+1. 安装 pre-commit
+
+```bash
+sudo apt install pre-commit
+```
+
+2. 创建 .pre-commit-config.yaml
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v17.0.6  # 使用最新版本
+    hooks:
+      - id: clang-format
+        types: [c++]
+        args: [--style=file]  # 使用项目中的 .clang-format 文件
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        types: [c++]
+      - id: end-of-file-fixer
+        types: [c++]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  # 可选：添加其他检查
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+```
+
+3. 安装 pre-commit hooks
+
+```bash
+# 在项目根目录下执行
+pre-commit install
+
+# 可选：也安装到 commit-msg hook
+pre-commit install --hook-type commit-msg
+```
+
+4. 手动运行（测试用）
+
+```bash
+# 对所有文件运行
+pre-commit run --all-files
+
+# 只对暂存的文件运行
+pre-commit run
+
+# 运行特定的hook
+pre-commit run clang-format --all-files
+```
+
 ### QT Designer
 
 ```bash
