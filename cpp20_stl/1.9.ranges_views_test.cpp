@@ -52,7 +52,7 @@ TEST(RangesViewsTest, RangesAlgorithm) {
     }
     {
         auto vec = std::vector{3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
-        ranges::sort(views::drop(views::reverse(vec), 5)); // 丢弃后 5 个元素并逆序排序（从大到小）
+        ranges::sort(views::drop(views::reverse(vec), 5));  // 丢弃后 5 个元素并逆序排序（从大到小）
         EXPECT_TRUE(ranges::equal(vec, std::vector{5, 4, 3, 1, 1, 9, 2, 6, 5, 3}));
     }
 }

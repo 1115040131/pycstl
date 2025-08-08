@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QDialog>
 #include <unordered_map>
+
+#include <QDialog>
 
 #include "chat/client/user_data.h"
 

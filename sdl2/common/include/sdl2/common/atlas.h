@@ -3,9 +3,8 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include <SDL.h>
+#include <fmt/format.h>
 
 namespace pyc {
 namespace sdl2 {

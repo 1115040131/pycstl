@@ -5,7 +5,6 @@
 
 #include "network/thread_pool/thread_pool_server.h"
 
-
 int main() {
     try {
         boost::asio::io_context io_context;

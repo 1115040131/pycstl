@@ -3,9 +3,8 @@
 #include "ghost_escape/weapon_thunder.h"
 #include "sdl3/common/affiliate/sprite_anim.h"
 #include "sdl3/common/core/actor.h"
-#include "sdl3/common/world/effect.h"
 #include "sdl3/common/raw/timer.h"
-
+#include "sdl3/common/world/effect.h"
 
 namespace pyc {
 namespace sdl3 {

@@ -8,7 +8,8 @@ namespace monkey {
 #define DEF_BUILTIN(name) \
     inline static std::shared_ptr<Object> Builtin_##name(const std::vector<std::shared_ptr<Object>>& args)
 
-#define ADD_BUILTIN(name) {#name, std::make_shared<Builtin>(&Builtin_##name)}
+#define ADD_BUILTIN(name) \
+    { #name, std::make_shared<Builtin>(&Builtin_##name) }
 
 DEF_BUILTIN(len) {
     if (args.size() != 1) {

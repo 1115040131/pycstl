@@ -9,11 +9,11 @@
 #include <fstream>
 #include <unordered_map>
 #endif
+#include <memory>
 #include <source_location>
+#include <sstream>
 #include <type_traits>
 #include <typeinfo>
-#include <sstream>
-#include <memory>
 #if defined(__unix__) && __has_include(<cxxabi.h>)
 #include <cxxabi.h>
 #endif
@@ -29,40 +29,49 @@ private:
         supress = 3,
     } state;
 
-    char const *line;
-    std::source_location const &loc;
+    char const* line;
+    std::source_location const& loc;
 
-    static void uni_quotes(std::ostream &oss, std::string_view sv, char quote) {
+    static void uni_quotes(std::ostream& oss, std::string_view sv, char quote) {
         oss << quote;
-        for (char c: sv) {
+        for (char c : sv) {
             switch (c) {
-            case '\n': oss << "\\n"; break;
-            case '\r': oss << "\\r"; break;
-            case '\t': oss << "\\t"; break;
-            case '\\': oss << "\\\\"; break;
-            case '\0': oss << "\\0"; break;
-            default:
-                if ((c >= 0 && c < 0x20) || c == 0x7F) {
-                    auto f = oss.flags();
-                    oss << "\\x" << std::hex << std::setfill('0')
-                        << std::setw(2) << static_cast<int>(c);
-                    oss.flags(f);
-                } else {
-                    if (c == quote) {
-                        oss << '\\';
+                case '\n':
+                    oss << "\\n";
+                    break;
+                case '\r':
+                    oss << "\\r";
+                    break;
+                case '\t':
+                    oss << "\\t";
+                    break;
+                case '\\':
+                    oss << "\\\\";
+                    break;
+                case '\0':
+                    oss << "\\0";
+                    break;
+                default:
+                    if ((c >= 0 && c < 0x20) || c == 0x7F) {
+                        auto f = oss.flags();
+                        oss << "\\x" << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(c);
+                        oss.flags(f);
+                    } else {
+                        if (c == quote) {
+                            oss << '\\';
+                        }
+                        oss << c;
                     }
-                    oss << c;
-                }
-                break;
+                    break;
             }
         }
         oss << quote;
     }
 
-    static std::string uni_demangle(char const *name) {
+    static std::string uni_demangle(char const* name) {
 #if defined(__unix__) && __has_include(<cxxabi.h>)
         int status;
-        char *p = abi::__cxa_demangle(name, 0, 0, &status);
+        char* p = abi::__cxa_demangle(name, 0, 0, &status);
         std::string s = p ? p : name;
         std::free(p);
 #else
@@ -72,31 +81,26 @@ private:
     }
 
     template <class T0>
-    static void uni_format(std::ostream &oss, T0 &&t) {
+    static void uni_format(std::ostream& oss, T0&& t) {
         using T = std::decay_t<T0>;
-        if constexpr (std::is_convertible_v<T, std::string_view> &&
-                      !std::is_same_v<T, char const *>) {
+        if constexpr (std::is_convertible_v<T, std::string_view> && !std::is_same_v<T, char const*>) {
             uni_quotes(oss, t, '"');
         } else if constexpr (std::is_same_v<T, bool>) {
             auto f = oss.flags();
             oss << std::boolalpha << t;
             oss.flags(f);
-        } else if constexpr (std::is_same_v<T, char> ||
-                             std::is_same_v<T, signed char>) {
-            uni_quotes(oss, {reinterpret_cast<char const *>(&t), 1}, '\'');
-        } else if constexpr (std::is_same_v<T, char8_t> ||
-                             std::is_same_v<T, char16_t> ||
+        } else if constexpr (std::is_same_v<T, char> || std::is_same_v<T, signed char>) {
+            uni_quotes(oss, {reinterpret_cast<char const*>(&t), 1}, '\'');
+        } else if constexpr (std::is_same_v<T, char8_t> || std::is_same_v<T, char16_t> ||
                              std::is_same_v<T, char32_t>) {
             auto f = oss.flags();
             oss << "'\\"
-                << " xu U"[sizeof(T)] << std::hex << std::setfill('0')
-                << std::setw(sizeof(T) * 2) << std::uppercase
-                << static_cast<std::uint32_t>(t) << "'";
+                << " xu U"[sizeof(T)] << std::hex << std::setfill('0') << std::setw(sizeof(T) * 2)
+                << std::uppercase << static_cast<std::uint32_t>(t) << "'";
             oss.flags(f);
         } else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) {
             auto f = oss.flags();
-            oss << "0x" << std::hex << std::setfill('0')
-                << std::setw(sizeof(T) * 2) << std::uppercase;
+            oss << "0x" << std::hex << std::setfill('0') << std::setw(sizeof(T) * 2) << std::uppercase;
             if constexpr (sizeof(T) == 1) {
                 oss << static_cast<unsigned int>(t);
             } else {
@@ -105,31 +109,24 @@ private:
             oss.flags(f);
         } else if constexpr (std::is_floating_point_v<T>) {
             auto f = oss.flags();
-            oss << std::fixed
-                << std::setprecision(std::numeric_limits<T>::digits10) << t;
+            oss << std::fixed << std::setprecision(std::numeric_limits<T>::digits10) << t;
             oss.flags(f);
-        } else if constexpr (requires(std::ostream &oss, T0 &&t) {
-                                 oss << std::forward<T0>(t);
-                             }) {
+        } else if constexpr (requires(std::ostream& oss, T0&& t) { oss << std::forward<T0>(t); }) {
             oss << std::forward<T0>(t);
-        } else if constexpr (requires(T0 &&t) {
-                                 std::to_string(std::forward<T0>(t));
-                             }) {
+        } else if constexpr (requires(T0&& t) { std::to_string(std::forward<T0>(t)); }) {
             oss << std::to_string(std::forward<T0>(t));
-        } else if constexpr (requires(T0 &&t) {
-                                 std::begin(std::forward<T0>(t)) !=
-                                     std::end(std::forward<T0>(t));
+        } else if constexpr (requires(T0&& t) {
+                                 std::begin(std::forward<T0>(t)) != std::end(std::forward<T0>(t));
                              }) {
             oss << '{';
             bool add_comma = false;
-            for (auto &&i: t) {
-                if (add_comma)
-                    oss << ", ";
+            for (auto&& i : t) {
+                if (add_comma) oss << ", ";
                 add_comma = true;
                 uni_format(oss, std::forward<decltype(i)>(i));
             }
             oss << '}';
-        } else if constexpr (requires(T0 &&t) {
+        } else if constexpr (requires(T0&& t) {
                                  /* []<std::size_t... Is>( */
                                  /*     T &&t, std::index_sequence<Is...>) { */
                                  /*     void (*f)(...) = nullptr; */
@@ -143,10 +140,9 @@ private:
             oss << '{';
             bool add_comma = false;
             std::apply(
-                [&](auto &&...args) {
+                [&](auto&&... args) {
                     (([&] {
-                         if (add_comma)
-                             oss << ", ";
+                         if (add_comma) oss << ", ";
                          add_comma = true;
                          (uni_format)(oss, std::forward<decltype(args)>(args));
                      }()),
@@ -158,19 +154,15 @@ private:
             uni_format(oss, static_cast<std::underlying_type_t<T>>(t));
         } else if constexpr (std::is_same_v<T, std::type_info>) {
             oss << uni_demangle(t.name());
-        } else if constexpr (requires(T0 &&t) { std::forward<T0>(t).repr(); }) {
+        } else if constexpr (requires(T0&& t) { std::forward<T0>(t).repr(); }) {
             uni_format(oss, std::forward<T0>(t).repr());
-        } else if constexpr (requires(T0 &&t) {
-                                 std::forward<T0>(t).repr(oss);
-                             }) {
+        } else if constexpr (requires(T0&& t) { std::forward<T0>(t).repr(oss); }) {
             std::forward<T0>(t).repr(oss);
-        } else if constexpr (requires(T0 &&t) { repr(std::forward<T0>(t)); }) {
+        } else if constexpr (requires(T0&& t) { repr(std::forward<T0>(t)); }) {
             uni_format(oss, repr(std::forward<T0>(t)));
-        } else if constexpr (requires(T0 &&t) {
-                                 repr(oss, std::forward<T0>(t));
-                             }) {
+        } else if constexpr (requires(T0&& t) { repr(oss, std::forward<T0>(t)); }) {
             repr(oss, std::forward<T0>(t));
-        } else if constexpr (requires(T0 const &t) {
+        } else if constexpr (requires(T0 const& t) {
                                  (*t);
                                  (bool)t;
                              }) {
@@ -179,19 +171,17 @@ private:
             } else {
                 oss << "nil";
             }
-        } else if constexpr (requires(T0 const &t) {
-                                 visit([](auto const &) {}, t);
-                             }) {
-            visit([&oss](auto const &t) { uni_format(oss, t); }, t);
+        } else if constexpr (requires(T0 const& t) { visit([](auto const&) {}, t); }) {
+            visit([&oss](auto const& t) { uni_format(oss, t); }, t);
         } else {
             oss << '[' << uni_demangle(typeid(t).name()) << " at "
-                << reinterpret_cast<void const *>(std::addressof(t)) << ']';
+                << reinterpret_cast<void const*>(std::addressof(t)) << ']';
         }
     }
 
-    debug &add_location_marks() {
-        char const *fn = loc.file_name();
-        for (char const *fp = fn; *fp; ++fp) {
+    debug& add_location_marks() {
+        char const* fn = loc.file_name();
+        for (char const* fp = fn; *fp; ++fp) {
             if (*fp == '/') {
                 fn = fp + 1;
             }
@@ -201,14 +191,11 @@ private:
             oss << '[' << line << ']' << '\t';
         } else {
 #if DEBUG_SHOW_SOURCE
-            static thread_local std::unordered_map<std::string, std::string>
-                fileCache;
+            static thread_local std::unordered_map<std::string, std::string> fileCache;
             auto key = std::to_string(loc.line()) + loc.file_name();
-            if (auto it = fileCache.find(key);
-                it != fileCache.end() && !it->second.empty()) [[likely]] {
+            if (auto it = fileCache.find(key); it != fileCache.end() && !it->second.empty()) [[likely]] {
                 oss << '[' << it->second << ']';
-            } else if (auto file = std::ifstream(loc.file_name());
-                       file.is_open()) [[likely]] {
+            } else if (auto file = std::ifstream(loc.file_name()); file.is_open()) [[likely]] {
                 std::string line;
                 for (int i = 0; i < loc.line(); ++i) {
                     if (!std::getline(file, line)) [[unlikely]] {
@@ -216,8 +203,7 @@ private:
                         break;
                     }
                 }
-                if (auto pos = line.find_first_not_of(" \t\r\n");
-                    pos != line.npos) [[likely]] {
+                if (auto pos = line.find_first_not_of(" \t\r\n"); pos != line.npos) [[likely]] {
                     line = line.substr(pos);
                 }
                 if (!line.empty()) [[likely]] {
@@ -240,11 +226,11 @@ private:
     template <class T>
     struct debug_condition {
     private:
-        debug &d;
-        T const &t;
+        debug& d;
+        T const& t;
 
         template <class U>
-        debug &check(bool cond, U const &u, char const *sym) {
+        debug& check(bool cond, U const& u, char const* sym) {
             if (!cond) [[unlikely]] {
                 d.on_error("assertion failed:") << t << sym << u;
             }
@@ -252,40 +238,40 @@ private:
         }
 
     public:
-        explicit debug_condition(debug &d, T const &t) noexcept : d(d), t(t) {}
+        explicit debug_condition(debug& d, T const& t) noexcept : d(d), t(t) {}
 
         template <class U>
-        debug &operator<(U const &u) {
+        debug& operator<(U const& u) {
             return check(t < u, u, "<");
         }
 
         template <class U>
-        debug &operator>(U const &u) {
+        debug& operator>(U const& u) {
             return check(t > u, u, ">");
         }
 
         template <class U>
-        debug &operator<=(U const &u) {
+        debug& operator<=(U const& u) {
             return check(t <= u, u, "<=");
         }
 
         template <class U>
-        debug &operator>=(U const &u) {
+        debug& operator>=(U const& u) {
             return check(t >= u, u, ">=");
         }
 
         template <class U>
-        debug &operator==(U const &u) {
+        debug& operator==(U const& u) {
             return check(t == u, u, "==");
         }
 
         template <class U>
-        debug &operator!=(U const &u) {
+        debug& operator!=(U const& u) {
             return check(t != u, u, "!=");
         }
     };
 
-    debug &on_error(char const *msg) {
+    debug& on_error(char const* msg) {
         if (state != supress) {
             state = panic;
             add_location_marks();
@@ -297,9 +283,8 @@ private:
     }
 
     template <class T>
-    debug &on_print(T &&t) {
-        if (state == supress)
-            return *this;
+    debug& on_print(T&& t) {
+        if (state == supress) return *this;
         if (state == silent) {
             state = print;
             add_location_marks();
@@ -311,27 +296,24 @@ private:
     }
 
 public:
-    debug(bool enable = true, char const *line = nullptr,
-          std::source_location const &loc =
-              std::source_location::current()) noexcept
-        : state(enable ? silent : supress),
-          line(line),
-          loc(loc) {}
+    debug(bool enable = true, char const* line = nullptr,
+          std::source_location const& loc = std::source_location::current()) noexcept
+        : state(enable ? silent : supress), line(line), loc(loc) {}
 
-    debug(debug &&) = delete;
-    debug(debug const &) = delete;
+    debug(debug&&) = delete;
+    debug(debug const&) = delete;
 
     template <class T>
-    debug_condition<T> check(T const &t) noexcept {
+    debug_condition<T> check(T const& t) noexcept {
         return debug_condition<T>{*this, t};
     }
 
     template <class T>
-    debug_condition<T> operator>>(T const &t) noexcept {
+    debug_condition<T> operator>>(T const& t) noexcept {
         return debug_condition<T>{*this, t};
     }
 
-    debug &fail(bool fail = true) {
+    debug& fail(bool fail = true) {
         if (fail) [[unlikely]] {
             on_error("error:");
         } else {
@@ -340,7 +322,7 @@ public:
         return *this;
     }
 
-    debug &on(bool enable) {
+    debug& on(bool enable) {
         if (!enable) [[likely]] {
             state = supress;
         }
@@ -348,12 +330,12 @@ public:
     }
 
     template <class T>
-    debug &operator<<(T &&t) {
+    debug& operator<<(T&& t) {
         return on_print(std::forward<T>(t));
     }
 
     template <class T>
-    debug &operator,(T &&t) {
+    debug& operator,(T&& t) {
         return on_print(std::forward<T>(t));
     }
 
@@ -371,76 +353,72 @@ public:
 #else
 
 struct debug {
-    debug(bool = true, char const * = nullptr) noexcept {}
+    debug(bool = true, char const* = nullptr) noexcept {}
 
-    debug(debug &&) = delete;
-    debug(debug const &) = delete;
-
-    template <class T>
-    debug &operator,(T &&) {
-        return *this;
-    }
+    debug(debug&&) = delete;
+    debug(debug const&) = delete;
 
     template <class T>
-    debug &operator<<(T &&) {
+    debug& operator,(T&&) {
         return *this;
     }
 
-    debug &on(bool) {
+    template <class T>
+    debug& operator<<(T&&) {
         return *this;
     }
 
-    debug &fail(bool = true) {
-        return *this;
-    }
+    debug& on(bool) { return *this; }
+
+    debug& fail(bool = true) { return *this; }
 
     ~debug() noexcept(false) {}
 
 private:
     struct debug_condition {
-        debug &d;
+        debug& d;
 
-        explicit debug_condition(debug &d) : d(d) {}
+        explicit debug_condition(debug& d) : d(d) {}
 
         template <class U>
-        debug &operator<(U const &) {
+        debug& operator<(U const&) {
             return d;
         }
 
         template <class U>
-        debug &operator>(U const &) {
+        debug& operator>(U const&) {
             return d;
         }
 
         template <class U>
-        debug &operator<=(U const &) {
+        debug& operator<=(U const&) {
             return d;
         }
 
         template <class U>
-        debug &operator>=(U const &) {
+        debug& operator>=(U const&) {
             return d;
         }
 
         template <class U>
-        debug &operator==(U const &) {
+        debug& operator==(U const&) {
             return d;
         }
 
         template <class U>
-        debug &operator!=(U const &) {
+        debug& operator!=(U const&) {
             return d;
         }
     };
 
 public:
     template <class T>
-    debug_condition check(T const &) noexcept {
+    debug_condition check(T const&) noexcept {
         return debug_condition{*this};
     }
 
     template <class T>
-    debug_condition operator>>(T const &) noexcept {
+    debug_condition operator>>(T const&) noexcept {
         return debug_condition{*this};
     }
 };

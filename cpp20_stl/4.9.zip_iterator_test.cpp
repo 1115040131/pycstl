@@ -15,8 +15,7 @@ public:
           ita_end_{a.end()},
           itb_{b.begin()},
           itb_begin_{b.begin()},
-          itb_end_{b.end()} {
-    }
+          itb_end_{b.end()} {}
 
     ZipIterator& operator++() {
         ++ita_;

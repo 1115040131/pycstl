@@ -170,7 +170,6 @@ TEST(ConfigMgrTest, GetSectionConfig) {
             DUMMY_CODE(cannot_convert);
         },
         ::testing::ExitedWithCode(1), "");
-
 }
 
 }  // namespace chat

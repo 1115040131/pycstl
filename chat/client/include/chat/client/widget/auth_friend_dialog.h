@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QDialog>
 #include <map>
 #include <memory>
 #include <queue>
+
+#include <QDialog>
 
 #include "chat/client/user_data.h"
 #include "chat/client/util/clicked_label.h"

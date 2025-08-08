@@ -1,8 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include <QDialog>
 #include <QListWidget>
-#include <memory>
 
 #include "chat/client/user_data.h"
 

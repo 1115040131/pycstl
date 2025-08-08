@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QDialog>
 #include <memory>
+
+#include <QDialog>
 
 #include "chat/client/user_data.h"
 

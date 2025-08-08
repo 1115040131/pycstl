@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QString>
 #include <list>
 #include <unordered_map>
 #include <vector>
+
+#include <QString>
 
 #include "chat/client/user_data.h"
 #include "common/singleton.h"

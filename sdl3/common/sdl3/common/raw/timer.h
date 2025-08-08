@@ -16,9 +16,7 @@ public:
 
     bool isTimeOut();
 
-    float getProgress() const {
-        return timer_.count() / interval_.count();
-    }
+    float getProgress() const { return timer_.count() / interval_.count(); }
 
 private:
     std::chrono::duration<float> timer_{};

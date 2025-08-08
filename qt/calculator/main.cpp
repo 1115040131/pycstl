@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <QApplication>
 #include <QGridLayout>
 #include <QLabel>
@@ -5,7 +7,6 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QValidator>
-#include <vector>
 
 class PushButton : public QPushButton {
 public:

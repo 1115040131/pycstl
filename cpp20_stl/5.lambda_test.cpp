@@ -47,9 +47,7 @@ auto combine(F binary_func, A a, B b) {
 TEST(LambdaTest, CombineTest) {
     auto begin_with = [](std::string_view str) { return str.find("a") == 0; };
     auto end_with = [](std::string_view str) { return str.rfind("b") == str.size() - 1; };
-    auto bool_and = [](const auto& lhs,const auto& rhs) {
-        return lhs && rhs;
-    };
+    auto bool_and = [](const auto& lhs, const auto& rhs) { return lhs && rhs; };
     auto begin_and_end_with = combine(bool_and, begin_with, end_with);
     EXPECT_FALSE(begin_and_end_with(""));
     EXPECT_FALSE(begin_and_end_with("hello"));

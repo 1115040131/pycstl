@@ -7,11 +7,7 @@ struct Base {
 
 template <typename T>
 struct Derived : Base<T> {
-    void print() {
-        std::cout << this->value_ << std::endl;
-    }
+    void print() { std::cout << this->value_ << std::endl; }
 };
 
-int main() {
-    return 0;
-}
+int main() { return 0; }

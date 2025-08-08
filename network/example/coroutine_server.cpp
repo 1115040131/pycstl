@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "network/coroutine/coroutine_server.h"
+
+#include <iostream>
 
 int main() {
     try {

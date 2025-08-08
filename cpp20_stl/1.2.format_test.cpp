@@ -68,16 +68,16 @@ struct Frac {
     long d;
 };
 
-template<>
+template <>
 struct std::formatter<Frac> {
-	template<typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		return ctx.begin();
-	}
-	template<typename FormatContext>
-	auto format(const Frac& f, FormatContext& ctx) {
-		return std::format_to(ctx.out(), "{0:d}/{1:d}", f.a, f.b);
-	}
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        return ctx.begin();
+    }
+    template <typename FormatContext>
+    auto format(const Frac& f, FormatContext& ctx) {
+        return std::format_to(ctx.out(), "{0:d}/{1:d}", f.a, f.b);
+    }
 };
 
 TEST(FormatTest, FormatStruct) {

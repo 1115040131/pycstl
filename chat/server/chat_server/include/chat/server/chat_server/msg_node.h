@@ -2,9 +2,8 @@
 
 #include <cstring>
 
-#include "common/noncopyable.h"
-
 #include "chat/common/method.h"
+#include "common/noncopyable.h"
 
 namespace pyc {
 namespace chat {
