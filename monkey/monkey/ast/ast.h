@@ -367,10 +367,14 @@ public:
     void setBody(std::shared_ptr<BlockStatement> body) { body_ = std::move(body); }
     const std::shared_ptr<BlockStatement>& body() const { return body_; }
 
+    void setName(const std::string& name) { name_ = name; }
+    const std::string& name() const { return name_; }
+
 private:
     Token token_;  // fn 关键字
     std::vector<std::shared_ptr<Identifier>> parameters_;
     std::shared_ptr<BlockStatement> body_;
+    std::string name_;  // 函数名称
 };
 
 class CallExpression : public Expression {

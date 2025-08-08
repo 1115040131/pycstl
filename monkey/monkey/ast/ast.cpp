@@ -77,6 +77,9 @@ std::string FunctionLiteral::toString() const {
         params.pop_back();
         params.pop_back();
     }
+    if (!name_.empty()) {
+        return fmt::format("<{}>({}) {}", token_.literal, params, body_->toString());
+    }
     return fmt::format("{}({}) {}", token_.literal, params, body_->toString());
 }
 

@@ -110,6 +110,10 @@ std::unique_ptr<LetStatement> Parser::parseLetStatement() {
     nextToken();
     statement->setValue(parseExpression(Priority::LOWEST));
 
+    if (statement->value()->type() == Node::Type::FunctionLiteral) {
+        std::dynamic_pointer_cast<FunctionLiteral>(statement->value())->setName(statement->name()->toString());
+    }
+
     if (peek_token_.type == Token::Type::kSemicolon) {
         nextToken();
     }

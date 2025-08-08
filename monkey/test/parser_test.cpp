@@ -623,6 +623,24 @@ TEST(ParserTest, FunctionLiteralTest) {
     EXPECT_EQ(function_literal->toString(), "fn(x, y) { (x + y) }");
 }
 
+TEST(ParserTest, FunctionLiteralWithNameTest) {
+    std::string input = "let myFunction = fn(){ };";
+
+    auto parser = Parser::New(Lexer::New(input));
+    auto program = parser->parseProgram();
+
+    ASSERT_TRUE(program && parser->errors().empty());
+    EXPECT_EQ(program->statements().size(), 1);
+    const auto& statement = program->statements()[0];
+    EXPECT_EQ(statement->type(), Statement::Type::LetStatement);
+    const auto& expression = reinterpret_cast<LetStatement*>(statement.get())->value();
+    EXPECT_EQ(expression->type(), Expression::Type::FunctionLiteral);
+
+    // function literal
+    const auto& function_literal = reinterpret_cast<FunctionLiteral*>(expression.get());
+    EXPECT_EQ(function_literal->name(), "myFunction");
+}
+
 TEST(ParserTest, FunctionParameterTest) {
     struct Input {
         std::string input;
