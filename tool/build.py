@@ -215,6 +215,7 @@ def main():
         "monkey": lambda args: run_bazel_build('//monkey //monkey/test:monkey_all_test', args=args),
         "monkey_run": lambda args: run_bazel_run('//monkey', args=args),
         "monkey_test": lambda args: run_bazel_test('//monkey/test:monkey_all_test', args=args),
+        "monkey_bench": lambda args: run_bazel_run('//monkey/bench:monkey_bench --config=release', args=args),
 
         ######################### build for network #########################
         "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args=args),

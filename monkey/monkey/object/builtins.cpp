@@ -71,7 +71,7 @@ DEF_BUILTIN(rest) {
 
 DEF_BUILTIN(push) {
     if (args.size() != 2) {
-        return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
+        return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=2", args.size()));
     }
     if (auto array = std::dynamic_pointer_cast<Array>(args[0])) {
         auto elements = array->elements();
@@ -81,9 +81,34 @@ DEF_BUILTIN(push) {
     return std::make_shared<Error>(fmt::format("argument to `push` must be ARRAY, got {}", args[0]->typeStr()));
 }
 
+int fibonacci(int num) {
+    if (num == 0) {
+        return 0;
+    } else if (num == 1) {
+        return 1;
+    } else {
+        return fibonacci(num - 1) + fibonacci(num - 2);
+    }
+}
+
+DEF_BUILTIN(fibonacci) {
+    if (args.size() != 1) {
+        return std::make_shared<Error>(fmt::format("wrong number of arguments. got={}, want=1", args.size()));
+    }
+    if (auto integer = std::dynamic_pointer_cast<Integer>(args[0])) {
+        if (integer->value() < 0) {
+            return std::make_shared<Error>(
+                fmt::format("argument to `fibonacci` can not be negative, got {}", integer->value()));
+        }
+        return std::make_shared<Integer>(fibonacci(integer->value()));
+    }
+    return std::make_shared<Error>(
+        fmt::format("argument to `fibonacci` must be INTEGER, got {}", args[0]->typeStr()));
+}
+
 #define ALL_BUILTINS                                                                               \
     ADD_BUILTIN(len), ADD_BUILTIN(puts), ADD_BUILTIN(first), ADD_BUILTIN(last), ADD_BUILTIN(rest), \
-        ADD_BUILTIN(push),
+        ADD_BUILTIN(push), ADD_BUILTIN(fibonacci)
 
 inline static std::vector<BuiltinWithName> BuiltinList{ALL_BUILTINS};
 
