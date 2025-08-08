@@ -55,6 +55,7 @@ enum class OpcodeType : Opcode {
 
     OpClosure,
     OpGetFree,
+    OpCurrentClosure,
 };
 
 std::string_view toString(OpcodeType type);

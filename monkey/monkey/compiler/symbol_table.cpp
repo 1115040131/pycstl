@@ -27,6 +27,12 @@ std::shared_ptr<Symbol> SymbolTable::DefineFree(std::shared_ptr<Symbol> original
     return symbol;
 }
 
+std::shared_ptr<Symbol> SymbolTable::DefineFunctionName(const std::string& name) {
+    auto symbol = std::make_shared<Symbol>(Symbol{name, SymbolScopeType::kFunctionScope, 0});
+    store_[name] = symbol;
+    return symbol;
+}
+
 std::shared_ptr<Symbol> SymbolTable::Resolve(const std::string& name) {
     auto it = store_.find(name);
     if (it != store_.end()) {

@@ -190,5 +190,24 @@ TEST(SymbolTableTest, ResolveUnresolveableFreeTest) {
     EXPECT_FALSE(second_local->Resolve("d"));
 }
 
+TEST(SymbolTableTest, DefineAndResolveFunctionNameTest) {
+    auto global = SymbolTable::New();
+    global->DefineFunctionName("a");
+
+    auto result = global->Resolve("a");
+    auto expected = Symbol{"a", SymbolScopeType::kFunctionScope, 0};
+    EXPECT_EQ(*result, expected);
+}
+
+TEST(SymbolTableTest, ShadowingFunctionNameTest) {
+    auto global = SymbolTable::New();
+    global->DefineFunctionName("a");
+    global->Define("a");
+
+    auto result = global->Resolve("a");
+    auto expected = Symbol{"a", SymbolScopeType::kGlobal, 0};
+    EXPECT_EQ(*result, expected);
+}
+
 }  // namespace monkey
 }  // namespace pyc

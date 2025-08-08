@@ -796,5 +796,77 @@ TEST(CompilerTest, CompileClosureTest) {
     RUN_COMPILER_TESTS(tests);
 }
 
+TEST(CompilerTest, CompileRecursiveFunctionsTest) {
+    CompilerTestCase tests[] = {
+        {R""(
+                let countDown = fn(x){
+                    countDown(x - 1);
+                };
+
+                countDown(1);
+            )"",
+         {
+             1,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpCurrentClosure, {}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpSub, {}),
+                 ByteCode::Make(OpcodeType::OpCall, {1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             1,
+         },
+         {
+             ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
+             ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpConstant, {2}),
+             ByteCode::Make(OpcodeType::OpCall, {1}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+        {R""(
+                let wrapper = fn(){
+                    let countDown = fn(x){
+                        countDown(x - 1);
+                    };
+
+                    countDown(1);
+                };
+
+                wrapper();
+            )"",
+         {
+             1,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpCurrentClosure, {}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpConstant, {0}),
+                 ByteCode::Make(OpcodeType::OpSub, {}),
+                 ByteCode::Make(OpcodeType::OpCall, {1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+             1,
+             std::vector<Instructions>{
+                 ByteCode::Make(OpcodeType::OpClosure, {1, 0}),
+                 ByteCode::Make(OpcodeType::OpSetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpGetLocal, {0}),
+                 ByteCode::Make(OpcodeType::OpConstant, {2}),
+                 ByteCode::Make(OpcodeType::OpCall, {1}),
+                 ByteCode::Make(OpcodeType::OpReturnValue, {}),
+             },
+         },
+         {
+             ByteCode::Make(OpcodeType::OpClosure, {3, 0}),
+             ByteCode::Make(OpcodeType::OpSetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpGetGlobal, {0}),
+             ByteCode::Make(OpcodeType::OpCall, {0}),
+             ByteCode::Make(OpcodeType::OpPop, {}),
+         }},
+    };
+
+    RUN_COMPILER_TESTS(tests);
+}
+
 }  // namespace monkey
 }  // namespace pyc

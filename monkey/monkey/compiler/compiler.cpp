@@ -34,10 +34,10 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
         } break;
         case Node::Type::LetStatement: {
             auto let_statement = std::dynamic_pointer_cast<LetStatement>(node);
+            auto symbol = symbol_table_->Define(let_statement->name()->toString());
             if (auto err = compile(let_statement->value()); IsError(err)) {
                 return err;
             }
-            auto symbol = symbol_table_->Define(let_statement->name()->toString());
             if (symbol->scope == SymbolScopeType::kGlobal) {
                 emit(OpcodeType::OpSetGlobal, {symbol->index});
             } else {
@@ -235,6 +235,10 @@ std::shared_ptr<Error> Compiler::compile(std::shared_ptr<Node> node) {
             // 在新编译作用域编译函数
             enterScope();
 
+            if (!function_literal->name().empty()) {
+                symbol_table_->DefineFunctionName(function_literal->name());
+            }
+
             for (const auto& param : function_literal->parameters()) {
                 symbol_table_->Define(param->toString());
             }
@@ -320,6 +324,8 @@ void Compiler::loadSymbol(std::shared_ptr<Symbol> symbol) {
         emit(OpcodeType::OpGetBuiltin, {symbol->index});
     } else if (symbol->scope == SymbolScopeType::kFree) {
         emit(OpcodeType::OpGetFree, {symbol->index});
+    } else if (symbol->scope == SymbolScopeType::kFunctionScope) {
+        emit(OpcodeType::OpCurrentClosure, {});
     }
 }
 

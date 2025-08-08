@@ -254,6 +254,13 @@ std::shared_ptr<Object> VM::run() {
                 }
             } break;
 
+            case OpcodeType::OpCurrentClosure: {
+                auto result = push(currentFrame()->closure);
+                if (IsError(result)) {
+                    return result;
+                }
+            } break;
+
             default:
                 break;
         }

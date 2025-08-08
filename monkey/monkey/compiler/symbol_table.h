@@ -15,6 +15,7 @@ inline constexpr SymbolScope kGlobal = "GLOBAL";
 inline constexpr SymbolScope kLocal = "LOCAL";
 inline constexpr SymbolScope kBuiltin = "BUILTIN";
 inline constexpr SymbolScope kFree = "FREE";
+inline constexpr SymbolScope kFunctionScope = "FUNCTION";
 }  // namespace SymbolScopeType
 
 struct Symbol {
@@ -40,6 +41,8 @@ public:
     std::shared_ptr<Symbol> DefineBuiltin(const std::string& name, size_t index);
 
     std::shared_ptr<Symbol> DefineFree(std::shared_ptr<Symbol> original);
+
+    std::shared_ptr<Symbol> DefineFunctionName(const std::string& name);
 
     std::shared_ptr<Symbol> Resolve(const std::string& name);
 

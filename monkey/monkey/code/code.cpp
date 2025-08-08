@@ -56,6 +56,7 @@ std::string_view toString(OpcodeType type) {
 
         TO_STRING_CASE(OpcodeType, OpClosure);
         TO_STRING_CASE(OpcodeType, OpGetFree);
+        TO_STRING_CASE(OpcodeType, OpCurrentClosure);
     }
     return "Unknown OpcodeType";
 }
@@ -108,6 +109,7 @@ inline const std::map<OpcodeType, Definition> definitions{
 
     {OpcodeType::OpClosure, {"OpClosure", {2, 1}}},
     {OpcodeType::OpGetFree, {"OpGetFree", {1}}},
+    {OpcodeType::OpCurrentClosure, {"OpCurrentClosure", {}}},
 };
 
 // 整数版本
