@@ -64,6 +64,12 @@ sudo usermod -aG docker your_username
 bazel clean --expunge
 ```
 
+### 限制并行数量
+
+```bash
+bazel build --local_cpu_resources=24
+```
+
 ## 更新 pnpm
 
 首先更新 package.json 然后运行如下命令

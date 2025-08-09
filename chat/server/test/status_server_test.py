@@ -4,8 +4,8 @@ import time
 import unittest
 
 import grpc
-from status_pb2 import GetChatServerReq, LoginReq
-from status_pb2_grpc import StatusServiceStub
+from chat.server.proto.status_pb2 import GetChatServerReq, LoginReq
+from chat.server.proto.status_pb2_grpc import StatusServiceStub
 
 from test_define import *
 

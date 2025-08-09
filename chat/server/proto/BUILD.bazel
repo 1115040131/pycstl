@@ -1,5 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_grpc_library", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -42,6 +43,17 @@ cc_grpc_library(
     srcs = ["status_proto"],
     grpc_only = True,
     deps = ["status_cc_proto"],
+)
+
+py_proto_library(
+    name = "status_py_proto",
+    deps = ["status_proto"],
+)
+
+py_grpc_library(
+    name = "status_py_grpc",
+    srcs = ["status_proto"],
+    deps = ["status_py_proto"],
 )
 
 # chat.grpc

@@ -43,7 +43,7 @@ git_repository(
     name = "sdl3",
     build_file_content = _ALL_CONTENT,
     remote = "https://github.com/libsdl-org/SDL.git",
-    tag = "release-3.2.8",
+    tag = "release-3.2.20",
 )
 
 git_repository(
@@ -67,5 +67,5 @@ git_repository(
     build_file_content = _ALL_CONTENT,
     init_submodules = True,
     remote = "https://github.com/libsdl-org/SDL_ttf.git",
-    tag = "release-3.2.0",
+    tag = "release-3.2.2",
 )
