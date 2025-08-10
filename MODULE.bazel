@@ -42,27 +42,6 @@ local_path_override(
     path = "third_party/mysql-connector-cpp",
 )
 
-# Qt6
-bazel_dep(name = "rules_qt")
-git_override(
-    module_name = "rules_qt",
-    remote = "https://github.com/Sayter99/rules_qt6.git",
-    commit = "6c0124fece859b0363f0b075ae6acf6fa5db5255",
-)
-
-qt = use_extension("@rules_qt//:extensions.bzl", "qt")
-qt.fetch()
-use_repo(
-    qt,
-    "qt_linux_x86_64",
-    "qt_windows_x86_64",
-    "qt_mac_aarch64",
-)
-register_toolchains(
-    "@rules_qt//tools:all",
-    dev_dependency = True,
-)
-
 # SDL2
 bazel_dep(name = "sdl2_gfx")
 local_path_override(

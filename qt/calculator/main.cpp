@@ -188,7 +188,7 @@ private:
         if (text.size() == 1) {
             setLineText("0");
         } else if (!text.isEmpty()) {
-            text.erase(text.end() - 1);
+            text.erase(text.end() - 1, text.end());
             setLineText(text);
         }
     }
@@ -209,7 +209,7 @@ private:
         auto text = line_edit_->text();
         if (!text.isEmpty()) {
             if (text.startsWith("-")) {
-                text.erase(text.begin());
+                text.erase(text.begin(), text.begin() + 1);
             } else {
                 text = "-" + text;
             }
