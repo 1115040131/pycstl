@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sdl3/common/raw/weapon.h"
-#include "sdl3/common/screen/hud_skill.h"
+#include "ghost_escape/raw/weapon.h"
+#include "ghost_escape/screen/hud_skill.h"
 
 namespace pyc {
 namespace sdl3 {

@@ -1,5 +1,5 @@
+#include "ghost_escape/core/game.h"
 #include "ghost_escape/scene_title.h"
-#include "sdl3/common/core/game.h"
 
 using namespace pyc::sdl3;
 

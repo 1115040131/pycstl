@@ -6,13 +6,13 @@
 
 #include "ghost_escape/hud_stats.h"
 #include "ghost_escape/player.h"
+#include "ghost_escape/raw/bg_star.h"
+#include "ghost_escape/raw/timer.h"
 #include "ghost_escape/scene_title.h"
+#include "ghost_escape/screen/hud_button.h"
+#include "ghost_escape/screen/hud_text.h"
+#include "ghost_escape/screen/ui_mouse.h"
 #include "ghost_escape/spawner.h"
-#include "sdl3/common/raw/bg_star.h"
-#include "sdl3/common/raw/timer.h"
-#include "sdl3/common/screen/hud_button.h"
-#include "sdl3/common/screen/hud_text.h"
-#include "sdl3/common/screen/ui_mouse.h"
 
 namespace pyc {
 namespace sdl3 {

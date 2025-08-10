@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sdl3/common/affiliate/sprite_anim.h"
-#include "sdl3/common/core/actor.h"
+#include "ghost_escape/affiliate/sprite_anim.h"
+#include "ghost_escape/core/actor.h"
 
 namespace pyc {
 namespace sdl3 {

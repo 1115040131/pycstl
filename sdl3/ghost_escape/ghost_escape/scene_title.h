@@ -1,9 +1,9 @@
 #pragma once
 
-#include "sdl3/common/core/scene.h"
-#include "sdl3/common/screen/hud_button.h"
-#include "sdl3/common/screen/hud_text.h"
-#include "sdl3/common/screen/ui_mouse.h"
+#include "ghost_escape/core/scene.h"
+#include "ghost_escape/screen/hud_button.h"
+#include "ghost_escape/screen/hud_text.h"
+#include "ghost_escape/screen/ui_mouse.h"
 
 namespace pyc {
 namespace sdl3 {

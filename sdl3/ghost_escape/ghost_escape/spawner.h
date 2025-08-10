@@ -2,8 +2,8 @@
 
 #include <chrono>
 
-#include "sdl3/common/core/actor.h"
-#include "sdl3/common/core/object.h"
+#include "ghost_escape/core/actor.h"
+#include "ghost_escape/core/object.h"
 
 namespace pyc {
 namespace sdl3 {
