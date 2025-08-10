@@ -3,6 +3,7 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 # sdl3
 cmake(
     name = "sdl3",
+    generate_args = ["-GNinja"],
     lib_source = "@sdl3//:all_srcs",
     out_shared_libs = [
         "libSDL3.so",
@@ -13,12 +14,16 @@ cmake(
 
 cmake(
     name = "sdl3_image",
-    cache_entries = {"SDLIMAGE_VENDORED": "ON"},
-    data = ["@nasm"],
-    env = {
-        "ASM_NASM": "$(execpath @nasm//:nasm)",
-        "NASM_PATH": "$(execpath @nasm//:nasm)/..",
+    cache_entries = {
+        "SDLIMAGE_VENDORED": "ON",
+        "SDLIMAGE_AVIF": "OFF", # disable for ninja compile error
     },
+    # data = ["@nasm"],
+    # env = {
+    #     "ASM_NASM": "$(execpath @nasm//:nasm)",
+    #     "NASM_PATH": "$(execpath @nasm//:nasm)/..",
+    # },
+    generate_args = ["-GNinja"],
     lib_source = "@sdl3_image//:all_srcs",
     out_shared_libs = [
         "libSDL3_image.so",
@@ -34,6 +39,7 @@ cmake(
         "SDLMIXER_VENDORED": "ON",
         "SDLMIXER_MIDI_NATIVE": "OFF",
     },
+    generate_args = ["-GNinja"],
     lib_source = "@sdl3_mixer//:all_srcs",
     out_shared_libs = [
         "libSDL3_mixer.so",
@@ -46,6 +52,7 @@ cmake(
 cmake(
     name = "sdl3_ttf",
     cache_entries = {"SDLTTF_VENDORED": "ON"},
+    generate_args = ["-GNinja"],
     lib_source = "@sdl3_ttf//:all_srcs",
     out_shared_libs = [
         "libSDL3_ttf.so",
