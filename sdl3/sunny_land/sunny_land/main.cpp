@@ -1,7 +1,7 @@
-#include <fmt/format.h>
+#include "sunny_land/engine/core/game_app.h"
 
 int main() {
-    fmt::println("Hello Sunny Land");
-
+    pyc::sunny_land::GameApp app;
+    app.run();
     return 0;
 }
