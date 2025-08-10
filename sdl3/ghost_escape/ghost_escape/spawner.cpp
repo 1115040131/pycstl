@@ -1,8 +1,8 @@
 #include "ghost_escape/spawner.h"
 
+#include "ghost_escape/core/scene.h"
 #include "ghost_escape/enemy.h"
-#include "sdl3/common/core/scene.h"
-#include "sdl3/common/world/effect.h"
+#include "ghost_escape/world/effect.h"
 
 namespace pyc {
 namespace sdl3 {

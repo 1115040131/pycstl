@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sdl3/common/core/scene.h"
+#include "ghost_escape/core/scene.h"
 
 namespace pyc {
 namespace sdl3 {

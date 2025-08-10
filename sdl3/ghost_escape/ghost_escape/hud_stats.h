@@ -1,8 +1,8 @@
 #pragma once
 
-#include "sdl3/common/affiliate/sprite.h"
-#include "sdl3/common/core/actor.h"
-#include "sdl3/common/core/object_screen.h"
+#include "ghost_escape/affiliate/sprite.h"
+#include "ghost_escape/core/actor.h"
+#include "ghost_escape/core/object_screen.h"
 
 namespace pyc {
 namespace sdl3 {

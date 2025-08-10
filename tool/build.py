@@ -242,8 +242,8 @@ def main():
 
         ######################### build for sdl3 #########################
         "sdl3_demo": lambda args: run_bazel_run('//sdl3/demo', args=args),
-        "ghost_escape": lambda args: run_bazel_run('//sdl3/ghost_escape --define=project=ghost_escape', args=args),
-        "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=release --define=project=ghost_escape', args=args),
+        "ghost_escape": lambda args: run_bazel_run('//sdl3/ghost_escape', args=args),
+        "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=release', args=args),
 
         ######################### build for tetris #########################
         "tetris": lambda args: run_bazel_build('//tetris', args=args),
