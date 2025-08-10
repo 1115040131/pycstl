@@ -1,0 +1,26 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_binary(
+    name = "sunny_land",
+    srcs = glob([
+        "sunny_land/**/*.cpp",
+        "sunny_land/**/*.h",
+    ]),
+    copts = STRICT_COPTS,
+    data = glob(["assets/**"]),
+    defines = select({
+        "//conditions:default": [],
+        "//:debug": ["DEBUG_MODE"],
+    }),
+    includes = ["."],
+    deps = [
+        "//sdl3",
+        "//sdl3:sdl3_image",
+        "//sdl3:sdl3_mixer",
+        "//sdl3:sdl3_ttf",
+        "@fmt",
+        "@glm",
+        "@nlohmann_json//:json",
+        "@spdlog",
+    ],
+)
