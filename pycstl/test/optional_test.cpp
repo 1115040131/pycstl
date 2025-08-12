@@ -71,7 +71,9 @@ TEST(OptionalTest, ConstructionTest) {
         EXPECT_FALSE(opt2);
         EXPECT_FALSE(opt2.has_value());
     }
-    { Optional<C> opt; }
+    {
+        Optional<C> opt;
+    }
     {
         Optional<C> opt(in_place, 1, 2);
         EXPECT_EQ(opt->x_, 1);

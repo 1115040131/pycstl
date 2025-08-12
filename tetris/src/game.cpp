@@ -144,8 +144,7 @@ void Game::UpdateRender() {
     Merge(frame_, piece_);
     auto shadow = piece_;
     shadow.type = Piece::Type::kShadow;
-    while (shadow.Down())
-        ;
+    while (shadow.Down());
     Merge(frame_, shadow);
 
     // preview_field
@@ -215,8 +214,7 @@ void Game::Clear() {
 void Game::Drop() {
     if (!locking_) {
         locking_ = true;
-        while (piece_.Down())
-            ;
+        while (piece_.Down());
         score_ += 2;  // Hard Drop
     }
 }

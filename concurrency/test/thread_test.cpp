@@ -44,7 +44,9 @@ TEST(ThreadTest, ThreadOwnership) {
     EXPECT_EQ(s_count, kLoopTime);
 
     s_count = 0;
-    { std::jthread jt{Loop}; }
+    {
+        std::jthread jt{Loop};
+    }
     EXPECT_EQ(s_count, kLoopTime);
 
     s_count = 0;

@@ -45,11 +45,9 @@ TEST(ListTest, Remove) {
     std::list<int> stl_arr{init_list};
     COMPARE_CONTENT(arr, stl_arr);
 
-    ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) { container.remove(5); }, COMPARE_CONTENT);
+    ACTION_AND_COMPARE(arr, stl_arr, [](auto& container) { container.remove(5); }, COMPARE_CONTENT);
 
-    ACTION_AND_COMPARE(
-        arr, stl_arr, [](auto& container) { container.remove(-99); }, COMPARE_CONTENT);
+    ACTION_AND_COMPARE(arr, stl_arr, [](auto& container) { container.remove(-99); }, COMPARE_CONTENT);
 
     auto remove_condition = [](int value) { return value > 100; };
     ACTION_AND_COMPARE(

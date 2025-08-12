@@ -134,7 +134,7 @@ struct get_member_kind<T (C::*)(Ts...) const> {
 };
 
 template <class T, class C, class... Ts>
-struct get_member_kind<T (C::*)(Ts...)&> {
+struct get_member_kind<T (C::*)(Ts...) &> {
     static constexpr member_kind value = member_kind::member_function;
 };
 
