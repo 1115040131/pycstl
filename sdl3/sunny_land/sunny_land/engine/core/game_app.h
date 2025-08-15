@@ -12,6 +12,8 @@ namespace pyc::sunny_land {
 
 class Time;
 class ResourceManager;
+class Renderer;
+class Camera;
 
 /**
  * @brief 主游戏应用程序类, 初始化 SDL, 管理游戏循环
@@ -38,19 +40,27 @@ private:
     [[nodiscard]] bool initSDL();
     [[nodiscard]] bool initTime();
     [[nodiscard]] bool initResourceManager();
+    [[nodiscard]] bool initRenderer();
+    [[nodiscard]] bool initCamera();
 #pragma endregion
 
+#pragma region test
     // 测试函数
     void testResourceManger();
+    void testRenderer();
+    void testCamera();
+#pragma endregion
 
 private:
     SDL_Window* window_{};
-    SDL_Renderer* renderer_{};
+    SDL_Renderer* sdl_renderer_{};
     bool is_running_{};
 
     // 引擎组件
     std::unique_ptr<Time> time_;
     std::unique_ptr<ResourceManager> resource_manager_;
+    std::unique_ptr<Renderer> renderer_;
+    std::unique_ptr<Camera> camera_;
 };
 
 }  // namespace pyc::sunny_land

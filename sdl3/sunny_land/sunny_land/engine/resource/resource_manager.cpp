@@ -8,9 +8,9 @@
 
 namespace pyc::sunny_land {
 
-ResourceManager::ResourceManager(SDL_Renderer* renderer) {
+ResourceManager::ResourceManager(SDL_Renderer* sdl_renderer) {
     // --- 初始化各个子系统 --- (如果出现错误会抛出异常，由上层捕获)
-    texture_manager_ = std::make_unique<TextureManager>(renderer);
+    texture_manager_ = std::make_unique<TextureManager>(sdl_renderer);
     audio_manager_ = std::make_unique<AudioManager>();
     font_manager_ = std::make_unique<FontManager>();
 

@@ -24,10 +24,10 @@ class TextureManager final : Noncopyable {
 public:
     /**
      * @brief 构造函数，执行初始化。
-     * @param renderer 指向有效的 SDL_Renderer 上下文的指针。不能为空。
-     * @throws std::runtime_error 如果 renderer 为 nullptr 或初始化失败。
+     * @param sdl_renderer 指向有效的 SDL_Renderer 上下文的指针。不能为空。
+     * @throws std::runtime_error 如果 sdl_renderer 为 nullptr 或初始化失败。
      */
-    explicit TextureManager(SDL_Renderer* renderer);
+    explicit TextureManager(SDL_Renderer* sdl_renderer);
 
 private:                                                   // 仅供 ResourceManager 访问的方法
     SDL_Texture* loadTexture(std::string_view file_path);  ///< @brief 从文件路径加载纹理
@@ -49,7 +49,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<SDL_Texture, SDLTextureDeleter>, StringHash, StringEqual>
         textures_;
 
-    SDL_Renderer* renderer_ = nullptr;  // 指向主渲染器的非拥有指针
+    SDL_Renderer* sdl_renderer_ = nullptr;  // 指向主渲染器的非拥有指针
 };
 
 }  // namespace pyc::sunny_land

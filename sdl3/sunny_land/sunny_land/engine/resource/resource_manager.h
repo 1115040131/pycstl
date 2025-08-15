@@ -30,9 +30,9 @@ class ResourceManager final : Noncopyable {
 public:
     /**
      * @brief 构造函数，执行初始化。
-     * @param renderer SDL_Renderer 的指针，传递给需要它的子管理器。不能为空。
+     * @param sdl_renderer SDL_Renderer 的指针，传递给需要它的子管理器。不能为空。
      */
-    explicit ResourceManager(SDL_Renderer* renderer);
+    explicit ResourceManager(SDL_Renderer* sdl_renderer);
 
     ~ResourceManager();  // 显式声明析构函数，这是为了能让智能指针正确管理仅有前向声明的类
 

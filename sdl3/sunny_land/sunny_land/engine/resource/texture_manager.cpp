@@ -5,8 +5,8 @@
 
 namespace pyc::sunny_land {
 
-TextureManager::TextureManager(SDL_Renderer* renderer) : renderer_(renderer) {
-    if (!renderer_) {
+TextureManager::TextureManager(SDL_Renderer* sdl_renderer) : sdl_renderer_(sdl_renderer) {
+    if (!sdl_renderer_) {
         throw std::runtime_error("TextureManager 构造失败: 渲染器指针为空。");
     }
     // SDL3中不再需要手动调用IMG_Init/IMG_Quit
@@ -20,7 +20,7 @@ SDL_Texture* TextureManager::loadTexture(std::string_view file_path) {
     }
 
     // 如果没加载则尝试加载纹理
-    auto raw_texture = IMG_LoadTexture(renderer_, file_path.data());
+    auto raw_texture = IMG_LoadTexture(sdl_renderer_, file_path.data());
 
     // 载入纹理时，设置纹理缩放模式为最邻近插值(必不可少，否则TileLayer渲染中会出现边缘空隙/模糊)
     if (!SDL_SetTextureScaleMode(raw_texture, SDL_SCALEMODE_NEAREST)) {
