@@ -10,6 +10,7 @@ struct SDL_Renderer;
 
 namespace pyc::sunny_land {
 
+class Config;
 class Time;
 class ResourceManager;
 class Renderer;
@@ -37,6 +38,7 @@ private:
 
 #pragma region init
     // 各模块的初始化/创建函数，在init()中调用
+    [[nodiscard]] bool initConfig();
     [[nodiscard]] bool initSDL();
     [[nodiscard]] bool initTime();
     [[nodiscard]] bool initResourceManager();
@@ -57,6 +59,7 @@ private:
     bool is_running_{};
 
     // 引擎组件
+    std::unique_ptr<Config> config_;
     std::unique_ptr<Time> time_;
     std::unique_ptr<ResourceManager> resource_manager_;
     std::unique_ptr<Renderer> renderer_;
