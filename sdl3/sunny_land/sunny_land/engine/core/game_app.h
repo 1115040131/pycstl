@@ -15,6 +15,7 @@ class Time;
 class ResourceManager;
 class Renderer;
 class Camera;
+class InputManager;
 
 /**
  * @brief 主游戏应用程序类, 初始化 SDL, 管理游戏循环
@@ -44,6 +45,7 @@ private:
     [[nodiscard]] bool initResourceManager();
     [[nodiscard]] bool initRenderer();
     [[nodiscard]] bool initCamera();
+    [[nodiscard]] bool initInputManager();
 #pragma endregion
 
 #pragma region test
@@ -51,6 +53,7 @@ private:
     void testResourceManger();
     void testRenderer();
     void testCamera();
+    void testInputManager();
 #pragma endregion
 
 private:
@@ -64,6 +67,7 @@ private:
     std::unique_ptr<ResourceManager> resource_manager_;
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Camera> camera_;
+    std::unique_ptr<InputManager> input_manager_;
 };
 
 }  // namespace pyc::sunny_land

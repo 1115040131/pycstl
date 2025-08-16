@@ -5,13 +5,12 @@
 
 #include "sunny_land/engine/core/config.h"
 #include "sunny_land/engine/core/time.h"
+#include "sunny_land/engine/input/input_manager.h"
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/render/renderer.h"
 #include "sunny_land/engine/resource/resource_manager.h"
 
 namespace pyc::sunny_land {
-
-#define CONFIG(path) config_->getConfigDetail().path
 
 using namespace std::chrono_literals;
 
@@ -33,12 +32,13 @@ void GameApp::run() {
     while (is_running_) {
         time_->update();
         auto delta_time = time_->getDeltaTime();
+        input_manager_->update();
 
         handleEvents();
         update(delta_time);
         render();
 
-        spdlog::info("delta_time: {:.6f}s", delta_time.count());
+        // spdlog::info("delta_time: {:.6f}s", delta_time.count());
     }
 
     close();
@@ -46,7 +46,8 @@ void GameApp::run() {
 
 bool GameApp::init() {
     spdlog::trace("初始化 GamApp ...");
-    if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initRenderer() || !initCamera()) {
+    if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initRenderer() || !initCamera() ||
+        !initInputManager()) {
         return false;
     }
 
@@ -58,14 +59,13 @@ bool GameApp::init() {
 }
 
 void GameApp::handleEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-            case SDL_EVENT_QUIT:
-                is_running_ = false;
-                break;
-        }
+    if (input_manager_->shouldQuit()) {
+        spdlog::trace("GameApp 收到来自 InputManager 的退出请求。");
+        is_running_ = false;
+        return;
     }
+
+    testInputManager();
 }
 
 void GameApp::update(std::chrono::duration<double> /* delta_time */) {
@@ -114,8 +114,8 @@ bool GameApp::initSDL() {
         return false;
     }
 
-    SDL_CreateWindowAndRenderer("SunnyLand", CONFIG(window.width), CONFIG(window.height), SDL_WINDOW_RESIZABLE,
-                                &window_, &sdl_renderer_);
+    SDL_CreateWindowAndRenderer("SunnyLand", config_->CONFIG(window.width), config_->CONFIG(window.height),
+                                SDL_WINDOW_RESIZABLE, &window_, &sdl_renderer_);
     if (!window_ || !sdl_renderer_) {
         spdlog::error("无法创建窗口与渲染器! SDL错误: {}", SDL_GetError());
         return false;
@@ -123,13 +123,13 @@ bool GameApp::initSDL() {
 
     // 设置 VSync (注意: VSync 开启时，驱动程序会尝试将帧率限制到显示器刷新率，有可能会覆盖我们手动设置的
     // target_fps)
-    int vsync_mode = CONFIG(graphics.vsync) ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
+    int vsync_mode = config_->CONFIG(graphics.vsync) ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
     SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
-    spdlog::trace("VSync 设置为: {}", CONFIG(graphics.vsync) ? "Enabled" : "Disabled");
+    spdlog::trace("VSync 设置为: {}", config_->CONFIG(graphics.vsync) ? "Enabled" : "Disabled");
 
     // 设置逻辑分辨率
-    SDL_SetRenderLogicalPresentation(sdl_renderer_, CONFIG(window.width) / 2, CONFIG(window.height) / 2,
-                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->CONFIG(window.width) / 2,
+                                     config_->CONFIG(window.height) / 2, SDL_LOGICAL_PRESENTATION_LETTERBOX);
     spdlog::trace("SDL 初始化成功。");
     return true;
 }
@@ -141,7 +141,7 @@ bool GameApp::initTime() {
         spdlog::error("初始化时间管理失败: {}", e.what());
         return false;
     }
-    time_->setTargetFps(CONFIG(performance.target_fps));
+    time_->setTargetFps(config_->CONFIG(performance.target_fps));
     spdlog::trace("时间管理初始化成功。");
     return true;
 }
@@ -170,12 +170,24 @@ bool GameApp::initRenderer() {
 
 bool GameApp::initCamera() {
     try {
-        camera_ = std::make_unique<Camera>(glm::vec2(CONFIG(window.width) / 2, CONFIG(window.height) / 2));
+        camera_ = std::make_unique<Camera>(
+            glm::vec2(config_->CONFIG(window.width) / 2, config_->CONFIG(window.height) / 2));
     } catch (const std::exception& e) {
         spdlog::error("初始化相机失败: {}", e.what());
         return false;
     }
     spdlog::trace("相机初始化成功。");
+    return true;
+}
+
+bool GameApp::initInputManager() {
+    try {
+        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_.get());
+    } catch (const std::exception& e) {
+        spdlog::error("初始化输入管理器失败: {}", e.what());
+        return false;
+    }
+    spdlog::trace("输入管理器初始化成功。");
     return true;
 }
 #pragma endregion
@@ -211,6 +223,25 @@ void GameApp::testCamera() {
     if (key_state[SDL_SCANCODE_DOWN]) camera_->move(glm::vec2(0, 1));
     if (key_state[SDL_SCANCODE_LEFT]) camera_->move(glm::vec2(-1, 0));
     if (key_state[SDL_SCANCODE_RIGHT]) camera_->move(glm::vec2(1, 0));
+}
+
+void GameApp::testInputManager() {
+    std::vector<std::string> actions = {
+        "move_up", "move_down", "move_left",      "move_right",      "jump",
+        "attack",  "pause",     "MouseLeftClick", "MouseRightClick",
+    };
+
+    for (const auto& action : actions) {
+        if (input_manager_->isActionPressed(action)) {
+            spdlog::info(" {} 按下 ", action);
+        }
+        if (input_manager_->isActionReleased(action)) {
+            spdlog::info(" {} 抬起 ", action);
+        }
+        if (input_manager_->isActionDown(action)) {
+            spdlog::info(" {} 按下中 ", action);
+        }
+    }
 }
 #pragma endregion
 

@@ -7,6 +7,7 @@
 #include <nlohmann/json_fwd.hpp>
 
 #include "common/noncopyable.h"
+#include "common/string_hash.h"
 
 namespace pyc::sunny_land {
 
@@ -37,7 +38,7 @@ struct ConfigDetail {
     } audio;
 
     // 存储动作名称到 SDL Scancode 名称列表的映射
-    std::unordered_map<std::string, std::vector<std::string>> input_mappings = {
+    std::unordered_map<std::string, std::vector<std::string>, StringHash, StringEqual> input_mappings = {
         // 提供一些合理的默认值，以防配置文件加载失败或缺少此部分
         {"move_left", {"A", "Left"}}, {"move_right", {"D", "Right"}}, {"move_up", {"W", "Up"}},
         {"move_down", {"S", "Down"}}, {"jump", {"J", "Space"}},       {"attack", {"K", "MouseLeft"}},
@@ -68,3 +69,5 @@ private:
 };
 
 }  // namespace pyc::sunny_land
+
+#define CONFIG(path) getConfigDetail().path
