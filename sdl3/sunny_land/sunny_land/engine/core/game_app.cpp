@@ -6,6 +6,7 @@
 #include "sunny_land/engine/core/config.h"
 #include "sunny_land/engine/core/time.h"
 #include "sunny_land/engine/input/input_manager.h"
+#include "sunny_land/engine/object/game_object.h"
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/render/renderer.h"
 #include "sunny_land/engine/resource/resource_manager.h"
@@ -55,6 +56,7 @@ bool GameApp::init() {
 
     is_running_ = true;
     spdlog::trace("GameApp 初始化成功。");
+    testGameObject();
     return true;
 }
 
@@ -242,6 +244,11 @@ void GameApp::testInputManager() {
             spdlog::info(" {} 按下中 ", action);
         }
     }
+}
+
+void GameApp::testGameObject() {
+    GameObject game_object("test_game_object");
+    game_object.addComponent<Component>();
 }
 #pragma endregion
 

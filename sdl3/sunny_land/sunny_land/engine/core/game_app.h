@@ -50,10 +50,12 @@ private:
 
 #pragma region test
     // 测试函数
+    // TODO: remove
     void testResourceManger();
     void testRenderer();
     void testCamera();
     void testInputManager();
+    void testGameObject();
 #pragma endregion
 
 private:
