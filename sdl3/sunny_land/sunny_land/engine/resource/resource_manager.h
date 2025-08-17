@@ -7,9 +7,6 @@
 
 #include "common/noncopyable.h"
 
-#define ASSET_PATH "sdl3/sunny_land/assets/"
-#define ASSET(filename) (ASSET_PATH filename)
-
 struct SDL_Renderer;
 struct SDL_Texture;
 struct Mix_Chunk;
