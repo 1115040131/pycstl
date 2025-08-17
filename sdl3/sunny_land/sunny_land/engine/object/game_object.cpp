@@ -6,21 +6,21 @@ GameObject::GameObject(std::string_view name, std::string_view tag) : name_(name
     spdlog::trace("GameObject created: {} {}", name_, tag_);
 }
 
-void GameObject::handleInput() {
+void GameObject::handleInput(Context& context) {
     for (auto& [_, component] : components_) {
-        component->handleInput();
+        component->handleInput(context);
     }
 }
 
-void GameObject::update() {
+void GameObject::update(std::chrono::duration<double> delta_time, Context& context) {
     for (auto& [_, component] : components_) {
-        component->update();
+        component->update(delta_time, context);
     }
 }
 
-void GameObject::render() {
+void GameObject::render(Context& context) {
     for (auto& [_, component] : components_) {
-        component->render();
+        component->render(context);
     }
 }
 

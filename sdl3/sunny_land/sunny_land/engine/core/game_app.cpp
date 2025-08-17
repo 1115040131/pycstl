@@ -3,17 +3,26 @@
 #include <SDL3/SDL.h>
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/object/game_object.h"
+
+// 引擎组件
 #include "sunny_land/engine/core/config.h"
+#include "sunny_land/engine/core/context.h"
 #include "sunny_land/engine/core/time.h"
 #include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/engine/object/game_object.h"
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/render/renderer.h"
 #include "sunny_land/engine/resource/resource_manager.h"
 
+// component
+#include "sunny_land/engine/component/sprite_component.h"
+#include "sunny_land/engine/component/transform_component.h"
+
 namespace pyc::sunny_land {
 
 using namespace std::chrono_literals;
+
+static GameObject game_object("test_game_object");
 
 GameApp::GameApp() = default;
 
@@ -48,7 +57,7 @@ void GameApp::run() {
 bool GameApp::init() {
     spdlog::trace("初始化 GamApp ...");
     if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initRenderer() || !initCamera() ||
-        !initInputManager()) {
+        !initInputManager() || !initContext()) {
         return false;
     }
 
@@ -77,7 +86,8 @@ void GameApp::update(std::chrono::duration<double> /* delta_time */) {
 void GameApp::render() {
     renderer_->clearScreen();
 
-    testRenderer();  // TODO: remove
+    testRenderer();                 // TODO: remove
+    game_object.render(*context_);  // TODO: remove
 
     renderer_->present();
 }
@@ -192,6 +202,16 @@ bool GameApp::initInputManager() {
     spdlog::trace("输入管理器初始化成功。");
     return true;
 }
+
+bool GameApp::initContext() {
+    try {
+        context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *input_manager_);
+    } catch (const std::exception& e) {
+        spdlog::error("初始化上下文失败: {}", e.what());
+        return false;
+    }
+    return true;
+}
 #pragma endregion
 
 #pragma region test
@@ -247,8 +267,11 @@ void GameApp::testInputManager() {
 }
 
 void GameApp::testGameObject() {
-    GameObject game_object("test_game_object");
-    game_object.addComponent<Component>();
+    game_object.addComponent<TransformComponent>(glm::vec2(100));
+    game_object.addComponent<SpriteComponent>(ASSET("textures/Props/big-crate.png"), *resource_manager_,
+                                              Alignment::CENTER);
+    game_object.getComponent<TransformComponent>()->setScale(glm::vec2(2.0f));
+    game_object.getComponent<TransformComponent>()->setRotation(30.0f);
 }
 #pragma endregion
 

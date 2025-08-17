@@ -16,6 +16,7 @@ class ResourceManager;
 class Renderer;
 class Camera;
 class InputManager;
+class Context;
 
 /**
  * @brief 主游戏应用程序类, 初始化 SDL, 管理游戏循环
@@ -46,6 +47,8 @@ private:
     [[nodiscard]] bool initRenderer();
     [[nodiscard]] bool initCamera();
     [[nodiscard]] bool initInputManager();
+
+    [[nodiscard]] bool initContext();
 #pragma endregion
 
 #pragma region test
@@ -70,6 +73,8 @@ private:
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<InputManager> input_manager_;
+
+    std::unique_ptr<Context> context_;
 };
 
 }  // namespace pyc::sunny_land
