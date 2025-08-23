@@ -1,14 +1,17 @@
 #pragma once
 
+#include <map>
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
+#include <glm/glm.hpp>
+#include <nlohmann/json.hpp>
 
 #include "common/noncopyable.h"
 
 namespace pyc::sunny_land {
 
 class Scene;
+class TileInfo;
 
 class LevelLoader final : Noncopyable {
 public:
@@ -26,6 +29,20 @@ private:
     void loadObjectLayer(const nlohmann::json& layer_json, Scene& scene);  ///< @brief 加载对象图层
 
     /**
+     * @brief 根据全局 ID 获取瓦片信息。
+     * @param gid 全局 ID。
+     * @return engine::component::TileInfo 瓦片信息。
+     */
+    TileInfo getTileInfoByGid(int gid);
+
+    /**
+     * @brief 加载 Tiled tileset 文件 (.tsj)。
+     * @param tileset_path Tileset 文件路径。
+     * @param first_gid 此 tileset 的第一个全局 ID。
+     */
+    void loadTileset(std::string_view tileset_path, int first_gid);
+
+    /**
      * @brief 解析图片路径，合并地图路径和相对路径。例如：
      * 1. 文件路径："assets/maps/level1.tmj"
      * 2. 相对路径："../textures/Layers/back.png"
@@ -34,10 +51,13 @@ private:
      * @param file_path 文件路径
      * @return std::string 解析后的完整路径。
      */
-    std::string resolvePath(std::string_view image_path);
+    std::string resolvePath(std::string_view relative_path, std::string_view file_path);
 
 private:
-    std::string map_path_;
+    std::string map_path_;                        ///< @brief 地图路径（拼接路径时需要）
+    glm::ivec2 map_size_;                         ///< @brief 地图尺寸(瓦片数量)
+    glm::ivec2 tile_size_;                        ///< @brief 瓦片尺寸(像素)
+    std::map<int, nlohmann::json> tileset_data_;  ///< @brief firstgid -> 瓦片集数据
 };
 
 }  // namespace pyc::sunny_land
