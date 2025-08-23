@@ -6,8 +6,10 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/component/parallax_component.h"
+#include "sunny_land/engine/component/sprite_component.h"
 #include "sunny_land/engine/component/tilelayer_component.h"
 #include "sunny_land/engine/component/transform_component.h"
+#include "sunny_land/engine/core/context.h"
 #include "sunny_land/engine/object/game_object.h"
 #include "sunny_land/engine/scene/scene.h"
 
@@ -130,7 +132,50 @@ void LevelLoader::loadTileLayer(const nlohmann::json& layer_json, Scene& scene) 
     spdlog::info("加载图层: '{}' 完成", layer_name);
 }
 
-void LevelLoader::loadObjectLayer(const nlohmann::json&, Scene&) {}
+void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene) {
+    if (!layer_json.contains("objects") || !layer_json["objects"].is_array()) {
+        spdlog::error("图层 '{}' 缺少 'objects' 属性。", layer_json.value("name", "Unnamed"));
+        return;
+    }
+    for (const auto& object_json : layer_json["objects"]) {
+        auto gid = object_json.value("gid", 0);
+        if (gid == 0) {  // gid 为 0 即不存在, 代表需要自己绘制
+            // TODO
+        } else {
+            auto tile_info = getTileInfoByGid(gid);
+            if (tile_info.sprite.getTextureId().empty()) {
+                spdlog::error("gid为 {} 的瓦片没有图像纹理。", gid);
+                continue;
+            }
+            // 获取Transform相关信息
+            auto position = glm::vec2(object_json.value("x", 0.0f), object_json.value("y", 0.0f));
+            auto dst_size = glm::vec2(object_json.value("width", 0.0f), object_json.value("height", 0.0f));
+            position.y -= dst_size.y;  // 实际position需要进行调整(左下角到左上角)
+
+            auto rotation = object_json.value("rotation", 0.0f);
+            auto src_size_opt = tile_info.sprite.getSourceRect();
+            if (!src_size_opt) {  // 正常情况下，所有瓦片的Sprite都设置了源矩形，没有代表某处出错
+                spdlog::error("gid为 {} 的瓦片没有源矩形。", gid);
+                continue;
+            }
+            auto src_size = glm::vec2(src_size_opt->w, src_size_opt->h);
+            auto scale = dst_size / src_size;
+
+            // 获取图层名称
+            const auto& object_name = object_json.value("name", "Unnamed");
+
+            // 创建游戏对象
+            auto game_object = std::make_unique<GameObject>(object_name);
+            game_object->addComponent<TransformComponent>(position, scale, rotation);
+            game_object->addComponent<SpriteComponent>(std::move(tile_info.sprite),
+                                                       scene.getContext().getResourceManager());
+
+            // 添加到场景中
+            scene.addGameObject(std::move(game_object));
+            spdlog::info("加载图层: '{}' 完成", object_name);
+        }
+    }
+}
 
 TileInfo LevelLoader::getTileInfoByGid(int gid) {
     if (gid == 0) {

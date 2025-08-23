@@ -10,11 +10,8 @@
 
 namespace pyc::sunny_land {
 
-SpriteComponent::SpriteComponent(std::string_view texture_id, ResourceManager& resource_manager,
-                                 Alignment alignment, std::optional<SDL_FRect> source_rect_opt, bool is_flipped)
-    : resource_manager_(&resource_manager),
-      sprite_(texture_id, std::move(source_rect_opt), is_flipped),
-      alignment_(alignment) {
+SpriteComponent::SpriteComponent(Sprite&& sprite, ResourceManager& resource_manager, Alignment alignment)
+    : resource_manager_(&resource_manager), sprite_(std::move(sprite)), alignment_(alignment) {
     if (!resource_manager_) {
         spdlog::critical("创建 SpriteComponent 时 ResourceManager 为空！，此组件将无效。");
         // 不要在游戏主循环中使用 try...catch / throw，会极大影响性能
@@ -22,6 +19,10 @@ SpriteComponent::SpriteComponent(std::string_view texture_id, ResourceManager& r
     // offset_ 和 sprite_size_ 将在 init 中计算
     spdlog::trace("创建 SpriteComponent, 纹理ID: {}", sprite_.getTextureId());
 }
+
+SpriteComponent::SpriteComponent(std::string_view texture_id, ResourceManager& resource_manager,
+                                 Alignment alignment, std::optional<SDL_FRect> source_rect_opt, bool is_flipped)
+    : SpriteComponent(Sprite(texture_id, std::move(source_rect_opt), is_flipped), resource_manager, alignment) {}
 
 void SpriteComponent::setSpriteById(std::string_view texture_id, std::optional<SDL_FRect> source_rect_opt) {
     sprite_.setTextureId(texture_id);

@@ -49,7 +49,7 @@ void GameScene::creatTestObject() {
 
     test_object->addComponent<TransformComponent>(glm::vec2(100));
     test_object->addComponent<SpriteComponent>(ASSET("textures/Props/big-crate.png"),
-                                               context_.getResourceManager(), Alignment::CENTER);
+                                               context_.getResourceManager());
     // test_object->getComponent<TransformComponent>()->setScale(glm::vec2(2.0f));
     // test_object->getComponent<TransformComponent>()->setRotation(30.0f);
 

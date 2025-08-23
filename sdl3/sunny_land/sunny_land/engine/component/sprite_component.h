@@ -18,6 +18,14 @@ class SpriteComponent final : public Component {
 public:
     /**
      * @brief 构造函数
+     * @param sprite 精灵对象。
+     * @param resource_manager 资源管理器指针。
+     * @param alignment 初始对齐方式。
+     */
+    SpriteComponent(Sprite&& sprite, ResourceManager& resource_manager, Alignment alignment = Alignment::NONE);
+
+    /**
+     * @brief 构造函数
      * @param texture_id 纹理资源的标识符。
      * @param resource_manager 资源管理器指针。
      * @param alignment 初始对齐方式。
