@@ -22,6 +22,7 @@ private:
     // 测试函数
     // TODO: remove
     void creatTestObject();
+    void testCamera();
 };
 
 }  // namespace pyc::sunny_land
