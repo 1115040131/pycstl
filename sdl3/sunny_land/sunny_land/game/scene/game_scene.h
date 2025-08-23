@@ -23,6 +23,8 @@ private:
     // TODO: remove
     void creatTestObject();
     void testCamera();
+    void testObject();
+    GameObject* test_object_;
 };
 
 }  // namespace pyc::sunny_land

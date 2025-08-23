@@ -5,8 +5,12 @@
 namespace pyc::sunny_land {
 
 Context::Context(ResourceManager& resource_manager, Renderer& renderer, Camera& camera,
-                 InputManager& input_manager)
-    : resource_manager_(resource_manager), renderer_(renderer), camera_(camera), input_manager_(input_manager) {
+                 InputManager& input_manager, PhysicsEngine& physics_engine)
+    : resource_manager_(resource_manager),
+      renderer_(renderer),
+      camera_(camera),
+      input_manager_(input_manager),
+      physics_engine_(physics_engine) {
     spdlog::trace("上下文已创建并初始化。");
 }
 

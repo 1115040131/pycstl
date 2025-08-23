@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
 #include "sunny_land/engine/component/transform_component.h"
 #include "sunny_land/engine/core/context.h"
@@ -34,7 +35,8 @@ void GameScene::init() {
 
 void GameScene::handleInput() {
     Scene::handleInput();
-    testCamera();
+    // testCamera();
+    testObject();
 }
 
 void GameScene::update(std::chrono::duration<float> delta_time) { Scene::update(delta_time); }
@@ -46,12 +48,12 @@ void GameScene::clean() { Scene::clean(); }
 void GameScene::creatTestObject() {
     spdlog::trace("在 GameScene 中创建测试对象。");
     auto test_object = std::make_unique<GameObject>("test_object");
+    test_object_ = test_object.get();
 
     test_object->addComponent<TransformComponent>(glm::vec2(100));
     test_object->addComponent<SpriteComponent>(ASSET("textures/Props/big-crate.png"),
                                                context_.getResourceManager());
-    // test_object->getComponent<TransformComponent>()->setScale(glm::vec2(2.0f));
-    // test_object->getComponent<TransformComponent>()->setRotation(30.0f);
+    test_object->addComponent<PhysicsComponent>(&context_.getPhysicsEngine());
 
     addGameObject(std::move(test_object));
     spdlog::trace("test_object 创建并添加到 GameScene 中。");
@@ -71,6 +73,23 @@ void GameScene::testCamera() {
     }
     if (input_manager_.isActionDown("move_right")) {
         camera_.move(glm::vec2(1, 0));
+    }
+}
+
+void GameScene::testObject() {
+    if (!test_object_) {
+        return;
+    }
+
+    auto& input_manager_ = context_.getInputManager();
+    if (input_manager_.isActionDown("move_left")) {
+        test_object_->getComponent<TransformComponent>()->translate(glm::vec2(-1, 0));
+    }
+    if (input_manager_.isActionDown("move_right")) {
+        test_object_->getComponent<TransformComponent>()->translate(glm::vec2(1, 0));
+    }
+    if (input_manager_.isActionDown("jump")) {
+        test_object_->getComponent<PhysicsComponent>()->setVelocity(glm::vec2(0, -400));
     }
 }
 

@@ -16,6 +16,7 @@ class ResourceManager;
 class Renderer;
 class Camera;
 class InputManager;
+class PhysicsEngine;
 class Context;
 class SceneManager;
 
@@ -48,6 +49,7 @@ private:
     [[nodiscard]] bool initRenderer();
     [[nodiscard]] bool initCamera();
     [[nodiscard]] bool initInputManager();
+    [[nodiscard]] bool initPhysicsEngine();
 
     [[nodiscard]] bool initContext();
     [[nodiscard]] bool initSceneManager();
@@ -65,6 +67,7 @@ private:
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<InputManager> input_manager_;
+    std::unique_ptr<PhysicsEngine> physics_engine_;
 
     std::unique_ptr<Context> context_;
     std::unique_ptr<SceneManager> scene_manager_;

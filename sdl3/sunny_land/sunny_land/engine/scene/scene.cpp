@@ -2,7 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/core/context.h"
 #include "sunny_land/engine/object/game_object.h"
+#include "sunny_land/engine/physics/physics_engine.h"
 
 namespace pyc::sunny_land {
 
@@ -32,6 +34,9 @@ void Scene::update(std::chrono::duration<float> delta_time) {
     if (!is_initialized_) {
         return;
     }
+
+    // 先更新物理引擎
+    context_.getPhysicsEngine().update(delta_time);
 
     auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
                                        [delta_time, this](const std::unique_ptr<GameObject>& game_object) {
