@@ -80,7 +80,7 @@ public:
 protected:
     // 核心循环方法
     void init() override;
-    void update(std::chrono::duration<double>, Context&) override {}
+    void update(std::chrono::duration<float>, Context&) override {}
     void render(Context& context) override;
     void clean() override {}
 

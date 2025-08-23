@@ -28,10 +28,10 @@ public:
 protected:
     // 关键循环函数，全部设为保护，只有 GameObject 需要（可以）调用
     virtual void init() {}  ///< @brief 保留两段初始化的机制，GameObject 添加组件时自动调用，不需要外部调用
-    virtual void handleInput(Context&) {}                            ///< @brief 处理输入
-    virtual void update(std::chrono::duration<double>, Context&) {}  ///< @brief 更新，必须实现
-    virtual void render(Context&) {}                                 ///< @brief 渲染
-    virtual void clean() {}                                          ///< @brief 清理
+    virtual void handleInput(Context&) {}                           ///< @brief 处理输入
+    virtual void update(std::chrono::duration<float>, Context&) {}  ///< @brief 更新，必须实现
+    virtual void render(Context&) {}                                ///< @brief 渲染
+    virtual void clean() {}                                         ///< @brief 清理
 
 protected:
     GameObject* owner_{};  ///< @brief 指向拥有此组件的 GameObject

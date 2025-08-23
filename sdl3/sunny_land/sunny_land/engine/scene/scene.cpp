@@ -28,7 +28,7 @@ void Scene::handleInput() {
     }
 }
 
-void Scene::update(std::chrono::duration<double> delta_time) {
+void Scene::update(std::chrono::duration<float> delta_time) {
     if (!is_initialized_) {
         return;
     }

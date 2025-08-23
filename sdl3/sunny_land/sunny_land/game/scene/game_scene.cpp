@@ -37,7 +37,7 @@ void GameScene::handleInput() {
     testCamera();
 }
 
-void GameScene::update(std::chrono::duration<double> delta_time) { Scene::update(delta_time); }
+void GameScene::update(std::chrono::duration<float> delta_time) { Scene::update(delta_time); }
 
 void GameScene::render() { Scene::render(); }
 

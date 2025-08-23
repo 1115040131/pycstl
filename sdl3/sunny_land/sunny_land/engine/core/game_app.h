@@ -35,7 +35,7 @@ public:
 private:
     [[nodiscard]] bool init();
     void handleEvents();
-    void update(std::chrono::duration<double> delta_time);
+    void update(std::chrono::duration<float> delta_time);
     void render();
     void close();
 

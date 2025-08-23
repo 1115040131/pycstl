@@ -26,7 +26,7 @@ public:
 
     // 核心循环函数
     void handleInput() const;
-    void update(std::chrono::duration<double> delta_time);
+    void update(std::chrono::duration<float> delta_time);
     void render() const;
     void clean();
 

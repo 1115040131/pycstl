@@ -21,7 +21,7 @@ void Time::update() {
     }
 
     auto end_time = std::chrono::nanoseconds(SDL_GetTicksNS());
-    delta_time_ = std::chrono::duration<double>(end_time - last_time_);
+    delta_time_ = std::chrono::duration<float>(end_time - last_time_);
     last_time_ = end_time;
 }
 
@@ -31,9 +31,9 @@ void Time::limitFrameRate(std::chrono::nanoseconds current_delta_time) {
     }
 }
 
-std::chrono::duration<double> Time::getDeltaTime() const { return delta_time_ * time_scale_; }
+std::chrono::duration<float> Time::getDeltaTime() const { return delta_time_ * time_scale_; }
 
-std::chrono::duration<double> Time::getUnscaledDeltaTime() const { return delta_time_; }
+std::chrono::duration<float> Time::getUnscaledDeltaTime() const { return delta_time_; }
 
 void Time::setTimeScale(double scale) {
     if (scale < 0.0) {
@@ -54,7 +54,7 @@ void Time::setTargetFps(uint64_t fps) {
     }
 
     spdlog::info("Target FPS 设置为: {} (Frame time: {:.6f}s)", target_fps_,
-                 std::chrono::duration<double>(target_frame_time_).count());
+                 std::chrono::duration<float>(target_frame_time_).count());
 }
 
 uint64_t Time::getTargetFps() const { return target_fps_; }

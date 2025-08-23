@@ -61,9 +61,9 @@ private:
     void updateOffset();  ///< @brief 更新偏移量(根据当前的 alignment_ 和 sprite_size_ 计算 offset_)。
 
     // Component 虚函数覆盖
-    void init() override;                                             ///< @brief 初始化函数需要覆盖
-    void update(std::chrono::duration<double>, Context&) override {}  ///< @brief 更新函数留空
-    void render(Context& context) override;                           ///< @brief 渲染函数需要覆盖
+    void init() override;                                            ///< @brief 初始化函数需要覆盖
+    void update(std::chrono::duration<float>, Context&) override {}  ///< @brief 更新函数留空
+    void render(Context& context) override;                          ///< @brief 渲染函数需要覆盖
 
 private:
     ResourceManager* resource_manager_{};        ///< @brief 保存资源管理器指针，用于获取纹理大小

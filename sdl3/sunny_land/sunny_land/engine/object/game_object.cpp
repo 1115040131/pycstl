@@ -12,7 +12,7 @@ void GameObject::handleInput(Context& context) {
     }
 }
 
-void GameObject::update(std::chrono::duration<double> delta_time, Context& context) {
+void GameObject::update(std::chrono::duration<float> delta_time, Context& context) {
     for (auto& [_, component] : components_) {
         component->update(delta_time, context);
     }

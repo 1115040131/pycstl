@@ -75,7 +75,7 @@ void GameApp::handleEvents() {
     scene_manager_->handleInput();
 }
 
-void GameApp::update(std::chrono::duration<double> delta_time) { scene_manager_->update(delta_time); }
+void GameApp::update(std::chrono::duration<float> delta_time) { scene_manager_->update(delta_time); }
 
 void GameApp::render() {
     renderer_->clearScreen();

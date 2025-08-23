@@ -33,11 +33,11 @@ public:
     virtual ~Scene();
 
     // 核心循环方法
-    virtual void init();                                            ///< @brief 初始化场景。
-    virtual void handleInput();                                     ///< @brief 处理输入。
-    virtual void update(std::chrono::duration<double> delta_time);  ///< @brief 更新场景。
-    virtual void render();                                          ///< @brief 渲染场景。
-    virtual void clean();                                           ///< @brief 清理场景。
+    virtual void init();                                           ///< @brief 初始化场景。
+    virtual void handleInput();                                    ///< @brief 处理输入。
+    virtual void update(std::chrono::duration<float> delta_time);  ///< @brief 更新场景。
+    virtual void render();                                         ///< @brief 渲染场景。
+    virtual void clean();                                          ///< @brief 清理场景。
 
     /// @brief 直接向场景中添加一个游戏对象。（初始化时可用，游戏进行中不安全）
     virtual void addGameObject(std::unique_ptr<GameObject> game_object);

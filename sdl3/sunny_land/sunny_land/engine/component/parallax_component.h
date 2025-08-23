@@ -42,9 +42,9 @@ public:
 
 private:
     // Component 虚函数覆盖
-    void init() override;                                             ///< @brief 初始化函数需要覆盖
-    void update(std::chrono::duration<double>, Context&) override {}  ///< @brief 更新函数留空
-    void render(Context& context) override;                           ///< @brief 渲染函数需要覆盖
+    void init() override;                                            ///< @brief 初始化函数需要覆盖
+    void update(std::chrono::duration<float>, Context&) override {}  ///< @brief 更新函数留空
+    void render(Context& context) override;                          ///< @brief 渲染函数需要覆盖
 
 private:
     TransformComponent* transform_component_{};  ///< @brief 缓存变换组件

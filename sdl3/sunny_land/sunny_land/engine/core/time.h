@@ -22,16 +22,16 @@ public:
     /**
      * @brief 获取经过时间缩放调整后的 DeltaTime
      *
-     * @return std::chrono::duration<double> 缩放后的 DeltaTime (s)
+     * @return std::chrono::duration<float> 缩放后的 DeltaTime (s)
      */
-    std::chrono::duration<double> getDeltaTime() const;
+    std::chrono::duration<float> getDeltaTime() const;
 
     /**
      * @brief 获取未经过时间缩放调整后的 DeltaTime
      *
-     * @return std::chrono::duration<double> 未缩放后 DeltaTime (s)
+     * @return std::chrono::duration<float> 未缩放后 DeltaTime (s)
      */
-    std::chrono::duration<double> getUnscaledDeltaTime() const;
+    std::chrono::duration<float> getUnscaledDeltaTime() const;
 
     /**
      * @brief 设置时间缩放因子。
@@ -72,10 +72,10 @@ private:
     void limitFrameRate(std::chrono::nanoseconds current_delta_time);
 
 private:
-    std::chrono::nanoseconds last_time_{};        // 上一帧的时间戳
-    std::chrono::nanoseconds start_time_{};       // 当前帧开始时间戳
-    std::chrono::duration<double> delta_time_{};  // 未缩放的帧间时间差
-    double time_scale_{1.0};                      // 时间缩放因子
+    std::chrono::nanoseconds last_time_{};       // 上一帧的时间戳
+    std::chrono::nanoseconds start_time_{};      // 当前帧开始时间戳
+    std::chrono::duration<float> delta_time_{};  // 未缩放的帧间时间差
+    double time_scale_{1.0};                     // 时间缩放因子
 
     uint64_t target_fps_{};
     std::chrono::nanoseconds target_frame_time_{};

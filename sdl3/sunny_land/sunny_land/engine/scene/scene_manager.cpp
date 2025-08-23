@@ -26,7 +26,7 @@ void SceneManager::handleInput() const {  // 只考虑栈顶场景
     }
 }
 
-void SceneManager::update(std::chrono::duration<double> delta_time) {
+void SceneManager::update(std::chrono::duration<float> delta_time) {
     // 只更新栈顶（当前）场景
     if (auto current_scene = getCurrentScene()) {
         current_scene->update(delta_time);

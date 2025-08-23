@@ -26,8 +26,8 @@ public:
     Camera(glm::vec2 viewport_size, glm::vec2 position = glm::vec2(0.0f, 0.0f),
            std::optional<Rect> limit_bounds = std::nullopt);
 
-    void update(std::chrono::duration<double> delta_time);  ///< @brief 更新相机位置
-    void move(const glm::vec2& offset);                     ///< @brief 移动相机
+    void update(std::chrono::duration<float> delta_time);  ///< @brief 更新相机位置
+    void move(const glm::vec2& offset);                    ///< @brief 移动相机
 
     ///< @brief 世界坐标转屏幕坐标
     glm::vec2 worldToScreen(const glm::vec2& world_pos) const;

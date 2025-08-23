@@ -11,7 +11,7 @@ Camera::Camera(glm::vec2 viewport_size, glm::vec2 position, std::optional<Rect> 
     spdlog::trace("Camera 初始化成功，位置: {},{}", position_.x, position_.y);
 }
 
-void Camera::update([[maybe_unused]] std::chrono::duration<double> delta_time) {}
+void Camera::update([[maybe_unused]] std::chrono::duration<float> delta_time) {}
 
 void Camera::move(const glm::vec2& offset) {
     position_ += offset;
