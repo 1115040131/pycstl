@@ -66,8 +66,8 @@ private:
     void render(Context& context) override;                          ///< @brief 渲染函数需要覆盖
 
 private:
-    ResourceManager* resource_manager_{};        ///< @brief 保存资源管理器指针，用于获取纹理大小
-    TransformComponent* transform_component_{};  ///< @brief 缓存 TransformComponent 指针（非必须）
+    ResourceManager* resource_manager_{};  ///< @brief 保存资源管理器指针，用于获取纹理大小
+    TransformComponent* transform_{};      ///< @brief 缓存 TransformComponent 指针（非必须）
 
     Sprite sprite_;                         ///< @brief 精灵对象
     Alignment alignment_{Alignment::NONE};  ///< @brief 对齐方式

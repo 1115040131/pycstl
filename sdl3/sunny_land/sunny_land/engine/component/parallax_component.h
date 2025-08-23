@@ -47,7 +47,7 @@ private:
     void render(Context& context) override;                          ///< @brief 渲染函数需要覆盖
 
 private:
-    TransformComponent* transform_component_{};  ///< @brief 缓存变换组件
+    TransformComponent* transform_{};  ///< @brief 缓存变换组件
 
     Sprite sprite_;            ///< @brief 精灵对象
     glm::vec2 scroll_factor_;  ///< @brief 滚动速度因子 (0=静止, 1=随相机移动, <1=比相机慢)

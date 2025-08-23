@@ -19,8 +19,8 @@ void ParallaxComponent::init() {
         spdlog::error("ParallaxComponent 在初始化前未设置所有者。");
         return;
     }
-    transform_component_ = owner_->getComponent<TransformComponent>();
-    if (!transform_component_) {
+    transform_ = owner_->getComponent<TransformComponent>();
+    if (!transform_) {
         spdlog::warn("GameObject '{}' 上的 ParallaxComponent 需要一个 TransformComponent, 但未找到。",
                      owner_->getName());
         return;
@@ -28,12 +28,12 @@ void ParallaxComponent::init() {
 }
 
 void ParallaxComponent::render(Context& context) {
-    if (is_hidden_ || !transform_component_) {
+    if (is_hidden_ || !transform_) {
         return;
     }
 
-    context.getRenderer().drawParallax(context.getCamera(), sprite_, transform_component_->getPosition(),
-                                       scroll_factor_, repeat_);
+    context.getRenderer().drawParallax(context.getCamera(), sprite_, transform_->getPosition(), scroll_factor_,
+                                       repeat_);
 }
 
 }  // namespace pyc::sunny_land
