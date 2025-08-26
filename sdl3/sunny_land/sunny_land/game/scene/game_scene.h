@@ -24,6 +24,7 @@ private:
     void creatTestObject();
     void testCamera();
     void testObject();
+    void testCollisionPairs();
     GameObject* test_object_;
 };
 
