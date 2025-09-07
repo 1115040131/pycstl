@@ -5,6 +5,7 @@
 #include "sunny_land/engine/component/collider_component.h"
 #include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
+#include "sunny_land/engine/component/tilelayer_component.h"
 #include "sunny_land/engine/component/transform_component.h"
 #include "sunny_land/engine/core/context.h"
 #include "sunny_land/engine/input/input_manager.h"
@@ -27,6 +28,14 @@ void GameScene::init() {
     if (!level_loader.loadLevel(ASSET("maps/level1.tmj"), *this)) {
         spdlog::error("关卡加载失败");
         return;
+    }
+
+    // 注册 main 层到物理引擎
+    if (auto main_layer = findGameObjectByName("main")) {
+        if (auto tile_layer = main_layer->getComponent<TileLayerComponent>()) {
+            context_.getPhysicsEngine().registerCollisionLayer(tile_layer);
+            spdlog::info("注册\"main\"层到物理引擎");
+        }
     }
 
     creatTestObject();
@@ -95,15 +104,25 @@ void GameScene::testObject() {
         return;
     }
 
-    auto& input_manager_ = context_.getInputManager();
+    auto physics = test_object_->getComponent<PhysicsComponent>();
+    if (!physics) {
+        return;
+    }
+
+    const auto& input_manager_ = context_.getInputManager();
+    const auto& velocity = physics->getVelocity();
     if (input_manager_.isActionDown("move_left")) {
-        test_object_->getComponent<TransformComponent>()->translate(glm::vec2(-1, 0));
+        physics->setVelocity({-100.0f, velocity.y});
+    } else {
+        physics->setVelocity({velocity.x * 0.9f, velocity.y});
     }
     if (input_manager_.isActionDown("move_right")) {
-        test_object_->getComponent<TransformComponent>()->translate(glm::vec2(1, 0));
+        physics->setVelocity({100.0f, velocity.y});
+    } else {
+        physics->setVelocity({velocity.x * 0.9f, velocity.y});
     }
     if (input_manager_.isActionDown("jump")) {
-        test_object_->getComponent<PhysicsComponent>()->setVelocity(glm::vec2(0, -400));
+        physics->setVelocity({velocity.x, -400.0f});
     }
 }
 

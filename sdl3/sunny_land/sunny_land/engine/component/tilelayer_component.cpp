@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/core/context.h"
+#include "sunny_land/engine/physics/physics_engine.h"
 #include "sunny_land/engine/render/renderer.h"
 
 namespace pyc::sunny_land {
@@ -50,6 +51,12 @@ void TileLayerComponent::render(Context& context) {
                 context.getRenderer().drawSprite(context.getCamera(), tile_info.sprite, tile_pos);
             }
         }
+    }
+}
+
+void TileLayerComponent::clean() {
+    if (physics_engine_) {
+        physics_engine_->unregisterCollisionLayer(this);
     }
 }
 

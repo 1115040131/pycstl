@@ -177,6 +177,28 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
     }
 }
 
+TileType LevelLoader::getTileType(const nlohmann::json& tile_json) {
+    if (tile_json.contains("properties")) {
+        for (const auto& property : tile_json["properties"]) {
+            if (property.contains("name") && property["name"] == "solid") {
+                return property.value("value", false) ? TileType::SOLID : TileType::NORMAL;
+            }
+        }
+    }
+    return TileType::NORMAL;
+}
+
+TileType LevelLoader::getTileTypeById(const nlohmann::json& tileset_json, int local_id) {
+    if (tileset_json.contains("tiles")) {
+        for (const auto& tile : tileset_json["tiles"]) {
+            if (tile.contains("id") && tile["id"] == local_id) {
+                return getTileType(tile);
+            }
+        }
+    }
+    return TileType::NORMAL;
+}
+
 TileInfo LevelLoader::getTileInfoByGid(int gid) {
     if (gid == 0) {
         return TileInfo{};
@@ -207,8 +229,9 @@ TileInfo LevelLoader::getTileInfoByGid(int gid) {
         SDL_FRect texture_rect = {static_cast<float>(coordinate_x * tile_size_.x),
                                   static_cast<float>(coordinate_y * tile_size_.y),
                                   static_cast<float>(tile_size_.x), static_cast<float>(tile_size_.y)};
-        return TileInfo{{texture_id, texture_rect}, TileType::NORMAL};  // 目前不考虑类型
-    } else {                                                            // 这是多图片的情况
+        auto tile_type = getTileTypeById(tileset, local_id);
+        return TileInfo{{texture_id, texture_rect}, tile_type};
+    } else {  // 这是多图片的情况
         if (!tileset.contains("tiles") ||
             !tileset["tiles"].is_array()) {  // 没有tiles字段的话不符合数据格式要求，直接返回空的瓦片信息
             spdlog::error("Tileset 文件 '{}' 缺少 'tiles' 属性。", tileset_it->first);
@@ -235,7 +258,8 @@ TileInfo LevelLoader::getTileInfoByGid(int gid) {
                     static_cast<float>(tile_json.value("width", image_width)),  // 如果未设置，则使用图片尺寸
                     static_cast<float>(tile_json.value("height", image_height)),
                 };
-                return TileInfo{{texture_id, texture_rect}, TileType::NORMAL};  // 目前不考虑类型
+                auto tile_type = getTileType(tile_json);
+                return TileInfo{{texture_id, texture_rect}, tile_type};
             }
         }
     }

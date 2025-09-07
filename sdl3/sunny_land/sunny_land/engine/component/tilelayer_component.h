@@ -25,6 +25,8 @@ struct TileInfo {
     TileType type;  ///< @brief 瓦片的逻辑类型
 };
 
+class PhysicsEngine;
+
 /**
  * @brief 管理和渲染瓦片地图层。
  *
@@ -76,13 +78,14 @@ public:
 
     void setOffset(glm::vec2 offset) { offset_ = std::move(offset); }  ///< @brief 设置瓦片层的偏移量
     void setHidden(bool hidden) { is_hidden_ = hidden; }               ///< @brief 设置是否隐藏（不渲染）
+    void setPhysicsEngine(PhysicsEngine* physics_engine) { physics_engine_ = physics_engine; }
 
 protected:
     // 核心循环方法
     void init() override;
     void update(std::chrono::duration<float>, Context&) override {}
     void render(Context& context) override;
-    void clean() override {}
+    void clean() override;
 
 private:
     glm::ivec2 tile_size_;         ///< @brief 单个瓦片尺寸（像素）
@@ -91,7 +94,8 @@ private:
     glm::vec2 offset_ = {
         0.0f, 0.0f};  ///< @brief 瓦片层在世界中的偏移量 (瓦片层通常不需要缩放及旋转，因此不引入Transform组件)
                       // offset_ 最好也保持默认的0，以免增加不必要的复杂性
-    bool is_hidden_ = false;  ///< @brief 是否隐藏（不渲染）
+    bool is_hidden_ = false;                   ///< @brief 是否隐藏（不渲染）
+    PhysicsEngine* physics_engine_ = nullptr;  ///< @brief 物理引擎的指针， clean()函数中可能需要反注册
 };
 
 }  // namespace pyc::sunny_land
