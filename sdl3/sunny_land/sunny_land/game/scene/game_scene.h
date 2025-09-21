@@ -21,11 +21,10 @@ public:
 private:
     // 测试函数
     // TODO: remove
-    void creatTestObject();
     void testCamera();
-    void testObject();
+    void testPlayer();
     void testCollisionPairs();
-    GameObject* test_object_;
+    GameObject* player_;
 };
 
 }  // namespace pyc::sunny_land

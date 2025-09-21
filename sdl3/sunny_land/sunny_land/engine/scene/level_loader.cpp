@@ -5,7 +5,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/component/collider_component.h"
 #include "sunny_land/engine/component/parallax_component.h"
+#include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
 #include "sunny_land/engine/component/tilelayer_component.h"
 #include "sunny_land/engine/component/transform_component.h"
@@ -170,6 +172,34 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             game_object->addComponent<SpriteComponent>(std::move(tile_info.sprite),
                                                        scene.getContext().getResourceManager());
 
+            // 获取瓦片json信息
+            // 1. 必然存在，因为getTileInfoByGid(gid)函数已经顺利执行
+            // 2. 这里再获取json，实际上检索了两次，未来可以优化
+            auto tile_json = getTileJsonByGid(gid);
+
+            // 获取碰信息：如果是SOLID类型，则添加物理组件，且图片源矩形区域就是碰撞盒大小
+            if (tile_info.type == TileType::SOLID) {
+                auto collider = std::make_unique<AABBCollider>(src_size);
+                game_object->addComponent<ColliderComponent>(std::move(collider));
+                // 设置标签方便物理引擎检索
+                game_object->setTag("solid");
+            } else if (auto rect = getColliderRect(tile_json)) {  // 如果非SOLID类型，检查自定义碰撞盒是否存在
+                // 如果有，添加碰撞组件
+                auto collider = std::make_unique<AABBCollider>(rect->size);
+                auto cc = game_object->addComponent<ColliderComponent>(std::move(collider));
+                cc->setOffset(rect->position);  // 自定义碰撞盒的坐标是相对于图片坐标，也就是针对Transform的偏移量
+            }
+
+            // 获取标签信息并设置
+            if (auto tag = getTileProperty<std::string>(tile_json, "tag")) {
+                game_object->setTag(tag.value());
+            }
+
+            // 获取重力信息并设置物理组件
+            auto gravity = getTileProperty<bool>(tile_json, "gravity");
+            game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(),
+                                                        gravity && gravity.value());
+
             // 添加到场景中
             scene.addGameObject(std::move(game_object));
             spdlog::info("加载图层: '{}' 完成", object_name);
@@ -177,7 +207,28 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
     }
 }
 
-TileType LevelLoader::getTileType(const nlohmann::json& tile_json) {
+std::optional<Rect> LevelLoader::getColliderRect(const nlohmann::json& tile_json) const {
+    if (!tile_json.contains("objectgroup")) {
+        return std::nullopt;
+    }
+    const auto& objectgroup = tile_json["objectgroup"];
+    if (!objectgroup.contains("objects")) {
+        return std::nullopt;
+    }
+    const auto& objects = objectgroup["objects"];
+    for (const auto& object : objects) {
+        auto rect = Rect{
+            {object.value("x", 0.0f), object.value("y", 0.0f)},
+            {object.value("width", 0.0f), object.value("height", 0.0f)},
+        };
+        if (rect.size.x > 0 && rect.size.y > 0) {
+            return rect;
+        }
+    }
+    return std::nullopt;
+}
+
+TileType LevelLoader::getTileType(const nlohmann::json& tile_json) const {
     if (tile_json.contains("properties")) {
         for (const auto& property : tile_json["properties"]) {
             if (property.contains("name") && property["name"] == "solid") {
@@ -188,7 +239,7 @@ TileType LevelLoader::getTileType(const nlohmann::json& tile_json) {
     return TileType::NORMAL;
 }
 
-TileType LevelLoader::getTileTypeById(const nlohmann::json& tileset_json, int local_id) {
+TileType LevelLoader::getTileTypeById(const nlohmann::json& tileset_json, int local_id) const {
     if (tileset_json.contains("tiles")) {
         for (const auto& tile : tileset_json["tiles"]) {
             if (tile.contains("id") && tile["id"] == local_id) {
@@ -199,7 +250,7 @@ TileType LevelLoader::getTileTypeById(const nlohmann::json& tileset_json, int lo
     return TileType::NORMAL;
 }
 
-TileInfo LevelLoader::getTileInfoByGid(int gid) {
+TileInfo LevelLoader::getTileInfoByGid(int gid) const {
     if (gid == 0) {
         return TileInfo{};
     }
@@ -268,6 +319,36 @@ TileInfo LevelLoader::getTileInfoByGid(int gid) {
     return TileInfo{};
 }
 
+std::optional<nlohmann::json> LevelLoader::getTileJsonByGid(int gid) const {
+    if (gid == 0) {
+        return std::nullopt;
+    }
+
+    // 1. 查找tileset_data_中键小于等于gid的最近元素
+    auto tileset_it = tileset_data_.upper_bound(gid);
+    if (tileset_it == tileset_data_.begin()) {
+        spdlog::error("gid为 {} 的瓦片未找到图块集。", gid);
+        return std::nullopt;
+    }
+    --tileset_it;
+    // 2. 获取图块集json对象
+    const auto& tileset = tileset_it->second;
+    if (!tileset.contains("tiles")) {  // 没有tiles字段的话不符合数据格式要求，直接返回空
+        spdlog::error("Tileset 文件 '{}' 缺少 'tiles' 属性。", tileset_it->first);
+        return std::nullopt;
+    }
+    auto local_id = gid - tileset_it->first;  // 计算瓦片在图块集中的局部ID
+    // 3. 遍历tiles数组，根据id查找对应的瓦片并返回瓦片json
+    const auto& tiles_json = tileset["tiles"];
+    for (const auto& tile_json : tiles_json) {
+        auto tile_id = tile_json.value("id", 0);
+        if (tile_id == local_id) {  // 找到对应的瓦片，返回瓦片json
+            return tile_json;
+        }
+    }
+    return std::nullopt;
+}
+
 void LevelLoader::loadTileset(std::string_view tileset_path, int first_gid) {
     std::ifstream file(tileset_path.data());
     if (!file.is_open()) {
@@ -287,7 +368,7 @@ void LevelLoader::loadTileset(std::string_view tileset_path, int first_gid) {
     spdlog::info("Tileset 文件 '{}' 加载完成，firstgid: {}", tileset_path, first_gid);
 }
 
-std::string LevelLoader::resolvePath(std::string_view relative_path, std::string_view file_path) {
+std::string LevelLoader::resolvePath(std::string_view relative_path, std::string_view file_path) const {
     try {
         // 获取地图文件的父目录（相对于可执行文件）
         auto map_dir = std::filesystem::path(file_path).parent_path();

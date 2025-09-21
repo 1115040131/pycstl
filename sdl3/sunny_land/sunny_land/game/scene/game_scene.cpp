@@ -38,7 +38,11 @@ void GameScene::init() {
         }
     }
 
-    creatTestObject();
+    player_ = findGameObjectByName("player");
+    if (!player_) {
+        spdlog::error("未找到玩家对象");
+        return;
+    }
 
     Scene::init();
     spdlog::trace("GameScene 初始化完成。");
@@ -47,40 +51,17 @@ void GameScene::init() {
 void GameScene::handleInput() {
     Scene::handleInput();
     // testCamera();
-    testObject();
-    testCollisionPairs();
+    testPlayer();
 }
 
-void GameScene::update(std::chrono::duration<float> delta_time) { Scene::update(delta_time); }
+void GameScene::update(std::chrono::duration<float> delta_time) {
+    Scene::update(delta_time);
+    testCollisionPairs();
+}
 
 void GameScene::render() { Scene::render(); }
 
 void GameScene::clean() { Scene::clean(); }
-
-void GameScene::creatTestObject() {
-    spdlog::trace("在 GameScene 中创建测试对象。");
-    auto test_object = std::make_unique<GameObject>("test_object");
-    test_object_ = test_object.get();
-
-    test_object->addComponent<TransformComponent>(glm::vec2(100));
-    test_object->addComponent<SpriteComponent>(ASSET("textures/Props/big-crate.png"),
-                                               context_.getResourceManager());
-    test_object->addComponent<PhysicsComponent>(&context_.getPhysicsEngine());
-    test_object->addComponent<ColliderComponent>(std::make_unique<AABBCollider>(glm::vec2(32.0f)));
-
-    addGameObject(std::move(test_object));
-
-    // 添加第二个物体, 不受重力影响
-    auto test_object_2 = std::make_unique<GameObject>("test_object_2");
-    test_object_2->addComponent<TransformComponent>(glm::vec2(50.0f));
-    test_object_2->addComponent<SpriteComponent>(ASSET("textures/Props/big-crate.png"),
-                                                 context_.getResourceManager());
-    test_object_2->addComponent<PhysicsComponent>(&context_.getPhysicsEngine(), false);
-    test_object_2->addComponent<ColliderComponent>(std::make_unique<CircleCollider>(16.0f));
-    addGameObject(std::move(test_object_2));
-
-    spdlog::trace("test_object 创建并添加到 GameScene 中。");
-}
 
 void GameScene::testCamera() {
     auto& camera_ = context_.getCamera();
@@ -99,12 +80,12 @@ void GameScene::testCamera() {
     }
 }
 
-void GameScene::testObject() {
-    if (!test_object_) {
+void GameScene::testPlayer() {
+    if (!player_) {
         return;
     }
 
-    auto physics = test_object_->getComponent<PhysicsComponent>();
+    auto physics = player_->getComponent<PhysicsComponent>();
     if (!physics) {
         return;
     }

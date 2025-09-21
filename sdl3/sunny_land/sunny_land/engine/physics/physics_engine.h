@@ -41,6 +41,9 @@ private:
     /// @brief 检测并处理游戏对象和瓦片层之间的碰撞。
     void resolveTileCollisions(PhysicsComponent* physics, std::chrono::duration<float> delta_time);
 
+    /// @brief 处理可移动物体与SOLID物体的碰撞。
+    void resolveSolidObjectCollisions(GameObject* move_obj, GameObject* solid_obj);
+
 private:
     std::vector<PhysicsComponent*> components_;     ///< @brief 注册的物理组件容器，非拥有指针
     std::vector<TileLayerComponent*> tile_layers_;  ///< @brief 注册的碰撞瓦片图层容器
