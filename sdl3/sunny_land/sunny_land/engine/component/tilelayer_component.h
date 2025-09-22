@@ -14,10 +14,16 @@ namespace pyc::sunny_land {
  * @brief 定义瓦片的类型，用于游戏逻辑（例如碰撞）。
  */
 enum class TileType {
-    EMPTY,   ///< @brief 空白瓦片
-    NORMAL,  ///< @brief 普通瓦片
-    SOLID,   ///< @brief 静止可碰撞瓦片
-
+    EMPTY,      ///< @brief 空白瓦片
+    NORMAL,     ///< @brief 普通瓦片
+    SOLID,      ///< @brief 静止可碰撞瓦片
+    UNISOLID,   ///< @brief 单向静止可碰撞瓦片
+    SLOPE_0_1,  ///< @brief 斜坡瓦片, 高度:左 0   右 1
+    SLOPE_1_0,  ///< @brief 斜坡瓦片, 高度:左 1   右 0
+    SLOPE_0_2,  ///< @brief 斜坡瓦片, 高度:左 0   右 1/2
+    SLOPE_2_1,  ///< @brief 斜坡瓦片, 高度:左 1/2 右 1
+    SLOPE_1_2,  ///< @brief 斜坡瓦片, 高度:左 1   右 1/2
+    SLOPE_2_0,  ///< @brief 斜坡瓦片, 高度:左 1/2 右 0
 };
 
 struct TileInfo {

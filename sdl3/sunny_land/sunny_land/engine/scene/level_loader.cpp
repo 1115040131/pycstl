@@ -181,6 +181,7 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             if (tile_info.type == TileType::SOLID) {
                 auto collider = std::make_unique<AABBCollider>(src_size);
                 game_object->addComponent<ColliderComponent>(std::move(collider));
+                game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
                 // 设置标签方便物理引擎检索
                 game_object->setTag("solid");
             } else if (auto rect = getColliderRect(tile_json)) {  // 如果非SOLID类型，检查自定义碰撞盒是否存在
@@ -188,17 +189,17 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
                 auto collider = std::make_unique<AABBCollider>(rect->size);
                 auto cc = game_object->addComponent<ColliderComponent>(std::move(collider));
                 cc->setOffset(rect->position);  // 自定义碰撞盒的坐标是相对于图片坐标，也就是针对Transform的偏移量
+
+                // 获取重力信息并设置物理组件
+                auto gravity = getTileProperty<bool>(tile_json, "gravity");
+                game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(),
+                                                            gravity && gravity.value());
             }
 
             // 获取标签信息并设置
             if (auto tag = getTileProperty<std::string>(tile_json, "tag")) {
                 game_object->setTag(tag.value());
             }
-
-            // 获取重力信息并设置物理组件
-            auto gravity = getTileProperty<bool>(tile_json, "gravity");
-            game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(),
-                                                        gravity && gravity.value());
 
             // 添加到场景中
             scene.addGameObject(std::move(game_object));
@@ -231,8 +232,29 @@ std::optional<Rect> LevelLoader::getColliderRect(const nlohmann::json& tile_json
 TileType LevelLoader::getTileType(const nlohmann::json& tile_json) const {
     if (tile_json.contains("properties")) {
         for (const auto& property : tile_json["properties"]) {
-            if (property.contains("name") && property["name"] == "solid") {
+            auto name = property.value("name", "");
+            if (name == "solid") {
                 return property.value("value", false) ? TileType::SOLID : TileType::NORMAL;
+            } else if (name == "unisolid") {
+                return property.value("value", false) ? TileType::UNISOLID : TileType::NORMAL;
+            } else if (name == "slope") {
+                auto slope_type = property.value("value", "");
+                if (slope_type == "0_1") {
+                    return TileType::SLOPE_0_1;
+                } else if (slope_type == "1_0") {
+                    return TileType::SLOPE_1_0;
+                } else if (slope_type == "0_2") {
+                    return TileType::SLOPE_0_2;
+                } else if (slope_type == "2_1") {
+                    return TileType::SLOPE_2_1;
+                } else if (slope_type == "1_2") {
+                    return TileType::SLOPE_1_2;
+                } else if (slope_type == "2_0") {
+                    return TileType::SLOPE_2_0;
+                } else {
+                    spdlog::error("未知的斜坡类型: {}", slope_type);
+                    return TileType::NORMAL;
+                }
             }
         }
     }

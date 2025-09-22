@@ -31,18 +31,38 @@ void GameScene::init() {
     }
 
     // 注册 main 层到物理引擎
-    if (auto main_layer = findGameObjectByName("main")) {
-        if (auto tile_layer = main_layer->getComponent<TileLayerComponent>()) {
-            context_.getPhysicsEngine().registerCollisionLayer(tile_layer);
-            spdlog::info("注册\"main\"层到物理引擎");
-        }
+    auto main_layer = findGameObjectByName("main");
+    if (!main_layer) {
+        spdlog::error("未找到\"main\"层");
+        return;
     }
+    auto tile_layer = main_layer->getComponent<TileLayerComponent>();
+    if (!tile_layer) {
+        spdlog::error("\"main\"层没有 TileLayerComponent 组件");
+    }
+    context_.getPhysicsEngine().registerCollisionLayer(tile_layer);
+    spdlog::info("注册\"main\"层到物理引擎");
 
+    // 获取玩家对象
     player_ = findGameObjectByName("player");
     if (!player_) {
         spdlog::error("未找到玩家对象");
         return;
     }
+
+    // 相机跟随玩家
+    auto player_transform = player_->getComponent<TransformComponent>();
+    if (!player_transform) {
+        spdlog::error("玩家对象没有 TransformComponent 组件, 无法设置相机目标");
+        return;
+    }
+    context_.getCamera().setTarget(player_transform);
+
+    // 设置相机边界
+    context_.getCamera().setLimitBounds(Rect{glm::vec2(0.0f), tile_layer->getWorldSize()});
+
+    // 设置世界边界
+    context_.getPhysicsEngine().setWorldBounds(Rect{glm::vec2(0.0f), tile_layer->getWorldSize()});
 
     Scene::init();
     spdlog::trace("GameScene 初始化完成。");

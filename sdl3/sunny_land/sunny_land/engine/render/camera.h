@@ -10,6 +10,8 @@
 
 namespace pyc::sunny_land {
 
+class TransformComponent;
+
 /**
  * @brief 相机类负责管理相机位置和视口大小，并提供坐标转换功能。
  * 它还包含限制相机移动范围的边界。
@@ -36,20 +38,24 @@ public:
     ///< @brief 屏幕坐标转世界坐标
     glm::vec2 screenToWorld(const glm::vec2& screen_pos) const;
 
-    void setPosition(const glm::vec2& position);            ///< @brief 设置相机位置
-    void setLimitBounds(std::optional<Rect> limit_bounds);  ///< @brief 设置限制相机的移动范围
+    void setPosition(const glm::vec2& position);                      ///< @brief 设置相机位置
+    void setLimitBounds(std::optional<Rect> limit_bounds);            ///< @brief 设置限制相机的移动范围
+    void setTarget(TransformComponent* target) { target_ = target; }  ///< @brief 设置跟随目标变换组件
 
-    const glm::vec2& getViewportSize() const;           ///< @brief 获取视口大小
-    const glm::vec2& getPosition() const;               ///< @brief 获取相机位置
-    const std::optional<Rect>& getLimitBounds() const;  ///< @brief 获取限制相机的移动范围
+    const glm::vec2& getViewportSize() const { return viewport_size_; }          ///< @brief 获取视口大小
+    const glm::vec2& getPosition() const { return position_; }                   ///< @brief 获取相机位置
+    const std::optional<Rect>& getLimitBounds() const { return limit_bounds_; }  ///< @brief 获取限制相机的移动范围
+    TransformComponent* getTarget() const { return target_; }                    ///< @brief 获取跟随目标变换组件
 
 private:
     void clampPosition();  ///< @brief 限制相机位置在边界内
 
 private:
-    glm::vec2 viewport_size_;           ///< @brief 视口大小（屏幕大小）
-    glm::vec2 position_;                ///< @brief 相机左上角的世界坐标
-    std::optional<Rect> limit_bounds_;  ///< @brief 限制相机的移动范围，空值表示不限制
+    glm::vec2 viewport_size_;               ///< @brief 视口大小（屏幕大小）
+    glm::vec2 position_;                    ///< @brief 相机左上角的世界坐标
+    std::optional<Rect> limit_bounds_;      ///< @brief 限制相机的移动范围，空值表示不限制
+    float smooth_speed_ = 5.0f;             ///< @brief 相机移动的平滑速度
+    TransformComponent* target_ = nullptr;  ///< @brief 跟随目标变换组件，空值表示不跟随
 };
 
 }  // namespace pyc::sunny_land

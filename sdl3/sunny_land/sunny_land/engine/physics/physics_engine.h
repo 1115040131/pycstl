@@ -6,12 +6,14 @@
 #include <glm/glm.hpp>
 
 #include "common/noncopyable.h"
+#include "sunny_land/engine/utils/math.h"
 
 namespace pyc::sunny_land {
 
 class GameObject;
 class PhysicsComponent;
 class TileLayerComponent;
+enum class TileType;
 
 class PhysicsEngine : Noncopyable, std::enable_shared_from_this<PhysicsEngine> {
 public:
@@ -31,6 +33,8 @@ public:
     const glm::vec2& getGravity() const { return gravity_; }               ///< @brief 获取当前的全局重力加速度
     void setMaxSpeed(float max_speed) { max_speed_ = max_speed; }          ///< @brief 设置最大速度
     float getMaxSpeed() const { return max_speed_; }                       ///< @brief 获取当前的最大速度
+    void setWorldBounds(Rect world_bounds) { world_bounds_ = std::move(world_bounds); }  ///< @brief 设置世界边界
+    const std::optional<Rect>& getWorldBounds() const { return world_bounds_; }          ///< @brief 获取世界边界
 
     /// @brief 获取本帧检测到的所有 GameObject 碰撞对。(此列表在每次 update 开始时清空)
     const std::vector<std::pair<GameObject*, GameObject*>>& getCollisionPairs() const { return collision_pairs_; };
@@ -44,11 +48,23 @@ private:
     /// @brief 处理可移动物体与SOLID物体的碰撞。
     void resolveSolidObjectCollisions(GameObject* move_obj, GameObject* solid_obj);
 
+    void applyWorldBounds(PhysicsComponent* pc);  ///< @brief 应用世界边界，限制物体移动范围
+
+    /**
+     * @brief 根据瓦片类型和指定宽度x坐标，计算瓦片上对应y坐标。
+     * @param width 从瓦片左侧起算的宽度。
+     * @param type 瓦片类型。
+     * @param tile_size 瓦片尺寸。
+     * @return 瓦片上对应高度（从瓦片下侧起算）。
+     */
+    float getTileHeightAtWidth(float width, TileType type, glm::vec2 tile_size);
+
 private:
     std::vector<PhysicsComponent*> components_;     ///< @brief 注册的物理组件容器，非拥有指针
     std::vector<TileLayerComponent*> tile_layers_;  ///< @brief 注册的碰撞瓦片图层容器
     glm::vec2 gravity_ = {0.0f, 980.0f};            ///< @brief 默认重力值 (像素/秒^2, 相当于100像素对应现实1m)
     float max_speed_ = 500.0f;                      ///< @brief 最大速度 (像素/秒)
+    std::optional<Rect> world_bounds_;              ///< @brief 世界边界，用于限制物体移动范围
 
     /// @brief 存储本帧发生的 GameObject 碰撞对 （每次 update 开始时清空）
     std::vector<std::pair<GameObject*, GameObject*>> collision_pairs_;

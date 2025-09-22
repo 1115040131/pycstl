@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/component/transform_component.h"
+
 namespace pyc::sunny_land {
 
 Camera::Camera(glm::vec2 viewport_size, glm::vec2 position, std::optional<Rect> limit_bounds)
@@ -11,7 +13,30 @@ Camera::Camera(glm::vec2 viewport_size, glm::vec2 position, std::optional<Rect> 
     spdlog::trace("Camera 初始化成功，位置: {},{}", position_.x, position_.y);
 }
 
-void Camera::update([[maybe_unused]] std::chrono::duration<float> delta_time) {}
+void Camera::update(std::chrono::duration<float> delta_time) {
+    if (!target_) {
+        return;
+    }
+    auto target_pos = target_->getPosition();
+    auto desired_position = target_pos - viewport_size_ * 0.5f;
+
+    // 计算当前位置与目标位置的距离
+    auto distance_ = glm::distance(position_, desired_position);
+    constexpr float SNAP_THRESHOLD = 1.0f;  // 设置一个距离阈值  (constexpr: 编译时常量，避免每次调用都计算)
+
+    if (distance_ < SNAP_THRESHOLD) {
+        // 如果距离小于阈值，直接吸附到目标位置
+        position_ = desired_position;
+    } else {
+        // 否则，使用线性插值平滑移动   glm::mix(a,b,t): 在向量 a 和 b 之间进行插值，t 是插值因子，范围在0到1之间。
+        // 公式: (b-a)*t + a;   t = 0 时结果为 a，t = 1 时结果为 b
+        position_ = glm::mix(position_, desired_position, smooth_speed_ * delta_time.count());
+        position_ = glm::vec2(glm::round(position_.x),
+                              glm::round(position_.y));  // 四舍五入到整数,省略的话偶尔会出现画面割裂
+    }
+
+    clampPosition();
+}
 
 void Camera::move(const glm::vec2& offset) {
     position_ += offset;
@@ -35,12 +60,6 @@ void Camera::setLimitBounds(std::optional<Rect> limit_bounds) {
     limit_bounds_ = std::move(limit_bounds);
     clampPosition();
 }
-
-const glm::vec2& Camera::getViewportSize() const { return viewport_size_; }
-
-const glm::vec2& Camera::getPosition() const { return position_; }
-
-const std::optional<Rect>& Camera::getLimitBounds() const { return limit_bounds_; }
 
 void Camera::clampPosition() {
     if (limit_bounds_ && limit_bounds_->size.x > 0 && limit_bounds_->size.y > 0) {
