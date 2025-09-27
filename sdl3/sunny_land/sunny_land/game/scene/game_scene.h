@@ -19,12 +19,11 @@ public:
     void clean() override;
 
 private:
-    // 测试函数
-    // TODO: remove
-    void testCamera();
-    void testPlayer();
-    void testCollisionPairs();
-    GameObject* player_;
+    [[nodiscard]] bool initLevel();
+    [[nodiscard]] bool initPlayer();
+
+private:
+    GameObject* player_{};  ///< @brief 保存玩家对象的指针，方便访问
 };
 
 }  // namespace pyc::sunny_land
