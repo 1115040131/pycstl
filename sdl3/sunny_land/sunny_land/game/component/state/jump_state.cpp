@@ -12,6 +12,7 @@
 namespace pyc::sunny_land {
 
 void JumpState::enter() {
+    playAnimation("jump");
     // 设置跳跃初始速度
     auto physics_component = player_component_->getPhysicsComponent();
     physics_component->setVelocityY(-player_component_->getJumpVelocity());

@@ -19,8 +19,9 @@ public:
     void clean() override;
 
 private:
-    [[nodiscard]] bool initLevel();
-    [[nodiscard]] bool initPlayer();
+    [[nodiscard]] bool initLevel();         ///< @brief 初始化关卡
+    [[nodiscard]] bool initPlayer();        ///< @brief 初始化玩家
+    [[nodiscard]] bool initEnemyAndItem();  ///< @brief 初始化敌人和道具
 
 private:
     GameObject* player_{};  ///< @brief 保存玩家对象的指针，方便访问

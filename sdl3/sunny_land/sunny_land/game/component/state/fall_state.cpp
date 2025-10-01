@@ -9,6 +9,8 @@
 
 namespace pyc::sunny_land {
 
+void FallState::enter() { playAnimation("fall"); }
+
 std::unique_ptr<PlayerState> FallState::handleInput(Context& context) {
     const auto& input_manager = context.getInputManager();
     auto physics_component = player_component_->getPhysicsComponent();

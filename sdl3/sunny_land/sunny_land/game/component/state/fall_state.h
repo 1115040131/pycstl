@@ -9,7 +9,7 @@ public:
     using PlayerState::PlayerState;
 
 private:
-    void enter() override {}
+    void enter() override;
     void exit() override {}
     std::unique_ptr<PlayerState> handleInput(Context&) override;
     std::unique_ptr<PlayerState> update(std::chrono::duration<float>, Context&) override;

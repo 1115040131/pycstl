@@ -8,6 +8,8 @@
 
 namespace pyc::sunny_land {
 
+void IdleState::enter() { playAnimation("idle"); }
+
 std::unique_ptr<PlayerState> IdleState::handleInput(Context& context) {
     const auto& input_manager = context.getInputManager();
 

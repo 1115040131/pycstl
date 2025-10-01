@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/component/animation_component.h"
 #include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
 #include "sunny_land/engine/component/transform_component.h"
@@ -20,9 +21,10 @@ void PlayerComponent::init() {
     transform_component_ = owner_->getComponent<TransformComponent>();
     physics_component_ = owner_->getComponent<PhysicsComponent>();
     sprite_component_ = owner_->getComponent<SpriteComponent>();
+    animation_component_ = owner_->getComponent<AnimationComponent>();
 
     // 检查必要组件是否存在
-    if (!transform_component_ || !physics_component_ || !sprite_component_) {
+    if (!transform_component_ || !physics_component_ || !sprite_component_ || !animation_component_) {
         spdlog::error("Player 对象缺少必要组件！");
     }
 

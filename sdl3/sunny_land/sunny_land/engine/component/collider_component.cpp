@@ -11,7 +11,7 @@ namespace pyc::sunny_land {
 ColliderComponent::ColliderComponent(std::unique_ptr<Collider> collider, Alignment alignment, bool is_trigger,
                                      bool is_active)
     : collider_(std::move(collider)), alignment_(alignment), is_trigger_(is_trigger), is_active_(is_active) {
-    if (!collider) {
+    if (!collider_) {
         spdlog::error("创建 ColliderComponent 时传入了空的碰撞器！");
     }
 }

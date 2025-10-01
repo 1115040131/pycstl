@@ -20,6 +20,9 @@ public:
     explicit PlayerState(PlayerComponent* player_component) : player_component_(player_component) {}
     virtual ~PlayerState() = default;
 
+    ///< @brief 播放指定名称的动画，使用 AnimationComponent 的方法
+    void playAnimation(std::string_view animation_name);
+
 protected:
     // 核心状态方法
     virtual void enter() = 0;                                                                 ///< @brief 进入

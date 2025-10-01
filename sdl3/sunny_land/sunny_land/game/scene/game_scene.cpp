@@ -2,9 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-// #include "sunny_land/engine/component/collider_component.h"
-// #include "sunny_land/engine/component/physics_component.h"
-// #include "sunny_land/engine/component/sprite_component.h"
+#include "sunny_land/engine/component/animation_component.h"
 #include "sunny_land/engine/component/tilelayer_component.h"
 #include "sunny_land/engine/component/transform_component.h"
 #include "sunny_land/engine/core/context.h"
@@ -40,78 +38,26 @@ void GameScene::init() {
         context_.getInputManager().setShouldQuit(true);
         return;
     }
+    if (!initEnemyAndItem()) {
+        spdlog::error("敌人和道具初始化失败，无法继续。");
+        context_.getInputManager().setShouldQuit(true);
+        return;
+    }
 
     Scene::init();
     spdlog::trace("GameScene 初始化完成。");
 }
 
-void GameScene::handleInput() {
-    Scene::handleInput();
-    // testCamera();
-    // testPlayer();
-}
+void GameScene::handleInput() { Scene::handleInput(); }
 
-void GameScene::update(std::chrono::duration<float> delta_time) {
-    Scene::update(delta_time);
-    // testCollisionPairs();
-}
+void GameScene::update(std::chrono::duration<float> delta_time) { Scene::update(delta_time); }
 
 void GameScene::render() { Scene::render(); }
 
 void GameScene::clean() { Scene::clean(); }
 
-// void GameScene::testCamera() {
-//     auto& camera_ = context_.getCamera();
-//     auto& input_manager_ = context_.getInputManager();
-//     if (input_manager_.isActionDown("move_up")) {
-//         camera_.move(glm::vec2(0, -1));
-//     }
-//     if (input_manager_.isActionDown("move_down")) {
-//         camera_.move(glm::vec2(0, 1));
-//     }
-//     if (input_manager_.isActionDown("move_left")) {
-//         camera_.move(glm::vec2(-1, 0));
-//     }
-//     if (input_manager_.isActionDown("move_right")) {
-//         camera_.move(glm::vec2(1, 0));
-//     }
-// }
-
-// void GameScene::testPlayer() {
-//     if (!player_) {
-//         return;
-//     }
-
-//     auto physics = player_->getComponent<PhysicsComponent>();
-//     if (!physics) {
-//         return;
-//     }
-
-//     const auto& input_manager_ = context_.getInputManager();
-//     const auto& velocity = physics->getVelocity();
-//     if (input_manager_.isActionDown("move_left")) {
-//         physics->setVelocity({-100.0f, velocity.y});
-//     } else {
-//         physics->setVelocity({velocity.x * 0.9f, velocity.y});
-//     }
-//     if (input_manager_.isActionDown("move_right")) {
-//         physics->setVelocity({100.0f, velocity.y});
-//     } else {
-//         physics->setVelocity({velocity.x * 0.9f, velocity.y});
-//     }
-//     if (input_manager_.isActionDown("jump")) {
-//         physics->setVelocity({velocity.x, -400.0f});
-//     }
-// }
-
-// void GameScene::testCollisionPairs() {
-//     auto& physics_engine = context_.getPhysicsEngine();
-//     for (const auto& pair : physics_engine.getCollisionPairs()) {
-//         spdlog::info("检测到碰撞: {} <-> {}", pair.first->getName(), pair.second->getName());
-//     }
-// }
-
-bool GameScene::initLevel() {  // 加载关卡
+bool GameScene::initLevel() {
+    // 加载关卡
     LevelLoader level_loader;
     if (!level_loader.loadLevel(ASSET("maps/level1.tmj"), *this)) {
         spdlog::error("关卡加载失败");
@@ -141,7 +87,7 @@ bool GameScene::initLevel() {  // 加载关卡
     return true;
 }
 
-bool GameScene::initPlayer() {  // 获取玩家对象
+bool GameScene::initPlayer() {
     // 获取玩家对象
     player_ = findGameObjectByName("player");
     if (!player_) {
@@ -165,6 +111,32 @@ bool GameScene::initPlayer() {  // 获取玩家对象
     context_.getCamera().setTarget(player_transform);
     spdlog::trace("Player初始化完成。");
     return true;
+}
+
+static bool objectPlayerAnimation(std::unique_ptr<GameObject>& game_object, std::string_view animation_name) {
+    if (auto ac = game_object->getComponent<AnimationComponent>()) {
+        ac->playAnimation(animation_name);
+        return true;
+    } else {
+        spdlog::error("{} 对象缺少 AnimationComponent, 无法播放动画。", game_object->getName());
+        return false;
+    }
+}
+
+bool GameScene::initEnemyAndItem() {
+    bool success = true;
+    for (auto& game_object : game_objects_) {
+        if (game_object->getName() == "eagle") {
+            success = success && objectPlayerAnimation(game_object, "fly");
+        } else if (game_object->getName() == "frog") {
+            success = success && objectPlayerAnimation(game_object, "idle");
+        } else if (game_object->getName() == "opossum") {
+            success = success && objectPlayerAnimation(game_object, "walk");
+        } else if (game_object->getTag() == "item") {
+            success = success && objectPlayerAnimation(game_object, "idle");
+        }
+    }
+    return success;
 }
 
 }  // namespace pyc::sunny_land
