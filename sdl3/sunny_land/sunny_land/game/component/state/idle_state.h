@@ -1,3 +1,5 @@
+#pragma once
+
 #include "sunny_land/game/component/state/player_state.h"
 
 namespace pyc::sunny_land {

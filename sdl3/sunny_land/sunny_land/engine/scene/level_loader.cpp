@@ -7,6 +7,7 @@
 
 #include "sunny_land/engine/component/animation_component.h"
 #include "sunny_land/engine/component/collider_component.h"
+#include "sunny_land/engine/component/health_component.h"
 #include "sunny_land/engine/component/parallax_component.h"
 #include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
@@ -203,7 +204,7 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
                 game_object->setTag(tag.value());
             }
 
-            // 获取标签信息并设置
+            // 获取动画信息并设置
             if (auto animation = getTileProperty<std::string>(tile_json, "animation")) {
                 // 解析 string 为 JSON 对象
                 nlohmann::json anim_json;
@@ -217,6 +218,12 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
                 auto* ac = game_object->addComponent<AnimationComponent>();
                 // 添加动画到 AnimationComponent
                 addAnimation(anim_json, ac, src_size);
+            }
+
+            // 获取生命值信息并设置
+            if (auto health = getTileProperty<int>(tile_json, "health")) {
+                // 添加 HealthComponent
+                game_object->addComponent<HealthComponent>(health.value());
             }
 
             // 添加到场景中

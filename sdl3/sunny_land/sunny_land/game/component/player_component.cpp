@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/component/animation_component.h"
+#include "sunny_land/engine/component/health_component.h"
 #include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
 #include "sunny_land/engine/component/transform_component.h"
@@ -22,9 +23,11 @@ void PlayerComponent::init() {
     physics_component_ = owner_->getComponent<PhysicsComponent>();
     sprite_component_ = owner_->getComponent<SpriteComponent>();
     animation_component_ = owner_->getComponent<AnimationComponent>();
+    health_component_ = owner_->getComponent<HealthComponent>();
 
     // 检查必要组件是否存在
-    if (!transform_component_ || !physics_component_ || !sprite_component_ || !animation_component_) {
+    if (!transform_component_ || !physics_component_ || !sprite_component_ || !animation_component_ ||
+        !health_component_) {
         spdlog::error("Player 对象缺少必要组件！");
     }
 
@@ -50,6 +53,32 @@ void PlayerComponent::update(std::chrono::duration<float> delta_time, Context& c
             setState(std::move(next_state));
         }
     }
+}
+
+bool PlayerComponent::takeDamage(int damage) {
+    if (isDead() || !health_component_ || damage <= 0) {
+        spdlog::warn("玩家已死亡或却少必要组件，并未造成伤害。");
+        return false;
+    }
+
+    bool success = health_component_->takeDamage(damage);
+    if (!success) {
+        return false;
+    }
+
+    // --- 成功造成伤害了，根据是否存活决定状态切换
+    if (health_component_->isAlive()) {
+        spdlog::debug("玩家受到了 {} 点伤害，当前生命值: {}/{}。", damage, health_component_->getCurrentHealth(),
+                      health_component_->getMaxHealth());
+        // 切换到受伤状态
+        setState(StateFactory::create<HurtState>(this));
+    } else {
+        spdlog::debug("玩家死亡。");
+        is_dead_ = true;
+        // 切换到死亡状态
+        setState(StateFactory::create<DeadState>(this));
+    }
+    return true;
 }
 
 void PlayerComponent::setState(std::unique_ptr<PlayerState> new_state) {

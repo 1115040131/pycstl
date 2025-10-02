@@ -23,6 +23,9 @@ private:
     [[nodiscard]] bool initPlayer();        ///< @brief 初始化玩家
     [[nodiscard]] bool initEnemyAndItem();  ///< @brief 初始化敌人和道具
 
+    // TODO: remove test
+    void testHealth();
+
 private:
     GameObject* player_{};  ///< @brief 保存玩家对象的指针，方便访问
 };

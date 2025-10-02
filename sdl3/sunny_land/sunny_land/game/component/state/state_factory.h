@@ -7,7 +7,9 @@ namespace pyc::sunny_land {
 class PlayerComponent;
 class PlayerState;
 
+class DeadState;
 class FallState;
+class HurtState;
 class IdleState;
 class JumpState;
 class WalkState;

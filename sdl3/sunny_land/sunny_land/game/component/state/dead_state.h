@@ -4,7 +4,7 @@
 
 namespace pyc::sunny_land {
 
-class WalkState final : public PlayerState {
+class DeadState final : public PlayerState {
     friend class PlayerComponent;
 
 public:

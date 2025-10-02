@@ -48,7 +48,10 @@ void GameScene::init() {
     spdlog::trace("GameScene 初始化完成。");
 }
 
-void GameScene::handleInput() { Scene::handleInput(); }
+void GameScene::handleInput() {
+    Scene::handleInput();
+    testHealth();
+}
 
 void GameScene::update(std::chrono::duration<float> delta_time) { Scene::update(delta_time); }
 
@@ -137,6 +140,12 @@ bool GameScene::initEnemyAndItem() {
         }
     }
     return success;
+}
+
+void GameScene::testHealth() {
+    if (context_.getInputManager().isActionPressed("attack")) {
+        player_->getComponent<PlayerComponent>()->takeDamage(1);
+    }
 }
 
 }  // namespace pyc::sunny_land

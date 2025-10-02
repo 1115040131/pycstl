@@ -113,7 +113,7 @@ void PhysicsEngine::resolveTileCollisions(PhysicsComponent* physics, std::chrono
     }
     auto transform = physics->getTransform();
     auto collider = object->getComponent<ColliderComponent>();
-    if (!transform || !collider || !collider->isActive() || collider->isTrigger()) {
+    if (!transform || !collider || collider->isTrigger()) {
         return;
     }
     auto world_aabb = collider->getWorldAABB();
@@ -126,6 +126,13 @@ void PhysicsEngine::resolveTileCollisions(PhysicsComponent* physics, std::chrono
     auto new_obj_pos = world_aabb.position + ds;        // 计算物体在delta_time后的新位置
     const auto& obj_pos = world_aabb.position;
     const auto& obj_size = world_aabb.size;
+
+    // 如果碰撞器未激活，直接让物体正常移动，然后返回。
+    if (!collider->isActive()) {
+        transform->translate(ds);
+        physics->setVelocity(glm::clamp(physics->velocity_, -max_speed_, max_speed_));
+        return;
+    }
 
     // 遍历所有注册的碰撞瓦片层
     for (auto tile_layer : tile_layers_) {
