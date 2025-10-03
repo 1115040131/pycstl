@@ -46,9 +46,9 @@ private:
     SpriteComponent* sprite_component_ = nullptr;  ///< @brief 指向必需的SpriteComponent的指针
     Animation* current_animation_ = nullptr;       ///< @brief 指向当前播放动画的原始指针
 
-    std::chrono::duration<float> animation_timer_;  ///< @brief 动画播放中的计时器
-    bool is_playing_ = false;                       ///< @brief 当前是否有动画正在播放
-    bool is_one_shot_removal_ = false;              ///< @brief 是否在动画结束后删除整个GameObject
+    std::chrono::duration<float> animation_timer_{};  ///< @brief 动画播放中的计时器
+    bool is_playing_ = false;                         ///< @brief 当前是否有动画正在播放
+    bool is_one_shot_removal_ = false;                ///< @brief 是否在动画结束后删除整个GameObject
 };
 
 }  // namespace pyc::sunny_land

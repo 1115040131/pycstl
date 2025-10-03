@@ -1,5 +1,7 @@
 #include "sunny_land/engine/physics/physics_engine.h"
 
+#include <set>
+
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/component/collider_component.h"
@@ -58,6 +60,9 @@ void PhysicsEngine::update(std::chrono::duration<float> delta_time) {
     }
     // 处理对象间碰撞
     checkObjectCollisions();
+
+    // 检测瓦片触发事件 (检测前已经处理完位移)
+    checkTileTriggers();
 }
 
 void PhysicsEngine::checkObjectCollisions() {
@@ -359,6 +364,65 @@ float PhysicsEngine::getTileHeightAtWidth(float width, TileType type, glm::vec2 
             return (1.0f - rel_x) * tile_size.y * 0.5f + tile_size.y * 0.5f;
         default:
             return 0.0f;  // 非斜坡类型，返回高度为0
+    }
+}
+
+void PhysicsEngine::checkTileTriggers() {
+    tile_trigger_events_.clear();
+
+    for (auto physics : components_) {
+        if (!physics || !physics->isEnabled()) {
+            continue;
+        }
+        auto object = physics->getOwner();
+        if (!object) {
+            continue;
+        }
+        auto collider = object->getComponent<ColliderComponent>();
+        if (!collider || !collider->isActive()) {
+            continue;
+        }
+
+        // 获取物体的世界AABB
+        auto world_aabb = collider->getWorldAABB();
+
+        // 使用 set 来跟踪循环遍历中已经触发过的瓦片类型,
+        // 防止重复添加（例如，玩家同时踩到两个尖刺，只需要受到一次伤害）
+        std::set<TileType> triggers_set;
+
+        for (auto layer : tile_layers_) {
+            if (!layer) {
+                continue;
+            }
+
+            const auto& tile_size = layer->getTileSize();
+            constexpr float kTolerance = 1.0f;  // 检查右边缘和下边缘时，需要减1像素，否则会检查到下一行/列的瓦片
+
+            // 获取瓦片坐标范围
+            auto start_x = static_cast<int>(std::floor(world_aabb.position.x / tile_size.x));
+            auto end_x = static_cast<int>(
+                std::ceil((world_aabb.position.x + world_aabb.size.x - kTolerance) / tile_size.x));
+            auto start_y = static_cast<int>(std::floor(world_aabb.position.y / tile_size.y));
+            auto end_y = static_cast<int>(
+                std::ceil((world_aabb.position.y + world_aabb.size.y - kTolerance) / tile_size.y));
+
+            // 遍历瓦片坐标范围进行检测
+            for (int x = start_x; x < end_x; ++x) {
+                for (int y = start_y; y < end_y; ++y) {
+                    auto tile_type = layer->getTileTypeAt({x, y});
+                    // 未来可以添加更多触发器类型的瓦片，目前只有 HAZARD 类型
+                    if (tile_type == TileType::HAZARD) {
+                        triggers_set.insert(tile_type);  // 记录触发事件，set 保证每个瓦片类型只记录一次
+                    }
+                }
+            }
+            // 遍历触发事件集合，添加到 tile_trigger_events_ 中
+            for (const auto& type : triggers_set) {
+                tile_trigger_events_.emplace_back(object, type);
+                spdlog::trace("tile_trigger_events_中 添加了 GameObject {} 和瓦片触发类型: {}", object->getName(),
+                              static_cast<int>(type));
+            }
+        }
     }
 }
 

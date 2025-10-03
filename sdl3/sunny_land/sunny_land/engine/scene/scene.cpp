@@ -36,26 +36,46 @@ void Scene::update(std::chrono::duration<float> delta_time) {
         return;
     }
 
+    // 清理标记为删除的对象
+    auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
+                                       [](const std::unique_ptr<GameObject>& game_object) {
+                                           if (!game_object || game_object->isNeedRemove()) {
+                                               if (game_object) {
+                                                   game_object->clean();
+                                               }
+                                               return false;
+                                           } else {
+                                               return true;
+                                           }
+                                       });
+    game_objects_.erase(partition_it, game_objects_.end());
+    // 处理待添加的对象
+    processPendingAdditions();
+
     // 先更新物理引擎
     context_.getPhysicsEngine().update(delta_time);
     // 更新相机
     context_.getCamera().update(delta_time);
 
-    auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
-                                       [delta_time, this](const std::unique_ptr<GameObject>& game_object) {
-                                           if (game_object && !game_object->isNeedRemove()) {
-                                               game_object->update(delta_time, context_);
-                                               return true;
-                                           } else {
-                                               if (game_object) {
-                                                   game_object->clean();
-                                               }
-                                               return false;
-                                           }
-                                       });
-    game_objects_.erase(partition_it, game_objects_.end());
+    // auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
+    //                                    [delta_time, this](const std::unique_ptr<GameObject>& game_object) {
+    //                                        if (game_object && !game_object->isNeedRemove()) {
+    //                                            game_object->update(delta_time, context_);
+    //                                            return true;
+    //                                        } else {
+    //                                            if (game_object) {
+    //                                                game_object->clean();
+    //                                            }
+    //                                            return false;
+    //                                        }
+    //                                    });
+    // game_objects_.erase(partition_it, game_objects_.end());
 
-    processPendingAdditions();
+    for (const auto& game_object : game_objects_) {
+        if (game_object && !game_object->isNeedRemove()) {
+            game_object->update(delta_time, context_);
+        }
+    }
 }
 
 void Scene::render() {

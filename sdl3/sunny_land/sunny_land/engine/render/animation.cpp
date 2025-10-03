@@ -11,7 +11,7 @@ void Animation::addFrame(SDL_FRect source_rect, std::chrono::duration<float> dur
         spdlog::warn("尝试向动画 '{}' 添加无效持续时间的帧", name_);
         return;
     }
-    frames_.emplace_back(AnimationFrame{source_rect, duration});
+    frames_.emplace_back(source_rect, duration);
     total_duration_ += duration;
 }
 

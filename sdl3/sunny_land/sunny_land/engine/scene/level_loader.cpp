@@ -202,6 +202,9 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             // 获取标签信息并设置
             if (auto tag = getTileProperty<std::string>(tile_json, "tag")) {
                 game_object->setTag(tag.value());
+            } else if (tile_info.type ==
+                       TileType::HAZARD) {  // 如果是危险瓦片，且没有手动设置标签，则自动设置标签为 "hazard"
+                game_object->setTag("hazard");
             }
 
             // 获取动画信息并设置
@@ -329,6 +332,8 @@ TileType LevelLoader::getTileType(const nlohmann::json& tile_json) const {
                     spdlog::error("未知的斜坡类型: {}", slope_type);
                     return TileType::NORMAL;
                 }
+            } else if (name == "hazard") {
+                return property.value("value", false) ? TileType::HAZARD : TileType::NORMAL;
             }
         }
     }

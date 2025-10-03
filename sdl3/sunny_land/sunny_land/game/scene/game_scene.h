@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "sunny_land/engine/scene/scene.h"
 
 namespace pyc::sunny_land {
@@ -23,8 +25,17 @@ private:
     [[nodiscard]] bool initPlayer();        ///< @brief 初始化玩家
     [[nodiscard]] bool initEnemyAndItem();  ///< @brief 初始化敌人和道具
 
-    // TODO: remove test
-    void testHealth();
+    void handleObjectCollisions();  ///< @brief 处理游戏对象间的碰撞逻辑（从PhysicsEngine获取信息）
+    void handleTileTriggers();      ///< @brief 处理瓦片触发事件（从PhysicsEngine获取信息）
+    void playerVSEnemyCollision(GameObject* player, GameObject* enemy);  ///< @brief 玩家与敌人碰撞处理
+    void playerVSItemCollision(GameObject* player, GameObject* item);    ///< @brief 玩家与道具碰撞处理
+
+    /**
+     * @brief 创建一个特效对象（一次性）。
+     * @param center_pos 特效中心位置
+     * @param tag 特效标签（决定特效类型,例如"enemy","item"）
+     */
+    void createEffect(glm::vec2 center_pos, std::string_view tag);
 
 private:
     GameObject* player_{};  ///< @brief 保存玩家对象的指针，方便访问

@@ -38,6 +38,10 @@ public:
 
     /// @brief 获取本帧检测到的所有 GameObject 碰撞对。(此列表在每次 update 开始时清空)
     const std::vector<std::pair<GameObject*, GameObject*>>& getCollisionPairs() const { return collision_pairs_; };
+    /// @brief 获取本帧检测到的所有瓦片触发事件。(此列表在每次 update 开始时清空)
+    const std::vector<std::pair<GameObject*, TileType>>& getTileTriggerEvents() const {
+        return tile_trigger_events_;
+    };
 
 private:
     void checkObjectCollisions();  ///< @brief 检测并处理对象之间的碰撞，并记录需要游戏逻辑处理的碰撞对。
@@ -59,6 +63,11 @@ private:
      */
     float getTileHeightAtWidth(float width, TileType type, glm::vec2 tile_size);
 
+    /**
+     * @brief 检测所有游戏对象与瓦片层的触发器类型瓦片碰撞，并记录触发事件。(位移处理完毕后再调用)
+     */
+    void checkTileTriggers();
+
 private:
     std::vector<PhysicsComponent*> components_;     ///< @brief 注册的物理组件容器，非拥有指针
     std::vector<TileLayerComponent*> tile_layers_;  ///< @brief 注册的碰撞瓦片图层容器
@@ -68,6 +77,8 @@ private:
 
     /// @brief 存储本帧发生的 GameObject 碰撞对 （每次 update 开始时清空）
     std::vector<std::pair<GameObject*, GameObject*>> collision_pairs_;
+    /// @brief 存储本帧发生的 GameObject 碰撞对 （每次 update 开始时清空）
+    std::vector<std::pair<GameObject*, TileType>> tile_trigger_events_;
 };
 
 }  // namespace pyc::sunny_land

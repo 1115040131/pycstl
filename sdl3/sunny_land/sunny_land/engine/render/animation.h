@@ -14,8 +14,8 @@ namespace pyc::sunny_land {
  * 包含纹理图集上的源矩形和该帧的显示持续时间。
  */
 struct AnimationFrame {
-    SDL_FRect source_rect;                  ///< @brief 纹理图集上此帧的区域
-    std::chrono::duration<float> duration;  ///< @brief 此帧显示的持续时间（秒）
+    SDL_FRect source_rect{};                  ///< @brief 纹理图集上此帧的区域
+    std::chrono::duration<float> duration{};  ///< @brief 此帧显示的持续时间（秒）
 };
 
 /**
@@ -60,10 +60,10 @@ public:
     void setLooping(bool loop) { loop_ = loop; }           ///< @brief 设置动画是否循环播放。
 
 private:
-    std::string name_;                             ///< @brief 动画的名称 (例如, "walk", "idle")。
-    std::vector<AnimationFrame> frames_;           ///< @brief 动画帧列表
-    std::chrono::duration<float> total_duration_;  ///< @brief 动画的总持续时间（秒）
-    bool loop_ = true;                             ///< @brief 默认动画是循环的
+    std::string name_;                               ///< @brief 动画的名称 (例如, "walk", "idle")。
+    std::vector<AnimationFrame> frames_;             ///< @brief 动画帧列表
+    std::chrono::duration<float> total_duration_{};  ///< @brief 动画的总持续时间（秒）
+    bool loop_ = true;                               ///< @brief 默认动画是循环的
 };
 
 }  // namespace pyc::sunny_land
