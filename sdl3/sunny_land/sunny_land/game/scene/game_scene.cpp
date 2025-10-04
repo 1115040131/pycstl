@@ -17,6 +17,10 @@
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/scene/level_loader.h"
 #include "sunny_land/engine/utils/macro.h"
+#include "sunny_land/game/component/ai/jump_behavior.h"
+#include "sunny_land/game/component/ai/patrol_behavior.h"
+#include "sunny_land/game/component/ai/updown_behavior.h"
+#include "sunny_land/game/component/ai_component.h"
 #include "sunny_land/game/component/player_component.h"
 
 namespace pyc::sunny_land {
@@ -138,11 +142,23 @@ bool GameScene::initEnemyAndItem() {
     bool success = true;
     for (auto& game_object : game_objects_) {
         if (game_object->getName() == "eagle") {
-            success = success && objectPlayerAnimation(game_object, "fly");
+            if (auto ai_component = game_object->addComponent<AIComponent>()) {
+                auto y_max = game_object->getComponent<TransformComponent>()->getPosition().y;
+                auto y_min = y_max - 80.0f;  // 让鹰的飞行范围 (当前位置与上方80像素 的区域)
+                ai_component->setBehavior(std::make_unique<UpDownBehavior>(y_min, y_max));
+            }
         } else if (game_object->getName() == "frog") {
-            success = success && objectPlayerAnimation(game_object, "idle");
+            if (auto ai_component = game_object->addComponent<AIComponent>()) {
+                auto x_max = game_object->getComponent<TransformComponent>()->getPosition().x - 10.0f;
+                auto x_min = x_max - 90.0f;  // 青蛙跳跃范围（右侧 - 10.0f 是为了增加稳定性）
+                ai_component->setBehavior(std::make_unique<JumpBehavior>(x_min, x_max));
+            }
         } else if (game_object->getName() == "opossum") {
-            success = success && objectPlayerAnimation(game_object, "walk");
+            if (auto ai_component = game_object->addComponent<AIComponent>()) {
+                auto x_max = game_object->getComponent<TransformComponent>()->getPosition().x;
+                auto x_min = x_max - 200.0f;  // 负鼠巡逻范围
+                ai_component->setBehavior(std::make_unique<PatrolBehavior>(x_min, x_max));
+            }
         } else if (game_object->getTag() == "item") {
             success = success && objectPlayerAnimation(game_object, "idle");
         }
