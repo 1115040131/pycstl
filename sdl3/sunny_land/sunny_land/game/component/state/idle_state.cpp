@@ -46,7 +46,7 @@ std::unique_ptr<PlayerState> IdleState::update(std::chrono::duration<float>, Con
     physics_component->setVelocityX(physics_component->getVelocity().x * friction_factor);
 
     // 如果离地，则切换到 FallState
-    if (!physics_component->hasCollidedBelow()) {
+    if (!player_component_->is_on_ground()) {
         return StateFactory::create<FallState>(player_component_);
     }
 

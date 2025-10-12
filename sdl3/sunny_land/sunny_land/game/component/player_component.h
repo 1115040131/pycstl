@@ -8,6 +8,8 @@
 
 namespace pyc::sunny_land {
 
+using namespace std::chrono_literals;
+
 class TransformComponent;
 class SpriteComponent;
 class PhysicsComponent;
@@ -48,6 +50,7 @@ public:
     std::chrono::duration<float> getStunnedDuration() const { return stunned_duration_; }  ///< @brief 获取硬直时间
 
     void setState(std::unique_ptr<PlayerState> new_state);  ///< @brief 切换玩家状态
+    bool is_on_ground() const;                              ///< @brief 检查玩家是否在地面上(考虑了Coyote Time)
 
 private:
     // 核心循环函数
@@ -68,6 +71,14 @@ private:
 
     // --- 属性相关参数 ---
     std::chrono::duration<float> stunned_duration_{0.4f};  ///< @brief 玩家被击中后的硬直时间（单位：秒）
+
+    // 土狼时间(Coyote Time): 允许玩家在离地后短暂时间内仍然可以跳跃
+    static constexpr auto coyote_time_ = 0.1s;         ///< @brief Coyote Time (单位：秒）
+    std::chrono::duration<float> coyote_timer_{0.0f};  ///< @brief Coyote Time 计时器
+
+    // 无敌闪烁时间
+    static constexpr auto flash_interval_ = 0.03s;    ///< @brief 闪烁间隔时间（单位：秒）
+    std::chrono::duration<float> flash_timer_{0.0f};  ///< @brief 闪烁计时器，用于无敌状态下的闪烁效果
 };
 
 }  // namespace pyc::sunny_land

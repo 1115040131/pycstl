@@ -52,7 +52,7 @@ std::unique_ptr<PlayerState> WalkState::update(std::chrono::duration<float>, Con
     physics_component->setVelocityX(glm::clamp(physics_component->getVelocity().x, -max_speed, max_speed));
 
     // 如果离地，则切换到 FallState
-    if (!physics_component->hasCollidedBelow()) {
+    if (!player_component_->is_on_ground()) {
         return StateFactory::create<FallState>(player_component_);
     }
 
