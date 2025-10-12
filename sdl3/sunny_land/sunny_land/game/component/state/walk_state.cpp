@@ -16,6 +16,11 @@ std::unique_ptr<PlayerState> WalkState::handleInput(Context& context) {
     auto physics_component = player_component_->getPhysicsComponent();
     auto sprite_component = player_component_->getSpriteComponent();
 
+    // 如果按下上键，且与梯子重合，则切换到 ClimbState
+    if (physics_component->hasCollidedLadder() && input_manager.isActionDown("move_up")) {
+        return StateFactory::create<ClimbState>(player_component_);
+    }
+
     // 如果按下“jump”则切换到 JumpState
     if (input_manager.isActionPressed("jump")) {
         return StateFactory::create<JumpState>(player_component_);

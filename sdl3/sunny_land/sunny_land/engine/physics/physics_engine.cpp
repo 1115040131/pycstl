@@ -217,6 +217,22 @@ void PhysicsEngine::resolveTileCollisions(PhysicsComponent* physics, std::chrono
                 new_obj_pos.y = tile_y * tile_size.y - obj_size.y;
                 physics->velocity_.y = 0.0f;
                 physics->setCollidedBelow(true);
+            } else if (tile_type_left == TileType::LADDER && tile_type_right == TileType::LADDER) {
+                // 如果两个角点都位于梯子上，则判断是不是处在梯子顶层
+                auto tile_type_up_l = tile_layer->getTileTypeAt({tile_x, tile_y - 1});  // 检测左角点上方瓦片类型
+                auto tile_type_up_r =
+                    tile_layer->getTileTypeAt({tile_x_right, tile_y - 1});  // 检测右角点上方瓦片类型
+                // 如果上方不是梯子，证明处在梯子顶层
+                if (tile_type_up_r != TileType::LADDER && tile_type_up_l != TileType::LADDER) {
+                    // 通过是否使用重力来区分是否处于攀爬状态。
+                    if (physics->isUseGravity()) {        // 非攀爬状态
+                        physics->setOnTopLadder(true);    // 设置在梯子顶层标志
+                        physics->setCollidedBelow(true);  // 设置下方碰撞标志
+                        // 让物体贴着梯子顶层位置(与SOLID情况相同)
+                        new_obj_pos.y = tile_y * tile_layer->getTileSize().y - obj_size.y;
+                        physics->velocity_.y = 0.0f;
+                    }
+                }
             } else {
                 // 检测斜坡瓦片（下方两个角点都要检测）
                 auto width_left = obj_pos.x - tile_x * tile_size.x;
@@ -413,6 +429,8 @@ void PhysicsEngine::checkTileTriggers() {
                     // 未来可以添加更多触发器类型的瓦片，目前只有 HAZARD 类型
                     if (tile_type == TileType::HAZARD) {
                         triggers_set.insert(tile_type);  // 记录触发事件，set 保证每个瓦片类型只记录一次
+                    } else if (tile_type == TileType::LADDER) {
+                        physics->setCollidedLadder(true);  // 梯子类型不必记录到事件容器，物理引擎自己处理
                     }
                 }
             }

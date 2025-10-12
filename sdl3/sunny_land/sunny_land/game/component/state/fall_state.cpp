@@ -16,6 +16,12 @@ std::unique_ptr<PlayerState> FallState::handleInput(Context& context) {
     auto physics_component = player_component_->getPhysicsComponent();
     auto sprite_component = player_component_->getSpriteComponent();
 
+    // 如果按下上下键，且与梯子重合，则切换到 ClimbState
+    if (physics_component->hasCollidedLadder() &&
+        (input_manager.isActionDown("move_up") || input_manager.isActionDown("move_down"))) {
+        return StateFactory::create<ClimbState>(player_component_);
+    }
+
     if (input_manager.isActionDown("move_left")) {
         if (physics_component->getVelocity().x > 0.0f) {
             physics_component->setVelocityX(0.0f);  // 如果当前速度是向右的，则先减速到0 (增强操控手感)

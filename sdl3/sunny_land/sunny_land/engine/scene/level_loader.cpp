@@ -334,6 +334,8 @@ TileType LevelLoader::getTileType(const nlohmann::json& tile_json) const {
                 }
             } else if (name == "hazard") {
                 return property.value("value", false) ? TileType::HAZARD : TileType::NORMAL;
+            } else if (name == "ladder") {
+                return property.value("value", false) ? TileType::LADDER : TileType::NORMAL;
             }
         }
     }
