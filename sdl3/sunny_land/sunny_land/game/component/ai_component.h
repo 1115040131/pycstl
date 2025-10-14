@@ -11,6 +11,7 @@ class TransformComponent;
 class SpriteComponent;
 class PhysicsComponent;
 class AnimationComponent;
+class AudioComponent;
 
 /**
  * @brief 处理玩家输入、状态和控制 GameObject 移动的组件。
@@ -23,6 +24,7 @@ class AIComponent final : public Component {
     DECLARE_COMPONENT(SpriteComponent, sprite_component_);
     DECLARE_COMPONENT(PhysicsComponent, physics_component_);
     DECLARE_COMPONENT(AnimationComponent, animation_component_);
+    DECLARE_COMPONENT(AudioComponent, audio_component_);
 
 public:
     void setBehavior(std::unique_ptr<AIBehavior> behavior);  ///< @brief 设置当前 AI 行为策略

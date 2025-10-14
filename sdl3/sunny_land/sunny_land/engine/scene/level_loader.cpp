@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/component/animation_component.h"
+#include "sunny_land/engine/component/audio_component.h"
 #include "sunny_land/engine/component/collider_component.h"
 #include "sunny_land/engine/component/health_component.h"
 #include "sunny_land/engine/component/parallax_component.h"
@@ -218,9 +219,26 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
                     continue;  // 跳过此对象
                 }
                 // 添加AnimationComponent
-                auto* ac = game_object->addComponent<AnimationComponent>();
+                auto* animation_component = game_object->addComponent<AnimationComponent>();
                 // 添加动画到 AnimationComponent
-                addAnimation(anim_json, ac, src_size);
+                addAnimation(anim_json, animation_component, src_size);
+            }
+
+            // 获取音效信息并设置
+            if (auto sound_string = getTileProperty<std::string>(tile_json, "sound")) {
+                // 解析string为JSON对象
+                nlohmann::json sound_json;
+                try {
+                    sound_json = nlohmann::json::parse(sound_string.value());
+                } catch (const nlohmann::json::parse_error& e) {
+                    spdlog::error("解析音效 JSON 字符串失败: {}", e.what());
+                    continue;  // 跳过此对象
+                }
+                // 添加AudioComponent
+                auto* audio_component = game_object->addComponent<AudioComponent>(
+                    &scene.getContext().getAudioPlayer(), &scene.getContext().getCamera());
+                // 添加音效到 AudioComponent
+                addSound(sound_json, audio_component);
             }
 
             // 获取生命值信息并设置
@@ -236,10 +254,10 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
     }
 }
 
-void LevelLoader::addAnimation(const nlohmann::json& anim_json, AnimationComponent* ac,
+void LevelLoader::addAnimation(const nlohmann::json& anim_json, AnimationComponent* animation_component,
                                const glm::vec2& sprite_size) {
     // 检查 anim_json 必须是一个对象，并且 ac 不能为 nullptr
-    if (!anim_json.is_object() || !ac) {
+    if (!anim_json.is_object() || !animation_component) {
         spdlog::error("无效的动画 JSON 或 AnimationComponent 指针。");
         return;
     }
@@ -281,7 +299,25 @@ void LevelLoader::addAnimation(const nlohmann::json& anim_json, AnimationCompone
             animation->addFrame(src_rect, duration);
         }
         // 将 Animation 对象添加到 AnimationComponent 中
-        ac->addAnimation(std::move(animation));
+        animation_component->addAnimation(std::move(animation));
+    }
+}
+
+void LevelLoader::addSound(const nlohmann::json& sound_json, AudioComponent* audio_component) {
+    if (!sound_json.is_object() || !audio_component) {
+        spdlog::error("无效的音效 JSON 或 AudioComponent 指针。");
+        return;
+    }
+    // 遍历音效 JSON 对象中的每个键值对（音效id : 音效路径）
+    for (const auto& sound : sound_json.items()) {
+        const std::string& sound_id = sound.key();
+        const std::string& sound_path = sound.value();
+        if (sound_id.empty() || sound_path.empty()) {
+            spdlog::warn("音效 '{}' 缺少必要信息。", sound_id);
+            continue;
+        }
+        // 添加音效到 AudioComponent
+        audio_component->addSound(sound_id, resolvePath(sound_path, map_path_));
     }
 }
 

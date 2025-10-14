@@ -14,6 +14,7 @@ class TransformComponent;
 class SpriteComponent;
 class PhysicsComponent;
 class AnimationComponent;
+class AudioComponent;
 class HealthComponent;
 
 /**
@@ -27,6 +28,7 @@ class PlayerComponent final : public Component {
     DECLARE_COMPONENT(SpriteComponent, sprite_component_);
     DECLARE_COMPONENT(PhysicsComponent, physics_component_);
     DECLARE_COMPONENT(AnimationComponent, animation_component_);
+    DECLARE_COMPONENT(AudioComponent, audio_component_);
     DECLARE_COMPONENT(HealthComponent, health_component_);
 
 public:

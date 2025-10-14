@@ -7,6 +7,7 @@
 #include "sunny_land/game/scene/game_scene.h"
 
 // 引擎组件
+#include "sunny_land/engine/audio/audio_player.h"
 #include "sunny_land/engine/core/config.h"
 #include "sunny_land/engine/core/context.h"
 #include "sunny_land/engine/core/time.h"
@@ -53,8 +54,9 @@ void GameApp::run() {
 
 bool GameApp::init() {
     spdlog::trace("初始化 GamApp ...");
-    if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initRenderer() || !initCamera() ||
-        !initInputManager() || !initPhysicsEngine() || !initContext() || !initSceneManager()) {
+    if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initAudioPlayer() ||
+        !initRenderer() || !initCamera() || !initInputManager() || !initPhysicsEngine() || !initContext() ||
+        !initSceneManager()) {
         return false;
     }
 
@@ -165,6 +167,17 @@ bool GameApp::initResourceManager() {
     return true;
 }
 
+bool GameApp::initAudioPlayer() {
+    try {
+        audio_player_ = std::make_unique<AudioPlayer>(resource_manager_.get());
+    } catch (const std::exception& e) {
+        spdlog::error("初始化音频播放器失败: {}", e.what());
+        return false;
+    }
+    spdlog::trace("音频播放器初始化成功。");
+    return true;
+}
+
 bool GameApp::initRenderer() {
     try {
         renderer_ = std::make_unique<Renderer>(sdl_renderer_, resource_manager_.get());
@@ -212,8 +225,8 @@ bool GameApp::initPhysicsEngine() {
 
 bool GameApp::initContext() {
     try {
-        context_ =
-            std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *input_manager_, *physics_engine_);
+        context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *input_manager_,
+                                             *physics_engine_, *audio_player_);
     } catch (const std::exception& e) {
         spdlog::error("初始化上下文失败: {}", e.what());
         return false;

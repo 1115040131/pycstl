@@ -23,6 +23,9 @@ public:
     ///< @brief 播放指定名称的动画，使用 AnimationComponent 的方法
     void playAnimation(std::string_view animation_name);
 
+    ///< @brief 播放指定音效，使用 AudioComponent 的方法
+    void playSound(std::string_view audio_name);
+
 protected:
     // 核心状态方法
     virtual void enter() = 0;                                                                 ///< @brief 进入

@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "sunny_land/engine/audio/audio_player.h"
 #include "sunny_land/engine/component/animation_component.h"
 #include "sunny_land/engine/component/collider_component.h"
 #include "sunny_land/engine/component/health_component.h"
@@ -97,6 +98,12 @@ bool GameScene::initLevel() {
 
     // 设置世界边界
     context_.getPhysicsEngine().setWorldBounds(Rect{glm::vec2(0.0f), tile_layer->getWorldSize()});
+
+    // 设置音量
+    context_.getAudioPlayer().setMusicVolume(0.2f);
+    context_.getAudioPlayer().setSoundVolume(0.5f);
+    // 播放背景音乐
+    context_.getAudioPlayer().playMusic(ASSET("audio/hurry_up_and_run.ogg"), true, 1s);
 
     spdlog::trace("关卡初始化完成。");
     return true;
@@ -229,6 +236,8 @@ void GameScene::playerVSEnemyCollision(GameObject* player, GameObject* enemy) {
         }
         // 玩家跳起效果
         player->getComponent<PhysicsComponent>()->setVelocityY(-300.0f);  // 向上跳起
+        // 播放音效(此音效完全可以放在玩家的音频组件中，这里示例另一种用法：直接用AudioPlayer播放，传入文件路径)
+        context_.getAudioPlayer().playSound(ASSET("audio/punch2a.mp3"));
     }
     // 踩踏判断失败，玩家受伤
     else {
@@ -247,6 +256,7 @@ void GameScene::playerVSItemCollision(GameObject* player, GameObject* item) {
     item->setNeedRemove(true);
     auto item_aabb = item->getComponent<ColliderComponent>()->getWorldAABB();
     createEffect(item_aabb.position + item_aabb.size / 2.0f, item->getTag());  // 创建特效
+    context_.getAudioPlayer().playSound(ASSET("audio/poka01.mp3"));            // 播放音效
 }
 
 void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {

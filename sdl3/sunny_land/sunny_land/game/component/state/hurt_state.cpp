@@ -18,6 +18,8 @@ void HurtState::enter() {
         knockback_velocity.x = -knockback_velocity.x;  // 变成向右
     }
     physics_component->setVelocity(knockback_velocity);  // 设置击退速度
+
+    playSound("hurt");  // 播放受伤音效
 }
 
 std::unique_ptr<PlayerState> HurtState::handleInput(Context&) {

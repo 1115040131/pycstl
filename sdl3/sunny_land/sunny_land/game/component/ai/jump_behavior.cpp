@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/component/animation_component.h"
+#include "sunny_land/engine/component/audio_component.h"
 #include "sunny_land/engine/component/physics_component.h"
 #include "sunny_land/engine/component/sprite_component.h"
 #include "sunny_land/engine/component/transform_component.h"
@@ -32,6 +33,7 @@ void JumpBehavior::update(std::chrono::duration<float> delta_time, AIComponent& 
     auto transform_component = ai_component.getTransformComponent();
     auto sprite_component = ai_component.getSpriteComponent();
     auto animation_component = ai_component.getAnimationComponent();
+    auto audio_component = ai_component.getAudioComponent();
     if (!physics_component || !transform_component || !sprite_component || !animation_component) {
         spdlog::error("JumpBehavior: 缺少必要的组件, 无法执行巡逻行为。");
         return;
@@ -39,6 +41,10 @@ void JumpBehavior::update(std::chrono::duration<float> delta_time, AIComponent& 
 
     auto is_on_ground = physics_component->hasCollidedBelow();
     if (is_on_ground) {
+        if (audio_component && jump_timer_ < 1ms) {       // 刚刚落地时（进入idle状态），如果有音频组件，播放音效
+            audio_component->playSound("cry", -1, true);  // 使用空间音频
+        }
+
         jump_timer_ += delta_time;              // 增加跳跃计时器
         physics_component->setVelocityX(0.0f);  // 停止水平移动（否则会有惯性）
 

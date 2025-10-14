@@ -13,6 +13,7 @@ namespace pyc::sunny_land {
 class Config;
 class Time;
 class ResourceManager;
+class AudioPlayer;
 class Renderer;
 class Camera;
 class InputManager;
@@ -46,6 +47,7 @@ private:
     [[nodiscard]] bool initSDL();
     [[nodiscard]] bool initTime();
     [[nodiscard]] bool initResourceManager();
+    [[nodiscard]] bool initAudioPlayer();
     [[nodiscard]] bool initRenderer();
     [[nodiscard]] bool initCamera();
     [[nodiscard]] bool initInputManager();
@@ -64,6 +66,7 @@ private:
     std::unique_ptr<Config> config_;
     std::unique_ptr<Time> time_;
     std::unique_ptr<ResourceManager> resource_manager_;
+    std::unique_ptr<AudioPlayer> audio_player_;
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<InputManager> input_manager_;

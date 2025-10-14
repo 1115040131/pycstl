@@ -19,10 +19,11 @@ void DeadState::enter() {
     physics_component->setVelocity(glm::vec2(0.0f, -200.0f));  // 向上击退
 
     // 禁用碰撞(自动掉出屏幕)
-    auto collider_component = player_component_->getOwner()->getComponent<ColliderComponent>();
-    if (collider_component) {
+    if (auto collider_component = player_component_->getOwner()->getComponent<ColliderComponent>()) {
         collider_component->setActive(false);
     }
+
+    playSound("dead");  // 播放死亡音效
 }
 
 std::unique_ptr<PlayerState> DeadState::handleInput(Context&) {

@@ -15,6 +15,7 @@ class Scene;
 class TileInfo;
 enum class TileType;
 class AnimationComponent;
+class AudioComponent;
 
 class LevelLoader final : Noncopyable {
 public:
@@ -34,10 +35,18 @@ private:
     /**
      * @brief 添加动画到指定的 AnimationComponent。
      * @param anim_json 动画json数据（自定义）
-     * @param ac AnimationComponent 指针（动画添加到此组件）
+     * @param animation_component AnimationComponent 指针（动画添加到此组件）
      * @param sprite_size 每一帧动画的尺寸
      */
-    void addAnimation(const nlohmann::json& anim_json, AnimationComponent* ac, const glm::vec2& sprite_size);
+    void addAnimation(const nlohmann::json& anim_json, AnimationComponent* animation_component,
+                      const glm::vec2& sprite_size);
+
+    /**
+     * @brief 添加音效到指定的 AudioComponent。
+     * @param sound_json 音效json数据（自定义）
+     * @param audio_component AudioComponent 指针（音效添加到此组件）
+     */
+    void addSound(const nlohmann::json& sound_json, AudioComponent* audio_component);
 
     /**
      * @brief 获取瓦片属性
