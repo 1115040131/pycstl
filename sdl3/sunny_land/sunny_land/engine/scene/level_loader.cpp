@@ -146,7 +146,45 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
     for (const auto& object_json : layer_json["objects"]) {
         auto gid = object_json.value("gid", 0);
         if (gid == 0) {  // gid 为 0 即不存在, 代表需要自己绘制
-            // TODO
+            // 非矩形对象会有额外标识（目前不考虑）
+            if (object_json.value("point", false)) {           // 如果是点对象
+                continue;                                      // TODO: 点对象的处理方式
+            } else if (object_json.value("ellipse", false)) {  // 如果是椭圆对象
+                continue;                                      // TODO: 椭圆对象的处理方式
+            } else if (object_json.value("polygon", false)) {  // 如果是多边形对象
+                continue;                                      // TODO: 多边形对象的处理方式
+            } else {
+                // 没有这些标识则默认是矩形对象
+                // --- 创建游戏对象并添加TransfromComponent ---
+                auto object_name = object_json.value("name", "Unnamed");
+                auto game_object = std::make_unique<GameObject>(object_name);
+
+                // 获取Transform相关信息 （自定义形状的坐标针对左上角）
+                auto position = glm::vec2(object_json.value("x", 0.0f), object_json.value("y", 0.0f));
+                auto dst_size = glm::vec2(object_json.value("width", 0.0f), object_json.value("height", 0.0f));
+                auto rotation = object_json.value("rotation", 0.0f);
+                // 添加TransformComponent，缩放为设定为1.0f
+                game_object->addComponent<TransformComponent>(position, glm::vec2(1.0f), rotation);
+
+                // 添加碰撞组件
+                game_object->addComponent<ColliderComponent>(
+                    std::make_unique<AABBCollider>(dst_size),  // 碰撞盒大小与dst_size相同
+                    Alignment::NONE,
+                    object_json.value("trigger", true)  // 自定义形状通常是trigger类型, 除非显示指定, 因此默认为真
+                );
+
+                // 添加物理组件，不受重力影响
+                game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
+
+                // 获取标签信息并设置
+                if (auto tag = getTileProperty<std::string>(object_json, "tag")) {  // 如果有标签
+                    game_object->setTag(tag.value());
+                }
+
+                // 添加到场景
+                scene.addGameObject(std::move(game_object));
+                spdlog::info("加载对象: '{}' 完成 (类型: 自定义形状)", object_name);
+            }
         } else {
             auto tile_info = getTileInfoByGid(gid);
             if (tile_info.sprite.getTextureId().empty()) {

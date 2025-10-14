@@ -17,6 +17,7 @@ void JumpState::enter() {
     auto physics_component = player_component_->getPhysicsComponent();
     physics_component->setVelocityY(-player_component_->getJumpVelocity());
     spdlog::debug("PlayerComponent 进入 JumpState，设置初始垂直速度为: {}", physics_component->getVelocity().y);
+    playSound("jump");  // 播放跳跃音效
 }
 
 std::unique_ptr<PlayerState> JumpState::handleInput(Context& context) {

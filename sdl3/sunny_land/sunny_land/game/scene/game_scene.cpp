@@ -17,6 +17,7 @@
 #include "sunny_land/engine/render/animation.h"
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/scene/level_loader.h"
+#include "sunny_land/engine/scene/scene_manager.h"
 #include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/component/ai/jump_behavior.h"
 #include "sunny_land/game/component/ai/patrol_behavior.h"
@@ -75,7 +76,8 @@ void GameScene::clean() { Scene::clean(); }
 bool GameScene::initLevel() {
     // 加载关卡
     LevelLoader level_loader;
-    if (!level_loader.loadLevel(ASSET("maps/level1.tmj"), *this)) {
+    auto level_path = levelNameToPath(scene_name_);
+    if (!level_loader.loadLevel(level_path, *this)) {
         spdlog::error("关卡加载失败");
         return false;
     }
@@ -196,6 +198,12 @@ void GameScene::handleObjectCollisions() {
             obj2->getComponent<PlayerComponent>()->takeDamage(1);
             spdlog::debug("玩家 {} 受到了 HAZARD 对象伤害", obj2->getName());
         }
+        // 处理玩家与关底触发器碰撞
+        else if (obj1->getName() == "player" && obj2->getTag() == "next_level") {
+            toNextLevel(obj2);
+        } else if (obj2->getName() == "player" && obj1->getTag() == "next_level") {
+            toNextLevel(obj1);
+        }
     }
 }
 
@@ -257,6 +265,12 @@ void GameScene::playerVSItemCollision(GameObject* player, GameObject* item) {
     auto item_aabb = item->getComponent<ColliderComponent>()->getWorldAABB();
     createEffect(item_aabb.position + item_aabb.size / 2.0f, item->getTag());  // 创建特效
     context_.getAudioPlayer().playSound(ASSET("audio/poka01.mp3"));            // 播放音效
+}
+
+void GameScene::toNextLevel(GameObject* trigger) {
+    auto level_name = trigger->getName();
+    auto next_scene = std::make_unique<GameScene>(level_name, context_, scene_manager_);
+    scene_manager_.requestReplaceScene(std::move(next_scene));
 }
 
 void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {

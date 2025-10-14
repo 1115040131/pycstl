@@ -1,8 +1,10 @@
 #pragma once
 
+#include <fmt/format.h>
 #include <glm/glm.hpp>
 
 #include "sunny_land/engine/scene/scene.h"
+#include "sunny_land/engine/utils/macro.h"
 
 namespace pyc::sunny_land {
 
@@ -29,6 +31,13 @@ private:
     void handleTileTriggers();      ///< @brief 处理瓦片触发事件（从PhysicsEngine获取信息）
     void playerVSEnemyCollision(GameObject* player, GameObject* enemy);  ///< @brief 玩家与敌人碰撞处理
     void playerVSItemCollision(GameObject* player, GameObject* item);    ///< @brief 玩家与道具碰撞处理
+
+    void toNextLevel(GameObject* trigger);  ///< @brief 进入下一个关卡
+
+    /// @brief 根据关卡名称获取对应的地图文件路径
+    std::string levelNameToPath(std::string_view level_name) const {
+        return fmt::format("{}maps/{}.tmj", ASSET_PATH, level_name);
+    }
 
     /**
      * @brief 创建一个特效对象（一次性）。
