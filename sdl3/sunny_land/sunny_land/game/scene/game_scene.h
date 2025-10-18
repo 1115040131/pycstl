@@ -8,12 +8,14 @@
 
 namespace pyc::sunny_land {
 
+class SessionData;
+
 /**
  * @brief 主要的游戏场景，包含玩家、敌人、关卡元素等。
  */
 class GameScene final : public Scene {
 public:
-    GameScene(std::string_view name, Context& context, SceneManager& scene_manager);
+    GameScene(Context& context, SceneManager& scene_manager, std::shared_ptr<SessionData> session_data = nullptr);
 
     // 覆盖场景基类的核心方法
     void init() override;
@@ -27,8 +29,9 @@ private:
     [[nodiscard]] bool initPlayer();        ///< @brief 初始化玩家
     [[nodiscard]] bool initEnemyAndItem();  ///< @brief 初始化敌人和道具
 
-    void handleObjectCollisions();  ///< @brief 处理游戏对象间的碰撞逻辑（从PhysicsEngine获取信息）
-    void handleTileTriggers();      ///< @brief 处理瓦片触发事件（从PhysicsEngine获取信息）
+    void handleObjectCollisions();        ///< @brief 处理游戏对象间的碰撞逻辑（从PhysicsEngine获取信息）
+    void handleTileTriggers();            ///< @brief 处理瓦片触发事件（从PhysicsEngine获取信息）
+    void handlePlayerDamage(int damage);  ///< @brief 处理玩家受伤（更新得分、UI等）
     void playerVSEnemyCollision(GameObject* player, GameObject* enemy);  ///< @brief 玩家与敌人碰撞处理
     void playerVSItemCollision(GameObject* player, GameObject* item);    ///< @brief 玩家与道具碰撞处理
 
@@ -36,7 +39,7 @@ private:
 
     /// @brief 根据关卡名称获取对应的地图文件路径
     std::string levelNameToPath(std::string_view level_name) const {
-        return fmt::format("{}maps/{}.tmj", ASSET_PATH, level_name);
+        return fmt::format(ASSET_PATH "maps/{}.tmj", level_name);
     }
 
     /**
@@ -46,8 +49,12 @@ private:
      */
     void createEffect(glm::vec2 center_pos, std::string_view tag);
 
+    // for test
+    void testSaveAndLoad();
+
 private:
-    GameObject* player_{};  ///< @brief 保存玩家对象的指针，方便访问
+    std::shared_ptr<SessionData> game_session_data_;  ///< @brief 场景间共享数据，因此用shared_ptr
+    GameObject* player_{};                            ///< @brief 保存玩家对象的指针，方便访问
 };
 
 }  // namespace pyc::sunny_land
