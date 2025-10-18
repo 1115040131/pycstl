@@ -50,7 +50,7 @@ private:
     void createEffect(glm::vec2 center_pos, std::string_view tag);
 
     // for test
-    void testSaveAndLoad();
+    void testTextRender();
 
 private:
     std::shared_ptr<SessionData> game_session_data_;  ///< @brief 场景间共享数据，因此用shared_ptr

@@ -16,6 +16,7 @@ class ResourceManager;
 class AudioPlayer;
 class Renderer;
 class Camera;
+class TextRenderer;
 class InputManager;
 class PhysicsEngine;
 class Context;
@@ -50,6 +51,7 @@ private:
     [[nodiscard]] bool initAudioPlayer();
     [[nodiscard]] bool initRenderer();
     [[nodiscard]] bool initCamera();
+    [[nodiscard]] bool initTextRenderer();
     [[nodiscard]] bool initInputManager();
     [[nodiscard]] bool initPhysicsEngine();
 
@@ -69,6 +71,7 @@ private:
     std::unique_ptr<AudioPlayer> audio_player_;
     std::unique_ptr<Renderer> renderer_;
     std::unique_ptr<Camera> camera_;
+    std::unique_ptr<TextRenderer> text_renderer_;
     std::unique_ptr<InputManager> input_manager_;
     std::unique_ptr<PhysicsEngine> physics_engine_;
 

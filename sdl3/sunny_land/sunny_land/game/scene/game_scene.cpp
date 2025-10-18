@@ -16,6 +16,7 @@
 #include "sunny_land/engine/physics/physics_engine.h"
 #include "sunny_land/engine/render/animation.h"
 #include "sunny_land/engine/render/camera.h"
+#include "sunny_land/engine/render/text_renderer.h"
 #include "sunny_land/engine/scene/level_loader.h"
 #include "sunny_land/engine/scene/scene_manager.h"
 #include "sunny_land/engine/utils/macro.h"
@@ -66,10 +67,7 @@ void GameScene::init() {
     spdlog::trace("GameScene 初始化完成。");
 }
 
-void GameScene::handleInput() {
-    Scene::handleInput();
-    testSaveAndLoad();
-}
+void GameScene::handleInput() { Scene::handleInput(); }
 
 void GameScene::update(std::chrono::duration<float> delta_time) {
     Scene::update(delta_time);
@@ -77,7 +75,10 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     handleTileTriggers();
 }
 
-void GameScene::render() { Scene::render(); }
+void GameScene::render() {
+    Scene::render();
+    testTextRender();
+}
 
 void GameScene::clean() { Scene::clean(); }
 
@@ -331,16 +332,12 @@ void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {
     spdlog::debug("创建特效: {}", tag);
 }
 
-void GameScene::testSaveAndLoad() {
-    const auto& input_manager = context_.getInputManager();
-    if (input_manager.isActionPressed("attack")) {
-        game_session_data_->saveToFile(ASSET("save.json"));
-    }
-    if (input_manager.isActionPressed("pause")) {
-        game_session_data_->loadFromFile(ASSET("save.json"));
-        spdlog::info("当前生命值: {}", game_session_data_->getCurrentHealth());
-        spdlog::info("当前得分: {}", game_session_data_->getCurrentScore());
-    }
+void GameScene::testTextRender() {
+    auto& text_renderer = context_.getTextRenderer();
+    const auto& camera = context_.getCamera();
+    text_renderer.drawUIText("UI Text", ASSET("fonts/VonwaonBitmap-16px.ttf"), 32, glm::vec2(100.0f),
+                             {0, 1.0f, 0, 1.0f});
+    text_renderer.drawText(camera, "Map Text", ASSET("fonts/VonwaonBitmap-16px.ttf"), 32, glm::vec2(200.0f));
 }
 
 }  // namespace pyc::sunny_land

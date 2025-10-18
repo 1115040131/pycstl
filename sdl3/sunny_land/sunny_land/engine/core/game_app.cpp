@@ -15,6 +15,7 @@
 #include "sunny_land/engine/physics/physics_engine.h"
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/render/renderer.h"
+#include "sunny_land/engine/render/text_renderer.h"
 #include "sunny_land/engine/resource/resource_manager.h"
 #include "sunny_land/engine/scene/scene_manager.h"
 
@@ -55,8 +56,8 @@ void GameApp::run() {
 bool GameApp::init() {
     spdlog::trace("初始化 GamApp ...");
     if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initAudioPlayer() ||
-        !initRenderer() || !initCamera() || !initInputManager() || !initPhysicsEngine() || !initContext() ||
-        !initSceneManager()) {
+        !initRenderer() || !initCamera() || !initTextRenderer() || !initInputManager() || !initPhysicsEngine() ||
+        !initContext() || !initSceneManager()) {
         return false;
     }
 
@@ -201,6 +202,17 @@ bool GameApp::initCamera() {
     return true;
 }
 
+bool GameApp::initTextRenderer() {
+    try {
+        text_renderer_ = std::make_unique<TextRenderer>(sdl_renderer_, resource_manager_.get());
+    } catch (const std::exception& e) {
+        spdlog::error("初始化文字渲染引擎失败: {}", e.what());
+        return false;
+    }
+    spdlog::trace("文字渲染引擎初始化成功。");
+    return true;
+}
+
 bool GameApp::initInputManager() {
     try {
         input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_.get());
@@ -225,8 +237,8 @@ bool GameApp::initPhysicsEngine() {
 
 bool GameApp::initContext() {
     try {
-        context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *input_manager_,
-                                             *physics_engine_, *audio_player_);
+        context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *text_renderer_,
+                                             *input_manager_, *physics_engine_, *audio_player_);
     } catch (const std::exception& e) {
         spdlog::error("初始化上下文失败: {}", e.what());
         return false;
