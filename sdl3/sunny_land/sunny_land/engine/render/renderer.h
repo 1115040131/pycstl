@@ -4,6 +4,7 @@
 
 #include "common/noncopyable.h"
 #include "sunny_land/engine/render/sprite.h"
+#include "sunny_land/engine/utils/math.h"
 
 struct SDL_Renderer;
 
@@ -59,6 +60,14 @@ public:
      */
     void drawUISprite(const Sprite& sprite, const glm::vec2& position,
                       std::optional<glm::vec2> size = std::nullopt);
+
+    /**
+     * @brief 绘制填充矩形
+     *
+     * @param rect 矩形区域
+     * @param color 填充颜色
+     */
+    void drawUIFilledRect(const Rect& rect, const FColor& color);
 
     void present();      ///< @brief 更新屏幕，包装 SDL_RenderPresent 函数
     void clearScreen();  ///< @brief 清屏，包装 SDL_RenderClear 函数

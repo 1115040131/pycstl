@@ -6,11 +6,15 @@
 #include "sunny_land/engine/object/game_object.h"
 #include "sunny_land/engine/physics/physics_engine.h"
 #include "sunny_land/engine/render/camera.h"
+#include "sunny_land/engine/ui/ui_manager.h"
 
 namespace pyc::sunny_land {
 
 Scene::Scene(std::string_view name, Context& context, SceneManager& scene_manager)
-    : scene_name_(name), context_(context), scene_manager_(scene_manager) {
+    : scene_name_(name),
+      context_(context),
+      scene_manager_(scene_manager),
+      ui_manager_(std::make_unique<UIManager>()) {
     spdlog::trace("场景 '{}' 构造完成。", scene_name_);
 }
 
@@ -24,6 +28,11 @@ void Scene::init() {
 void Scene::handleInput() {
     if (!is_initialized_) {
         return;
+    }
+
+    // 处理UI管理器输入
+    if (ui_manager_->handleInput(context_)) {
+        return;  // 如果输入事件被UI处理则返回，不再处理游戏对象输入
     }
 
     for (const auto& game_object : game_objects_) {
@@ -76,6 +85,9 @@ void Scene::update(std::chrono::duration<float> delta_time) {
             game_object->update(delta_time, context_);
         }
     }
+
+    // 更新UI管理器
+    ui_manager_->update(delta_time, context_);
 }
 
 void Scene::render() {
@@ -86,6 +98,9 @@ void Scene::render() {
     for (const auto& game_object : game_objects_) {
         game_object->render(context_);
     }
+
+    // 渲染UI管理器
+    ui_manager_->render(context_);
 }
 
 void Scene::clean() {

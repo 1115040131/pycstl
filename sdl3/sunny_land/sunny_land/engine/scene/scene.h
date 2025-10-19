@@ -11,6 +11,7 @@ namespace pyc::sunny_land {
 
 class Context;
 class SceneManager;
+class UIManager;
 class GameObject;
 
 /**
@@ -69,9 +70,10 @@ protected:
     void processPendingAdditions();  ///< @brief 处理待添加的游戏对象。（每轮更新的最后调用）
 
 protected:
-    std::string scene_name_;       ///< @brief 场景名称
-    Context& context_;             ///< @brief 上下文引用（隐式，构造时传入）
-    SceneManager& scene_manager_;  ///< @brief 场景管理器引用（构造时传入）
+    std::string scene_name_;                 ///< @brief 场景名称
+    Context& context_;                       ///< @brief 上下文引用（隐式，构造时传入）
+    SceneManager& scene_manager_;            ///< @brief 场景管理器引用（构造时传入）
+    std::unique_ptr<UIManager> ui_manager_;  ///< @brief UI管理器(初始化时自动创建)
 
     ///< @brief 场景是否已初始化(非当前场景很可能未被删除，因此需要初始化标志避免重复初始化)
     bool is_initialized_ = false;

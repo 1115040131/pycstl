@@ -19,6 +19,8 @@
 #include "sunny_land/engine/render/text_renderer.h"
 #include "sunny_land/engine/scene/level_loader.h"
 #include "sunny_land/engine/scene/scene_manager.h"
+#include "sunny_land/engine/ui/ui_manager.h"
+#include "sunny_land/engine/ui/ui_panel.h"
 #include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/component/ai/jump_behavior.h"
 #include "sunny_land/game/component/ai/patrol_behavior.h"
@@ -62,6 +64,11 @@ void GameScene::init() {
         context_.getInputManager().setShouldQuit(true);
         return;
     }
+    if (!initUI()) {
+        spdlog::error("UI初始化失败, 无法继续。");
+        context_.getInputManager().setShouldQuit(true);
+        return;
+    }
 
     Scene::init();
     spdlog::trace("GameScene 初始化完成。");
@@ -75,10 +82,7 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     handleTileTriggers();
 }
 
-void GameScene::render() {
-    Scene::render();
-    testTextRender();
-}
+void GameScene::render() { Scene::render(); }
 
 void GameScene::clean() { Scene::clean(); }
 
@@ -182,6 +186,17 @@ bool GameScene::initEnemyAndItem() {
         }
     }
     return success;
+}
+
+bool GameScene::initUI() {
+    if (!ui_manager_->init(glm::vec2{640.0f, 360.0f})) {
+        return false;
+    }
+
+    // 创建一个透明的方形UIPanel
+    ui_manager_->addElement(std::make_unique<UIPanel>(glm::vec2(100.0f, 100.0f), glm::vec2(200.0f, 200.0f),
+                                                      FColor{0.5f, 0.0f, 0.0f, 0.3f}));
+    return true;
 }
 
 void GameScene::handleObjectCollisions() {
@@ -330,14 +345,6 @@ void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {
 
     safeAddGameObject(std::move(effect_obj));  // 安全添加特效对象
     spdlog::debug("创建特效: {}", tag);
-}
-
-void GameScene::testTextRender() {
-    auto& text_renderer = context_.getTextRenderer();
-    const auto& camera = context_.getCamera();
-    text_renderer.drawUIText("UI Text", ASSET("fonts/VonwaonBitmap-16px.ttf"), 32, glm::vec2(100.0f),
-                             {0, 1.0f, 0, 1.0f});
-    text_renderer.drawText(camera, "Map Text", ASSET("fonts/VonwaonBitmap-16px.ttf"), 32, glm::vec2(200.0f));
 }
 
 }  // namespace pyc::sunny_land

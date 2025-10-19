@@ -28,6 +28,7 @@ private:
     [[nodiscard]] bool initLevel();         ///< @brief 初始化关卡
     [[nodiscard]] bool initPlayer();        ///< @brief 初始化玩家
     [[nodiscard]] bool initEnemyAndItem();  ///< @brief 初始化敌人和道具
+    [[nodiscard]] bool initUI();            ///< @brief 初始化UI
 
     void handleObjectCollisions();        ///< @brief 处理游戏对象间的碰撞逻辑（从PhysicsEngine获取信息）
     void handleTileTriggers();            ///< @brief 处理瓦片触发事件（从PhysicsEngine获取信息）
@@ -50,7 +51,6 @@ private:
     void createEffect(glm::vec2 center_pos, std::string_view tag);
 
     // for test
-    void testTextRender();
 
 private:
     std::shared_ptr<SessionData> game_session_data_;  ///< @brief 场景间共享数据，因此用shared_ptr

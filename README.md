@@ -67,7 +67,7 @@ bazel clean --expunge
 ### 限制并行数量
 
 ```bash
-bazel build --local_cpu_resources=24
+bazel build --local_resources=cpu=24
 ```
 
 ## 更新 pnpm
