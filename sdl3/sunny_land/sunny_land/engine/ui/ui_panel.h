@@ -1,3 +1,5 @@
+#pragma once
+
 #include "sunny_land/engine/ui/ui_element.h"
 
 namespace pyc::sunny_land {
