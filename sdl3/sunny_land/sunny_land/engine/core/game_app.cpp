@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/utils/macro.h"
-#include "sunny_land/game/scene/game_scene.h"
+#include "sunny_land/game/scene/title_scene.h"
 
 // 引擎组件
 #include "sunny_land/engine/audio/audio_player.h"
@@ -62,7 +62,7 @@ bool GameApp::init() {
     }
 
     // 创建第一个场景并压入栈
-    auto scene = std::make_unique<GameScene>(*context_, *scene_manager_);
+    auto scene = std::make_unique<TitleScene>(*context_, *scene_manager_);
     scene_manager_->requestPushScene(std::move(scene));
 
     is_running_ = true;

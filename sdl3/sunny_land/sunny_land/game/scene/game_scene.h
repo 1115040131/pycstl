@@ -60,10 +60,6 @@ private:
     void healWithUI(int amount);     ///< @brief 增加生命，同时更新UI
     void updateHealthWithUI();       ///< @brief 更新生命值UI (只适用最大生命值不变的情况)
 
-    // --- 测试函数 ---
-    void createTestButton();   ///< @brief 创建测试按钮
-    void testButtonClicked();  ///< @brief 测试按钮点击事件
-
 private:
     std::shared_ptr<SessionData> game_session_data_;  ///< @brief 场景间共享数据，因此用shared_ptr
     GameObject* player_{};                            ///< @brief 保存玩家对象的指针，方便访问

@@ -19,7 +19,6 @@
 #include "sunny_land/engine/render/text_renderer.h"
 #include "sunny_land/engine/scene/level_loader.h"
 #include "sunny_land/engine/scene/scene_manager.h"
-#include "sunny_land/engine/ui/ui_button.h"
 #include "sunny_land/engine/ui/ui_image.h"
 #include "sunny_land/engine/ui/ui_label.h"
 #include "sunny_land/engine/ui/ui_manager.h"
@@ -113,13 +112,11 @@ bool GameScene::initLevel() {
 
     // 设置相机边界
     context_.getCamera().setLimitBounds(Rect{glm::vec2(0.0f), tile_layer->getWorldSize()});
+    context_.getCamera().setPosition(glm::vec2(0.0f));  // 开始时重置相机位置，以免切换场景时晃动
 
     // 设置世界边界
     context_.getPhysicsEngine().setWorldBounds(Rect{glm::vec2(0.0f), tile_layer->getWorldSize()});
 
-    // 设置音量
-    context_.getAudioPlayer().setMusicVolume(0.2f);
-    context_.getAudioPlayer().setSoundVolume(0.5f);
     // 播放背景音乐
     context_.getAudioPlayer().playMusic(ASSET("audio/hurry_up_and_run.ogg"), true, 1s);
 
@@ -198,7 +195,6 @@ bool GameScene::initUI() {
 
     createScoreUI();
     createHealthUI();
-    createTestButton();
     return true;
 }
 
@@ -423,16 +419,5 @@ void GameScene::updateHealthWithUI() {
         health_panel_->getChildren()[i]->setVisible(i - max_health < current_health);
     }
 }
-
-void GameScene::createTestButton() {
-    auto test_button = std::make_unique<UIButton>(
-        context_, ASSET("textures/UI/buttons/Start1.png"), ASSET("textures/UI/buttons/Start2.png"),
-        ASSET("textures/UI/buttons/Start3.png"), glm::vec2(100.0f, 100.0f),
-        glm::vec2(0.0f),  // 采用图片大小
-        [this]() { this->testButtonClicked(); });
-    ui_manager_->addElement(std::move(test_button));
-}
-
-void GameScene::testButtonClicked() { spdlog::info("测试按钮被点击"); }
 
 }  // namespace pyc::sunny_land
