@@ -10,6 +10,7 @@
 #include "sunny_land/engine/audio/audio_player.h"
 #include "sunny_land/engine/core/config.h"
 #include "sunny_land/engine/core/context.h"
+#include "sunny_land/engine/core/game_state.h"
 #include "sunny_land/engine/core/time.h"
 #include "sunny_land/engine/input/input_manager.h"
 #include "sunny_land/engine/physics/physics_engine.h"
@@ -57,7 +58,7 @@ bool GameApp::init() {
     spdlog::trace("初始化 GamApp ...");
     if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initAudioPlayer() ||
         !initRenderer() || !initCamera() || !initTextRenderer() || !initInputManager() || !initPhysicsEngine() ||
-        !initContext() || !initSceneManager()) {
+        !initGameState() || !initContext() || !initSceneManager()) {
         return false;
     }
 
@@ -238,10 +239,20 @@ bool GameApp::initPhysicsEngine() {
     return true;
 }
 
+bool GameApp::initGameState() {
+    try {
+        game_state_ = std::make_unique<GameState>(window_, sdl_renderer_);
+    } catch (const std::exception& e) {
+        spdlog::error("初始化游戏状态失败: {}", e.what());
+        return false;
+    }
+    return true;
+}
+
 bool GameApp::initContext() {
     try {
         context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *text_renderer_,
-                                             *input_manager_, *physics_engine_, *audio_player_);
+                                             *input_manager_, *physics_engine_, *audio_player_, *game_state_);
     } catch (const std::exception& e) {
         spdlog::error("初始化上下文失败: {}", e.what());
         return false;

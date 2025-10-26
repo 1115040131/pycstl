@@ -11,6 +11,7 @@
 #include "sunny_land/engine/component/tilelayer_component.h"
 #include "sunny_land/engine/component/transform_component.h"
 #include "sunny_land/engine/core/context.h"
+#include "sunny_land/engine/core/game_state.h"
 #include "sunny_land/engine/input/input_manager.h"
 #include "sunny_land/engine/object/game_object.h"
 #include "sunny_land/engine/physics/physics_engine.h"
@@ -30,6 +31,7 @@
 #include "sunny_land/game/component/ai_component.h"
 #include "sunny_land/game/component/player_component.h"
 #include "sunny_land/game/data/session_data.h"
+#include "sunny_land/game/scene/menu_scene.h"
 
 namespace pyc::sunny_land {
 
@@ -50,6 +52,7 @@ void GameScene::init() {
         return;
     }
     spdlog::trace("GameScene 初始化开始...");
+    context_.getGameState().setState(State::Playing);
 
     if (!initLevel()) {
         spdlog::error("关卡初始化失败，无法继续。");
@@ -76,7 +79,14 @@ void GameScene::init() {
     spdlog::trace("GameScene 初始化完成。");
 }
 
-void GameScene::handleInput() { Scene::handleInput(); }
+void GameScene::handleInput() {
+    Scene::handleInput();
+    // 检查暂停动作
+    if (context_.getInputManager().isActionPressed("pause")) {
+        spdlog::debug("在GameScene中检测到暂停动作, 正在推送MenuScene。");
+        scene_manager_.requestPushScene(std::make_unique<MenuScene>(context_, scene_manager_, game_session_data_));
+    }
+}
 
 void GameScene::update(std::chrono::duration<float> delta_time) {
     Scene::update(delta_time);
@@ -189,7 +199,7 @@ bool GameScene::initEnemyAndItem() {
 }
 
 bool GameScene::initUI() {
-    if (!ui_manager_->init(glm::vec2{640.0f, 360.0f})) {
+    if (!ui_manager_->init(context_.getGameState().getLogicalSize())) {
         return false;
     }
 

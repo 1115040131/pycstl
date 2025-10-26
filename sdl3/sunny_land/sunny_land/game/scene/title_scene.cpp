@@ -4,6 +4,7 @@
 
 #include "sunny_land/engine/audio/audio_player.h"
 #include "sunny_land/engine/core/context.h"
+#include "sunny_land/engine/core/game_state.h"
 #include "sunny_land/engine/input/input_manager.h"
 #include "sunny_land/engine/render/camera.h"
 #include "sunny_land/engine/resource/resource_manager.h"
@@ -35,6 +36,8 @@ void TitleScene::init() {
         spdlog::warn("TitleScene 已经初始化过了，重复调用 init()。");
         return;
     }
+    spdlog::trace("TitleScene 初始化开始...");
+    context_.getGameState().setState(State::Title);
 
     // 加载背景
     LevelLoader level_loader;
@@ -59,12 +62,15 @@ void TitleScene::update(std::chrono::duration<float> delta_time) {
 
 void TitleScene::createUI() {
     spdlog::trace("创建 TitleScene UI...");
-    auto window_size = glm::vec2(640.0f, 360.0f);
+    auto window_size = context_.getGameState().getLogicalSize();
 
     if (!ui_manager_->init(window_size)) {
         spdlog::error("初始化 UIManager 失败!");
         return;
     }
+
+    // 设置相机无边界
+    context_.getCamera().setLimitBounds(std::nullopt);
 
     // 设置音量
     context_.getAudioPlayer().setMusicVolume(0.2f);

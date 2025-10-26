@@ -7,9 +7,10 @@ namespace pyc::sunny_land {
 class SessionData;
 
 /**
- * @brief 标题场景类，提供4个按钮：开始游戏、加载游戏、帮助、退出
+ * @brief 游戏暂停时显示的菜单场景，提供继续、保存、返回、退出等选项。
+ * 该场景通常被推送到 GameScene 之上。
  */
-class TitleScene final : public Scene {
+class MenuScene final : public Scene {
 public:
     /**
      * @brief 构造函数
@@ -17,21 +18,21 @@ public:
      * @param scene_manager 场景管理器
      * @param session_data 指向游戏玩法状态的共享指针
      */
-    TitleScene(Context& context, SceneManager& scene_manager, std::shared_ptr<SessionData> session_data = nullptr);
+    MenuScene(Context& context, SceneManager& scene_manager, std::shared_ptr<SessionData> session_data = nullptr);
 
     // --- 核心方法 --- //
     void init() override;
-    void update(std::chrono::duration<float> delta_time) override;
+    void handleInput() override;
 
 private:
     // 初始化 UI 元素
     void createUI();
 
     // 按钮回调函数
-    void onStartGameClick();
-    void onLoadGameClick();
-    void onHelpsClick();
-    void onQuitClick();
+    void onResumeClicked();
+    void onSaveClicked();
+    void onBackClicked();
+    void onQuitClicked();
 
 private:
     std::shared_ptr<SessionData> session_data_;

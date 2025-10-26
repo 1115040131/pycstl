@@ -19,6 +19,7 @@ class Camera;
 class TextRenderer;
 class InputManager;
 class PhysicsEngine;
+class GameState;
 class Context;
 class SceneManager;
 
@@ -54,6 +55,7 @@ private:
     [[nodiscard]] bool initTextRenderer();
     [[nodiscard]] bool initInputManager();
     [[nodiscard]] bool initPhysicsEngine();
+    [[nodiscard]] bool initGameState();
 
     [[nodiscard]] bool initContext();
     [[nodiscard]] bool initSceneManager();
@@ -74,6 +76,7 @@ private:
     std::unique_ptr<TextRenderer> text_renderer_;
     std::unique_ptr<InputManager> input_manager_;
     std::unique_ptr<PhysicsEngine> physics_engine_;
+    std::unique_ptr<GameState> game_state_;
 
     std::unique_ptr<Context> context_;
     std::unique_ptr<SceneManager> scene_manager_;

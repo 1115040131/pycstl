@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/core/context.h"
+#include "sunny_land/engine/core/game_state.h"
 #include "sunny_land/engine/object/game_object.h"
 #include "sunny_land/engine/physics/physics_engine.h"
 #include "sunny_land/engine/render/camera.h"
@@ -61,10 +62,11 @@ void Scene::update(std::chrono::duration<float> delta_time) {
     // 处理待添加的对象
     processPendingAdditions();
 
-    // 先更新物理引擎
-    context_.getPhysicsEngine().update(delta_time);
-    // 更新相机
-    context_.getCamera().update(delta_time);
+    // 只有游戏进行中，才需要更新物理引擎和相机
+    if (context_.getGameState().isPlaying()) {
+        context_.getPhysicsEngine().update(delta_time);
+        context_.getCamera().update(delta_time);
+    }
 
     // auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
     //                                    [delta_time, this](const std::unique_ptr<GameObject>& game_object) {
