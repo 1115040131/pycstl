@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 
 #include "sunny_land/engine/core/game_app.h"
+#include "sunny_land/engine/scene/scene_manager.h"
+#include "sunny_land/game/scene/title_scene.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
 namespace fs = std::filesystem;
@@ -52,6 +54,12 @@ bool setup_working_directory(int, char** argv) {
     }
 }
 
+void setupInitialScene(pyc::sunny_land::SceneManager& scene_manager) {
+    // GameApp在调用run方法之前，先创建并设置初始场景
+    auto title_scene = std::make_unique<pyc::sunny_land::TitleScene>(scene_manager.getContext(), scene_manager);
+    scene_manager.requestPushScene(std::move(title_scene));
+}
+
 int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::info);
 
@@ -61,6 +69,7 @@ int main(int argc, char** argv) {
     }
 
     pyc::sunny_land::GameApp app;
+    app.registerSceneSetup(setupInitialScene);
     app.run();
     return 0;
 }

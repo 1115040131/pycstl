@@ -73,10 +73,6 @@ void TitleScene::createUI() {
     context_.getCamera().setLimitBounds(std::nullopt);
     context_.getCamera().setPosition(glm::vec2(0.0f));
 
-    // 设置音量
-    context_.getAudioPlayer().setMusicVolume(0.2f);
-    context_.getAudioPlayer().setSoundVolume(0.5f);
-
     // 设置背景音乐
     context_.getAudioPlayer().playMusic("assets/audio/platformer_level03_loop.ogg");
 

@@ -1,11 +1,33 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
+cc_library(
+    name = "ziyu_engine",
+    srcs = glob(["sunny_land/engine/**/*.cpp"]),
+    hdrs = glob(["sunny_land/engine/**/*.h"]),
+    copts = STRICT_COPTS,
+    defines = select({
+        "//conditions:default": [],
+        "//:debug": ["DEBUG_MODE"],
+    }),
+    includes = [""],
+    deps = [
+        "//common",
+        "//sdl3",
+        "//sdl3:sdl3_image",
+        "//sdl3:sdl3_mixer",
+        "//sdl3:sdl3_ttf",
+        "@glm",
+        "@nlohmann_json//:json",
+        "@spdlog",
+    ],
+)
+
 cc_binary(
     name = "sunny_land",
     srcs = glob([
-        "sunny_land/**/*.cpp",
-        "sunny_land/**/*.h",
-    ]),
+        "sunny_land/game/**/*.cpp",
+        "sunny_land/game/**/*.h",
+    ]) + ["sunny_land/main.cpp"],
     copts = STRICT_COPTS,
     data = glob(["assets/**"]),
     defines = select({
@@ -14,14 +36,7 @@ cc_binary(
     }),
     includes = ["."],
     deps = [
-        "//common",
-        "//sdl3",
-        "//sdl3:sdl3_image",
-        "//sdl3:sdl3_mixer",
-        "//sdl3:sdl3_ttf",
+        "ziyu_engine",
         "@bazel_tools//tools/cpp/runfiles",
-        "@glm",
-        "@nlohmann_json//:json",
-        "@spdlog",
     ],
 )

@@ -3,8 +3,6 @@
 #include <SDL3/SDL.h>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/game/scene/title_scene.h"
-
 // 引擎组件
 #include "sunny_land/engine/audio/audio_player.h"
 #include "sunny_land/engine/core/config.h"
@@ -53,17 +51,25 @@ void GameApp::run() {
     close();
 }
 
+void GameApp::registerSceneSetup(std::function<void(SceneManager&)> func) {
+    scene_setup_func_ = std::move(func);
+    spdlog::trace("已注册场景设置函数。");
+}
+
 bool GameApp::init() {
     spdlog::trace("初始化 GamApp ...");
+    if (!scene_setup_func_) {
+        spdlog::error("未注册场景设置函数，无法初始化 GameApp。");
+        return false;
+    }
     if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initAudioPlayer() ||
         !initRenderer() || !initCamera() || !initTextRenderer() || !initInputManager() || !initPhysicsEngine() ||
         !initGameState() || !initContext() || !initSceneManager()) {
         return false;
     }
 
-    // 创建第一个场景并压入栈
-    auto scene = std::make_unique<TitleScene>(*context_, *scene_manager_);
-    scene_manager_->requestPushScene(std::move(scene));
+    // 调用场景设置函数 (创建第一个场景并压入栈)
+    scene_setup_func_(*scene_manager_);
 
     is_running_ = true;
     spdlog::trace("GameApp 初始化成功。");
@@ -174,6 +180,9 @@ bool GameApp::initResourceManager() {
 bool GameApp::initAudioPlayer() {
     try {
         audio_player_ = std::make_unique<AudioPlayer>(resource_manager_.get());
+        // 设置音量
+        audio_player_->setMusicVolume(config_->CONFIG(audio.music_volume));
+        audio_player_->setSoundVolume(config_->CONFIG(audio.sound_volume));
     } catch (const std::exception& e) {
         spdlog::error("初始化音频播放器失败: {}", e.what());
         return false;
