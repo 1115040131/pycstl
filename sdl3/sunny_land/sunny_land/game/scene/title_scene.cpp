@@ -37,6 +37,7 @@ void TitleScene::init() {
     }
     spdlog::trace("TitleScene 初始化开始...");
     context_.getGameState().setState(State::Title);
+    session_data_->syncHighScore("assets/save.json");  // 更新最高分
 
     // 加载背景
     LevelLoader level_loader;
@@ -70,6 +71,7 @@ void TitleScene::createUI() {
 
     // 设置相机无边界
     context_.getCamera().setLimitBounds(std::nullopt);
+    context_.getCamera().setPosition(glm::vec2(0.0f));
 
     // 设置音量
     context_.getAudioPlayer().setMusicVolume(0.2f);
@@ -184,6 +186,7 @@ void TitleScene::onHelpsClick() {
 
 void TitleScene::onQuitClick() {
     spdlog::debug("退出按钮被点击。");
+    session_data_->syncHighScore("assets/save.json");  // 更新最高分
     context_.getInputManager().setShouldQuit(true);
 }
 

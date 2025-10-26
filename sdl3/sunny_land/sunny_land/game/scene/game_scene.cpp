@@ -30,6 +30,7 @@
 #include "sunny_land/game/component/ai_component.h"
 #include "sunny_land/game/component/player_component.h"
 #include "sunny_land/game/data/session_data.h"
+#include "sunny_land/game/scene/end_scene.h"
 #include "sunny_land/game/scene/menu_scene.h"
 
 namespace pyc::sunny_land {
@@ -52,6 +53,7 @@ void GameScene::init() {
     }
     spdlog::trace("GameScene 初始化开始...");
     context_.getGameState().setState(State::Playing);
+    game_session_data_->syncHighScore("assets/save.json");  // 更新最高分
 
     if (!initLevel()) {
         spdlog::error("关卡初始化失败，无法继续。");
@@ -91,6 +93,17 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     Scene::update(delta_time);
     handleObjectCollisions();
     handleTileTriggers();
+
+    // 玩家掉出地图下方则判断为失败
+    if (player_) {
+        auto pos = player_->getComponent<TransformComponent>()->getPosition();
+        auto world_rect = context_.getPhysicsEngine().getWorldBounds();
+        // 多100像素冗余量
+        if (world_rect && pos.y > world_rect->position.y + world_rect->size.y + 100.0f) {
+            spdlog::debug("玩家掉出地图下方，游戏失败");
+            showEndScene(false);
+        }
+    }
 }
 
 void GameScene::render() { Scene::render(); }
@@ -145,6 +158,15 @@ bool GameScene::initPlayer() {
     auto player_component = player_->addComponent<PlayerComponent>();
     if (!player_component) {
         spdlog::error("无法添加 PlayerComponent 到玩家对象");
+        return false;
+    }
+
+    // 从SessionData中更新玩家生命值
+    if (auto health_component = player_->getComponent<HealthComponent>()) {
+        health_component->setMaxHealth(game_session_data_->getMaxHealth());
+        health_component->setCurrentHealth(game_session_data_->getCurrentHealth());
+    } else {
+        spdlog::error("玩家对象缺少 HealthComponent 组件，无法设置生命值");
         return false;
     }
 
@@ -236,6 +258,12 @@ void GameScene::handleObjectCollisions() {
         } else if (obj2->getName() == "player" && obj1->getTag() == "next_level") {
             toNextLevel(obj1);
         }
+        // 处理玩家与结束触发器碰撞
+        else if (obj1->getName() == "player" && obj2->getName() == "win") {
+            showEndScene(true);
+        } else if (obj2->getName() == "player" && obj1->getName() == "win") {
+            showEndScene(true);
+        }
     }
 }
 
@@ -319,6 +347,13 @@ void GameScene::toNextLevel(GameObject* trigger) {
     game_session_data_->setNextLevel(level_name);
     auto next_scene = std::make_unique<GameScene>(context_, scene_manager_, game_session_data_);
     scene_manager_.requestReplaceScene(std::move(next_scene));
+}
+
+void GameScene::showEndScene(bool is_win) {
+    spdlog::debug("显示结束场景，游戏 {}", is_win ? "胜利" : "失败");
+    game_session_data_->setIsWin(is_win);
+    auto end_scene = std::make_unique<EndScene>(context_, scene_manager_, game_session_data_);
+    scene_manager_.requestPushScene(std::move(end_scene));
 }
 
 void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {

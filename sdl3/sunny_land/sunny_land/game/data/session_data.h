@@ -38,6 +38,7 @@ public:
     void setNextLevel(std::string_view map_path);      ///< @brief 设置下一个场景信息（地图、关卡开始时的得分生命）
     bool saveToFile(std::string_view filename) const;  ///< @brief 将当前游戏数据保存到JSON文件（存档）
     bool loadFromFile(std::string_view filename);      ///< @brief 从JSON文件中读取游戏数据（读档）
+    bool syncHighScore(std::string_view filename);     ///< @brief 同步最高分(文件与当前分数取最大值)
 
 private:
     int current_health_ = 3;

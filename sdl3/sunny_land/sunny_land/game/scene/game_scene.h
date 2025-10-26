@@ -39,6 +39,7 @@ private:
     void playerVSItemCollision(GameObject* player, GameObject* item);    ///< @brief 玩家与道具碰撞处理
 
     void toNextLevel(GameObject* trigger);  ///< @brief 进入下一个关卡
+    void showEndScene(bool is_win);         ///< @brief 显示结束场景
 
     /// @brief 根据关卡名称获取对应的地图文件路径
     std::string levelNameToPath(std::string_view level_name) const {
