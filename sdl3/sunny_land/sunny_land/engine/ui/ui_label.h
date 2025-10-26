@@ -37,10 +37,10 @@ public:
     int getFontSize() const { return font_size_; }
     const FColor& getTextFColor() const { return text_fcolor_; }
 
-    void setText(std::string_view text);                                    ///< @brief 设置文本内容, 同时更新尺寸
-    void setFontId(std::string_view font_id);                               ///< @brief 设置字体ID, 同时更新尺寸
-    void setFontSize(int font_size);                                        ///< @brief 设置字体大小, 同时更新尺寸
-    void setTextFColor(FColor text_fcolor) { text_fcolor_ = text_fcolor; }  ///< @brief 设置文本颜色
+    void setText(std::string_view text);       ///< @brief 设置文本内容, 同时更新尺寸
+    void setFontId(std::string_view font_id);  ///< @brief 设置字体ID, 同时更新尺寸
+    void setFontSize(int font_size);           ///< @brief 设置字体大小, 同时更新尺寸
+    void setTextFColor(FColor text_fcolor) { text_fcolor_ = std::move(text_fcolor); }  ///< @brief 设置文本颜色
 
 private:
     TextRenderer& text_renderer_;  ///< @brief 需要文本渲染器，用于获取/更新文本尺寸

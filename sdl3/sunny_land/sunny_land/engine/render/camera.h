@@ -38,7 +38,7 @@ public:
     ///< @brief 屏幕坐标转世界坐标
     glm::vec2 screenToWorld(const glm::vec2& screen_pos) const;
 
-    void setPosition(const glm::vec2& position);                      ///< @brief 设置相机位置
+    void setPosition(glm::vec2 position);                             ///< @brief 设置相机位置
     void setLimitBounds(std::optional<Rect> limit_bounds);            ///< @brief 设置限制相机的移动范围
     void setTarget(TransformComponent* target) { target_ = target; }  ///< @brief 设置跟随目标变换组件
 

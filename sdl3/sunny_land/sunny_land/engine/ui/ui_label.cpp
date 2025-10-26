@@ -13,7 +13,7 @@ UILabel::UILabel(TextRenderer& text_renderer, std::string_view text, std::string
       text_(text),
       font_id_(font_id),
       font_size_(font_size),
-      text_fcolor_(text_color) {
+      text_fcolor_(std::move(text_color)) {
     // 获取文本渲染尺寸
     size_ = text_renderer_.getTextSize(text_, font_id_, font_size_);
     spdlog::trace("UILabel 构造完成");

@@ -359,7 +359,7 @@ void GameScene::showEndScene(bool is_win) {
 void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {
     // --- 创建游戏对象和变换组件 ---
     auto effect_obj = std::make_unique<GameObject>(fmt::format("effect_{}", tag));
-    effect_obj->addComponent<TransformComponent>(center_pos);
+    effect_obj->addComponent<TransformComponent>(std::move(center_pos));
 
     // --- 根据标签创建不同的精灵组件和动画---
     auto animation = std::make_unique<Animation>("effect", false);

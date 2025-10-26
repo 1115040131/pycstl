@@ -51,8 +51,8 @@ glm::vec2 Camera::worldToScreenWithParallax(const glm::vec2& world_pos, const gl
 
 glm::vec2 Camera::screenToWorld(const glm::vec2& screen_pos) const { return screen_pos + position_; }
 
-void Camera::setPosition(const glm::vec2& position) {
-    position_ = position;
+void Camera::setPosition(glm::vec2 position) {
+    position_ = std::move(position);
     clampPosition();
 }
 
