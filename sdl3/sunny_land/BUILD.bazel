@@ -34,7 +34,6 @@ cc_binary(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    includes = ["."],
     deps = [
         "ziyu_engine",
         "@bazel_tools//tools/cpp/runfiles",
