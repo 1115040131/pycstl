@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 
 #include "sunny_land/engine/component/component.h"
-#include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/component/state/player_state.h"
 
 namespace pyc::sunny_land {

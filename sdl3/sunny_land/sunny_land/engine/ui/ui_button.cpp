@@ -4,7 +4,6 @@
 
 #include "sunny_land/engine/render/sprite.h"
 #include "sunny_land/engine/ui/state/ui_state_factory.h"
-#include "sunny_land/engine/utils/macro.h"
 
 namespace pyc::sunny_land {
 
@@ -20,8 +19,8 @@ UIButton::UIButton(Context& context, std::string_view normal_sprite_id, std::str
     setState(UIStateFactory::create<UINormalState>(this));
 
     // 设置默认音效
-    addSound("hover", ASSET("audio/button_hover.wav"));
-    addSound("pressed", ASSET("audio/button_click.wav"));
+    addSound("hover", "assets/audio/button_hover.wav");
+    addSound("pressed", "assets/audio/button_click.wav");
     spdlog::trace("UIButton 构造完成");
 }
 

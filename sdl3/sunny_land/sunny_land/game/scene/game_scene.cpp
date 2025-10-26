@@ -24,7 +24,6 @@
 #include "sunny_land/engine/ui/ui_label.h"
 #include "sunny_land/engine/ui/ui_manager.h"
 #include "sunny_land/engine/ui/ui_panel.h"
-#include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/component/ai/jump_behavior.h"
 #include "sunny_land/game/component/ai/patrol_behavior.h"
 #include "sunny_land/game/component/ai/updown_behavior.h"
@@ -128,7 +127,7 @@ bool GameScene::initLevel() {
     context_.getPhysicsEngine().setWorldBounds(Rect{glm::vec2(0.0f), tile_layer->getWorldSize()});
 
     // 播放背景音乐
-    context_.getAudioPlayer().playMusic(ASSET("audio/hurry_up_and_run.ogg"), true, 1s);
+    context_.getAudioPlayer().playMusic("assets/audio/hurry_up_and_run.ogg", true, 1s);
 
     spdlog::trace("关卡初始化完成。");
     return true;
@@ -291,7 +290,7 @@ void GameScene::playerVSEnemyCollision(GameObject* player, GameObject* enemy) {
         // 玩家跳起效果
         player->getComponent<PhysicsComponent>()->setVelocityY(-300.0f);  // 向上跳起
         // 播放音效(此音效完全可以放在玩家的音频组件中，这里示例另一种用法：直接用AudioPlayer播放，传入文件路径)
-        context_.getAudioPlayer().playSound(ASSET("audio/punch2a.mp3"));
+        context_.getAudioPlayer().playSound("assets/audio/punch2a.mp3");
         // 加分
         addScoreWithUI(10);
     }
@@ -312,7 +311,7 @@ void GameScene::playerVSItemCollision(GameObject*, GameObject* item) {
     item->setNeedRemove(true);
     auto item_aabb = item->getComponent<ColliderComponent>()->getWorldAABB();
     createEffect(item_aabb.position + item_aabb.size / 2.0f, item->getTag());  // 创建特效
-    context_.getAudioPlayer().playSound(ASSET("audio/poka01.mp3"));            // 播放音效
+    context_.getAudioPlayer().playSound("assets/audio/poka01.mp3");            // 播放音效
 }
 
 void GameScene::toNextLevel(GameObject* trigger) {
@@ -330,13 +329,13 @@ void GameScene::createEffect(glm::vec2 center_pos, std::string_view tag) {
     // --- 根据标签创建不同的精灵组件和动画---
     auto animation = std::make_unique<Animation>("effect", false);
     if (tag == "enemy") {
-        effect_obj->addComponent<SpriteComponent>(ASSET("textures/FX/enemy-deadth.png"),
+        effect_obj->addComponent<SpriteComponent>("assets/textures/FX/enemy-deadth.png",
                                                   context_.getResourceManager(), Alignment::CENTER);
         for (auto i = 0; i < 6; ++i) {
             animation->addFrame({static_cast<float>(i * 40), 0.0f, 40.0f, 41.0f}, 0.1s);
         }
     } else if (tag == "item") {
-        effect_obj->addComponent<SpriteComponent>(ASSET("textures/FX/item-feedback.png"),
+        effect_obj->addComponent<SpriteComponent>("assets/textures/FX/item-feedback.png",
                                                   context_.getResourceManager(), Alignment::CENTER);
         for (auto i = 0; i < 5; ++i) {
             animation->addFrame({static_cast<float>(i * 32), 0.0f, 32.0f, 32.0f}, 0.1s);
@@ -360,7 +359,7 @@ void GameScene::createScoreUI() {
     // 创建得分标签
     auto score_text = fmt::format("Score: {}", game_session_data_->getCurrentScore());
     auto score_label = std::make_unique<UILabel>(context_.getTextRenderer(), score_text,
-                                                 ASSET("fonts/VonwaonBitmap-16px.ttf"), 16);
+                                                 "assets/fonts/VonwaonBitmap-16px.ttf", 16);
     score_label_ = score_label.get();                             // 成员变量赋值（获取裸指针）
     auto screen_size = ui_manager_->getRootElement()->getSize();  // 获取屏幕尺寸
     score_label_->setPosition(glm::vec2{screen_size.x - 100.0f, 10.0f});
@@ -375,8 +374,8 @@ void GameScene::createHealthUI() {
     constexpr float icon_width = 20.0f;
     constexpr float icon_height = 18.0f;
     constexpr float spacing = 5.0f;
-    constexpr std::string_view full_heart_tex = ASSET("textures/UI/Heart.png");
-    constexpr std::string_view empty_heart_tex = ASSET("textures/UI/Heart-bg.png");
+    constexpr std::string_view full_heart_tex = "assets/textures/UI/Heart.png";
+    constexpr std::string_view empty_heart_tex = "assets/textures/UI/Heart-bg.png";
 
     // 创建一个默认的UIPanel (不需要背景色，因此大小无所谓，只用于定位)
     auto health_panel = std::make_unique<UIPanel>();

@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 
 #include "sunny_land/engine/scene/scene.h"
-#include "sunny_land/engine/utils/macro.h"
 
 namespace pyc::sunny_land {
 
@@ -43,7 +42,7 @@ private:
 
     /// @brief 根据关卡名称获取对应的地图文件路径
     std::string levelNameToPath(std::string_view level_name) const {
-        return fmt::format(ASSET_PATH "maps/{}.tmj", level_name);
+        return fmt::format("assets/maps/{}.tmj", level_name);
     }
 
     /**

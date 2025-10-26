@@ -9,7 +9,6 @@
 #include "sunny_land/engine/ui/ui_button.h"
 #include "sunny_land/engine/ui/ui_label.h"
 #include "sunny_land/engine/ui/ui_manager.h"
-#include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/data/session_data.h"
 #include "sunny_land/game/scene/title_scene.h"
 
@@ -60,7 +59,7 @@ void MenuScene::createUI() {
 
     // "PAUSE"标签
     auto pause_label =
-        std::make_unique<UILabel>(context_.getTextRenderer(), "PAUSE", ASSET("fonts/VonwaonBitmap-16px.ttf"), 32);
+        std::make_unique<UILabel>(context_.getTextRenderer(), "PAUSE", "assets/fonts/VonwaonBitmap-16px.ttf", 32);
     // 放在中间靠上的位置
     auto size = pause_label->getSize();
     auto label_y = window_size.y * 0.2;
@@ -76,32 +75,32 @@ void MenuScene::createUI() {
 
     // Resume Button
     auto resume_button = std::make_unique<UIButton>(
-        context_, ASSET("textures/UI/buttons/Resume1.png"), ASSET("textures/UI/buttons/Resume2.png"),
-        ASSET("textures/UI/buttons/Resume3.png"), glm::vec2{button_x, start_y},
+        context_, "assets/textures/UI/buttons/Resume1.png", "assets/textures/UI/buttons/Resume2.png",
+        "assets/textures/UI/buttons/Resume3.png", glm::vec2{button_x, start_y},
         glm::vec2{button_width, button_height}, [this]() { this->onResumeClicked(); });
     ui_manager_->addElement(std::move(resume_button));
 
     // Save Button
     start_y += button_height + button_spacing;
     auto save_button = std::make_unique<UIButton>(
-        context_, ASSET("textures/UI/buttons/Save1.png"), ASSET("textures/UI/buttons/Save2.png"),
-        ASSET("textures/UI/buttons/Save3.png"), glm::vec2{button_x, start_y},
+        context_, "assets/textures/UI/buttons/Save1.png", "assets/textures/UI/buttons/Save2.png",
+        "assets/textures/UI/buttons/Save3.png", glm::vec2{button_x, start_y},
         glm::vec2{button_width, button_height}, [this]() { this->onSaveClicked(); });
     ui_manager_->addElement(std::move(save_button));
 
     // Back Button
     start_y += button_height + button_spacing;
     auto back_button = std::make_unique<UIButton>(
-        context_, ASSET("textures/UI/buttons/Back1.png"), ASSET("textures/UI/buttons/Back2.png"),
-        ASSET("textures/UI/buttons/Back3.png"), glm::vec2{button_x, start_y},
+        context_, "assets/textures/UI/buttons/Back1.png", "assets/textures/UI/buttons/Back2.png",
+        "assets/textures/UI/buttons/Back3.png", glm::vec2{button_x, start_y},
         glm::vec2{button_width, button_height}, [this]() { this->onBackClicked(); });
     ui_manager_->addElement(std::move(back_button));
 
     // Quit Button
     start_y += button_height + button_spacing;
     auto quit_button = std::make_unique<UIButton>(
-        context_, ASSET("textures/UI/buttons/Quit1.png"), ASSET("textures/UI/buttons/Quit2.png"),
-        ASSET("textures/UI/buttons/Quit3.png"), glm::vec2{button_x, start_y},
+        context_, "assets/textures/UI/buttons/Quit1.png", "assets/textures/UI/buttons/Quit2.png",
+        "assets/textures/UI/buttons/Quit3.png", glm::vec2{button_x, start_y},
         glm::vec2{button_width, button_height}, [this]() { this->onQuitClicked(); });
     ui_manager_->addElement(std::move(quit_button));
 
@@ -116,7 +115,7 @@ void MenuScene::onResumeClicked() {
 
 void MenuScene::onSaveClicked() {
     spdlog::debug("保存游戏按钮被点击。");
-    if (session_data_ && session_data_->saveToFile(ASSET("save.json"))) {
+    if (session_data_ && session_data_->saveToFile("assets/save.json")) {
         spdlog::debug("菜单场景中成功保存游戏数据。");
     } else {
         spdlog::error("菜单场景中保存游戏数据失败。");

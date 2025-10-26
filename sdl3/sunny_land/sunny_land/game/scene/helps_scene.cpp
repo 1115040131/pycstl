@@ -7,7 +7,6 @@
 #include "sunny_land/engine/scene/scene_manager.h"
 #include "sunny_land/engine/ui/ui_image.h"
 #include "sunny_land/engine/ui/ui_manager.h"
-#include "sunny_land/engine/utils/macro.h"
 
 namespace pyc::sunny_land {
 
@@ -26,7 +25,7 @@ void HelpsScene::init() {
 
     // 创建帮助图片 UIImage （让它覆盖整个屏幕）
     auto help_image =
-        std::make_unique<UIImage>(ASSET("textures/UI/instructions.png"), glm::vec2(0.0f, 0.0f), window_size);
+        std::make_unique<UIImage>("assets/textures/UI/instructions.png", glm::vec2(0.0f, 0.0f), window_size);
 
     ui_manager_->addElement(std::move(help_image));
 

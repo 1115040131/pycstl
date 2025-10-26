@@ -38,3 +38,10 @@ protected:
 };
 
 }  // namespace pyc::sunny_land
+
+#define DECLARE_COMPONENT(ComponentType, component_name)                 \
+public:                                                                  \
+    ComponentType* get##ComponentType() const { return component_name; } \
+                                                                         \
+private:                                                                 \
+    ComponentType* component_name { nullptr }

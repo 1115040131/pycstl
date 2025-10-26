@@ -15,7 +15,6 @@
 #include "sunny_land/engine/ui/ui_label.h"
 #include "sunny_land/engine/ui/ui_manager.h"
 #include "sunny_land/engine/ui/ui_panel.h"
-#include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/data/session_data.h"
 #include "sunny_land/game/scene/game_scene.h"
 #include "sunny_land/game/scene/helps_scene.h"
@@ -41,7 +40,7 @@ void TitleScene::init() {
 
     // 加载背景
     LevelLoader level_loader;
-    if (!level_loader.loadLevel(ASSET("maps/level0.tmj"), *this)) {
+    if (!level_loader.loadLevel("assets/maps/level0.tmj", *this)) {
         spdlog::error("背景加载失败");
         return;
     }
@@ -77,10 +76,10 @@ void TitleScene::createUI() {
     context_.getAudioPlayer().setSoundVolume(0.5f);
 
     // 设置背景音乐
-    context_.getAudioPlayer().playMusic(ASSET("audio/platformer_level03_loop.ogg"));
+    context_.getAudioPlayer().playMusic("assets/audio/platformer_level03_loop.ogg");
 
     // 创建标题图片 (假设不知道大小)
-    auto title_image = std::make_unique<UIImage>(ASSET("textures/UI/title-screen.png"));
+    auto title_image = std::make_unique<UIImage>("assets/textures/UI/title-screen.png");
     auto size = context_.getResourceManager().getTextureSize(title_image->getTextureId());
     title_image->setSize(size * 2.0f);  // 放大为2倍
 
@@ -111,33 +110,33 @@ void TitleScene::createUI() {
     glm::vec2 button_size = glm::vec2(button_width, button_height);
 
     // Start Button
-    auto start_button = std::make_unique<UIButton>(context_, ASSET("textures/UI/buttons/Start1.png"),
-                                                   ASSET("textures/UI/buttons/Start2.png"),
-                                                   ASSET("textures/UI/buttons/Start3.png"), current_button_pos,
+    auto start_button = std::make_unique<UIButton>(context_, "assets/textures/UI/buttons/Start1.png",
+                                                   "assets/textures/UI/buttons/Start2.png",
+                                                   "assets/textures/UI/buttons/Start3.png", current_button_pos,
                                                    button_size, [this]() { this->onStartGameClick(); });
     button_panel->addChild(std::move(start_button));
 
     // Load Button
     current_button_pos.x += button_width + button_spacing;
     auto load_button =
-        std::make_unique<UIButton>(context_, ASSET("textures/UI/buttons/Load1.png"),
-                                   ASSET("textures/UI/buttons/Load2.png"), ASSET("textures/UI/buttons/Load3.png"),
+        std::make_unique<UIButton>(context_, "assets/textures/UI/buttons/Load1.png",
+                                   "assets/textures/UI/buttons/Load2.png", "assets/textures/UI/buttons/Load3.png",
                                    current_button_pos, button_size, [this]() { this->onLoadGameClick(); });
     button_panel->addChild(std::move(load_button));
 
     // Helps Button
     current_button_pos.x += button_width + button_spacing;
-    auto helps_button = std::make_unique<UIButton>(context_, ASSET("textures/UI/buttons/Helps1.png"),
-                                                   ASSET("textures/UI/buttons/Helps2.png"),
-                                                   ASSET("textures/UI/buttons/Helps3.png"), current_button_pos,
+    auto helps_button = std::make_unique<UIButton>(context_, "assets/textures/UI/buttons/Helps1.png",
+                                                   "assets/textures/UI/buttons/Helps2.png",
+                                                   "assets/textures/UI/buttons/Helps3.png", current_button_pos,
                                                    button_size, [this]() { this->onHelpsClick(); });
     button_panel->addChild(std::move(helps_button));
 
     // Quit Button
     current_button_pos.x += button_width + button_spacing;
     auto quit_button =
-        std::make_unique<UIButton>(context_, ASSET("textures/UI/buttons/Quit1.png"),
-                                   ASSET("textures/UI/buttons/Quit2.png"), ASSET("textures/UI/buttons/Quit3.png"),
+        std::make_unique<UIButton>(context_, "assets/textures/UI/buttons/Quit1.png",
+                                   "assets/textures/UI/buttons/Quit2.png", "assets/textures/UI/buttons/Quit3.png",
                                    current_button_pos, button_size, [this]() { this->onQuitClick(); });
     button_panel->addChild(std::move(quit_button));
 
@@ -147,7 +146,7 @@ void TitleScene::createUI() {
     // 创建 Credits 标签
     auto credits_label =
         std::make_unique<UILabel>(context_.getTextRenderer(), "SunnyLand Credits: XXX - 2025",
-                                  ASSET("fonts/VonwaonBitmap-16px.ttf"), 16, FColor{0.8f, 0.8f, 0.8f, 1.0f});
+                                  "assets/fonts/VonwaonBitmap-16px.ttf", 16, FColor{0.8f, 0.8f, 0.8f, 1.0f});
     credits_label->setPosition(glm::vec2{(window_size.x - credits_label->getSize().x) / 2.0f,
                                          window_size.y - credits_label->getSize().y - 10.0f});
     ui_manager_->addElement(std::move(credits_label));
@@ -170,7 +169,7 @@ void TitleScene::onLoadGameClick() {
         return;
     }
 
-    if (session_data_->loadFromFile(ASSET("save.json"))) {
+    if (session_data_->loadFromFile("assets/save.json")) {
         spdlog::debug("保存文件加载成功。开始游戏...");
         scene_manager_.requestReplaceScene(std::make_unique<GameScene>(context_, scene_manager_, session_data_));
     } else {

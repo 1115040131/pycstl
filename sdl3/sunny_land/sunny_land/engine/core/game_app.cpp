@@ -3,7 +3,6 @@
 #include <SDL3/SDL.h>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/utils/macro.h"
 #include "sunny_land/game/scene/title_scene.h"
 
 // 引擎组件
@@ -111,7 +110,7 @@ void GameApp::close() {
 #pragma region init
 bool GameApp::initConfig() {
     try {
-        config_ = std::make_unique<Config>(ASSET("config.json"));
+        config_ = std::make_unique<Config>("assets/config.json");
     } catch (const std::exception& e) {
         spdlog::error("初始化配置失败: {}", e.what());
         return false;
