@@ -1,0 +1,95 @@
+name: Bazel CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        bazel-version: ['6.4.0']
+      fail-fast: false
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+
+    - name: 安装 Bazelisk (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        wget https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64
+        chmod +x bazelisk-linux-amd64
+        sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
+
+    - name: 安装 Bazelisk (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install bazelisk
+        ln -sf $(which bazelisk) /usr/local/bin/bazel
+
+    - name: 验证 Bazel 版本
+      run: bazel --version
+
+    - name: 配置 Bazel 缓存
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/bazel
+          ~/.cache/bazelisk
+        key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE.bazel', 'MODULE.bazel', '.bazelversion') }}
+        restore-keys: |
+          ${{ runner.os }}-bazel-
+
+    - name: 构建所有目标
+      run: bazel build //...
+
+    - name: 运行所有测试
+      run: bazel test //... --test_output=errors
+
+    - name: 生成测试覆盖率
+      if: runner.os == 'Linux'
+      run: |
+        bazel coverage //... --combined_report=lcov
+
+    - name: 上传覆盖率报告
+      if: runner.os == 'Linux'
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./bazel-out/_coverage/_coverage_report.dat
+        flags: unittests
+        name: codecov-umbrella
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+
+    - name: 安装 clang-format
+      run: sudo apt-get install -y clang-format
+
+    - name: 检查代码格式
+      run: |
+        find src test -name '*.cc' -o -name '*.h' | xargs clang-format -i -style=Google
+        git diff --exit-code
+
+  buildifier:
+    name: Buildifier Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+
+    - name: 运行 Buildifier
+      uses: keith/buildifier-action@v1
+      with:
+        version: latest
