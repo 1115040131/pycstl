@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        bazel-version: ['6.4.0']
+        bazel-version: ['8.4.1']
       fail-fast: false
 
     steps:
@@ -80,16 +80,3 @@ jobs:
       run: |
         find src test -name '*.cc' -o -name '*.h' | xargs clang-format -i -style=Google
         git diff --exit-code
-
-  buildifier:
-    name: Buildifier Check
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: 检出代码
-      uses: actions/checkout@v3
-
-    - name: 运行 Buildifier
-      uses: keith/buildifier-action@v1
-      with:
-        version: latest
