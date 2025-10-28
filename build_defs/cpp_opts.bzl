@@ -23,4 +23,5 @@ STRICT_COPTS = select({
     "@bazel_tools//src/conditions:linux": [
         "-Wno-missing-requires",
     ],
+    "//conditions:default": [],
 })
