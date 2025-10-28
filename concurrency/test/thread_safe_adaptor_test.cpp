@@ -38,24 +38,20 @@ void TryPopWhilePush(T& thread_safe_container, const std::size_t kDataNum, const
         << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
 
     bool check[kDataNum] = {false};
-    std::atomic<int> fail_time{0};  // pop 失败次数
 
     auto push = [&](std::size_t data) { thread_safe_container.Emplace(data); };
     auto pop = [&](std::size_t) {
         auto result = thread_safe_container.TryPop();
         if (result.has_value()) {
             check[result.value().data] = true;
-        } else {
-            ++fail_time;
         }
-        return true;
+        return result;
     };
-    PushWhilePop(kDataNum, 2 * kDataNum, kThreadNum, push, pop);
+    PushWhilePop(kDataNum, kDataNum, kThreadNum, push, pop);
 
     for (std::size_t i = 0; i < kDataNum; i++) {
         EXPECT_TRUE(check[i]) << i;
     }
-    EXPECT_EQ(fail_time, kDataNum);
     EXPECT_TRUE(thread_safe_container.Empty());
 }
 

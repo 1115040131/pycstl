@@ -18,6 +18,9 @@ STRICT_COPTS = select({
         "-Wold-style-cast",
         "-Wreturn-type",
         "-Wnon-virtual-dtor",
+    ],
+}) + select({
+    "@bazel_tools//src/conditions:linux": [
         "-Wno-missing-requires",
     ],
 })
