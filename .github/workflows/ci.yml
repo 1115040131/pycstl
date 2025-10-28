@@ -46,8 +46,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-bazel-
 
+    - name: 替换 CI 专用文件
+      run: cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
+
     - name: 构建所有目标
       run: bazel build //...
+
+    - name: 启动 mysql 服务
+      run: tool/build.py chat_prepare
 
     - name: 运行所有测试
       run: bazel test //... --test_output=errors
