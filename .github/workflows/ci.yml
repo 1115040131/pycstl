@@ -44,6 +44,7 @@ jobs:
     #     remove-docker-images: 'true'
 
     - name: 手动清理磁盘
+      if: runner.os == 'Linux'
       run: |
         echo "清理前磁盘状态："
         df -h
