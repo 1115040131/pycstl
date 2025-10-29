@@ -30,17 +30,38 @@ jobs:
         du -sh ~/.cache 2>/dev/null || true
 
     # 使用 Action 自动清理
-    - name: 最大化构建空间
-      uses: easimon/maximize-build-space@master
-      with:
-        root-reserve-mb: 4096      # 为根分区保留 4GB
-        temp-reserve-mb: 1024      # 为 /tmp 保留 1GB
-        swap-size-mb: 4096         # 创建 4GB swap
-        remove-dotnet: 'true'
-        remove-android: 'true'
-        remove-haskell: 'true'
-        remove-codeql: 'true'
-        # remove-docker-images: 'true'
+    # - name: 最大化构建空间
+    #   if: runner.os == 'Linux'
+    #   uses: easimon/maximize-build-space@master
+    #   with:
+    #     root-reserve-mb: 4096      # 为根分区保留 4GB
+    #     temp-reserve-mb: 1024      # 为 /tmp 保留 1GB
+    #     swap-size-mb: 4096         # 创建 4GB swap
+    #     remove-dotnet: 'true'
+    #     remove-android: 'true'
+    #     remove-haskell: 'true'
+    #     remove-codeql: 'true'
+    #     remove-docker-images: 'true'
+
+    - name: 手动清理磁盘
+      run: |
+        echo "清理前磁盘状态："
+        df -h
+
+        # 删除不需要的软件
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+
+        # 清理 Docker
+        sudo docker system prune -af --volumes
+
+        # 清理 APT 缓存
+        sudo apt-get clean
+
+        # 清理日志
+        sudo journalctl --vacuum-time=1d
 
     - name: 清理后检查
       run: |

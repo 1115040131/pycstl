@@ -23,5 +23,8 @@ STRICT_COPTS = select({
     "@bazel_tools//src/conditions:linux": [
         "-Wno-missing-requires",
     ],
+    "@bazel_tools//src/conditions:darwin": [
+        "-fexperimental-library",
+    ],
     "//conditions:default": [],
 })
