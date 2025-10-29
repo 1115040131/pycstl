@@ -20,6 +20,37 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v3
 
+    - name: 初始状态检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
+    # 使用 Action 自动清理
+    - name: 最大化构建空间
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 4096      # 为根分区保留 4GB
+        temp-reserve-mb: 1024      # 为 /tmp 保留 1GB
+        swap-size-mb: 4096         # 创建 4GB swap
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        # remove-docker-images: 'true'
+
+    - name: 清理后检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
     - name: 安装 Bazelisk (Linux)
       if: runner.os == 'Linux'
       run: |
@@ -49,6 +80,15 @@ jobs:
     - name: 替换 CI 专用文件
       run: cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
 
+    - name: 构建前检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
     - name: 构建所有目标
       run: bazel build //...
 
@@ -65,11 +105,25 @@ jobs:
 
     - name: 上传覆盖率报告
       if: runner.os == 'Linux'
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: ./bazel-out/_coverage/_coverage_report.dat
         flags: unittests
         name: codecov-umbrella
+        fail_ci_if_error: true
+
+    - name: 步骤3 - 构建后状态（缓存保存前）
+      run: |
+        echo "===== 构建后磁盘状态 ====="
+        df -h /
+        echo ""
+        echo "===== Bazel 相关目录占用 ====="
+        du -sh ~/.cache/bazel* 2>/dev/null || echo "bazel 缓存不存在"
+        du -sh $(bazel info output_base 2>/dev/null) 2>/dev/null || echo "output_base 不存在"
+        echo ""
+        echo "===== 工作目录占用 ====="
+        du -sh /home/runner/work/pycstl 2>/dev/null || true
 
   code-quality:
     name: Code Quality Check
