@@ -256,7 +256,7 @@ public:
         if (this != &other) {
             clear();
             _uninit_assign(other.begin(), other.end());
-            alloc_ = other.alloc;
+            alloc_ = other.alloc_;
         }
         return *this;
     }

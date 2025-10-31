@@ -9,10 +9,9 @@
 namespace pyc {
 namespace concurrency {
 
-template <typename T>
-void PushWhilePop(T& lock_free_stack, const std::size_t kDataNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
-        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+template <std::size_t kDataNum, std::size_t kThreadNum, typename T>
+void PushWhilePop(T& lock_free_stack) {
+    static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
     bool check[kDataNum] = {false};
 
@@ -36,25 +35,25 @@ void PushWhilePop(T& lock_free_stack, const std::size_t kDataNum, const std::siz
 TEST(LockFreeStackTest, LockFreeStackTest) {
     LockFreeStack<HeapData> lock_free_stack;
     EXPECT_EQ(sizeof(lock_free_stack), 24);
-    PushWhilePop(lock_free_stack, 10000, 16);
+    PushWhilePop<10000, 16>(lock_free_stack);
 }
 
 TEST(LockFreeStackTest, HazardPointerStackTest) {
     HazardPointerStack<HeapData> lock_free_stack;
     EXPECT_EQ(sizeof(lock_free_stack), 16);
-    PushWhilePop(lock_free_stack, 10000, 16);
+    PushWhilePop<10000, 16>(lock_free_stack);
 }
 
 TEST(DISABLED_LockFreeStackTest, RefCountStackTest) {
     RefCountStack<HeapData, false> lock_free_stack;
     EXPECT_EQ(sizeof(lock_free_stack), 16);
-    PushWhilePop(lock_free_stack, 100000, 16);
+    PushWhilePop<100000, 16>(lock_free_stack);
 }
 
 TEST(DISABLED_LockFreeStackTest, RefCountStackUseMemoryOrderTest) {
     RefCountStack<HeapData, true> lock_free_stack;
     EXPECT_EQ(sizeof(lock_free_stack), 16);
-    PushWhilePop(lock_free_stack, 100000, 16);
+    PushWhilePop<100000, 16>(lock_free_stack);
 }
 
 }  // namespace concurrency

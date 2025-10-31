@@ -1,12 +1,13 @@
 #pragma once
 
 #include <algorithm>
+#include <limits>
 #include <memory>
-#include <numeric>
 
 namespace pyc {
 
 struct ReducerState {
+    virtual ~ReducerState() = default;
     virtual void add(int val) = 0;
     virtual int result() = 0;
 };

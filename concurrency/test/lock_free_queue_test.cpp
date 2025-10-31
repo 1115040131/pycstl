@@ -7,9 +7,9 @@
 namespace pyc {
 namespace concurrency {
 
-void PushWhilePop(const std::size_t kDataNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
-        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+template <std::size_t kDataNum, std::size_t kThreadNum>
+void PushWhilePop() {
+    static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
     LockFreeQueue<HeapData, true> lock_free_queue;
     EXPECT_EQ(sizeof(lock_free_queue), 32);
@@ -32,7 +32,7 @@ void PushWhilePop(const std::size_t kDataNum, const std::size_t kThreadNum) {
     EXPECT_FALSE(lock_free_queue.Pop());
 }
 
-TEST(DISABLED_LockFreeQueueTest, LockFreeQueueTest) { PushWhilePop(10000, 16); }
+TEST(DISABLED_LockFreeQueueTest, LockFreeQueueTest) { PushWhilePop<10000, 16>(); }
 
 }  // namespace concurrency
 }  // namespace pyc

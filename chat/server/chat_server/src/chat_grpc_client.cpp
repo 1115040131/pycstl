@@ -78,7 +78,7 @@ AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_name, con
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
-    Defer defer([this, &pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
+    Defer defer([&pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
 
     grpc::ClientContext context;
     auto status = connection.value()->NotifyAddFriend(&context, request, &response);
@@ -108,7 +108,7 @@ AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_name, c
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
-    Defer defer([this, &pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
+    Defer defer([&pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
 
     grpc::ClientContext context;
     auto status = connection.value()->NotifyAuthFriend(&context, request, &response);
@@ -138,7 +138,7 @@ TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name,
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
-    Defer defer([this, &pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
+    Defer defer([&pool, &connection]() { pool->ReturnConnection(std::move(*connection)); });
 
     grpc::ClientContext context;
     auto status = connection.value()->NotifyTextChatMsg(&context, request, &response);

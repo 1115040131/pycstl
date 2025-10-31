@@ -1,3 +1,4 @@
+#include <numeric>
 #include <sstream>
 
 #include <gtest/gtest.h>

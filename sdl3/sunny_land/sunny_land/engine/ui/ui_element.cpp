@@ -1,5 +1,7 @@
 #include "sunny_land/engine/ui/ui_element.h"
 
+#include <algorithm>
+
 namespace pyc::sunny_land {
 
 UIElement::UIElement(glm::vec2 position, glm::vec2 size)

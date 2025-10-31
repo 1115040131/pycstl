@@ -20,10 +20,10 @@ STRICT_COPTS = select({
         "-Wnon-virtual-dtor",
     ],
 }) + select({
-    "@bazel_tools//src/conditions:linux": [
+    "@bazel_tools//tools/cpp:gcc": [
         "-Wno-missing-requires",
     ],
-    "@bazel_tools//src/conditions:darwin": [
+    "@bazel_tools//tools/cpp:clang": [
         "-fexperimental-library",
     ],
     "//conditions:default": [],

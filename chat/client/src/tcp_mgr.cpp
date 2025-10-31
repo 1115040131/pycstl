@@ -62,7 +62,7 @@ TcpMgr::TcpMgr() {
                      });
 
     // 处理连接断开
-    QObject::connect(&socket_, &QTcpSocket::disconnected, [this]() { qDebug() << "Disconnected from server"; });
+    QObject::connect(&socket_, &QTcpSocket::disconnected, []() { qDebug() << "Disconnected from server"; });
 
     // 连接发送信号用来发送数据
     QObject::connect(this, &TcpMgr::sig_send_data, this, &TcpMgr::slot_send_data);
@@ -169,7 +169,7 @@ void TcpMgr::initHttpHandlers() {
 
         emit sig_user_search(search_info);
     });
-    handlers_.emplace(ReqId::kAddFriendRes, [this](const QByteArray& data) {
+    handlers_.emplace(ReqId::kAddFriendRes, [](const QByteArray& data) {
         QJsonDocument json_doc = QJsonDocument::fromJson(data);
 
         if (json_doc.isNull()) {
@@ -279,7 +279,7 @@ void TcpMgr::initHttpHandlers() {
 
         qDebug() << "kNotifyAuthFriendReq Success!";
     });
-    handlers_.emplace(ReqId::kTextChatMsgRes, [this](const QByteArray& data) {
+    handlers_.emplace(ReqId::kTextChatMsgRes, [](const QByteArray& data) {
         QJsonDocument json_doc = QJsonDocument::fromJson(data);
 
         if (json_doc.isNull()) {

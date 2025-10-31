@@ -8,7 +8,7 @@
 namespace pyc {
 namespace monkey {
 
-using SymbolScope = std::string;
+using SymbolScope = std::string_view;
 
 namespace SymbolScopeType {
 inline constexpr SymbolScope kGlobal = "GLOBAL";

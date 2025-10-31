@@ -1,6 +1,7 @@
 #include "tetris/control.h"
 
 #include <termios.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <thread>

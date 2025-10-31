@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "sunny_land/engine/component/component.h"
 
 namespace pyc::sunny_land {
