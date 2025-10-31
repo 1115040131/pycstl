@@ -10,6 +10,8 @@ build:fastbuild --compilation_mode=fastbuild
 common --enable_bzlmod
 common --enable_workspace
 common --incompatible_disallow_empty_glob=false
+common --enable_platform_specific_config
 
 build --compilation_mode=dbg
-build --cxxopt=-std=c++20
+build --cxxopt='-std=c++20'
+build --host_cxxopt='-std=c++20'
