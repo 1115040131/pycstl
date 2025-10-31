@@ -211,7 +211,7 @@ private:
 private:
     int index_;
 
-    alignas(std::max({sizeof(Ts)...})) char union_[std::max({sizeof(Ts)...})];
+    char union_[std::max({sizeof(Ts)...})];
 };
 
 template <typename T, typename... Ts>

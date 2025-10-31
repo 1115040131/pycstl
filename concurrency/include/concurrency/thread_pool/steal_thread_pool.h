@@ -26,7 +26,8 @@ public:
 
         std::size_t index = (thread_index.load() + 1) % task_queues_.size();
         thread_index.store(index);
-        std::packaged_task<RetType()> task(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+        std::packaged_task<RetType()> task(
+            [f = std::forward<F>(f), ... args = std::forward<Args>(args)]() mutable { return f(args...); });
         std::future<RetType> result = task.get_future();
         task_queues_[index].Push(std::move(task));
         return result;

@@ -35,7 +35,8 @@ struct LeafNode : public Node {
     std::array<Cell, kMaxCells> cells;
 
     explicit LeafNode() : Node(Node::Type::kLeaf) {}
-    explicit LeafNode(Node* node) : Node(Node::Type::kLeaf, false, node) {}
+    explicit LeafNode(Node* node)
+        : Node(Node::Type::kLeaf, 0, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(node))) {}
 };
 
 template <typename Key>
@@ -56,7 +57,8 @@ struct InternalNode : public Node {
     std::array<Child, kMaxChildren> children;
 
     InternalNode() : Node(Node::Type::kInternal) {}
-    InternalNode(Node* node) : Node(Node::Type::kInternal, false, node) {}
+    InternalNode(Node* node)
+        : Node(Node::Type::kInternal, 0, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(node))) {}
 };
 
 }  // namespace tiny_db

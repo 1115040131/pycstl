@@ -204,7 +204,7 @@ public:
     }
 
     template <typename F>
-    auto transform(F&& f) -> Optional<std::remove_cvref_t<decltype(f(T()))>> {
+    auto transform(F&& f) -> Optional<std::remove_cvref_t<std::invoke_result_t<F, T>>> {
         if (has_value_) {
             return std::forward<F>(f)(value_);
         }

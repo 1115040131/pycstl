@@ -8,10 +8,9 @@
 namespace pyc {
 namespace concurrency {
 
-template <typename T>
-void PushFrontWhileFind(T& thread_safe_list, const std::size_t kDataNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
-        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+template <std::size_t kDataNum, std::size_t kThreadNum, typename T>
+void PushFrontWhileFind(T& thread_safe_list) {
+    static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
     bool check[kDataNum] = {false};
 
@@ -31,10 +30,9 @@ void PushFrontWhileFind(T& thread_safe_list, const std::size_t kDataNum, const s
     }
 }
 
-template <typename T>
-void PushFrontWhileRemove(T& thread_safe_list, const std::size_t kDataNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
-        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+template <std::size_t kDataNum, std::size_t kThreadNum, typename T>
+void PushFrontWhileRemove(T& thread_safe_list) {
+    static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
     bool check[kDataNum] = {false};
 
@@ -59,9 +57,9 @@ void PushFrontWhileRemove(T& thread_safe_list, const std::size_t kDataNum, const
     EXPECT_EQ(cnt, 0);
 }
 
-void DoublePushWhileRemove(const std::size_t kDataNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0))
-        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+template <std::size_t kDataNum, std::size_t kThreadNum>
+void DoublePushWhileRemove() {
+    static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
     DoublePushList<MyClass> double_push_list;
     bool check[2 * kDataNum] = {false};
@@ -96,21 +94,21 @@ void DoublePushWhileRemove(const std::size_t kDataNum, const std::size_t kThread
 
 TEST(ThreadSafeListTest, FindWhilePushTest) {
     ThreadSafeList<MyClass> thread_safe_list;
-    PushFrontWhileFind(thread_safe_list, 2000, 16);
+    PushFrontWhileFind<2000, 16>(thread_safe_list);
 
     DoublePushList<MyClass> double_push_list;
-    PushFrontWhileFind(double_push_list, 2000, 16);
+    PushFrontWhileFind<2000, 16>(double_push_list);
 }
 
 TEST(ThreadSafeListTest, PushFrontWhileRemoveTest) {
     ThreadSafeList<MyClass> thread_safe_list;
-    PushFrontWhileRemove(thread_safe_list, 2000, 16);
+    PushFrontWhileRemove<2000, 16>(thread_safe_list);
 
     DoublePushList<MyClass> double_push_list;
-    PushFrontWhileRemove(double_push_list, 2000, 16);
+    PushFrontWhileRemove<2000, 16>(double_push_list);
 }
 
-TEST(ThreadSafeListTest, DoublePushWhileRemoveTest) { DoublePushWhileRemove(2000, 16); }
+TEST(ThreadSafeListTest, DoublePushWhileRemoveTest) { DoublePushWhileRemove<2000, 16>(); }
 
 }  // namespace concurrency
 }  // namespace pyc

@@ -231,7 +231,6 @@ TEST(OptionalTest, ModifyTest) {
         opt.emplace();
         EXPECT_EQ(opt.value(), 0);
     }
-    std::optional<int> a;
 }
 
 TEST(OptionalTest, CompareTest) {

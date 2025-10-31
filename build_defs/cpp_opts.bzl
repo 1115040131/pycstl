@@ -18,6 +18,13 @@ STRICT_COPTS = select({
         "-Wold-style-cast",
         "-Wreturn-type",
         "-Wnon-virtual-dtor",
+    ],
+}) + select({
+    "@bazel_tools//tools/cpp:gcc": [
         "-Wno-missing-requires",
     ],
+    "@bazel_tools//tools/cpp:clang": [
+        "-fexperimental-library",
+    ],
+    "//conditions:default": [],
 })

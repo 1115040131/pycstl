@@ -11,9 +11,9 @@ namespace concurrency {
 
 using namespace std::literals;
 
-void AddWhileRemove(const std::size_t kDataNum, const std::size_t kThreadNum) {
-    ASSERT_TRUE(kDataNum > kThreadNum && (kDataNum % kThreadNum == 0))
-        << fmt::format("{} 要能被 {} 均分", kDataNum, kThreadNum);
+template <std::size_t kDataNum, std::size_t kThreadNum>
+void AddWhileRemove() {
+    static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
     ThreadSafeHashTable<int, std::shared_ptr<MyClass>> table(97);
     bool check[kDataNum] = {false};
@@ -46,7 +46,7 @@ void AddWhileRemove(const std::size_t kDataNum, const std::size_t kThreadNum) {
     }
 }
 
-TEST(ThreadSafeHashTableTest, AddWhileRemoveTest) { AddWhileRemove(5000, 8); }
+TEST(ThreadSafeHashTableTest, AddWhileRemoveTest) { AddWhileRemove<5000, 8>(); }
 
 }  // namespace concurrency
 }  // namespace pyc

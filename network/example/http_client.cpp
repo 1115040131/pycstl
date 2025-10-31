@@ -25,11 +25,9 @@ public:
             path, server);
 
         std::size_t pos = server.find(":");
-        std::string_view ip = server.substr(0, pos);
-        std::string_view port = server.substr(pos + 1);
 
         resolver_.async_resolve(
-            ip, port,
+            server.substr(0, pos), server.substr(pos + 1),
             [this](const boost::system::error_code& error_code, const tcp::resolver::results_type& endpoints) {
                 HandleResolve(error_code, endpoints);
             });

@@ -1,0 +1,165 @@
+name: Bazel CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
+        bazel-version: ['8.4.1']
+      fail-fast: false
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+
+    - name: 初始状态检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
+    # 使用 Action 自动清理
+    # - name: 最大化构建空间
+    #   if: runner.os == 'Linux'
+    #   uses: easimon/maximize-build-space@master
+    #   with:
+    #     root-reserve-mb: 4096      # 为根分区保留 4GB
+    #     temp-reserve-mb: 1024      # 为 /tmp 保留 1GB
+    #     swap-size-mb: 4096         # 创建 4GB swap
+    #     remove-dotnet: 'true'
+    #     remove-android: 'true'
+    #     remove-haskell: 'true'
+    #     remove-codeql: 'true'
+    #     remove-docker-images: 'true'
+
+    - name: 手动清理磁盘
+      if: runner.os == 'Linux'
+      run: |
+        echo "清理前磁盘状态："
+        df -h
+
+        # 删除不需要的软件
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+
+        # 清理 Docker
+        sudo docker system prune -af --volumes
+
+        # 清理 APT 缓存
+        sudo apt-get clean
+
+        # 清理日志
+        sudo journalctl --vacuum-time=1d
+
+    - name: 清理后检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
+    - name: 安装 Bazelisk (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        wget https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64
+        chmod +x bazelisk-linux-amd64
+        sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
+
+    - name: 安装 Bazelisk (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install bazelisk
+        ln -sf $(which bazelisk) /usr/local/bin/bazel
+
+    - name: 验证 Bazel 版本
+      run: bazel --version
+
+    - name: 配置 Bazel 缓存
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/bazel
+          ~/.cache/bazelisk
+        key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE.bazel', 'MODULE.bazel', '.bazelversion') }}
+        restore-keys: |
+          ${{ runner.os }}-bazel-
+
+    - name: 替换 CI 专用文件
+      run: cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
+
+    - name: 构建前检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
+    - name: 构建所有目标
+      run: bazel build //...
+
+    - name: 启动 mysql 服务
+      run: tool/build.py chat_prepare
+
+    - name: 运行所有测试
+      run: bazel test //... --test_output=errors
+
+    - name: 生成测试覆盖率
+      if: runner.os == 'Linux'
+      run: |
+        bazel coverage //... --combined_report=lcov
+
+    - name: 上传覆盖率报告
+      if: runner.os == 'Linux'
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./bazel-out/_coverage/_coverage_report.dat
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+
+    - name: 步骤3 - 构建后状态（缓存保存前）
+      run: |
+        echo "===== 构建后磁盘状态 ====="
+        df -h /
+        echo ""
+        echo "===== Bazel 相关目录占用 ====="
+        du -sh ~/.cache/bazel* 2>/dev/null || echo "bazel 缓存不存在"
+        du -sh $(bazel info output_base 2>/dev/null) 2>/dev/null || echo "output_base 不存在"
+        echo ""
+        echo "===== 工作目录占用 ====="
+        du -sh /home/runner/work/pycstl 2>/dev/null || true
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+
+    - name: 安装 clang-format
+      run: sudo apt-get install -y clang-format
+
+    - name: 检查代码格式
+      run: |
+        find src test -name '*.cc' -o -name '*.h' | xargs clang-format -i -style=Google
+        git diff --exit-code

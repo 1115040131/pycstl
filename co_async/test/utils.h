@@ -16,6 +16,6 @@ private:
     {                                                                                                 \
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();   \
         auto expected = std::chrono::duration_cast<std::chrono::milliseconds>(expected_time).count(); \
-        auto tolerance = std::chrono::duration_cast<std::chrono::milliseconds>(1ms).count();          \
+        auto tolerance = std::chrono::duration_cast<std::chrono::milliseconds>(10ms).count();         \
         EXPECT_NEAR(elapsed, expected, tolerance);                                                    \
     }

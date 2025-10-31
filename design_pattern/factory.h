@@ -1,11 +1,11 @@
 #pragma once
 
-#include <iostream>
 #include <memory>
 
 namespace pyc {
 
 struct Bullet {
+    virtual ~Bullet() = default;
     virtual void explode() = 0;
 };
 
@@ -18,6 +18,7 @@ struct MagicBullet : Bullet {
 };
 
 struct Gun {
+    virtual ~Gun() = default;
     virtual std::unique_ptr<Bullet> shoot() = 0;
 };
 
