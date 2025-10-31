@@ -16,7 +16,7 @@ cmake(
     name = "sdl3_image",
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
-        "SDLIMAGE_AVIF": "OFF", # disable for ninja compile error
+        "SDLIMAGE_AVIF": "OFF",  # disable for ninja compile error
     },
     # data = ["@nasm"],
     # env = {
