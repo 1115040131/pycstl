@@ -18,23 +18,16 @@ bazel_dep(name = "boost.beast", version = BOOST_VERSION + ".bcr.1")
 bazel_dep(name = "boost.property_tree", version = BOOST_VERSION)
 bazel_dep(name = "boost.uuid", version = BOOST_VERSION)
 bazel_dep(name = "eigen", version = "5.0.0")
-bazel_dep(name = "fmt", version = "11.2.0")
+bazel_dep(name = "fmt", version = "12.0.0")
 bazel_dep(name = "gflags", version = "2.2.2")
 bazel_dep(name = "glm", version = "1.0.1")
 bazel_dep(name = "grpc", version = "1.74.1", repo_name = "com_github_grpc_grpc")
+bazel_dep(name = "hiredis", version = "1.3.0")
 bazel_dep(name = "nasm", version = "2.16.03.bcr.1")  # aom dav1d need it
 bazel_dep(name = "nlohmann_json", version = "3.12.0")
 bazel_dep(name = "platforms", version = "1.0.0")  # rules_qt need it
-bazel_dep(name = "rules_foreign_cc", version = "0.14.0")  # 升级后 sdl 编译有问题
-bazel_dep(name = "spdlog", version = "1.15.3")
-
-# hiredis
-bazel_dep(name = "hiredis")
-git_override(
-    module_name = "hiredis",
-    remote = "https://github.com/1115040131/hiredis.git",
-    commit = "8eddfaed5dd3567b71ac9fcb3d6045cb0552b277",
-)
+bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+bazel_dep(name = "spdlog", version = "1.16.0")
 
 # mysql-connector-cpp
 bazel_dep(name = "mysql-connector-cpp")
@@ -48,6 +41,37 @@ bazel_dep(name = "sdl2_gfx")
 local_path_override(
     module_name = "sdl2_gfx",
     path = "third_party/sdl2_gfx",
+)
+
+#-------------------------------------------------------------------------------------
+# Qt6
+#-------------------------------------------------------------------------------------
+
+bazel_dep(name = "rules_qt", version = "0.0.5")
+qt = use_extension("@rules_qt//extension:qt.bzl", "fetch")
+qt.install(
+    name = "qt_linux_x86_64",
+    build_file = "@rules_qt//extension:qt/6.8.3/linux_x86_64.BUILD",
+    os = "linux",
+    version = "6.8.3",
+)
+qt.install(
+    name = "qt_windows_x86_64",
+    build_file = "@rules_qt//extension:qt/6.8.3/windows_x86_64.BUILD",
+    os = "windows",
+    version = "6.8.3",
+    windows_architecture = "win64_msvc2022",
+)
+qt.install(
+    name = "qt_mac_aarch64",
+    build_file = "@rules_qt//extension:qt/6.8.3/mac_aarch64.BUILD",
+    os = "macos",
+    version = "6.8.3",
+)
+use_repo(qt, "qt_linux_x86_64", "qt_mac_aarch64", "qt_windows_x86_64")
+
+register_toolchains(
+    "@rules_qt//tools:all",
 )
 
 #-------------------------------------------------------------------------------------

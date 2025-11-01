@@ -7,7 +7,7 @@
 #include <optional>
 #include <queue>
 
-#include <hiredis.h>
+#include <hiredis/hiredis.h>
 
 #include "logger/logger.h"
 

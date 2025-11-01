@@ -16,7 +16,7 @@ git_repository(
     name = "sdl2",
     build_file_content = _ALL_CONTENT,
     remote = "https://github.com/libsdl-org/SDL.git",
-    tag = "release-2.32.2",
+    tag = "release-2.32.10",
 )
 
 git_repository(
@@ -47,7 +47,7 @@ git_repository(
     name = "sdl3",
     build_file_content = _ALL_CONTENT,
     remote = "https://github.com/libsdl-org/SDL.git",
-    tag = "release-3.2.20",
+    tag = "release-3.2.26",
 )
 
 git_repository(
@@ -73,21 +73,3 @@ git_repository(
     remote = "https://github.com/libsdl-org/SDL_ttf.git",
     tag = "release-3.2.2",
 )
-
-#-------------------------------------------------------------------------------------
-# Qt6
-#-------------------------------------------------------------------------------------
-
-git_repository(
-    name = "rules_qt",
-    commit = "f43d76ab1d3b60bd494e871f4f1042a351bfcff8",
-    remote = "https://github.com/Vertexwahn/rules_qt6.git",
-)
-
-load("@rules_qt//:fetch_qt.bzl", "fetch_qt6")
-
-fetch_qt6()
-
-load("@rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
-
-register_qt_toolchains()
