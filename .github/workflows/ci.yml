@@ -101,7 +101,9 @@ jobs:
           ${{ runner.os }}-bazel-
 
     - name: 替换 CI 专用文件
-      run: cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
+      run: |
+        cp .ci/co_async/test/utils.h co_async/test/utils.h
+        cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
 
     - name: 构建前检查
       run: |
