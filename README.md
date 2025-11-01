@@ -156,6 +156,13 @@ pre-commit run
 pre-commit run clang-format --all-files
 ```
 
+### QT
+
+```bash
+# for 6.5+
+sudo apt install libxcb-cursor0
+```
+
 ### QT Designer
 
 ```bash
