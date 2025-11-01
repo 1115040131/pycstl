@@ -22,19 +22,12 @@ bazel_dep(name = "fmt", version = "12.0.0")
 bazel_dep(name = "gflags", version = "2.2.2")
 bazel_dep(name = "glm", version = "1.0.1")
 bazel_dep(name = "grpc", version = "1.74.1", repo_name = "com_github_grpc_grpc")
+bazel_dep(name = "hiredis", version = "1.3.0")
 bazel_dep(name = "nasm", version = "2.16.03.bcr.1")  # aom dav1d need it
 bazel_dep(name = "nlohmann_json", version = "3.12.0")
 bazel_dep(name = "platforms", version = "1.0.0")  # rules_qt need it
 bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
 bazel_dep(name = "spdlog", version = "1.15.3")
-
-# hiredis
-bazel_dep(name = "hiredis")
-git_override(
-    module_name = "hiredis",
-    remote = "https://github.com/1115040131/hiredis.git",
-    commit = "8eddfaed5dd3567b71ac9fcb3d6045cb0552b277",
-)
 
 # mysql-connector-cpp
 bazel_dep(name = "mysql-connector-cpp")
