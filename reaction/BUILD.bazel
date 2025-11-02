@@ -1,0 +1,19 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "reaction",
+    srcs = glob(["reaction/**/*.cpp"]),
+    hdrs = glob(["reaction/**/*.h"]),
+    copts = STRICT_COPTS,
+    includes = [""],
+    deps = [
+        "//common",
+        "@fmt",
+    ],
+)

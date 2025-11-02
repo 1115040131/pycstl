@@ -235,6 +235,10 @@ def main():
         "calculator": lambda args: run_bazel_run('//qt/calculator', args=args),
         "notepad": lambda args: run_bazel_run('//qt/notepad', args=args),
 
+        ######################### build for reaction #########################
+        "reaction": lambda args: run_bazel_build('//reaction //reaction/test/...', args=args),
+        "reaction_test": lambda args: run_bazel_test('//reaction/test:reaction_all_test', args=args),
+
         ######################### build for sdl2 #########################
         "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),
         "chicken_evil": lambda args: run_bazel_run('//sdl2/chicken_evil', args=args),
