@@ -2,44 +2,45 @@
 
 #include <functional>
 #include <tuple>
-// #include <type_traits>
-// #include <utility>
 
+#include "reaction/concept.h"
 #include "reaction/resource.h"
 
 namespace pyc::reaction {
 
-template <typename T, typename... Args>
-class DataSource;
-
-template <typename T>
-struct ExpressionTraits {
-    using type = T;
-};
-
-template <typename T>
-struct ExpressionTraits<DataSource<T>> {
-    using type = T;
-};
-
-template <typename Fun, typename... Args>
-struct ExpressionTraits<DataSource<Fun, Args...>> {
-    using type = std::invoke_result_t<Fun, typename ExpressionTraits<Args>::type...>;
-};
-
-template <typename Fun, typename... Args>
-using ReturnType = typename ExpressionTraits<DataSource<Fun, Args...>>::type;
+struct VarExpr {};
+struct CalcExpr {};
 
 template <typename Fun, typename... Args>
 class Expression : public Resource<ReturnType<Fun, Args...>> {
 public:
+    using ExprType = CalcExpr;
+    using ValueType = ReturnType<Fun, Args...>;
+
     template <typename F, typename... A>
-    Expression(F&& f, A&&... a)
-        : Resource<ReturnType<Fun, Args...>>(), fun_(std::forward<F>(f)), args_(std::forward<A>(a)...) {
+    Expression(F&& f, A&&... args)
+        : Resource<ReturnType<Fun, Args...>>(), fun_(std::forward<F>(f)), args_(std::forward<A>(args)...) {
+#ifdef USE_FUNCTION
+        this->updateObservers([this]() { this->valueChanged(); }, std::forward<A>(args)...);
+#else
+        this->updateObservers(std::forward<A>(args)...);
+#endif
         evaluate();
     }
 
 private:
+#ifdef USE_FUNCTION
+    void valueChanged() {
+        evaluate();
+        this->notify();
+    }
+#else
+    void valueChanged() override {
+        evaluate();
+        this->notify();
+    }
+#endif
+
     void evaluate() {
         auto result = [&]<std::size_t... Is>(std::index_sequence<Is...>) {
             return std::invoke(fun_, std::get<Is>(args_).get().get()...);
@@ -55,6 +56,9 @@ private:
 template <typename T>
 class Expression<T> : public Resource<T> {
 public:
+    using ExprType = VarExpr;
+    using ValueType = T;
+
     using Resource<T>::Resource;
 };
 

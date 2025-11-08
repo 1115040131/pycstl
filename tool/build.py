@@ -238,6 +238,7 @@ def main():
         ######################### build for reaction #########################
         "reaction": lambda args: run_bazel_build('//reaction //reaction/test/...', args=args),
         "reaction_test": lambda args: run_bazel_test('//reaction/test:reaction_all_test', args=args),
+        "reaction_use_function_test": lambda args: run_bazel_test('//reaction/test:reaction_use_function_all_test', args=args),
 
         ######################### build for sdl2 #########################
         "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),

@@ -3,11 +3,12 @@
 #include <memory>
 
 #include "common/noncopyable.h"
+#include "reaction/observer_node.h"
 
 namespace pyc::reaction {
 
 template <typename T>
-class Resource : Noncopyable {
+class Resource : Noncopyable, public ObserverNode {
 public:
     explicit Resource() = default;
 
