@@ -35,4 +35,7 @@ private:
     std::unique_ptr<T> ptr_{nullptr};
 };
 
+template <>
+class Resource<void> : public ObserverNode {};
+
 }  // namespace pyc::reaction

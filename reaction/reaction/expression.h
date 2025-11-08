@@ -3,7 +3,6 @@
 #include <functional>
 #include <tuple>
 
-#include "reaction/concept.h"
 #include "reaction/resource.h"
 
 namespace pyc::reaction {
@@ -42,10 +41,16 @@ private:
 #endif
 
     void evaluate() {
-        auto result = [&]<std::size_t... Is>(std::index_sequence<Is...>) {
-            return std::invoke(fun_, std::get<Is>(args_).get().get()...);
-        }(std::make_index_sequence<sizeof...(Args)>{});
-        this->updateValue(std::move(result));
+        if constexpr (VoidType<ValueType>) {
+            [&]<std::size_t... Is>(std::index_sequence<Is...>) {
+                std::invoke(fun_, std::get<Is>(args_).get().get()...);
+            }(std::make_index_sequence<sizeof...(Args)>{});
+        } else {
+            auto result = [&]<std::size_t... Is>(std::index_sequence<Is...>) {
+                return std::invoke(fun_, std::get<Is>(args_).get().get()...);
+            }(std::make_index_sequence<sizeof...(Args)>{});
+            this->updateValue(std::move(result));
+        }
     }
 
 private:

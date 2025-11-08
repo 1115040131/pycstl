@@ -1,5 +1,6 @@
 #include <numeric>
 
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 #include "reaction/react.h"
@@ -10,7 +11,7 @@
 
 namespace pyc {
 
-TEST(BasicTest, CalcTest) {
+TEST(ReactionTest, CalcTest) {
     auto a = reaction::var(1);
     auto b = reaction::var(3.14);
     EXPECT_EQ(a.get(), 1);
@@ -29,7 +30,7 @@ TEST(BasicTest, CalcTest) {
     // ds.value(10.0); // should not compile
 }
 
-TEST(BasicTest, TestCopy) {
+TEST(ReactionTest, CopyTest) {
     auto a = reaction::var(1);
     auto b = reaction::var(3.14);
     auto ds = reaction::calc([](int aa, double bb) { return std::to_string(aa) + std::to_string(bb); }, a, b);
@@ -45,7 +46,7 @@ TEST(BasicTest, TestCopy) {
 }
 
 // Test for moving data sources
-TEST(BasicTest, TestMove) {
+TEST(ReactionTest, MoveTest) {
     auto a = reaction::var(1);
     auto b = reaction::var(3.14);
     auto ds = reaction::calc([](int aa, double bb) { return std::to_string(aa) + std::to_string(bb); }, a, b);
@@ -61,12 +62,32 @@ TEST(BasicTest, TestMove) {
     EXPECT_FALSE(static_cast<bool>(dds));
 }
 
+TEST(ReactionTest, ConstTest) {
+    auto a = reaction::var(1);
+    auto b = reaction::constVar(3.14);
+    auto ds = reaction::calc([](int aa, double bb) { return aa + bb; }, a, b);
+    ASSERT_FLOAT_EQ(ds.get(), 4.14);
+
+    a.value(2);
+    ASSERT_FLOAT_EQ(ds.get(), 5.14);
+    // b.value(4.14); // compile error;
+}
+
+TEST(ReactionTest, ActionTest) {
+    auto a = reaction::var(1);
+    auto b = reaction::var(3.14);
+    auto at = reaction::action([](int aa, double bb) { fmt::println("a = {}\t b = {}", aa, bb); }, a, b);
+
+    a.value(2);
+    // at.get(); // compile error;
+}
+
 struct ProcessedData {
     std::string info;
     int checksum;
 };
 
-TEST(DISABLED_BasicTest, StressTest) {
+TEST(DISABLED_ReactionTest, StressTest) {
     using namespace reaction;
     using namespace std::chrono;
 

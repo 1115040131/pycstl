@@ -17,7 +17,7 @@ public:
     auto get() const { return this->getValue(); }
 
     template <typename T>
-        requires Convertable<T, Type> && IsVarExpr<ExprType>
+        requires(Convertable<T, Type> && IsVarExpr<ExprType> && !ConstType<Type>)
     void value(T&& value) {
         this->updateValue(std::forward<T>(value));
         this->notify();
@@ -93,7 +93,11 @@ public:
         throw std::runtime_error("Attempt to access expired React object");
     }
 
-    auto get() const { return getPtr()->get(); }
+    auto get() const
+        requires(IsDataReact<ReactType>)
+    {
+        return getPtr()->get();
+    }
 
     template <typename T>
     void value(T&& value) {
@@ -111,12 +115,24 @@ auto var(T&& value) {
     return React(ptr);
 }
 
+template <typename T>
+auto constVar(T&& value) {
+    auto ptr = std::make_shared<ReactImpl<const std::decay_t<T>>>(std::forward<T>(value));
+    ObserverGraph::GetInstance().addNode(ptr);
+    return React(ptr);
+}
+
 template <typename Fun, typename... Args>
 auto calc(Fun&& fun, Args&&... args) {
     auto ptr = std::make_shared<ReactImpl<std::decay_t<Fun>, std::decay_t<Args>...>>(std::forward<Fun>(fun),
                                                                                      std::forward<Args>(args)...);
     ObserverGraph::GetInstance().addNode(ptr);
     return React(ptr);
+}
+
+template <typename Fun, typename... Args>
+auto action(Fun&& fun, Args&&... args) {
+    return calc(std::forward<Fun>(fun), std::forward<Args>(args)...);
 }
 
 }  // namespace pyc::reaction

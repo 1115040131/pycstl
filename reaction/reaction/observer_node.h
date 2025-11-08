@@ -3,11 +3,11 @@
 #ifdef USE_FUNCTION
 #include <functional>
 #endif
-#include <memory>
 #include <unordered_set>
 #include <vector>
 
 #include "common/singleton.h"
+#include "reaction/concept.h"
 
 namespace pyc::reaction {
 
@@ -54,8 +54,6 @@ private:
     std::vector<ObserverNode*> observers_;
 };
 #endif
-
-using NodePtr = std::shared_ptr<ObserverNode>;
 
 class ObserverGraph : public Singleton<ObserverGraph> {
 public:
