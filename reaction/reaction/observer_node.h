@@ -3,11 +3,13 @@
 #ifdef USE_FUNCTION
 #include <functional>
 #endif
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "common/singleton.h"
 #include "reaction/concept.h"
+#include "reaction/utility.h"
 
 namespace pyc::reaction {
 
@@ -35,7 +37,7 @@ class ObserverNode : public std::enable_shared_from_this<ObserverNode> {
 public:
     virtual ~ObserverNode() = default;
 
-    virtual void valueChanged() {}
+    virtual void valueChanged() { this->notify(); }
 
     void addObserver(ObserverNode* observer) { observers_.push_back(observer); }
 
@@ -63,6 +65,29 @@ public:
 
 private:
     std::unordered_set<NodePtr> nodes_;
+};
+
+class FieldGraph : public Singleton<FieldGraph> {
+public:
+    void addObj(const UniqueID& class_id, const NodePtr& obj) { field_map_[class_id].insert(obj); }
+
+    void deleteObj(const UniqueID& class_id) { field_map_.erase(class_id); }
+
+    void bindField(const UniqueID& class_id, const NodePtr& obj) {
+        auto it = field_map_.find(class_id);
+        if (it != field_map_.end()) {
+            for (const auto& field_obj : it->second) {
+#ifdef USE_FUNCTION
+                field_obj->addObserver([obj]() { obj->notify(); });
+#else
+                field_obj->addObserver(obj.get());
+#endif
+            }
+        }
+    }
+
+private:
+    std::unordered_map<UniqueID, std::unordered_set<NodePtr>> field_map_;
 };
 
 }  // namespace pyc::reaction

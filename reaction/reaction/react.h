@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include "reaction/expression.h"
+#include "reaction/utility.h"
 
 namespace pyc::reaction {
 
@@ -14,7 +15,12 @@ public:
 
     using Expression<Type, Args...>::Expression;
 
-    auto get() const { return this->getValue(); }
+    template <typename T>
+    void operator=(T&& other) {
+        value(std::forward<T>(other));
+    }
+
+    decltype(auto) get() const { return this->getValue(); }
 
     template <typename T>
         requires(Convertable<T, Type> && IsVarExpr<ExprType> && !ConstType<Type>)
@@ -28,6 +34,9 @@ public:
     void releaseWeakRef() {
         if (weak_ref_count_.fetch_sub(1, std::memory_order_relaxed) == 1) {
             ObserverGraph::GetInstance().removeNode(this->shared_from_this());
+            if constexpr (HasField<ValueType>) {
+                FieldGraph::GetInstance().deleteObj(this->getValue().getID());
+            }
         }
     }
 
@@ -84,6 +93,8 @@ public:
         return *this;
     }
 
+    ReactType& operator*() const { return *getPtr(); }
+
     explicit operator bool() const { return !weak_ptr_.expired(); }
 
     std::shared_ptr<ReactType> getPtr() const {
@@ -93,7 +104,7 @@ public:
         throw std::runtime_error("Attempt to access expired React object");
     }
 
-    auto get() const
+    decltype(auto) get() const
         requires(IsDataReact<ReactType>)
     {
         return getPtr()->get();
@@ -109,8 +120,29 @@ private:
 };
 
 template <typename T>
+using Field = React<ReactImpl<std::decay_t<T>>>;
+
+class FieldBase {
+public:
+    template <typename T>
+    auto field(T&& value) {
+        auto ptr = std::make_shared<ReactImpl<std::decay_t<T>>>(std::forward<T>(value));
+        FieldGraph::GetInstance().addObj(id_, ptr);
+        return React(ptr);
+    }
+
+    const UniqueID& getID() const { return id_; }
+
+private:
+    UniqueID id_;
+};
+
+template <typename T>
 auto var(T&& value) {
     auto ptr = std::make_shared<ReactImpl<std::decay_t<T>>>(std::forward<T>(value));
+    if constexpr (HasField<T>) {
+        FieldGraph::GetInstance().bindField(value.getID(), ptr);
+    }
     ObserverGraph::GetInstance().addNode(ptr);
     return React(ptr);
 }

@@ -82,14 +82,43 @@ TEST(ReactionTest, ActionTest) {
     // at.get(); // compile error;
 }
 
-struct ProcessedData {
-    std::string info;
-    int checksum;
+class Person : public reaction::FieldBase {
+public:
+    Person(std::string name, int age, bool male) : m_name(field(name)), m_age(field(age)), m_male(male) {}
+
+    std::string getName() const { return m_name.get(); }
+    void setName(const std::string& name) { *m_name = name; }
+
+    int getAge() const { return m_age.get(); }
+    void setAge(int age) { *m_age = age; }
+
+private:
+    reaction::Field<std::string> m_name;
+    reaction::Field<int> m_age;
+    bool m_male;
 };
+
+TEST(ReactionTest, FieldTest) {
+    Person person{"lummy", 18, true};
+    auto p = reaction::var(person);
+    auto a = reaction::var(1);
+    auto ds = reaction::calc([](int aa, auto pp) { return std::to_string(aa) + pp.getName(); }, a, p);
+
+    EXPECT_EQ(ds.get(), "1lummy");
+
+    // p->setName("lummy-new");
+    p.get().setName("lummy-new");
+    EXPECT_EQ(ds.get(), "1lummy-new");
+}
 
 TEST(DISABLED_ReactionTest, StressTest) {
     using namespace reaction;
     using namespace std::chrono;
+
+    struct ProcessedData {
+        std::string info;
+        int checksum;
+    };
 
     // Create var-data sources
     auto base1 = var(1);                 // Integer source

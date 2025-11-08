@@ -8,6 +8,8 @@ namespace pyc::reaction {
 
 struct VarExpr;
 
+class UniqueID;
+
 template <typename T, typename... Args>
 class ReactImpl;
 
@@ -15,6 +17,7 @@ template <typename ReactType>
 class React;
 
 class ObserverNode;
+class FieldBase;
 
 using NodePtr = std::shared_ptr<ObserverNode>;
 
@@ -27,6 +30,12 @@ concept Convertable = std::is_convertible_v<std::decay_t<T>, std::decay_t<U>>;
 
 template <typename T>
 concept IsVarExpr = std::is_same_v<T, VarExpr>;
+
+template <typename T>
+concept HasField = requires(T t) {
+    { t.getID() } -> std::same_as<const UniqueID&>;
+    requires std::is_base_of_v<FieldBase, std::decay_t<T>>;
+};
 
 template <typename T>
 concept ConstType = std::is_const_v<std::remove_reference_t<T>>;

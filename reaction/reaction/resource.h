@@ -15,7 +15,7 @@ public:
     template <typename U>
     explicit Resource(U&& value) : ptr_(std::make_unique<T>(std::forward<U>(value))) {}
 
-    const T& getValue() const {
+    T& getValue() const {
         if (!ptr_) {
             throw std::runtime_error("Resource is not initialized");
         }
