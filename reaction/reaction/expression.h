@@ -19,12 +19,20 @@ public:
                       "ReturnType<std::decay_t<F>, std::decay_t<A>...> should convert to ValueType");
 
 #ifdef USE_FUNCTION
-        this->updateObservers([this]() { this->valueChanged(); }, std::forward<A>(args)...);
+        this->updateObservers([this]() { this->valueChanged(); }, args.getPtr()...);
 #else
-        this->updateObservers(std::forward<A>(args)...);
+        this->updateObservers(args.getPtr()...);
 #endif
         setFunctor(createFun(std::forward<F>(fun), std::forward<A>(args)...));
         evaluate();
+    }
+
+    void addObCb(NodePtr node) {
+#ifdef USE_FUNCTION
+        this->updateObservers([this]() { this->valueChanged(); }, node);
+#else
+        this->updateObservers(node);
+#endif
     }
 
 private:
@@ -66,7 +74,7 @@ private:
     std::function<ValueType()> fun_;
 };
 
-template <typename T>
+template <NonInvocableType T>
 class Expression<T> : public Resource<T> {
 public:
     using ExprType = VarExpr;

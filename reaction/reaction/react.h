@@ -7,6 +7,13 @@
 
 namespace pyc::reaction {
 
+inline thread_local std::function<void(NodePtr)> g_reg_fun;
+
+struct RegGuard {
+    RegGuard(const std::function<void(NodePtr)>& func) { g_reg_fun = func; }
+    ~RegGuard() { g_reg_fun = nullptr; }
+};
+
 template <typename Type, typename... Args>
 class ReactImpl : public Expression<Type, Args...> {
 public:
@@ -24,9 +31,15 @@ public:
 
     auto getRaw() const { return this->getRawPtr(); }
 
-    template <typename F, typename... A>
+    template <typename F, HasArguments... A>
     void set(F&& fun, A&&... args) {
         this->setSource(std::forward<F>(fun), std::forward<A>(args)...);
+    }
+
+    template <typename F>
+    void set(F&& fun) {
+        RegGuard guard([this](NodePtr node) { this->addObCb(node); });
+        this->setSource(std::forward<F>(fun));
     }
 
     template <typename T>
@@ -106,6 +119,13 @@ public:
 
     explicit operator bool() const { return !weak_ptr_.expired(); }
 
+    decltype(auto) operator()() const {
+        if (g_reg_fun) {
+            std::invoke(g_reg_fun, getPtr());
+        }
+        return get();
+    }
+
     std::shared_ptr<ReactType> getPtr() const {
         if (auto sp = weak_ptr_.lock()) {
             return sp;
@@ -172,7 +192,7 @@ template <typename Fun, typename... Args>
 auto calc(Fun&& fun, Args&&... args) {
     auto ptr = std::make_shared<ReactImpl<std::decay_t<Fun>, std::decay_t<Args>...>>();
     ObserverGraph::GetInstance().addNode(ptr);
-    ptr->setSource(std::forward<Fun>(fun), std::forward<Args>(args)...);
+    ptr->set(std::forward<Fun>(fun), std::forward<Args>(args)...);
     return React(ptr);
 }
 

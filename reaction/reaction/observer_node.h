@@ -18,7 +18,7 @@ public:
 
     template <typename... Args>
     void updateObservers(const std::function<void()>& f, Args&&... args) {
-        (..., args.getPtr()->addObserver(f));
+        (..., args->addObserver(f));
     }
 
     void notify() {
@@ -41,7 +41,7 @@ public:
 
     template <typename... Args>
     void updateObservers(Args&&... args) {
-        (..., args.getPtr()->addObserver(this));
+        (..., args->addObserver(this));
     }
 
     void notify() {
