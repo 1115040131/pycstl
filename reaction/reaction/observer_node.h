@@ -1,8 +1,6 @@
 #pragma once
 
-#ifdef USE_FUNCTION
 #include <functional>
-#endif
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>

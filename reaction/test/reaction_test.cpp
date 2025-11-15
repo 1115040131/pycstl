@@ -78,27 +78,55 @@ TEST(ReactionTest, ActionTest) {
     auto b = reaction::var(3.14);
     auto at = reaction::action([](int aa, double bb) { fmt::println("a = {}\t b = {}", aa, bb); }, a, b);
 
+    bool trigger = false;
+    auto att = reaction::action(
+        [&]([[maybe_unused]] auto atat) {
+            trigger = true;
+            fmt::println("at trigger");
+        },
+        at);
+    EXPECT_TRUE(trigger);
+
+    trigger = false;
+    EXPECT_FALSE(trigger);
+
     a.value(2);
     // at.get(); // compile error;
+    EXPECT_TRUE(trigger);
 }
 
-class Person : public reaction::FieldBase {
-public:
-    Person(std::string name, int age, bool male) : m_name(field(name)), m_age(field(age)), m_male(male) {}
+TEST(ReactionTest, TestReset) {
+    auto a = reaction::var(1);
+    auto b = reaction::var(2);
 
-    std::string getName() const { return m_name.get(); }
-    void setName(const std::string& name) { *m_name = name; }
+    auto ds = reaction::calc([](auto aa, auto bb) { return aa + bb; }, a, b);
 
-    int getAge() const { return m_age.get(); }
-    void setAge(int age) { *m_age = age; }
+    auto dds = reaction::calc([](auto aa, auto bb) { return aa + bb; }, a, b);
 
-private:
-    reaction::Field<std::string> m_name;
-    reaction::Field<int> m_age;
-    bool m_male;
-};
+    dds.reset([](auto aa, auto dsds) { return aa + dsds; }, a, ds);
+    a.value(2);
+    EXPECT_EQ(dds.get(), 6);
+}
 
 TEST(ReactionTest, FieldTest) {
+    class Person : public reaction::FieldBase {
+    public:
+        Person(std::string name, int age, bool male) : m_name(field(name)), m_age(field(age)), m_male(male) {}
+
+        std::string getName() const { return m_name.get(); }
+        void setName(const std::string& name) { *m_name = name; }
+
+        int getAge() const { return m_age.get(); }
+        void setAge(int age) { *m_age = age; }
+
+        bool isMale() const { return m_male; }
+
+    private:
+        reaction::Field<std::string> m_name;
+        reaction::Field<int> m_age;
+        bool m_male;
+    };
+
     Person person{"lummy", 18, true};
     auto p = reaction::var(person);
     auto a = reaction::var(1);
@@ -106,8 +134,8 @@ TEST(ReactionTest, FieldTest) {
 
     EXPECT_EQ(ds.get(), "1lummy");
 
-    // p->setName("lummy-new");
-    p.get().setName("lummy-new");
+    p->setName("lummy-new");
+    // p.get().setName("lummy-new");
     EXPECT_EQ(ds.get(), "1lummy-new");
 }
 

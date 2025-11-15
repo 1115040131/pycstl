@@ -22,6 +22,13 @@ public:
 
     decltype(auto) get() const { return this->getValue(); }
 
+    auto getRaw() const { return this->getRawPtr(); }
+
+    template <typename F, typename... A>
+    void set(F&& fun, A&&... args) {
+        this->setSource(std::forward<F>(fun), std::forward<A>(args)...);
+    }
+
     template <typename T>
         requires(Convertable<T, Type> && IsVarExpr<ExprType> && !ConstType<Type>)
     void value(T&& value) {
@@ -95,6 +102,8 @@ public:
 
     ReactType& operator*() const { return *getPtr(); }
 
+    ReactType::ValueType* operator->() const { return getPtr()->getRaw(); }
+
     explicit operator bool() const { return !weak_ptr_.expired(); }
 
     std::shared_ptr<ReactType> getPtr() const {
@@ -105,9 +114,14 @@ public:
     }
 
     decltype(auto) get() const
-        requires(IsDataReact<ReactType>)
+    // requires(IsDataReact<ReactType>)
     {
         return getPtr()->get();
+    }
+
+    template <typename F, typename... A>
+    void reset(F&& fun, A&&... args) {
+        getPtr()->set(std::forward<F>(fun), std::forward<A>(args)...);
     }
 
     template <typename T>
@@ -156,9 +170,9 @@ auto constVar(T&& value) {
 
 template <typename Fun, typename... Args>
 auto calc(Fun&& fun, Args&&... args) {
-    auto ptr = std::make_shared<ReactImpl<std::decay_t<Fun>, std::decay_t<Args>...>>(std::forward<Fun>(fun),
-                                                                                     std::forward<Args>(args)...);
+    auto ptr = std::make_shared<ReactImpl<std::decay_t<Fun>, std::decay_t<Args>...>>();
     ObserverGraph::GetInstance().addNode(ptr);
+    ptr->setSource(std::forward<Fun>(fun), std::forward<Args>(args)...);
     return React(ptr);
 }
 

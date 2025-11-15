@@ -22,6 +22,13 @@ public:
         return *ptr_;
     }
 
+    T* getRawPtr() const {
+        if (!ptr_) {
+            throw std::runtime_error("Resource is not initialized");
+        }
+        return ptr_.get();
+    }
+
     template <typename U>
     void updateValue(U&& value) {
         if (!ptr_) {
@@ -35,7 +42,12 @@ private:
     std::unique_ptr<T> ptr_{nullptr};
 };
 
+struct VoidWrapper {};
+
 template <>
-class Resource<void> : public ObserverNode {};
+class Resource<VoidWrapper> : public ObserverNode {
+public:
+    auto getValue() const { return VoidWrapper{}; }
+};
 
 }  // namespace pyc::reaction

@@ -7,6 +7,7 @@ namespace pyc::reaction {
 #pragma region Forward declarations
 
 struct VarExpr;
+struct VoidWrapper;
 
 class UniqueID;
 
@@ -41,7 +42,7 @@ template <typename T>
 concept ConstType = std::is_const_v<std::remove_reference_t<T>>;
 
 template <typename T>
-concept VoidType = std::is_void_v<T>;
+concept VoidType = std::is_void_v<T> || std::is_same_v<T, VoidWrapper>;
 
 template <typename T>
 concept IsReactNode = requires(T t) {
@@ -70,7 +71,8 @@ struct ExpressionTraits<React<ReactImpl<T>>> {
 
 template <typename Fun, typename... Args>
 struct ExpressionTraits<React<ReactImpl<Fun, Args...>>> {
-    using type = std::invoke_result_t<Fun, typename ExpressionTraits<Args>::type...>;
+    using raw_type = std::invoke_result_t<Fun, typename ExpressionTraits<Args>::type...>;
+    using type = std::conditional_t<VoidType<raw_type>, VoidWrapper, raw_type>;
 };
 
 template <typename Fun, typename... Args>
