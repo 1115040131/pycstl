@@ -42,6 +42,11 @@ public:
         this->setSource(std::forward<F>(fun));
     }
 
+    void set() {
+        RegGuard guard([this](NodePtr node) { this->addObCb(node); });
+        this->setOpExpr();
+    }
+
     template <typename T>
         requires(Convertable<T, Type> && IsVarExpr<ExprType> && !ConstType<Type>)
     void value(T&& value) {
@@ -67,6 +72,8 @@ private:
 template <typename ReactType>
 class React {
 public:
+    using ValueType = typename ReactType::ValueType;
+
     explicit React(std::shared_ptr<ReactType> ptr = nullptr) : weak_ptr_(ptr) {
         if (auto sp = weak_ptr_.lock()) {
             sp->addWeakRef();
@@ -185,6 +192,14 @@ template <typename T>
 auto constVar(T&& value) {
     auto ptr = std::make_shared<ReactImpl<const std::decay_t<T>>>(std::forward<T>(value));
     ObserverGraph::GetInstance().addNode(ptr);
+    return React(ptr);
+}
+
+template <typename OpExpr>
+auto expr(OpExpr&& op_expr) {
+    auto ptr = std::make_shared<ReactImpl<std::decay_t<OpExpr>>>(std::forward<OpExpr>(op_expr));
+    ObserverGraph::GetInstance().addNode(ptr);
+    ptr->set();
     return React(ptr);
 }
 

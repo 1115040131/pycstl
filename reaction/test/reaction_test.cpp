@@ -139,7 +139,7 @@ TEST(ReactionTest, ResetTest) {
     EXPECT_EQ(dds.get(), 6);
 }
 
-TEST(ReactionTest, TestParentheses) {
+TEST(ReactionTest, ParenthesesTest) {
     auto a = reaction::var(1);
     auto b = reaction::var(3.14);
     EXPECT_EQ(a.get(), 1);
@@ -154,6 +154,20 @@ TEST(ReactionTest, TestParentheses) {
     a.value(2);
     EXPECT_DOUBLE_EQ(ds.get(), 5.14);
     EXPECT_EQ(dds.get(), "25.140000");
+}
+
+TEST(ReactionTest, ExprTest) {
+    auto a = reaction::var(1);
+    auto b = reaction::var(2);
+    auto c = reaction::var(3.14);
+    auto ds = reaction::calc([&]() { return a() + b(); });
+    auto expr_ds = reaction::expr(c + a / b - ds * 2);
+
+    EXPECT_DOUBLE_EQ(expr_ds.get(), -2.86);
+
+    a.value(2);
+    EXPECT_EQ(ds.get(), 4);
+    EXPECT_DOUBLE_EQ(expr_ds.get(), -3.86);
 }
 
 TEST(DISABLED_ReactionTest, StressTest) {

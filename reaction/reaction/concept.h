@@ -17,8 +17,14 @@ class ReactImpl;
 template <typename ReactType>
 class React;
 
+template <typename Type>
+struct ValueWrapper;
+
 class ObserverNode;
 class FieldBase;
+
+template <typename Op, typename L, typename R>
+class BinaryOpExpr;
 
 using NodePtr = std::shared_ptr<ObserverNode>;
 
@@ -50,7 +56,7 @@ concept InvocableType = std::is_invocable_v<std::decay_t<T>>;
 template <typename T>
 concept NonInvocableType = !InvocableType<T>;
 
-template <typename ...Args>
+template <typename... Args>
 concept HasArguments = (sizeof...(Args) > 0);
 
 template <typename T>
@@ -67,6 +73,14 @@ concept IsDataReact = requires(T t) {
 #pragma endregion
 
 #pragma region Type traits
+
+template <typename T>
+struct IsReact : std::false_type {};
+
+template <typename T>
+struct IsReact<React<T>> : std::true_type {
+    using type = T;
+};
 
 template <typename T>
 struct ExpressionTraits {
@@ -86,6 +100,22 @@ struct ExpressionTraits<React<ReactImpl<Fun, Args...>>> {
 
 template <typename Fun, typename... Args>
 using ReturnType = typename ExpressionTraits<React<ReactImpl<Fun, Args...>>>::type;
+
+template <typename T>
+struct BinaryOpExprTraits : std::false_type {};
+
+template <typename Op, typename L, typename R>
+struct BinaryOpExprTraits<BinaryOpExpr<Op, L, R>> : std::true_type {};
+
+template <typename T>
+concept IsBinaryOpExpr = BinaryOpExprTraits<T>::value;
+
+template <typename T>
+using ExprWrapper = std::conditional_t<IsReact<T>::value || IsBinaryOpExpr<T>, T, ValueWrapper<T>>;
+
+template <typename L, typename R>
+concept HasCustomOp = IsReact<std::decay_t<L>>::value || IsReact<std::decay_t<R>>::value ||
+                      IsBinaryOpExpr<std::decay_t<L>> || IsBinaryOpExpr<std::decay_t<R>>;
 
 #pragma endregion
 
