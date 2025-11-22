@@ -10,6 +10,8 @@
 
 namespace pyc::reaction {
 
+inline thread_local NodeSet g_delay_list;
+
 class ObserverGraph : public Singleton<ObserverGraph> {
 public:
     void addNode(const NodePtr& node);
@@ -21,6 +23,8 @@ public:
         if (hasCycle(source, target)) {
             throw std::runtime_error("Cycle detected in observer graph");
         }
+
+        hasRepeatDependencies(source, target);
 
         dependent_list_[source].insert(target);
         observer_list_.at(target).get().insert(source);
@@ -68,9 +72,65 @@ private:
         return false;
     }
 
+    void hasRepeatDependencies(const NodePtr& source, const NodePtr& target) {
+        // 获取目标节点的所有依赖节点
+        NodeSet dependencies;
+        collectDependencies(target, dependencies);
+
+        // 检查源节点其他依赖节点中是否包含这些依赖节点
+        NodeSet visited;
+        for (auto& dependent : dependent_list_.at(source)) {
+            checkDependency(source, dependent.lock(), dependencies, visited);
+        }
+    }
+
+    void collectDependencies(const NodePtr& node, NodeMap& dependencies) {
+        if (!node) {
+            return;
+        }
+
+        dependencies[node]++;
+
+        for (const auto& neighbour : dependent_list_.at(node)) {
+            collectDependencies(neighbour.lock(), dependencies);
+        }
+    }
+
+    void collectDependencies(const NodePtr& node, NodeSet& dependencies) {
+        NodeMap target_dependencies;
+        collectDependencies(node, target_dependencies);
+
+        for (const auto& [dependent, count] : target_dependencies) {
+            if (count == 1) {
+                dependencies.insert(dependent);
+            }
+        }
+    }
+
+    void checkDependency(const NodePtr& source, const NodePtr& node, const NodeSet& dependencies,
+                         NodeSet& visited) {
+        if (!node || visited.contains(node)) {
+            return;
+        }
+        visited.insert(node);
+
+        if (dependencies.contains(node)) {
+            if (repeat_list_.at(node).get().contains(source)) {
+                repeat_list_.at(node).get()[source]++;
+            } else {
+                repeat_list_.at(node).get().emplace(source, 2);
+            }
+        }
+
+        for (const auto& neighbour : dependent_list_.at(node)) {
+            checkDependency(source, neighbour.lock(), dependencies, visited);
+        }
+    }
+
 private:
-    std::unordered_map<NodePtr, NodeSetRef> observer_list_;
-    std::unordered_map<NodePtr, NodeSet> dependent_list_;
+    std::unordered_map<NodePtr, NodeSetRef> observer_list_;  // 节点的观察者列表
+    std::unordered_map<NodePtr, NodeSet> dependent_list_;    // 节点的被观察者列表
+    std::unordered_map<NodePtr, NodeMapRef> repeat_list_;    // 节点被重复依赖的列表
 };
 
 class ObserverNode : public std::enable_shared_from_this<ObserverNode> {
@@ -88,15 +148,34 @@ public:
     }
 
     void notify() {
+        for (auto& [repeat, _] : repeats_) {
+            g_delay_list.insert(repeat);
+        }
+
         for (auto& observer : observers_) {
+            if (g_delay_list.contains(observer)) {
+                continue;
+            }
             if (auto sp = observer.lock()) {
                 sp->valueChanged();
+            }
+        }
+
+        if (!g_delay_list.empty()) {
+            for (auto& [repeat, _] : repeats_) {
+                g_delay_list.erase(repeat);
+            }
+            for (auto& [repeat, _] : repeats_) {
+                if (auto sp = repeat.lock()) {
+                    sp->valueChanged();
+                }
             }
         }
     }
 
 private:
     NodeSet observers_;
+    NodeMap repeats_;
 };
 
 class FieldGraph : public Singleton<FieldGraph> {
@@ -121,6 +200,7 @@ private:
 inline void ObserverGraph::addNode(const NodePtr& node) {
     observer_list_.emplace(node, std::ref(node->observers_));
     dependent_list_.emplace(node, NodeSet{});
+    repeat_list_.emplace(node, std::ref(node->repeats_));
 }
 
 }  // namespace pyc::reaction

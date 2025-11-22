@@ -3,6 +3,7 @@
 #include <atomic>
 #include <compare>
 #include <cstdint>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "reaction/concept.h"
@@ -56,6 +57,8 @@ struct WeakPtrEqual {
 namespace pyc::reaction {
 
 using NodeSet = std::unordered_set<NodeWeak, std::WeakPtrHash, std::WeakPtrEqual>;
+using NodeMap = std::unordered_map<NodeWeak, size_t, std::WeakPtrHash, std::WeakPtrEqual>;
 using NodeSetRef = std::reference_wrapper<NodeSet>;
+using NodeMapRef = std::reference_wrapper<NodeMap>;
 
 }  // namespace pyc::reaction
