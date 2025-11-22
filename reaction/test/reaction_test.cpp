@@ -170,6 +170,82 @@ TEST(ReactionTest, ExprTest) {
     EXPECT_DOUBLE_EQ(expr_ds.get(), -3.86);
 }
 
+TEST(ReactionTest, SelfDependencyTest) {
+    auto a = reaction::var(1);
+    auto dsA = reaction::calc([](int aa) { return aa; }, a);
+
+    EXPECT_THROW(dsA.reset([&]() { return a() + dsA(); }), std::runtime_error);
+}
+
+TEST(ReactionTest, CycleDependencyTest) {
+    auto a = reaction::var(1);
+    auto b = reaction::var(2);
+    auto c = reaction::var(3);
+
+    auto dsA = reaction::calc([](int bb) { return bb; }, b);
+
+    auto dsB = reaction::calc([](int cc) { return cc; }, c);
+
+    auto dsC = reaction::calc([](int aa) { return aa; }, a);
+
+    dsA.reset([&]() { return b() + dsB(); });
+
+    dsB.reset([&]() { return c() * dsC(); });
+
+    EXPECT_THROW(dsC.reset([&]() { return a() - dsA(); }), std::runtime_error);
+}
+
+// TEST(ReactionTest, TestRepeatDependency) {
+//     // ds → A, ds → a, A → a
+//     auto a = reaction::var(1).setName("a");
+//     auto b = reaction::var(2).setName("b");
+
+//     int triggerCount = 0;
+//     auto dsA = reaction::calc([&]() { return a() + b(); }).setName("dsA");
+
+//     auto dsB = reaction::calc([&]() {++triggerCount; return a() + dsA(); }).setName("dsB");
+
+//     triggerCount = 0;
+//     a.value(2);
+//     EXPECT_EQ(triggerCount, 1);
+//     EXPECT_EQ(dsB.get(), 6);
+// }
+
+// TEST(ReactionTest, TestRepeatDependency2) {
+//     // ds → A, ds → B, ds → C, A → a, B → a
+//     int triggerCount = 0;
+//     auto a = reaction::var(1).setName("a");
+//     auto A = reaction::calc([&]() { return a() + 1; }).setName("A");
+//     auto B = reaction::calc([&]() { return a() + 2; }).setName("B");
+//     auto C = reaction::calc([&]() { return 5; }).setName("C");
+//     auto ds = reaction::calc([&]() { ++triggerCount; return A() + B() + C(); }).setName("ds");
+
+//     triggerCount = 0;
+//     a.value(2);
+//     EXPECT_EQ(triggerCount, 1);
+//     EXPECT_EQ(ds.get(), 12);
+// }
+
+// TEST(ReactionTest, TestRepeatDependency3) {
+//     // ds → A, ds → B, A → A1, A1 → A2, A2 → a, B → B1, B1 → a
+//     auto a = reaction::var(1).setName("a");
+//     auto b = reaction::var(1).setName("b");
+
+//     int triggerCount = 0;
+//     auto A2 = reaction::calc([&]() { return a() * 2; }).setName("A2");
+//     auto A1 = reaction::calc([&]() { return A2() + 1; }).setName("A1");
+//     auto A = reaction::calc([&]() { return A1() - 1; }).setName("A");
+
+//     auto B1 = reaction::calc([&]() { return a() - 1; }).setName("B1");
+//     auto B = reaction::calc([&]() { return B1() + 1; }).setName("B");
+
+//     auto ds = reaction::calc([&]() { ++triggerCount; return A() + B(); }).setName("ds");
+//     triggerCount = 0;
+//     a.value(2);
+//     EXPECT_EQ(triggerCount, 1);
+//     EXPECT_EQ(ds.get(), 6);
+// }
+
 TEST(DISABLED_ReactionTest, StressTest) {
     using namespace reaction;
     using namespace std::chrono;

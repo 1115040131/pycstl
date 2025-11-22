@@ -168,6 +168,7 @@ public:
     template <typename T>
     auto field(T&& value) {
         auto ptr = std::make_shared<ReactImpl<std::decay_t<T>>>(std::forward<T>(value));
+        ObserverGraph::GetInstance().addNode(ptr);
         FieldGraph::GetInstance().addObj(id_, ptr);
         return React(ptr);
     }
@@ -181,10 +182,10 @@ private:
 template <typename T>
 auto var(T&& value) {
     auto ptr = std::make_shared<ReactImpl<std::decay_t<T>>>(std::forward<T>(value));
+    ObserverGraph::GetInstance().addNode(ptr);
     if constexpr (HasField<T>) {
         FieldGraph::GetInstance().bindField(value.getID(), ptr);
     }
-    ObserverGraph::GetInstance().addNode(ptr);
     return React(ptr);
 }
 
