@@ -95,35 +95,18 @@ public:
         static_assert(std::convertible_to<ReturnType<std::decay_t<F>, std::decay_t<A>...>, ValueType>,
                       "ReturnType<std::decay_t<F>, std::decay_t<A>...> should convert to ValueType");
 
-#ifdef USE_FUNCTION
-        this->updateObservers([this]() { this->valueChanged(); }, args.getPtr()...);
-#else
         this->updateObservers(args.getPtr()...);
-#endif
         setFunctor(createFun(std::forward<F>(fun), std::forward<A>(args)...));
         evaluate();
     }
 
-    void addObCb(NodePtr node) {
-#ifdef USE_FUNCTION
-        this->updateObservers([this]() { this->valueChanged(); }, node);
-#else
-        this->updateObservers(node);
-#endif
-    }
+    void addObCb(NodePtr node) { this->updateObservers(node); }
 
 private:
-#ifdef USE_FUNCTION
-    void valueChanged() {
-        evaluate();
-        this->notify();
-    }
-#else
     void valueChanged() override {
         evaluate();
         this->notify();
     }
-#endif
 
     template <typename F, typename... A>
     auto createFun(F&& fun, A&&... args) {

@@ -5,10 +5,6 @@
 
 #include "reaction/react.h"
 
-#ifdef USE_FUNCTION
-#pragma message("USE_FUNCTION 已定义")
-#endif
-
 namespace pyc {
 
 TEST(ReactionTest, CalcTest) {

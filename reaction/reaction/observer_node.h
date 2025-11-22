@@ -3,7 +3,6 @@
 #include <functional>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 #include "common/singleton.h"
 #include "reaction/concept.h"
@@ -77,26 +76,6 @@ private:
     std::unordered_map<NodePtr, NodeSet> dependent_list_;
 };
 
-#ifdef USE_FUNCTION
-class ObserverNode : public std::enable_shared_from_this<ObserverNode> {
-public:
-    void addObserver(const std::function<void()>& f) { observers_.emplace_back(f); }
-
-    template <typename... Args>
-    void updateObservers(const std::function<void()>& f, Args&&... args) {
-        (..., args->addObserver(f));
-    }
-
-    void notify() {
-        for (auto& observer : observers_) {
-            observer();
-        }
-    }
-
-private:
-    std::vector<std::function<void()>> observers_;
-};
-#else
 class ObserverNode : public std::enable_shared_from_this<ObserverNode> {
     friend class ObserverGraph;
 
@@ -120,7 +99,6 @@ public:
 private:
     NodeSet observers_;
 };
-#endif
 
 class FieldGraph : public Singleton<FieldGraph> {
 public:
@@ -132,11 +110,7 @@ public:
         auto it = field_map_.find(class_id);
         if (it != field_map_.end()) {
             for (const auto& field_obj : it->second) {
-#ifdef USE_FUNCTION
-                field_obj->addObserver([obj]() { obj->notify(); });
-#else
                 ObserverGraph::GetInstance().addObserver(obj, field_obj);
-#endif
             }
         }
     }
