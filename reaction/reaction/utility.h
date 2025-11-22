@@ -3,6 +3,9 @@
 #include <atomic>
 #include <compare>
 #include <cstdint>
+#include <unordered_set>
+
+#include "reaction/concept.h"
 
 namespace pyc::reaction {
 
@@ -23,6 +26,8 @@ private:
     uint64_t id_;
 };
 
+using NodeWeak = std::weak_ptr<ObserverNode>;
+
 }  // namespace pyc::reaction
 
 namespace std {
@@ -34,4 +39,23 @@ struct hash<pyc::reaction::UniqueID> {
     }
 };
 
+struct WeakPtrHash {
+    size_t operator()(const pyc::reaction::NodeWeak& wp) const noexcept {
+        return std::hash<pyc::reaction::ObserverNode*>()(wp.lock().get());
+    }
+};
+
+struct WeakPtrEqual {
+    bool operator()(const pyc::reaction::NodeWeak& lhs, const pyc::reaction::NodeWeak& rhs) const noexcept {
+        return lhs.lock() == rhs.lock();
+    }
+};
+
 }  // namespace std
+
+namespace pyc::reaction {
+
+using NodeSet = std::unordered_set<NodeWeak, std::WeakPtrHash, std::WeakPtrEqual>;
+using NodeSetRef = std::reference_wrapper<NodeSet>;
+
+}  // namespace pyc::reaction

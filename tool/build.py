@@ -34,8 +34,6 @@ def run_bazel_run(target, check=False, args=[]):
 
 def run_valgrind(target, args=[]):
     command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args)}'
-    if len(args) == 0:
-        command += '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
     run_cmd(command)
 
 
@@ -198,6 +196,8 @@ def main():
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
         "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test',
                                                           args=args),
+        # '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
+
 
         ######################### build for cpp20_stl #########################
         "cpp20_stl": lambda args: run_bazel_build('//cpp20_stl:cpp20_stl_all_test', args=args),
@@ -238,6 +238,7 @@ def main():
         ######################### build for reaction #########################
         "reaction": lambda args: run_bazel_build('//reaction //reaction/test/...', args=args),
         "reaction_test": lambda args: run_bazel_test('//reaction/test:reaction_all_test', args=args),
+        "reaction_valgrind": lambda args: run_valgrind('./bazel-bin/reaction/test/reaction_all_test', args=args),
 
         ######################### build for sdl2 #########################
         "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),

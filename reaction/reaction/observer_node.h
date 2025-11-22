@@ -10,9 +10,6 @@
 
 namespace pyc::reaction {
 
-using NodeSet = std::unordered_set<NodePtr>;
-using NodeSetRef = std::reference_wrapper<NodeSet>;
-
 class ObserverGraph : public Singleton<ObserverGraph> {
 public:
     void addNode(const NodePtr& node);
@@ -62,7 +59,7 @@ private:
         stack.insert(node);
 
         for (const auto& neighbor : dependent_list_[node]) {
-            if (dfs(neighbor, visited, stack)) {
+            if (dfs(neighbor.lock(), visited, stack)) {
                 return true;
             }
         }
@@ -92,7 +89,9 @@ public:
 
     void notify() {
         for (auto& observer : observers_) {
-            observer->valueChanged();
+            if (auto sp = observer.lock()) {
+                sp->valueChanged();
+            }
         }
     }
 
@@ -110,7 +109,7 @@ public:
         auto it = field_map_.find(class_id);
         if (it != field_map_.end()) {
             for (const auto& field_obj : it->second) {
-                ObserverGraph::GetInstance().addObserver(obj, field_obj);
+                ObserverGraph::GetInstance().addObserver(obj, field_obj.lock());
             }
         }
     }
