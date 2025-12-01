@@ -1,6 +1,7 @@
 #pragma once
 
 #include "reaction/resource.h"
+#include "reaction/trigger_mode.h"
 
 namespace pyc::reaction {
 
@@ -84,30 +85,30 @@ auto operator/(L&& left, R&& right) {
     return make_binary_expr<DivOp>(std::forward<L>(left), std::forward<R>(right));
 }
 
-template <typename Fun, typename... Args>
-class Expression : public Resource<ReturnType<Fun, Args...>> {
+template <IsTrigMode TrigMode, typename Fun, typename... Args>
+class Expression : public Resource<ReturnType<TrigMode, Fun, Args...>>, public TrigMode {
 public:
     using ExprType = CalcExpr;
-    using ValueType = ReturnType<Fun, Args...>;
+    using ValueType = ReturnType<TrigMode, Fun, Args...>;
 
     template <typename F, typename... A>
     void setSource(F&& fun, A&&... args) {
-        static_assert(std::convertible_to<ReturnType<std::decay_t<F>, std::decay_t<A>...>, ValueType>,
-                      "ReturnType<std::decay_t<F>, std::decay_t<A>...> should convert to ValueType");
+        static_assert(std::convertible_to<ReturnType<TrigMode, std::decay_t<F>, std::decay_t<A>...>, ValueType>,
+                      "ReturnType<TrigMode, std::decay_t<F>, std::decay_t<A>...> should convert to ValueType");
 
         this->updateObservers(args.getPtr()...);
         setFunctor(createFun(std::forward<F>(fun), std::forward<A>(args)...));
-        evaluate();
+
+        if constexpr (!VoidType<ValueType>) {
+            this->updateValue(evaluate());
+        } else {
+            evaluate();
+        }
     }
 
     void addObCb(NodePtr node) { this->updateObservers(node); }
 
 private:
-    void valueChanged() override {
-        evaluate();
-        this->notify();
-    }
-
     template <typename F, typename... A>
     auto createFun(F&& fun, A&&... args) {
         return [fun = std::forward<F>(fun), ... args = args.getPtr()]() {
@@ -120,11 +121,32 @@ private:
         };
     }
 
-    void evaluate() {
+    void valueChanged(bool changed = true) override {
+        if constexpr (std::is_same_v<ChangeTrig, TrigMode>) {
+            this->setChanged(changed);
+        }
+        if (TrigMode::checkTrigger()) {
+            if constexpr (!VoidType<ValueType>) {
+                auto old_value = this->getValue();
+                auto new_value = evaluate();
+                this->updateValue(new_value);
+                if constexpr (Cmparable<ValueType>) {
+                    this->notify(old_value != new_value);
+                } else {
+                    this->notify(true);
+                }
+            } else {
+                evaluate();
+                this->notify(true);
+            }
+        }
+    }
+
+    auto evaluate() {
         if constexpr (VoidType<ValueType>) {
             std::invoke(fun_);
         } else {
-            this->updateValue(std::invoke(fun_));
+            return std::invoke(fun_);
         }
     }
 
@@ -134,8 +156,8 @@ private:
     std::function<ValueType()> fun_;
 };
 
-template <NonInvocableType T>
-class Expression<T> : public Resource<T> {
+template <IsTrigMode TrigMode, NonInvocableType T>
+class Expression<TrigMode, T> : public Resource<T> {
 public:
     using ExprType = VarExpr;
     using ValueType = T;
@@ -143,9 +165,10 @@ public:
     using Resource<T>::Resource;
 };
 
-template <typename Op, typename L, typename R>
-class Expression<BinaryOpExpr<Op, L, R>>
-    : public Expression<std::function<std::common_type_t<typename L::ValueType, typename R::ValueType>()>> {
+template <IsTrigMode TrigMode, typename Op, typename L, typename R>
+class Expression<TrigMode, BinaryOpExpr<Op, L, R>>
+    : public Expression<TrigMode,
+                        std::function<std::common_type_t<typename L::ValueType, typename R::ValueType>()>> {
 public:
     template <typename T>
     explicit Expression(T&& expr) : expr_(std::forward<T>(expr)) {}

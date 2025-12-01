@@ -4,6 +4,11 @@
 
 namespace pyc::reaction {
 
+template <typename T>
+concept IsTrigMode = requires(T t) {
+    { t.checkTrigger() } -> std::same_as<bool>;
+};
+
 #pragma region Forward declarations
 
 struct VarExpr;
@@ -11,7 +16,7 @@ struct VoidWrapper;
 
 class UniqueID;
 
-template <typename T, typename... Args>
+template <IsTrigMode TrigMode, typename T, typename... Args>
 class ReactImpl;
 
 template <typename ReactType>
@@ -70,6 +75,12 @@ concept IsDataReact = requires(T t) {
     requires IsReactNode<T> && !VoidType<typename T::ValueType>;
 };
 
+template <typename T>
+concept Cmparable = requires(T a, T b) {
+    { a == b } -> std::convertible_to<bool>;
+    { a != b } -> std::convertible_to<bool>;
+};
+
 #pragma endregion
 
 #pragma region Type traits
@@ -87,19 +98,19 @@ struct ExpressionTraits {
     using type = T;
 };
 
-template <NonInvocableType T>
-struct ExpressionTraits<React<ReactImpl<T>>> {
+template <IsTrigMode TrigMode, NonInvocableType T>
+struct ExpressionTraits<React<ReactImpl<TrigMode, T>>> {
     using type = T;
 };
 
-template <typename Fun, typename... Args>
-struct ExpressionTraits<React<ReactImpl<Fun, Args...>>> {
+template <IsTrigMode TrigMode, typename Fun, typename... Args>
+struct ExpressionTraits<React<ReactImpl<TrigMode, Fun, Args...>>> {
     using raw_type = std::invoke_result_t<Fun, typename ExpressionTraits<Args>::type...>;
     using type = std::conditional_t<VoidType<raw_type>, VoidWrapper, raw_type>;
 };
 
-template <typename Fun, typename... Args>
-using ReturnType = typename ExpressionTraits<React<ReactImpl<Fun, Args...>>>::type;
+template <IsTrigMode TrigMode, typename Fun, typename... Args>
+using ReturnType = typename ExpressionTraits<React<ReactImpl<TrigMode, Fun, Args...>>>::type;
 
 template <typename T>
 struct BinaryOpExprTraits : std::false_type {};

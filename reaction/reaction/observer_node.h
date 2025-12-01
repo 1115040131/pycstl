@@ -35,6 +35,17 @@ public:
         dependent_list_.erase(node);
     }
 
+    void setName(const NodePtr& node, const std::string& name) { name_list_.insert({node, name}); }
+
+    std::string getName(const NodePtr& node) {
+        auto it = name_list_.find(node);
+        if (it != name_list_.end()) {
+            return it->second;
+        } else {
+            return "";
+        }
+    }
+
 private:
     bool hasCycle(const NodePtr& source, const NodePtr& target) {
         dependent_list_[source].insert(target);
@@ -131,6 +142,7 @@ private:
     std::unordered_map<NodePtr, NodeSetRef> observer_list_;  // 节点的观察者列表
     std::unordered_map<NodePtr, NodeSet> dependent_list_;    // 节点的被观察者列表
     std::unordered_map<NodePtr, NodeMapRef> repeat_list_;    // 节点被重复依赖的列表
+    std::unordered_map<NodePtr, std::string> name_list_;
 };
 
 class ObserverNode : public std::enable_shared_from_this<ObserverNode> {
@@ -139,7 +151,7 @@ class ObserverNode : public std::enable_shared_from_this<ObserverNode> {
 public:
     virtual ~ObserverNode() = default;
 
-    virtual void valueChanged() { this->notify(); }
+    virtual void valueChanged(bool changed = true) { this->notify(changed); }
 
     template <typename... Args>
     void updateObservers(Args&&... args) {
@@ -147,7 +159,7 @@ public:
         (ObserverGraph::GetInstance().addObserver(shared_this, args), ...);
     }
 
-    void notify() {
+    void notify(bool changed = true) {
         for (auto& [repeat, _] : repeats_) {
             g_delay_list.insert(repeat);
         }
@@ -157,7 +169,7 @@ public:
                 continue;
             }
             if (auto sp = observer.lock()) {
-                sp->valueChanged();
+                sp->valueChanged(changed);
             }
         }
 
@@ -167,7 +179,7 @@ public:
             }
             for (auto& [repeat, _] : repeats_) {
                 if (auto sp = repeat.lock()) {
-                    sp->valueChanged();
+                    sp->valueChanged(changed);
                 }
             }
         }

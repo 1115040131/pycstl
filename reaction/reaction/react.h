@@ -14,13 +14,13 @@ struct RegGuard {
     ~RegGuard() { g_reg_fun = nullptr; }
 };
 
-template <typename Type, typename... Args>
-class ReactImpl : public Expression<Type, Args...> {
+template <IsTrigMode TrigMode, typename Type, typename... Args>
+class ReactImpl : public Expression<TrigMode, Type, Args...> {
 public:
-    using ExprType = typename Expression<Type, Args...>::ExprType;
-    using ValueType = typename Expression<Type, Args...>::ValueType;
+    using ExprType = typename Expression<TrigMode, Type, Args...>::ExprType;
+    using ValueType = typename Expression<TrigMode, Type, Args...>::ValueType;
 
-    using Expression<Type, Args...>::Expression;
+    using Expression<TrigMode, Type, Args...>::Expression;
 
     template <typename T>
     void operator=(T&& other) {
@@ -50,8 +50,10 @@ public:
     template <typename T>
         requires(Convertable<T, Type> && IsVarExpr<ExprType> && !ConstType<Type>)
     void value(T&& value) {
+        auto old_value = this->getValue();
+        auto changed = old_value != value;
         this->updateValue(std::forward<T>(value));
-        this->notify();
+        this->notify(changed);
     }
 
     void addWeakRef() { weak_ref_count_.fetch_add(1, std::memory_order_relaxed); }
@@ -140,34 +142,45 @@ public:
         throw std::runtime_error("Attempt to access expired React object");
     }
 
-    decltype(auto) get() const
-    // requires(IsDataReact<ReactType>)
-    {
-        return getPtr()->get();
-    }
+    decltype(auto) get() const { return getPtr()->get(); }
 
     template <typename F, typename... A>
-    void reset(F&& fun, A&&... args) {
+    React& reset(F&& fun, A&&... args) {
         getPtr()->set(std::forward<F>(fun), std::forward<A>(args)...);
+        return *this;
     }
 
     template <typename T>
-    void value(T&& value) {
+    React& value(T&& value) {
         getPtr()->value(std::forward<T>(value));
+        return *this;
     }
+
+    template <typename F, typename... A>
+    React& filter(F&& fun, A&&... args) {
+        getPtr()->filter(std::forward<F>(fun), std::forward<A>(args)...);
+        return *this;
+    }
+
+    React& setName(const std::string& name) {
+        ObserverGraph::GetInstance().setName(getPtr(), name);
+        return *this;
+    }
+
+    std::string getName() const { return ObserverGraph::GetInstance().getName(getPtr()); }
 
 private:
     std::weak_ptr<ReactType> weak_ptr_;
 };
 
-template <typename T>
-using Field = React<ReactImpl<std::decay_t<T>>>;
+template <typename T, IsTrigMode TrigMode = ChangeTrig>
+using Field = React<ReactImpl<TrigMode, std::decay_t<T>>>;
 
 class FieldBase {
 public:
-    template <typename T>
+    template <IsTrigMode TrigMode = ChangeTrig, typename T>
     auto field(T&& value) {
-        auto ptr = std::make_shared<ReactImpl<std::decay_t<T>>>(std::forward<T>(value));
+        auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<T>>>(std::forward<T>(value));
         ObserverGraph::GetInstance().addNode(ptr);
         FieldGraph::GetInstance().addObj(id_, ptr);
         return React(ptr);
@@ -179,9 +192,9 @@ private:
     UniqueID id_;
 };
 
-template <typename T>
+template <IsTrigMode TrigMode = ChangeTrig, typename T>
 auto var(T&& value) {
-    auto ptr = std::make_shared<ReactImpl<std::decay_t<T>>>(std::forward<T>(value));
+    auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<T>>>(std::forward<T>(value));
     ObserverGraph::GetInstance().addNode(ptr);
     if constexpr (HasField<T>) {
         FieldGraph::GetInstance().bindField(value.getID(), ptr);
@@ -189,30 +202,30 @@ auto var(T&& value) {
     return React(ptr);
 }
 
-template <typename T>
+template <IsTrigMode TrigMode = ChangeTrig, typename T>
 auto constVar(T&& value) {
-    auto ptr = std::make_shared<ReactImpl<const std::decay_t<T>>>(std::forward<T>(value));
+    auto ptr = std::make_shared<ReactImpl<TrigMode, const std::decay_t<T>>>(std::forward<T>(value));
     ObserverGraph::GetInstance().addNode(ptr);
     return React(ptr);
 }
 
-template <typename OpExpr>
+template <IsTrigMode TrigMode = ChangeTrig, typename OpExpr>
 auto expr(OpExpr&& op_expr) {
-    auto ptr = std::make_shared<ReactImpl<std::decay_t<OpExpr>>>(std::forward<OpExpr>(op_expr));
+    auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<OpExpr>>>(std::forward<OpExpr>(op_expr));
     ObserverGraph::GetInstance().addNode(ptr);
     ptr->set();
     return React(ptr);
 }
 
-template <typename Fun, typename... Args>
+template <IsTrigMode TrigMode = ChangeTrig, typename Fun, typename... Args>
 auto calc(Fun&& fun, Args&&... args) {
-    auto ptr = std::make_shared<ReactImpl<std::decay_t<Fun>, std::decay_t<Args>...>>();
+    auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<Fun>, std::decay_t<Args>...>>();
     ObserverGraph::GetInstance().addNode(ptr);
     ptr->set(std::forward<Fun>(fun), std::forward<Args>(args)...);
     return React(ptr);
 }
 
-template <typename Fun, typename... Args>
+template <IsTrigMode TrigMode = ChangeTrig, typename Fun, typename... Args>
 auto action(Fun&& fun, Args&&... args) {
     return calc(std::forward<Fun>(fun), std::forward<Args>(args)...);
 }
