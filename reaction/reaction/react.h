@@ -1,0 +1,233 @@
+#pragma once
+
+#include <atomic>
+
+#include "reaction/expression.h"
+#include "reaction/utility.h"
+
+namespace pyc::reaction {
+
+inline thread_local std::function<void(NodePtr)> g_reg_fun;
+
+struct RegGuard {
+    RegGuard(const std::function<void(NodePtr)>& func) { g_reg_fun = func; }
+    ~RegGuard() { g_reg_fun = nullptr; }
+};
+
+template <IsTrigMode TrigMode, typename Type, typename... Args>
+class ReactImpl : public Expression<TrigMode, Type, Args...> {
+public:
+    using ExprType = typename Expression<TrigMode, Type, Args...>::ExprType;
+    using ValueType = typename Expression<TrigMode, Type, Args...>::ValueType;
+
+    using Expression<TrigMode, Type, Args...>::Expression;
+
+    template <typename T>
+    void operator=(T&& other) {
+        value(std::forward<T>(other));
+    }
+
+    decltype(auto) get() const { return this->getValue(); }
+
+    auto getRaw() const { return this->getRawPtr(); }
+
+    template <typename F, HasArguments... A>
+    void set(F&& fun, A&&... args) {
+        this->setSource(std::forward<F>(fun), std::forward<A>(args)...);
+    }
+
+    template <typename F>
+    void set(F&& fun) {
+        RegGuard guard([this](NodePtr node) { this->addObCb(node); });
+        this->setSource(std::forward<F>(fun));
+    }
+
+    void set() {
+        RegGuard guard([this](NodePtr node) { this->addObCb(node); });
+        this->setOpExpr();
+    }
+
+    template <typename T>
+        requires(Convertable<T, Type> && IsVarExpr<ExprType> && !ConstType<Type>)
+    void value(T&& value) {
+        auto old_value = this->getValue();
+        auto changed = old_value != value;
+        this->updateValue(std::forward<T>(value));
+        this->notify(changed);
+    }
+
+    void addWeakRef() { weak_ref_count_.fetch_add(1, std::memory_order_relaxed); }
+
+    void releaseWeakRef() {
+        if (weak_ref_count_.fetch_sub(1, std::memory_order_relaxed) == 1) {
+            ObserverGraph::GetInstance().removeNode(this->shared_from_this());
+            if constexpr (HasField<ValueType>) {
+                FieldGraph::GetInstance().deleteObj(this->getValue().getID());
+            }
+        }
+    }
+
+private:
+    std::atomic<int> weak_ref_count_{0};
+};
+
+template <typename ReactType>
+class React {
+public:
+    using ValueType = typename ReactType::ValueType;
+
+    explicit React(std::shared_ptr<ReactType> ptr = nullptr) : weak_ptr_(ptr) {
+        if (auto sp = weak_ptr_.lock()) {
+            sp->addWeakRef();
+        }
+    }
+
+    ~React() {
+        if (auto sp = weak_ptr_.lock()) {
+            sp->releaseWeakRef();
+        }
+    }
+
+    React(const React& other) : weak_ptr_(other.weak_ptr_) {
+        if (auto sp = weak_ptr_.lock()) {
+            sp->addWeakRef();
+        }
+    }
+
+    React(React&& other) noexcept : weak_ptr_(std::move(other.weak_ptr_)) {
+        // No need to add weak ref, as ownership is transferred
+    }
+
+    React& operator=(const React& other) {
+        if (this != &other) {
+            if (auto sp = weak_ptr_.lock()) {
+                sp->releaseWeakRef();
+            }
+            weak_ptr_ = other.weak_ptr_;
+            if (auto sp = weak_ptr_.lock()) {
+                sp->addWeakRef();
+            }
+        }
+        return *this;
+    }
+
+    React& operator=(React&& other) noexcept {
+        if (this != &other) {
+            if (auto sp = weak_ptr_.lock()) {
+                sp->releaseWeakRef();
+            }
+            weak_ptr_ = std::move(other.weak_ptr_);
+            // No need to add weak ref, as ownership is transferred
+        }
+        return *this;
+    }
+
+    ReactType& operator*() const { return *getPtr(); }
+
+    ReactType::ValueType* operator->() const { return getPtr()->getRaw(); }
+
+    explicit operator bool() const { return !weak_ptr_.expired(); }
+
+    decltype(auto) operator()() const {
+        if (g_reg_fun) {
+            std::invoke(g_reg_fun, getPtr());
+        }
+        return get();
+    }
+
+    std::shared_ptr<ReactType> getPtr() const {
+        if (auto sp = weak_ptr_.lock()) {
+            return sp;
+        }
+        throw std::runtime_error("Attempt to access expired React object");
+    }
+
+    decltype(auto) get() const { return getPtr()->get(); }
+
+    template <typename F, typename... A>
+    React& reset(F&& fun, A&&... args) {
+        getPtr()->set(std::forward<F>(fun), std::forward<A>(args)...);
+        return *this;
+    }
+
+    template <typename T>
+    React& value(T&& value) {
+        getPtr()->value(std::forward<T>(value));
+        return *this;
+    }
+
+    template <typename F, typename... A>
+    React& filter(F&& fun, A&&... args) {
+        getPtr()->filter(std::forward<F>(fun), std::forward<A>(args)...);
+        return *this;
+    }
+
+    React& setName(const std::string& name) {
+        ObserverGraph::GetInstance().setName(getPtr(), name);
+        return *this;
+    }
+
+    std::string getName() const { return ObserverGraph::GetInstance().getName(getPtr()); }
+
+private:
+    std::weak_ptr<ReactType> weak_ptr_;
+};
+
+template <typename T, IsTrigMode TrigMode = ChangeTrig>
+using Field = React<ReactImpl<TrigMode, std::decay_t<T>>>;
+
+class FieldBase {
+public:
+    template <IsTrigMode TrigMode = ChangeTrig, typename T>
+    auto field(T&& value) {
+        auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<T>>>(std::forward<T>(value));
+        ObserverGraph::GetInstance().addNode(ptr);
+        FieldGraph::GetInstance().addObj(id_, ptr);
+        return React(ptr);
+    }
+
+    const UniqueID& getID() const { return id_; }
+
+private:
+    UniqueID id_;
+};
+
+template <IsTrigMode TrigMode = ChangeTrig, typename T>
+auto var(T&& value) {
+    auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<T>>>(std::forward<T>(value));
+    ObserverGraph::GetInstance().addNode(ptr);
+    if constexpr (HasField<T>) {
+        FieldGraph::GetInstance().bindField(value.getID(), ptr);
+    }
+    return React(ptr);
+}
+
+template <IsTrigMode TrigMode = ChangeTrig, typename T>
+auto constVar(T&& value) {
+    auto ptr = std::make_shared<ReactImpl<TrigMode, const std::decay_t<T>>>(std::forward<T>(value));
+    ObserverGraph::GetInstance().addNode(ptr);
+    return React(ptr);
+}
+
+template <IsTrigMode TrigMode = ChangeTrig, typename OpExpr>
+auto expr(OpExpr&& op_expr) {
+    auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<OpExpr>>>(std::forward<OpExpr>(op_expr));
+    ObserverGraph::GetInstance().addNode(ptr);
+    ptr->set();
+    return React(ptr);
+}
+
+template <IsTrigMode TrigMode = ChangeTrig, typename Fun, typename... Args>
+auto calc(Fun&& fun, Args&&... args) {
+    auto ptr = std::make_shared<ReactImpl<TrigMode, std::decay_t<Fun>, std::decay_t<Args>...>>();
+    ObserverGraph::GetInstance().addNode(ptr);
+    ptr->set(std::forward<Fun>(fun), std::forward<Args>(args)...);
+    return React(ptr);
+}
+
+template <IsTrigMode TrigMode = ChangeTrig, typename Fun, typename... Args>
+auto action(Fun&& fun, Args&&... args) {
+    return calc(std::forward<Fun>(fun), std::forward<Args>(args)...);
+}
+
+}  // namespace pyc::reaction
