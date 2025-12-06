@@ -1,0 +1,15 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_binary(
+    name = "entt_example",
+    srcs = [
+        "entt_base.cpp",
+        "entt_example.cpp",
+    ],
+    copts = STRICT_COPTS,
+    deps = [
+        "@entt",
+        "@fmt",
+        "@glm",
+    ],
+)
