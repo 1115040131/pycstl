@@ -15,3 +15,20 @@ cc_binary(
         "@glm",
     ],
 )
+
+cc_binary(
+    name = "imgui_example",
+    srcs = [
+        "imgui_example.cpp",
+    ],
+    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    data = glob(["assets/**"]),
+    deps = [
+        "//sdl3:imgui-platform-sdl3",
+        "//sdl3:imgui-renderer-sdlrenderer3",
+        "//sdl3:sdl3_image",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@glm",
+        "@spdlog",
+    ],
+)

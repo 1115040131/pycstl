@@ -1,5 +1,7 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
+package(default_visibility = ["//visibility:public"])
+
 # sdl3
 cmake(
     name = "sdl3",
@@ -16,7 +18,7 @@ cmake(
     name = "sdl3_image",
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
-        "SDLIMAGE_AVIF": "OFF", # disable for ninja compile error
+        "SDLIMAGE_AVIF": "OFF",  # disable for ninja compile error
     },
     # data = ["@nasm"],
     # env = {
@@ -60,4 +62,26 @@ cmake(
     ],
     visibility = ["//visibility:public"],
     deps = ["sdl3"],
+)
+
+cc_library(
+    name = "imgui-platform-sdl3",
+    srcs = ["@imgui//backends:imgui_impl_sdl3.cpp"],
+    hdrs = ["@imgui//backends:imgui_impl_sdl3.h"],
+    strip_include_prefix = "/backends",
+    deps = [
+        "//sdl3",
+        "@imgui",
+    ],
+)
+
+cc_library(
+    name = "imgui-renderer-sdlrenderer3",
+    srcs = ["@imgui//backends:imgui_impl_sdlrenderer3.cpp"],
+    hdrs = ["@imgui//backends:imgui_impl_sdlrenderer3.h"],
+    strip_include_prefix = "/backends",
+    deps = [
+        "//sdl3",
+        "@imgui",
+    ],
 )
