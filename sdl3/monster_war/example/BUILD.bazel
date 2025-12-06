@@ -5,6 +5,8 @@ cc_binary(
     srcs = [
         "entt_base.cpp",
         "entt_example.cpp",
+        "entt_signal.cpp",
+        "entt_struct.h",
     ],
     copts = STRICT_COPTS,
     deps = [
