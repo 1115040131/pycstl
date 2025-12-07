@@ -249,6 +249,8 @@ def main():
         "sdl3_demo": lambda args: run_bazel_run('//sdl3/demo', args=args),
         "ghost_escape": lambda args: run_bazel_run('//sdl3/ghost_escape', args=args),
         "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=release', args=args),
+        "monster_war": lambda args: run_bazel_run('//sdl3/monster_war', args=args),
+        "monster_war_release": lambda args: run_bazel_run('//sdl3/monster_war --config=release', args=args),
         "sunny_land": lambda args: run_bazel_run('//sdl3/sunny_land', args=args),
         "sunny_land_release": lambda args: run_bazel_run('//sdl3/sunny_land --config=release', args=args),
 

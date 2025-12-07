@@ -12,7 +12,7 @@ IncludeCategories:
     Priority: 20
 
   # 3. 第三方库
-  - Regex: '^<(boost/|Eigen/|entt/|fmt/|gmock/|glm/|grpcpp/|gtest/|hiredis|mysqlx|nlohmann/|SDL|spdlog/|yaml-cpp|zlib)'
+  - Regex: '^<(boost/|Eigen/|entt/|fmt/|gmock/|glm/|grpcpp/|gtest/|hiredis|imgui|mysqlx|nlohmann/|SDL|spdlog/|yaml-cpp|zlib)'
     Priority: 30
 
   # 3.1 Qt 模块头文件（如 QtCore, QtWidgets）
