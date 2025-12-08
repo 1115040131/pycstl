@@ -7,10 +7,8 @@
 
 #include "monster_war/engine/component/animation_component.h"
 #include "monster_war/engine/component/audio_component.h"
-#include "monster_war/engine/component/collider_component.h"
 #include "monster_war/engine/component/health_component.h"
 #include "monster_war/engine/component/parallax_component.h"
-#include "monster_war/engine/component/physics_component.h"
 #include "monster_war/engine/component/sprite_component.h"
 #include "monster_war/engine/component/tilelayer_component.h"
 #include "monster_war/engine/component/transform_component.h"
@@ -161,20 +159,10 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
 
                 // 获取Transform相关信息 （自定义形状的坐标针对左上角）
                 auto position = glm::vec2(object_json.value("x", 0.0f), object_json.value("y", 0.0f));
-                auto dst_size = glm::vec2(object_json.value("width", 0.0f), object_json.value("height", 0.0f));
+                // auto dst_size = glm::vec2(object_json.value("width", 0.0f), object_json.value("height", 0.0f));
                 auto rotation = object_json.value("rotation", 0.0f);
                 // 添加TransformComponent，缩放为设定为1.0f
                 game_object->addComponent<TransformComponent>(position, glm::vec2(1.0f), rotation);
-
-                // 添加碰撞组件
-                game_object->addComponent<ColliderComponent>(
-                    std::make_unique<AABBCollider>(dst_size),  // 碰撞盒大小与dst_size相同
-                    Alignment::NONE,
-                    object_json.value("trigger", true)  // 自定义形状通常是trigger类型, 除非显示指定, 因此默认为真
-                );
-
-                // 添加物理组件，不受重力影响
-                game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
 
                 // 获取标签信息并设置
                 if (auto tag = getTileProperty<std::string>(object_json, "tag")) {  // 如果有标签
@@ -218,25 +206,6 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             // 1. 必然存在，因为getTileInfoByGid(gid)函数已经顺利执行
             // 2. 这里再获取json，实际上检索了两次，未来可以优化
             auto tile_json = getTileJsonByGid(gid);
-
-            // 获取碰信息：如果是SOLID类型，则添加物理组件，且图片源矩形区域就是碰撞盒大小
-            if (tile_info.type == TileType::SOLID) {
-                auto collider = std::make_unique<AABBCollider>(src_size);
-                game_object->addComponent<ColliderComponent>(std::move(collider));
-                game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(), false);
-                // 设置标签方便物理引擎检索
-                game_object->setTag("solid");
-            } else if (auto rect = getColliderRect(tile_json)) {  // 如果非SOLID类型，检查自定义碰撞盒是否存在
-                // 如果有，添加碰撞组件
-                auto collider = std::make_unique<AABBCollider>(rect->size);
-                auto cc = game_object->addComponent<ColliderComponent>(std::move(collider));
-                cc->setOffset(rect->position);  // 自定义碰撞盒的坐标是相对于图片坐标，也就是针对Transform的偏移量
-
-                // 获取重力信息并设置物理组件
-                auto gravity = getTileProperty<bool>(tile_json, "gravity");
-                game_object->addComponent<PhysicsComponent>(&scene.getContext().getPhysicsEngine(),
-                                                            gravity && gravity.value());
-            }
 
             // 获取标签信息并设置
             if (auto tag = getTileProperty<std::string>(tile_json, "tag")) {

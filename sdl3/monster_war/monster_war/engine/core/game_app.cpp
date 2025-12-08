@@ -10,7 +10,6 @@
 #include "monster_war/engine/core/game_state.h"
 #include "monster_war/engine/core/time.h"
 #include "monster_war/engine/input/input_manager.h"
-#include "monster_war/engine/physics/physics_engine.h"
 #include "monster_war/engine/render/camera.h"
 #include "monster_war/engine/render/renderer.h"
 #include "monster_war/engine/render/text_renderer.h"
@@ -63,8 +62,8 @@ bool GameApp::init() {
         return false;
     }
     if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initAudioPlayer() ||
-        !initRenderer() || !initCamera() || !initTextRenderer() || !initInputManager() || !initPhysicsEngine() ||
-        !initGameState() || !initContext() || !initSceneManager()) {
+        !initRenderer() || !initCamera() || !initTextRenderer() || !initInputManager() || !initGameState() ||
+        !initContext() || !initSceneManager()) {
         return false;
     }
 
@@ -236,17 +235,6 @@ bool GameApp::initInputManager() {
     return true;
 }
 
-bool GameApp::initPhysicsEngine() {
-    try {
-        physics_engine_ = std::make_unique<PhysicsEngine>();
-    } catch (const std::exception& e) {
-        spdlog::error("初始化物理引擎失败: {}", e.what());
-        return false;
-    }
-    spdlog::trace("物理引擎初始化成功。");
-    return true;
-}
-
 bool GameApp::initGameState() {
     try {
         game_state_ = std::make_unique<GameState>(window_, sdl_renderer_);
@@ -260,7 +248,7 @@ bool GameApp::initGameState() {
 bool GameApp::initContext() {
     try {
         context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *text_renderer_,
-                                             *input_manager_, *physics_engine_, *audio_player_, *game_state_);
+                                             *input_manager_, *audio_player_, *game_state_);
     } catch (const std::exception& e) {
         spdlog::error("初始化上下文失败: {}", e.what());
         return false;

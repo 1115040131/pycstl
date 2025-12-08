@@ -5,7 +5,6 @@
 #include "monster_war/engine/core/context.h"
 #include "monster_war/engine/core/game_state.h"
 #include "monster_war/engine/object/game_object.h"
-#include "monster_war/engine/physics/physics_engine.h"
 #include "monster_war/engine/render/camera.h"
 #include "monster_war/engine/ui/ui_manager.h"
 
@@ -62,9 +61,8 @@ void Scene::update(std::chrono::duration<float> delta_time) {
     // 处理待添加的对象
     processPendingAdditions();
 
-    // 只有游戏进行中，才需要更新物理引擎和相机
+    // 只有游戏进行中，才需要更新相机
     if (context_.getGameState().isPlaying()) {
-        context_.getPhysicsEngine().update(delta_time);
         context_.getCamera().update(delta_time);
     }
 

@@ -3,7 +3,6 @@
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/context.h"
-#include "monster_war/engine/physics/physics_engine.h"
 #include "monster_war/engine/render/renderer.h"
 
 namespace pyc::monster_war {
@@ -51,12 +50,6 @@ void TileLayerComponent::render(Context& context) {
                 context.getRenderer().drawSprite(context.getCamera(), tile_info.sprite, tile_pos);
             }
         }
-    }
-}
-
-void TileLayerComponent::clean() {
-    if (physics_engine_) {
-        physics_engine_->unregisterCollisionLayer(this);
     }
 }
 
