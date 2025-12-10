@@ -1,0 +1,7 @@
+module(
+    name = "imgui_backends",
+    version = "0.0.1",
+)
+
+bazel_dep(name = "imgui", version = "1.92.2")
+bazel_dep(name = "pycstl", version = "0.0.1")

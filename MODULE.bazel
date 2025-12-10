@@ -49,6 +49,13 @@ local_path_override(
     path = "third_party/mysql-connector-cpp",
 )
 
+# imgui_backends
+bazel_dep(name = "imgui_backends")
+local_path_override(
+    module_name = "imgui_backends",
+    path = "third_party/imgui/backends",
+)
+
 #-------------------------------------------------------------------------------------
 # SDL2/SDL3
 #-------------------------------------------------------------------------------------

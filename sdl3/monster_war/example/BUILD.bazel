@@ -24,11 +24,11 @@ cc_binary(
     copts = STRICT_COPTS + ["-Wno-old-style-cast"],
     data = glob(["assets/**"]),
     deps = [
-        "//sdl3:imgui-platform-sdl3",
-        "//sdl3:imgui-renderer-sdlrenderer3",
         "//sdl3:sdl3_image",
         "@bazel_tools//tools/cpp/runfiles",
         "@glm",
+        "@imgui_backends//:platform-sdl3",
+        "@imgui_backends//:renderer-sdlrenderer3",
         "@spdlog",
     ],
 )
