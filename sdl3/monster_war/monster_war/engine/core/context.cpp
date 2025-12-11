@@ -3,11 +3,18 @@
 #include <spdlog/spdlog.h>
 
 namespace pyc::monster_war {
-
-Context::Context(ResourceManager& resource_manager, Renderer& renderer, Camera& camera,
-                 TextRenderer& text_renderer, InputManager& input_manager, AudioPlayer& audio_player,
+// clang-format off
+Context::Context(entt::dispatcher& dispatcher,
+                 ResourceManager& resource_manager,
+                 Renderer& renderer,
+                 Camera& camera,
+                 TextRenderer& text_renderer,
+                 InputManager& input_manager,
+                 AudioPlayer& audio_player,
                  GameState& game_state)
-    : resource_manager_(resource_manager),
+    // clang-format on
+    : dispatcher_(dispatcher),
+      resource_manager_(resource_manager),
       renderer_(renderer),
       camera_(camera),
       text_renderer_(text_renderer),

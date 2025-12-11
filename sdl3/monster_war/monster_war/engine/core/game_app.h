@@ -4,6 +4,8 @@
 #include <functional>
 #include <memory>
 
+#include <entt/signal/fwd.hpp>
+
 #include "common/noncopyable.h"
 
 struct SDL_Window;
@@ -52,6 +54,7 @@ private:
 
 #pragma region init
     // 各模块的初始化/创建函数，在init()中调用
+    [[nodiscard]] bool initDispatcher();
     [[nodiscard]] bool initConfig();
     [[nodiscard]] bool initSDL();
     [[nodiscard]] bool initTime();
@@ -67,6 +70,9 @@ private:
     [[nodiscard]] bool initSceneManager();
 #pragma endregion
 
+    // 事件处理函数
+    void onQuitEvent();
+
 private:
     SDL_Window* window_{};
     SDL_Renderer* sdl_renderer_{};
@@ -76,6 +82,7 @@ private:
     std::function<void(SceneManager&)> scene_setup_func_;
 
     // 引擎组件
+    std::unique_ptr<entt::dispatcher> dispatcher_;
     std::unique_ptr<Config> config_;
     std::unique_ptr<Time> time_;
     std::unique_ptr<ResourceManager> resource_manager_;

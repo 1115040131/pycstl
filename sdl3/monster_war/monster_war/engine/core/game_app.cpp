@@ -1,6 +1,7 @@
 #include "monster_war/engine/core/game_app.h"
 
 #include <SDL3/SDL.h>
+#include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
 // 引擎组件
@@ -15,6 +16,7 @@
 #include "monster_war/engine/render/text_renderer.h"
 #include "monster_war/engine/resource/resource_manager.h"
 #include "monster_war/engine/scene/scene_manager.h"
+#include "monster_war/engine/utils/events.h"
 
 namespace pyc::monster_war {
 
@@ -61,14 +63,29 @@ bool GameApp::init() {
         spdlog::error("未注册场景设置函数，无法初始化 GameApp。");
         return false;
     }
-    if (!initConfig() || !initSDL() || !initTime() || !initResourceManager() || !initAudioPlayer() ||
-        !initRenderer() || !initCamera() || !initTextRenderer() || !initInputManager() || !initGameState() ||
-        !initContext() || !initSceneManager()) {
+    // clang-format off
+    if (!initDispatcher() ||
+        !initConfig() ||
+        !initSDL() ||
+        !initTime() ||
+        !initResourceManager() ||
+        !initAudioPlayer() ||
+        !initRenderer() ||
+        !initCamera() ||
+        !initTextRenderer() ||
+        !initInputManager() ||
+        !initGameState() ||
+        !initContext() ||
+        !initSceneManager()) {
         return false;
     }
+    // clang-format on
 
     // 调用场景设置函数 (创建第一个场景并压入栈)
     scene_setup_func_(*scene_manager_);
+
+    // 注册退出事件 (回调函数可以无参, 代表不使用事件结构体中的数据)
+    dispatcher_->sink<QuitEvent>().connect<&GameApp::onQuitEvent>(this);
 
     is_running_ = true;
     spdlog::trace("GameApp 初始化成功。");
@@ -84,7 +101,13 @@ void GameApp::handleEvents() {
     scene_manager_->handleInput();
 }
 
-void GameApp::update(std::chrono::duration<float> delta_time) { scene_manager_->update(delta_time); }
+void GameApp::update(std::chrono::duration<float> delta_time) {
+    // 游戏逻辑更新
+    scene_manager_->update(delta_time);
+
+    // 分发事件
+    dispatcher_->update();
+}
 
 void GameApp::render() {
     renderer_->clearScreen();
@@ -96,6 +119,10 @@ void GameApp::render() {
 
 void GameApp::close() {
     spdlog::trace("关闭 GamApp ...");
+
+    // 断开事件处理函数
+    dispatcher_->sink<QuitEvent>().disconnect<&GameApp::onQuitEvent>(this);
+
     // 先关闭场景管理器，确保所有场景都被清理
     scene_manager_->clean();
 
@@ -113,6 +140,17 @@ void GameApp::close() {
 }
 
 #pragma region init
+bool GameApp::initDispatcher() {
+    try {
+        dispatcher_ = std::make_unique<entt::dispatcher>();
+    } catch (const std::exception& e) {
+        spdlog::error("初始化事件分发器失败: {}", e.what());
+        return false;
+    }
+    spdlog::trace("事件分发器初始化成功。");
+    return true;
+}
+
 bool GameApp::initConfig() {
     try {
         config_ = std::make_unique<Config>("assets/config.json");
@@ -247,8 +285,16 @@ bool GameApp::initGameState() {
 
 bool GameApp::initContext() {
     try {
-        context_ = std::make_unique<Context>(*resource_manager_, *renderer_, *camera_, *text_renderer_,
-                                             *input_manager_, *audio_player_, *game_state_);
+        // clang-format off
+        context_ = std::make_unique<Context>(*dispatcher_,
+                                             *resource_manager_,
+                                             *renderer_,
+                                             *camera_,
+                                             *text_renderer_,
+                                             *input_manager_,
+                                             *audio_player_,
+                                             *game_state_);
+        // clang-format on
     } catch (const std::exception& e) {
         spdlog::error("初始化上下文失败: {}", e.what());
         return false;
@@ -267,5 +313,10 @@ bool GameApp::initSceneManager() {
     return true;
 }
 #pragma endregion
+
+void GameApp::onQuitEvent() {
+    spdlog::info("GameApp 收到来自事件分发器的退出请求。");
+    is_running_ = false;
+}
 
 }  // namespace pyc::monster_war
