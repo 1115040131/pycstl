@@ -20,12 +20,16 @@ InputManager::InputManager(SDL_Renderer* sdl_renderer, Config* config) : sdl_ren
     SDL_GetMouseState(&x, &y);
 }
 
+entt::sink<entt::sigh<void()>> InputManager::onAction(std::string_view action_name, ActionState action_state) {
+    return actions_to_func_[std::string(action_name)].at(static_cast<size_t>(action_state));
+}
+
 void InputManager::update() {
     // 1. 根据上一帧的值更新默认的动作状态
     for (auto& [action_name, state] : action_states_) {
-        if (state == ActionState::PRESSED_THIS_FRAME) {
-            state = ActionState::HELD_DOWN;
-        } else if (state == ActionState::RELEASED_THIS_FRAME) {
+        if (state == ActionState::PRESSED) {
+            state = ActionState::HELD;
+        } else if (state == ActionState::RELEASED) {
             state = ActionState::INACTIVE;
         }
     }
@@ -35,12 +39,21 @@ void InputManager::update() {
     while (SDL_PollEvent(&event)) {
         processEvent(event);
     }
+
+    // 3. 触发回调
+    for (const auto& [action_name_id, state] : action_states_) {
+        if (state != ActionState::INACTIVE) {
+            if (auto it = actions_to_func_.find(action_name_id); it != actions_to_func_.end()) {
+                it->second.at(static_cast<size_t>(state)).publish();
+            }
+        }
+    }
 }
 
 bool InputManager::isActionDown(std::string_view action_name) const {
     auto it = action_states_.find(action_name);
     if (it != action_states_.end()) {
-        return it->second == ActionState::PRESSED_THIS_FRAME || it->second == ActionState::HELD_DOWN;
+        return it->second == ActionState::PRESSED || it->second == ActionState::HELD;
     }
     return false;
 }
@@ -48,7 +61,7 @@ bool InputManager::isActionDown(std::string_view action_name) const {
 bool InputManager::isActionPressed(std::string_view action_name) const {
     auto it = action_states_.find(action_name);
     if (it != action_states_.end()) {
-        return it->second == ActionState::PRESSED_THIS_FRAME;
+        return it->second == ActionState::PRESSED;
     }
     return false;
 }
@@ -56,7 +69,7 @@ bool InputManager::isActionPressed(std::string_view action_name) const {
 bool InputManager::isActionReleased(std::string_view action_name) const {
     auto it = action_states_.find(action_name);
     if (it != action_states_.end()) {
-        return it->second == ActionState::RELEASED_THIS_FRAME;
+        return it->second == ActionState::RELEASED;
     }
     return false;
 }
@@ -79,8 +92,8 @@ void InputManager::processEvent(const SDL_Event& event) {
     switch (event.type) {
         case SDL_EVENT_KEY_DOWN:
         case SDL_EVENT_KEY_UP: {
-            auto it = input_to_actions_map_.find(event.key.scancode);
-            if (it != input_to_actions_map_.end()) {
+            auto it = input_to_actions_.find(event.key.scancode);
+            if (it != input_to_actions_.end()) {
                 for (const auto& action_name : it->second) {
                     updateActionState(action_name, event.key.down, event.key.repeat);
                 }
@@ -88,8 +101,8 @@ void InputManager::processEvent(const SDL_Event& event) {
         } break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP: {
-            auto it = input_to_actions_map_.find(event.button.button);
-            if (it != input_to_actions_map_.end()) {
+            auto it = input_to_actions_.find(event.button.button);
+            if (it != input_to_actions_.end()) {
                 for (const auto& action_name : it->second) {
                     updateActionState(action_name, event.button.down, false);
                 }
@@ -108,41 +121,41 @@ void InputManager::processEvent(const SDL_Event& event) {
     }
 }
 
-void InputManager::initializeMappings(Config* config) {
+void InputManager::initializeMappings(const Config* config) {
     spdlog::trace("初始化输入映射...");
     if (!config) {
         spdlog::error("输入管理器: Config 为空指针");
         throw std::runtime_error("输入管理器: Config 为空指针");
     }
 
-    actions_to_keyname_map_ = config->CONFIG(input_mappings);
-    input_to_actions_map_.clear();
+    auto actions_to_keyname = config->CONFIG(input_mappings);
+    input_to_actions_.clear();
 
     // 如果配置中没有定义鼠标按钮动作(通常不需要配置),则添加默认映射, 用于 UI
-    if (actions_to_keyname_map_.find("MouseLeftClick") == actions_to_keyname_map_.end()) {
-        spdlog::debug("配置中没有定义 'MouseLeftClick' 动作,添加默认映射到 'MouseLeft'.");
-        actions_to_keyname_map_["MouseLeftClick"] = {"MouseLeft"};  // 如果缺失则添加默认映射
+    if (actions_to_keyname.contains("mouse_left")) {
+        spdlog::debug("配置中没有定义 'mouse_left' 动作,添加默认映射到 'MouseLeft'.");
+        actions_to_keyname["mouse_left"] = {"MouseLeft"};  // 如果缺失则添加默认映射
     }
-    if (actions_to_keyname_map_.find("MouseRightClick") == actions_to_keyname_map_.end()) {
-        spdlog::debug("配置中没有定义 'MouseRightClick' 动作,添加默认映射到 'MouseRight'.");
-        actions_to_keyname_map_["MouseRightClick"] = {"MouseRight"};  // 如果缺失则添加默认映射
+    if (actions_to_keyname.contains("mouse_right")) {
+        spdlog::debug("配置中没有定义 'mouse_right' 动作,添加默认映射到 'MouseRight'.");
+        actions_to_keyname["mouse_right"] = {"MouseRight"};  // 如果缺失则添加默认映射
     }
 
     // 遍历 动作 -> 按键名称 的映射
-    for (const auto& [action_name, key_names] : actions_to_keyname_map_) {
+    for (const auto& [action_name, key_names] : actions_to_keyname) {
         // 每个动作对应一个动作状态，初始化为 INACTIVE
         action_states_[action_name] = ActionState::INACTIVE;
         spdlog::trace("映射动作: {}", action_name);
         // 设置 "按键 -> 动作" 的映射
         for (const auto& key_name : key_names) {
             if (auto scancode = scancodeFromString(key_name)) {
-                // 如果 scancode 有效, 则将 action 添加到 input_to_actions_map_ 中
-                input_to_actions_map_[scancode.value()].push_back(action_name);
+                // 如果 scancode 有效, 则将 action 添加到 input_to_actions_ 中
+                input_to_actions_[scancode.value()].push_back(action_name);
                 spdlog::trace("  映射按键: {} (Scancode: {}) 到动作: {}", key_name,
                               static_cast<int>(scancode.value()), action_name);
             } else if (auto mouse_button = mouseButtonFromString(key_name)) {
-                // 如果鼠标按钮有效, 则将 action 添加到 input_to_actions_map_ 中
-                input_to_actions_map_[mouse_button.value()].push_back(action_name);
+                // 如果鼠标按钮有效, 则将 action 添加到 input_to_actions_ 中
+                input_to_actions_[mouse_button.value()].push_back(action_name);
                 spdlog::trace("  映射鼠标按钮: {} (Button ID: {}) 到动作: {}", key_name, mouse_button.value(),
                               action_name);
                 // else if: 未来可添加其它输入类型 ...
@@ -163,12 +176,12 @@ void InputManager::updateActionState(std::string_view action_name, bool is_input
 
     if (is_input_active) {
         if (is_repeat_event) {
-            it->second = ActionState::HELD_DOWN;
+            it->second = ActionState::HELD;
         } else {
-            it->second = ActionState::PRESSED_THIS_FRAME;
+            it->second = ActionState::PRESSED;
         }
     } else {
-        it->second = ActionState::RELEASED_THIS_FRAME;
+        it->second = ActionState::RELEASED;
     }
 }
 

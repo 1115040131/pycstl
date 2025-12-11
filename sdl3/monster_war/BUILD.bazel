@@ -16,6 +16,7 @@ cc_library(
         "//sdl3:sdl3_image",
         "//sdl3:sdl3_mixer",
         "//sdl3:sdl3_ttf",
+        "@entt",
         "@glm",
         "@nlohmann_json//:json",
         "@spdlog",
