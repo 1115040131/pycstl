@@ -1,16 +1,23 @@
 #include "monster_war/engine/input/input_manager.h"
 
 #include <SDL3/SDL.h>
+#include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/config.h"
+#include "monster_war/engine/utils/events.h"
 
 namespace pyc::monster_war {
 
-InputManager::InputManager(SDL_Renderer* sdl_renderer, Config* config) : sdl_renderer_(sdl_renderer) {
+InputManager::InputManager(SDL_Renderer* sdl_renderer, const Config* config, entt::dispatcher* dispatcher)
+    : sdl_renderer_(sdl_renderer), dispatcher_(dispatcher) {
     if (!sdl_renderer_) {
         spdlog::error("输入管理器: SDL_Renderer 为空指针");
         throw std::runtime_error("输入管理器: SDL_Renderer 为空指针");
+    }
+    if (!dispatcher_) {
+        spdlog::error("事件分发器为空指针");
+        throw std::runtime_error("事件分发器为空指针");
     }
     initializeMappings(config);
 
@@ -20,7 +27,7 @@ InputManager::InputManager(SDL_Renderer* sdl_renderer, Config* config) : sdl_ren
     SDL_GetMouseState(&x, &y);
 }
 
-entt::sink<entt::sigh<void()>> InputManager::onAction(std::string_view action_name, ActionState action_state) {
+entt::sink<entt::sigh<bool()>> InputManager::onAction(std::string_view action_name, ActionState action_state) {
     return actions_to_func_[std::string(action_name)].at(static_cast<size_t>(action_state));
 }
 
@@ -44,11 +51,16 @@ void InputManager::update() {
     for (const auto& [action_name_id, state] : action_states_) {
         if (state != ActionState::INACTIVE) {
             if (auto it = actions_to_func_.find(action_name_id); it != actions_to_func_.end()) {
-                it->second.at(static_cast<size_t>(state)).publish();
+                // collect方法可以获取回调函数返回值，放入lambda函数的参数中。
+                // 而lambda函数的返回值为真时，停止分发信号。
+                // 分发信号的顺序为“后绑定先调用”
+                it->second.at(static_cast<size_t>(state)).collect([](bool handled) { return handled; });
             }
         }
     }
 }
+
+void InputManager::quit() { dispatcher_->trigger<QuitEvent>(); }
 
 bool InputManager::isActionDown(std::string_view action_name) const {
     auto it = action_states_.find(action_name);
@@ -74,19 +86,9 @@ bool InputManager::isActionReleased(std::string_view action_name) const {
     return false;
 }
 
-bool InputManager::shouldQuit() const { return should_quit_; }
-
-void InputManager::setShouldQuit(bool should_quit) { should_quit_ = should_quit; }
-
 glm::vec2 InputManager::getMousePosition() const { return mouse_position_; }
 
-glm::vec2 InputManager::getLogicalMousePosition() const {
-    glm::vec2 logical_pos{};
-    // 通过窗口坐标获取渲染坐标（逻辑坐标）
-    SDL_RenderCoordinatesFromWindow(sdl_renderer_, mouse_position_.x, mouse_position_.y, &logical_pos.x,
-                                    &logical_pos.y);
-    return logical_pos;
-}
+glm::vec2 InputManager::getLogicalMousePosition() const { return logical_mouse_position_; }
 
 void InputManager::processEvent(const SDL_Event& event) {
     switch (event.type) {
@@ -107,14 +109,18 @@ void InputManager::processEvent(const SDL_Event& event) {
                     updateActionState(action_name, event.button.down, false);
                 }
             }
-            // 在点击时更新鼠标位置
+            // 在点击时更新鼠标位置以及逻辑位置
             mouse_position_ = {event.button.x, event.button.y};
+            SDL_RenderCoordinatesFromWindow(sdl_renderer_, mouse_position_.x, mouse_position_.y,
+                                            &logical_mouse_position_.x, &logical_mouse_position_.y);
         } break;
         case SDL_EVENT_MOUSE_MOTION:  // 处理鼠标运动
             mouse_position_ = {event.motion.x, event.motion.y};
+            SDL_RenderCoordinatesFromWindow(sdl_renderer_, mouse_position_.x, mouse_position_.y,
+                                            &logical_mouse_position_.x, &logical_mouse_position_.y);
             break;
         case SDL_EVENT_QUIT:
-            should_quit_ = true;
+            quit();
             break;
         default:
             break;

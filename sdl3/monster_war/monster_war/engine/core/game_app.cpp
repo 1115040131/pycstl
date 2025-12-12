@@ -40,7 +40,6 @@ void GameApp::run() {
     while (is_running_) {
         time_->update();
         auto delta_time = time_->getDeltaTime();
-        input_manager_->update();
 
         handleEvents();
         update(delta_time);
@@ -93,11 +92,9 @@ bool GameApp::init() {
 }
 
 void GameApp::handleEvents() {
-    if (input_manager_->shouldQuit()) {
-        spdlog::trace("GameApp 收到来自 InputManager 的退出请求。");
-        is_running_ = false;
-        return;
-    }
+    // 处理并分发事件
+    input_manager_->update();
+
     scene_manager_->handleInput();
 }
 
@@ -264,7 +261,7 @@ bool GameApp::initTextRenderer() {
 
 bool GameApp::initInputManager() {
     try {
-        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_.get());
+        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_.get(), dispatcher_.get());
     } catch (const std::exception& e) {
         spdlog::error("初始化输入管理器失败: {}", e.what());
         return false;
