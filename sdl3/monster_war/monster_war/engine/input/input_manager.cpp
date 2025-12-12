@@ -132,11 +132,11 @@ void InputManager::initializeMappings(const Config* config) {
     input_to_actions_.clear();
 
     // 如果配置中没有定义鼠标按钮动作(通常不需要配置),则添加默认映射, 用于 UI
-    if (actions_to_keyname.contains("mouse_left")) {
+    if (!actions_to_keyname.contains("mouse_left")) {
         spdlog::debug("配置中没有定义 'mouse_left' 动作,添加默认映射到 'MouseLeft'.");
         actions_to_keyname["mouse_left"] = {"MouseLeft"};  // 如果缺失则添加默认映射
     }
-    if (actions_to_keyname.contains("mouse_right")) {
+    if (!actions_to_keyname.contains("mouse_right")) {
         spdlog::debug("配置中没有定义 'mouse_right' 动作,添加默认映射到 'MouseRight'.");
         actions_to_keyname["mouse_right"] = {"MouseRight"};  // 如果缺失则添加默认映射
     }

@@ -9,30 +9,53 @@
 
 namespace pyc::monster_war {
 
-GameScene::GameScene(Context& context, SceneManager& scene_manager) : Scene("GameScene", context, scene_manager) {
-    spdlog::trace("GameScene 构造完成。");
-}
+GameScene::GameScene(Context& context) : Scene("GameScene", context) { spdlog::trace("GameScene 构造完成。"); }
 
 void GameScene::init() {
-    // 注册输入回调
+    // 测试场景编号, 每创建一个场景, 编号加1
+    static int count = 0;
+    scene_num_ = count++;
+    spdlog::info("场景编号: {}", scene_num_);
+
+    // 注册输入回调事件
     auto& input_manager = context_.getInputManager();
-    input_manager.onAction("attack").connect<&GameScene::onAttack>(this);
-    input_manager.onAction("jump", ActionState::RELEASED).connect<&GameScene::onJump>(this);
+    input_manager.onAction("jump").connect<&GameScene::onReplace>(this);     // J 键
+    input_manager.onAction("mouse_left").connect<&GameScene::onPush>(this);  // 鼠标左键
+    input_manager.onAction("mouse_right").connect<&GameScene::onPop>(this);  // 鼠标右键
+    input_manager.onAction("pause").connect<&GameScene::onQuit>(this);       // P 键
+
+    Scene::init();
 }
 
 void GameScene::clean() {
-    // 断开输入回调
+    // 断开输入回调事件 (谁连接，谁负责断开)
     auto& input_manager = context_.getInputManager();
-    input_manager.onAction("attack").disconnect<&GameScene::onAttack>(this);
-    input_manager.onAction("jump", ActionState::RELEASED).disconnect<&GameScene::onJump>(this);
+    input_manager.onAction("jump").disconnect<&GameScene::onReplace>(this);
+    input_manager.onAction("mouse_left").disconnect<&GameScene::onPush>(this);
+    input_manager.onAction("mouse_right").disconnect<&GameScene::onPop>(this);
+    input_manager.onAction("pause").disconnect<&GameScene::onQuit>(this);
+
+    Scene::clean();
 }
 
-void GameScene::onAttack() {
-    spdlog::info("onAttack");
-    // 按攻击键即发送“退出游戏”信号
-    context_.getDispatcher().enqueue<QuitEvent>();
+void GameScene::onReplace() {
+    spdlog::info("onReplace, 切换场景");
+    requestReplaceScene(std::make_unique<GameScene>(context_));
 }
 
-void GameScene::onJump() { spdlog::info("onJump"); }
+void GameScene::onPush() {
+    spdlog::info("onPush, 压入场景");
+    requestPushScene(std::make_unique<GameScene>(context_));
+}
+
+void GameScene::onPop() {
+    spdlog::info("onPop, 弹出编号为 {} 的场景", scene_num_);
+    requestPopScene();
+}
+
+void GameScene::onQuit() {
+    spdlog::info("onQuit, 退出游戏");
+    quit();
+}
 
 }  // namespace pyc::monster_war

@@ -1,12 +1,21 @@
 #include "monster_war/engine/scene/scene_manager.h"
 
+#include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/core/context.h"
 #include "monster_war/engine/scene/scene.h"
+#include "monster_war/engine/utils/events.h"
 
 namespace pyc::monster_war {
 
-SceneManager::SceneManager(Context& context) : context_(context) { spdlog::trace("场景管理器已创建。"); }
+SceneManager::SceneManager(Context& context) : context_(context) {
+    // 注册事件处理函数
+    context_.getDispatcher().sink<PopSceneEvent>().connect<&SceneManager::onPopScene>(this);
+    context_.getDispatcher().sink<PushSceneEvent>().connect<&SceneManager::onPushScene>(this);
+    context_.getDispatcher().sink<ReplaceSceneEvent>().connect<&SceneManager::onReplaceScene>(this);
+    spdlog::trace("场景管理器已创建。");
+}
 
 SceneManager::~SceneManager() {
     spdlog::trace("场景管理器已销毁。");
@@ -54,18 +63,20 @@ void SceneManager::clean() {
         }
         scene_stack_.pop_back();
     }
+    // 断开事件处理函数 (一次性断开所有和当前实例绑定的回调函数)
+    context_.getDispatcher().disconnect(this);
 }
 
-void SceneManager::requestPushScene(std::unique_ptr<Scene> scene) {
+void SceneManager::onPopScene() { pending_action_ = PendingAction::Pop; }
+
+void SceneManager::onPushScene(PushSceneEvent& event) {
     pending_action_ = PendingAction::Push;
-    pending_scene_ = std::move(scene);
+    pending_scene_ = std::move(event.scene);
 }
 
-void SceneManager::requestPopScene() { pending_action_ = PendingAction::Pop; }
-
-void SceneManager::requestReplaceScene(std::unique_ptr<Scene> scene) {
+void SceneManager::onReplaceScene(ReplaceSceneEvent& event) {
     pending_action_ = PendingAction::Replace;
-    pending_scene_ = std::move(scene);
+    pending_scene_ = std::move(event.scene);
 }
 
 void SceneManager::processPendingActions() {
@@ -113,6 +124,10 @@ void SceneManager::popScene() {
         scene_stack_.back()->clean();  // 显式调用清理
     }
     scene_stack_.pop_back();
+    if (scene_stack_.empty()) {
+        spdlog::warn("弹出最后一个场景, 退出游戏。");
+        context_.getDispatcher().enqueue<QuitEvent>();
+    }
 }
 
 void SceneManager::replaceScene(std::unique_ptr<Scene> scene) {
@@ -122,8 +137,15 @@ void SceneManager::replaceScene(std::unique_ptr<Scene> scene) {
     }
     spdlog::debug("正在用场景 '{}' 替换场景 '{}' 。", scene->getName(), scene_stack_.back()->getName());
 
-    // 清理并移除场景栈中所有场景
-    clean();
+    // 清理栈中所有剩余的场景（从顶到底）
+    while (!scene_stack_.empty()) {
+        if (scene_stack_.back()) {
+            spdlog::debug("正在清理场景 '{}' 。", scene_stack_.back()->getName());
+            scene_stack_.back()->clean();
+        }
+        scene_stack_.pop_back();
+    }
+
     // 压入新场景
     pushScene(std::move(scene));
 }

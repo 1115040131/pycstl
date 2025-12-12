@@ -1,5 +1,6 @@
 #include "monster_war/engine/scene/scene.h"
 
+#include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/context.h"
@@ -7,14 +8,12 @@
 #include "monster_war/engine/object/game_object.h"
 #include "monster_war/engine/render/camera.h"
 #include "monster_war/engine/ui/ui_manager.h"
+#include "monster_war/engine/utils/events.h"
 
 namespace pyc::monster_war {
 
-Scene::Scene(std::string_view name, Context& context, SceneManager& scene_manager)
-    : scene_name_(name),
-      context_(context),
-      scene_manager_(scene_manager),
-      ui_manager_(std::make_unique<UIManager>()) {
+Scene::Scene(std::string_view name, Context& context)
+    : scene_name_(name), context_(context), ui_manager_(std::make_unique<UIManager>()) {
     spdlog::trace("场景 '{}' 构造完成。", scene_name_);
 }
 
@@ -168,5 +167,17 @@ void Scene::processPendingAdditions() {
     }
     pending_additions_.clear();
 }
+
+void Scene::requestPopScene() { context_.getDispatcher().trigger<PopSceneEvent>(); }
+
+void Scene::requestPushScene(std::unique_ptr<Scene> scene) {
+    context_.getDispatcher().trigger<PushSceneEvent>(PushSceneEvent{std::move(scene)});
+}
+
+void Scene::requestReplaceScene(std::unique_ptr<Scene> scene) {
+    context_.getDispatcher().trigger<ReplaceSceneEvent>(ReplaceSceneEvent{std::move(scene)});
+}
+
+void Scene::quit() { context_.getDispatcher().trigger<QuitEvent>(); }
 
 }  // namespace pyc::monster_war

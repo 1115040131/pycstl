@@ -41,9 +41,9 @@ public:
     /**
      * @brief 注册用于设置初始游戏场景的函数。
      *        这个函数将在 SceneManager 初始化后被调用。
-     * @param func 一个接收 SceneManager 引用的函数对象。
+     * @param func 一个接收 Context 引用的函数对象。
      */
-    void registerSceneSetup(std::function<void(SceneManager&)> func);
+    void registerSceneSetup(std::function<void(Context&)> func);
 
 private:
     [[nodiscard]] bool init();
@@ -79,7 +79,7 @@ private:
     bool is_running_{};
 
     /// @brief 游戏场景设置函数，用于在运行游戏前设置初始场景 (GameApp不再决定初始场景是什么)
-    std::function<void(SceneManager&)> scene_setup_func_;
+    std::function<void(Context&)> scene_setup_func_;
 
     // 引擎组件
     std::unique_ptr<entt::dispatcher> dispatcher_;

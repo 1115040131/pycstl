@@ -10,7 +10,6 @@
 namespace pyc::monster_war {
 
 class Context;
-class SceneManager;
 class UIManager;
 class GameObject;
 
@@ -27,9 +26,8 @@ public:
      *
      * @param name 场景的名称。
      * @param context 场景上下文。
-     * @param scene_manager 场景管理器。
      */
-    Scene(std::string_view name, Context& context, SceneManager& scene_manager);
+    Scene(std::string_view name, Context& context);
 
     virtual ~Scene();
 
@@ -55,14 +53,25 @@ public:
     /// @brief 根据名称查找游戏对象（返回找到的第一个对象）。
     GameObject* findGameObjectByName(std::string_view name) const;
 
+    /// @brief 请求弹出当前场景。
+    void requestPopScene();
+
+    /// @brief 请求压入一个新场景。
+    void requestPushScene(std::unique_ptr<Scene> scene);
+
+    /// @brief 请求替换当前场景。
+    void requestReplaceScene(std::unique_ptr<Scene> scene);
+
+    /// @brief 退出游戏。
+    void quit();
+
     // getters and setters
     void setName(std::string_view name) { scene_name_ = name; }               ///< @brief 设置场景名称
     std::string_view getName() const { return scene_name_; }                  ///< @brief 获取场景名称
     void setInitialized(bool initialized) { is_initialized_ = initialized; }  ///< @brief 设置场景是否已初始化
     bool isInitialized() const { return is_initialized_; }                    ///< @brief 获取场景是否已初始化
 
-    Context& getContext() const { return context_; }                  ///< @brief 获取上下文引用
-    SceneManager& getSceneManager() const { return scene_manager_; }  ///< @brief 获取场景管理器引用
+    Context& getContext() const { return context_; }  ///< @brief 获取上下文引用
     ///< @brief 获取场景中的游戏对象
     const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const { return game_objects_; }
 
@@ -72,7 +81,6 @@ protected:
 protected:
     std::string scene_name_;                 ///< @brief 场景名称
     Context& context_;                       ///< @brief 上下文引用（隐式，构造时传入）
-    SceneManager& scene_manager_;            ///< @brief 场景管理器引用（构造时传入）
     std::unique_ptr<UIManager> ui_manager_;  ///< @brief UI管理器(初始化时自动创建)
 
     ///< @brief 场景是否已初始化(非当前场景很可能未被删除，因此需要初始化标志避免重复初始化)

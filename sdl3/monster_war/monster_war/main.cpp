@@ -1,14 +1,17 @@
 #include <filesystem>
 
+#include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/core/context.h"
 #include "monster_war/engine/core/game_app.h"
-#include "monster_war/engine/scene/scene_manager.h"
+#include "monster_war/engine/utils/events.h"
 #include "monster_war/game/scene/game_scene.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
 namespace fs = std::filesystem;
 using bazel::tools::cpp::runfiles::Runfiles;
+using namespace pyc::monster_war;
 
 // 初始化工作目录到 runfiles 根目录
 bool setup_working_directory(int, char** argv) {
@@ -54,10 +57,10 @@ bool setup_working_directory(int, char** argv) {
     }
 }
 
-void setupInitialScene(pyc::monster_war::SceneManager& scene_manager) {
+void setupInitialScene(Context& context) {
     // GameApp在调用run方法之前，先创建并设置初始场景
-    auto title_scene = std::make_unique<pyc::monster_war::GameScene>(scene_manager.getContext(), scene_manager);
-    scene_manager.requestPushScene(std::move(title_scene));
+    auto title_scene = std::make_unique<GameScene>(context);
+    context.getDispatcher().trigger<PushSceneEvent>(PushSceneEvent{std::move(title_scene)});
 }
 
 int main(int argc, char** argv) {
@@ -68,7 +71,7 @@ int main(int argc, char** argv) {
         spdlog::warn("Could not set working directory, trying to continue...");
     }
 
-    pyc::monster_war::GameApp app;
+    GameApp app;
     app.registerSceneSetup(setupInitialScene);
     app.run();
     return 0;
