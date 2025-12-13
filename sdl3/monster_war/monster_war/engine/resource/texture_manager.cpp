@@ -1,6 +1,7 @@
 #include "monster_war/engine/resource/texture_manager.h"
 
 #include <SDL3_image/SDL_image.h>
+#include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
 
 namespace pyc::monster_war {
@@ -13,8 +14,8 @@ TextureManager::TextureManager(SDL_Renderer* sdl_renderer) : sdl_renderer_(sdl_r
     spdlog::trace("TextureManager 构造成功。");
 }
 
-SDL_Texture* TextureManager::loadTexture(std::string_view file_path) {
-    auto it = textures_.find(file_path);
+SDL_Texture* TextureManager::loadTexture(entt::id_type id, std::string_view file_path) {
+    auto it = textures_.find(id);
     if (it != textures_.end()) {
         return it->second.get();
     }
@@ -33,27 +34,41 @@ SDL_Texture* TextureManager::loadTexture(std::string_view file_path) {
     }
 
     // 使用带有自定义删除器的 unique_ptr 存储加载的纹理
-    textures_.emplace(file_path, std::unique_ptr<SDL_Texture, SDLTextureDeleter>(raw_texture));
+    textures_.emplace(id, std::unique_ptr<SDL_Texture, SDLTextureDeleter>(raw_texture));
     spdlog::debug("成功加载并缓存纹理: {}", file_path);
 
     return raw_texture;
 }
 
-SDL_Texture* TextureManager::getTexture(std::string_view file_path) {
+SDL_Texture* TextureManager::loadTexture(entt::hashed_string str_hs) {
+    return loadTexture(str_hs.value(), str_hs.data());
+}
+
+SDL_Texture* TextureManager::getTexture(entt::id_type id, std::string_view file_path ) {
     // 查找现有纹理
-    auto it = textures_.find(file_path);
+    auto it = textures_.find(id);
     if (it != textures_.end()) {
         return it->second.get();
     }
 
+    // 如果未找到，判断是否提供了file_path
+    if (file_path.empty()) {
+        spdlog::error("纹理 '{}' 未找到缓存, 且未提供文件路径, 返回nullptr。", id);
+        return nullptr;
+    }
+
     // 如果未找到，尝试加载它
     spdlog::warn("纹理 '{}' 未找到缓存，尝试加载。", file_path);
-    return loadTexture(file_path);
+    return loadTexture(id, file_path);
 }
 
-glm::vec2 TextureManager::getTextureSize(std::string_view file_path) {
+SDL_Texture* TextureManager::getTexture(entt::hashed_string str_hs) {
+    return getTexture(str_hs.value(), str_hs.data());
+}
+
+glm::vec2 TextureManager::getTextureSize(entt::id_type id, std::string_view file_path ){
     // 获取纹理
-    auto texture = getTexture(file_path);
+    auto texture = getTexture(id,file_path);
     if (!texture) {
         spdlog::error("无法获取纹理: {}", file_path);
         return glm::vec2(0);
@@ -68,13 +83,17 @@ glm::vec2 TextureManager::getTextureSize(std::string_view file_path) {
     return size;
 }
 
-void TextureManager::unloadTexture(std::string_view file_path) {
-    auto it = textures_.find(file_path);
+glm::vec2 TextureManager::getTextureSize(entt::hashed_string str_hs) {
+    return getTextureSize(str_hs.value(), str_hs.data());
+}
+
+void TextureManager::unloadTexture(entt::id_type id) {
+    auto it = textures_.find(id);
     if (it != textures_.end()) {
-        spdlog::debug("卸载纹理: {}", file_path);
+        spdlog::debug("卸载纹理: id = {}", id);
         textures_.erase(it);  // unique_ptr 通过自定义删除器处理删除
     } else {
-        spdlog::warn("尝试卸载不存在的纹理: {}", file_path);
+        spdlog::warn("尝试卸载不存在的纹理: id = {}", id);
     }
 }
 

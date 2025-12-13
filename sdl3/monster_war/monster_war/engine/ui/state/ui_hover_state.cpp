@@ -1,5 +1,6 @@
 #include "monster_war/engine/ui/state/ui_hover_state.h"
 
+#include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/context.h"
@@ -9,8 +10,10 @@
 
 namespace pyc::monster_war {
 
+using namespace entt::literals;
+
 void UIHoverState::enter() {
-    owner_->setSprite("hover");
+    owner_->setSprite("hover"_hs);
     spdlog::debug("切换到悬停状态");
 }
 

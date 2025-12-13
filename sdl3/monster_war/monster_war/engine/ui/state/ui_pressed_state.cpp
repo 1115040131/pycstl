@@ -1,5 +1,6 @@
 #include "monster_war/engine/ui/state/ui_pressed_state.h"
 
+#include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/context.h"
@@ -9,9 +10,11 @@
 
 namespace pyc::monster_war {
 
+using namespace entt::literals;
+
 void UIPressedState::enter() {
-    owner_->setSprite("pressed");
-    owner_->playSound("pressed");
+    owner_->setSprite("pressed"_hs);
+    owner_->playSound("pressed"_hs);
     spdlog::debug("切换到按下状态");
 }
 

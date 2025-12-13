@@ -18,32 +18,41 @@ UIInteractive::UIInteractive(Context& context, glm::vec2 position, glm::vec2 siz
 
 UIInteractive::~UIInteractive() = default;
 
-void UIInteractive::addSprite(std::string_view name, std::unique_ptr<Sprite> sprite) {
+void UIInteractive::addSprite(entt::id_type name_id, Sprite sprite) {
     // 可交互UI元素必须有一个size用于交互检测，因此如果参数列表中没有指定，则用图片大小作为size
     if (size_.x == 0.0f && size_.y == 0.0f) {
-        size_ = context_.getResourceManager().getTextureSize(sprite->getTextureId());
+        size_ = context_.getResourceManager().getTextureSize(sprite.getTextureId());
     }
     // 添加精灵
-    sprites_[std::string(name)] = std::move(sprite);
+    sprites_.emplace(name_id, std::move(sprite));
 }
 
-void UIInteractive::setSprite(std::string_view name) {
-    auto it = sprites_.find(name);
-    if (it != sprites_.end()) {
-        current_sprite_ = it->second.get();
+void UIInteractive::setSprite(entt::id_type name_id) {
+    if (sprites_.contains(name_id)) {
+        current_sprite_id_ = name_id;
     } else {
-        spdlog::warn("Sprite '{}' 未找到", name);
+        spdlog::warn("Sprite '{}' 未找到", name_id);
     }
 }
 
-void UIInteractive::addSound(std::string_view name, std::string_view path) { sounds_[std::string(name)] = path; }
+void UIInteractive::addSound(entt::id_type name_id, entt::hashed_string hashed_path) {
+    // 插入容器
+    sounds_.emplace(name_id, hashed_path.value());
+    // 载入音效资源
+    context_.getResourceManager().loadSound(hashed_path);
+}
 
-void UIInteractive::playSound(std::string_view name) {
-    auto it = sounds_.find(name);
+void UIInteractive::playSound(entt::id_type name_id) {
+    // 先尝试在自定义sounds_中查找（map的值）
+    auto it = sounds_.find(name_id);
     if (it != sounds_.end()) {
-        context_.getAudioPlayer().playSound(it->second);
-    } else {
-        spdlog::warn("Sound '{}' 未找到", name);
+        if (context_.getAudioPlayer().playSound(it->second) == -1) {
+            spdlog::warn("Sound '{}' 未找到或无法播放", name_id);
+        }
+    } else {  // 如果自定义sounds_中没有找到，则使用默认音效（map的键）
+        if (context_.getAudioPlayer().playSound(name_id) == -1) {
+            spdlog::error("Sound '{}' 未找到或无法播放", name_id);
+        }
     }
 }
 
@@ -76,7 +85,7 @@ void UIInteractive::render(Context& context) {
     if (!visible_) return;
 
     // 先渲染自身
-    context.getRenderer().drawUISprite(*current_sprite_, getScreenPosition(), size_);
+    context.getRenderer().drawUISprite(sprites_[current_sprite_id_], getScreenPosition(), size_);
 
     // 再渲染子元素（调用基类方法）
     UIElement::render(context);

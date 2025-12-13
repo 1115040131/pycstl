@@ -2,6 +2,7 @@
 
 #include <string_view>
 
+#include <entt/entity/fwd.hpp>
 #include <glm/glm.hpp>
 
 #include "common/noncopyable.h"
@@ -45,7 +46,7 @@ public:
      * @param position 左上角屏幕位置。
      * @param color 文本颜色。(默认为白色)
      */
-    void drawUIText(std::string_view text, std::string_view font_id, int font_size, const glm::vec2& position,
+    void drawUIText(std::string_view text, entt::id_type font_id, int font_size, const glm::vec2& position,
                     const FColor& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     /**
@@ -58,7 +59,7 @@ public:
      * @param position 左上角屏幕位置。
      * @param color 文本颜色。
      */
-    void drawText(const Camera& camera, std::string_view text, std::string_view font_id, int font_size,
+    void drawText(const Camera& camera, std::string_view text, entt::id_type font_id, int font_size,
                   const glm::vec2& position, const FColor& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     /**
@@ -69,7 +70,8 @@ public:
      * @param font_size 字体大小。
      * @return 文本的尺寸。
      */
-    glm::vec2 getTextSize(std::string_view text, std::string_view font_id, int font_size);
+    glm::vec2 getTextSize(std::string_view text, entt::id_type font_id, int font_size,
+                          std::string_view font_path = "");
 
 private:
     SDL_Renderer* sdl_renderer_{};         ///< @brief 指向 SDL_Renderer 的非拥有指针

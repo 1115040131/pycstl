@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL3/SDL_rect.h>
 #include <glm/glm.hpp>
 
 #include "common/noncopyable.h"

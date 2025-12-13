@@ -1,5 +1,5 @@
 #include "monster_war/engine/resource/audio_manager.h"
-
+#include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
 
 namespace pyc::monster_war {
@@ -35,8 +35,9 @@ AudioManager::~AudioManager() {
     spdlog::trace("AudioManager 析构成功。");
 }
 
-Mix_Chunk* AudioManager::loadSound(std::string_view file_path) {  // 首先检查缓存
-    auto it = sounds_.find(file_path);
+Mix_Chunk* AudioManager::loadSound(entt::id_type id, std::string_view file_path) {
+    // 首先检查缓存
+    auto it = sounds_.find(id);
     if (it != sounds_.end()) {
         return it->second.get();
     }
@@ -50,27 +51,42 @@ Mix_Chunk* AudioManager::loadSound(std::string_view file_path) {  // 首先检�
     }
 
     // 使用unique_ptr存储在缓存中
-    sounds_.emplace(file_path, std::unique_ptr<Mix_Chunk, SDLMixChunkDeleter>(raw_chunk));
+    sounds_.emplace(id, std::unique_ptr<Mix_Chunk, SDLMixChunkDeleter>(raw_chunk));
     spdlog::debug("成功加载并缓存音效: {}", file_path);
     return raw_chunk;
 }
 
-Mix_Chunk* AudioManager::getSound(std::string_view file_path) {
-    auto it = sounds_.find(file_path);
+Mix_Chunk* AudioManager::loadSound(entt::hashed_string str_hs) {
+    return loadSound(str_hs.value(), str_hs.data());
+}
+
+Mix_Chunk* AudioManager::getSound(entt::id_type id,std::string_view file_path) {
+    auto it = sounds_.find(id);
     if (it != sounds_.end()) {
         return it->second.get();
     }
+    // 如果未找到，判断是否提供了file_path
+    if (file_path.empty()) {
+        spdlog::error("音效 '{}' 未找到缓存, 且未提供文件路径, 返回nullptr。", id);
+        return nullptr;
+    }
+
+
     spdlog::warn("音效 '{}' 未找到缓存，尝试加载。", file_path);
-    return loadSound(file_path);
+    return loadSound(id, file_path);
 }
 
-void AudioManager::unloadSound(std::string_view file_path) {
-    auto it = sounds_.find(file_path);
+Mix_Chunk* AudioManager::getSound(entt::hashed_string str_hs) {
+    return getSound(str_hs.value(), str_hs.data());
+}
+
+void AudioManager::unloadSound(entt::id_type id) {
+    auto it = sounds_.find(id);
     if (it != sounds_.end()) {
-        spdlog::debug("卸载音效: {}", file_path);
+        spdlog::debug("卸载音效: id = {}", id);
         sounds_.erase(it);  // unique_ptr处理Mix_FreeChunk
     } else {
-        spdlog::warn("尝试卸载不存在的音效: {}", file_path);
+        spdlog::warn("尝试卸载不存在的音效: id = {}", id);
     }
 }
 
@@ -81,8 +97,9 @@ void AudioManager::clearSounds() {
     }
 }
 
-Mix_Music* AudioManager::loadMusic(std::string_view file_path) {  // 首先检查缓存
-    auto it = music_.find(file_path);
+Mix_Music* AudioManager::loadMusic(entt::id_type id, std::string_view file_path) {
+    // 首先检查缓存
+    auto it = music_.find(id);
     if (it != music_.end()) {
         return it->second.get();
     }
@@ -96,27 +113,42 @@ Mix_Music* AudioManager::loadMusic(std::string_view file_path) {  // 首先检�
     }
 
     // 使用unique_ptr存储在缓存中
-    music_.emplace(file_path, std::unique_ptr<Mix_Music, SDLMixMusicDeleter>(raw_music));
+    music_.emplace(id, std::unique_ptr<Mix_Music, SDLMixMusicDeleter>(raw_music));
     spdlog::debug("成功加载并缓存音乐: {}", file_path);
     return raw_music;
 }
 
-Mix_Music* AudioManager::getMusic(std::string_view file_path) {
-    auto it = music_.find(file_path);
+Mix_Music* AudioManager::loadMusic(entt::hashed_string str_hs) {
+    return loadMusic(str_hs.value(), str_hs.data());
+}
+
+Mix_Music* AudioManager::getMusic(entt::id_type id,std::string_view file_path) {
+    auto it = music_.find(id);
     if (it != music_.end()) {
         return it->second.get();
     }
+
+    // 如果未找到，判断是否提供了file_path
+    if (file_path.empty()) {
+        spdlog::error("音乐 '{}' 未找到缓存, 且未提供文件路径, 返回nullptr。", id);
+        return nullptr;
+    }
+
     spdlog::warn("音乐 '{}' 未找到缓存，尝试加载。", file_path);
-    return loadMusic(file_path);
+    return loadMusic(id, file_path);
 }
 
-void AudioManager::unloadMusic(std::string_view file_path) {
-    auto it = music_.find(file_path);
+Mix_Music* AudioManager::getMusic(entt::hashed_string str_hs) {
+    return getMusic(str_hs.value(), str_hs.data());
+}
+
+void AudioManager::unloadMusic(entt::id_type id ) {
+    auto it = music_.find(id);
     if (it != music_.end()) {
-        spdlog::debug("卸载音乐: {}", file_path);
+        spdlog::debug("卸载音乐: id = {}", id);
         music_.erase(it);  // unique_ptr处理Mix_FreeMusic
     } else {
-        spdlog::warn("尝试卸载不存在的音乐: {}", file_path);
+        spdlog::warn("尝试卸载不存在的音乐: id ={}", id);
     }
 }
 
