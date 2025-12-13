@@ -4,9 +4,6 @@
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/context.h"
-#include "monster_war/engine/core/game_state.h"
-#include "monster_war/engine/object/game_object.h"
-#include "monster_war/engine/render/camera.h"
 #include "monster_war/engine/ui/ui_manager.h"
 #include "monster_war/engine/utils/events.h"
 
@@ -33,56 +30,11 @@ void Scene::handleInput() {
     if (ui_manager_->handleInput(context_)) {
         return;  // 如果输入事件被UI处理则返回，不再处理游戏对象输入
     }
-
-    for (const auto& game_object : game_objects_) {
-        game_object->handleInput(context_);
-    }
 }
 
 void Scene::update(std::chrono::duration<float> delta_time) {
     if (!is_initialized_) {
         return;
-    }
-
-    // 清理标记为删除的对象
-    auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
-                                       [](const std::unique_ptr<GameObject>& game_object) {
-                                           if (!game_object || game_object->isNeedRemove()) {
-                                               if (game_object) {
-                                                   game_object->clean();
-                                               }
-                                               return false;
-                                           } else {
-                                               return true;
-                                           }
-                                       });
-    game_objects_.erase(partition_it, game_objects_.end());
-    // 处理待添加的对象
-    processPendingAdditions();
-
-    // 只有游戏进行中，才需要更新相机
-    if (context_.getGameState().isPlaying()) {
-        context_.getCamera().update(delta_time);
-    }
-
-    // auto partition_it = std::partition(game_objects_.begin(), game_objects_.end(),
-    //                                    [delta_time, this](const std::unique_ptr<GameObject>& game_object) {
-    //                                        if (game_object && !game_object->isNeedRemove()) {
-    //                                            game_object->update(delta_time, context_);
-    //                                            return true;
-    //                                        } else {
-    //                                            if (game_object) {
-    //                                                game_object->clean();
-    //                                            }
-    //                                            return false;
-    //                                        }
-    //                                    });
-    // game_objects_.erase(partition_it, game_objects_.end());
-
-    for (const auto& game_object : game_objects_) {
-        if (game_object && !game_object->isNeedRemove()) {
-            game_object->update(delta_time, context_);
-        }
     }
 
     // 更新UI管理器
@@ -94,10 +46,6 @@ void Scene::render() {
         return;
     }
 
-    for (const auto& game_object : game_objects_) {
-        game_object->render(context_);
-    }
-
     // 渲染UI管理器
     ui_manager_->render(context_);
 }
@@ -107,65 +55,9 @@ void Scene::clean() {
         return;
     }
 
-    for (const auto& game_object : game_objects_) {
-        if (game_object) {
-            game_object->clean();
-        }
-    }
-    game_objects_.clear();
-
+    registry_.clear();        // 清理ECS注册表
     is_initialized_ = false;  // 清理完成后，设置场景为未初始化
     spdlog::trace("场景 '{}' 清理完成。", scene_name_);
-}
-
-void Scene::addGameObject(std::unique_ptr<GameObject> game_object) {
-    if (game_object) {
-        game_objects_.push_back(std::move(game_object));
-    } else {
-        spdlog::warn("尝试向场景 '{}' 添加空游戏对象。", scene_name_);
-    }
-}
-
-void Scene::safeAddGameObject(std::unique_ptr<GameObject> game_object) {
-    if (game_object) {
-        pending_additions_.push_back(std::move(game_object));
-    } else {
-        spdlog::warn("尝试向场景 '{}' 添加空游戏对象。", scene_name_);
-    }
-}
-
-void Scene::removeGameObject(GameObject* game_object_ptr) {
-    if (!game_object_ptr) {
-        spdlog::warn("尝试从场景 '{}' 中移除一个空的游戏对象指针。", scene_name_);
-        return;
-    }
-
-    auto result = std::erase_if(game_objects_, [game_object_ptr](const std::unique_ptr<GameObject>& game_object) {
-        return game_object.get() == game_object_ptr;
-    });
-    if (result == 0) {
-        spdlog::warn("在场景 '{}' 中未找到要移除的游戏对象 '{}'.", scene_name_, game_object_ptr->getName());
-    } else {
-        spdlog::trace("从场景 '{}' 中移除游戏对象 '{}'.", scene_name_, game_object_ptr->getName());
-    }
-}
-
-void Scene::safeRemoveGameObject(GameObject* game_object_ptr) const { game_object_ptr->setNeedRemove(true); }
-
-GameObject* Scene::findGameObjectByName(std::string_view name) const {
-    for (const auto& game_object : game_objects_) {
-        if (game_object->getName() == name) {
-            return game_object.get();
-        }
-    }
-    return nullptr;
-}
-
-void Scene::processPendingAdditions() {
-    for (auto& game_object : pending_additions_) {
-        addGameObject(std::move(game_object));
-    }
-    pending_additions_.clear();
 }
 
 void Scene::requestPopScene() { context_.getDispatcher().trigger<PopSceneEvent>(); }

@@ -3,7 +3,9 @@
 #include <SDL3/SDL.h>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/component/sprite_component.h"
 #include "monster_war/engine/render/camera.h"
+#include "monster_war/engine/render/image.h"
 #include "monster_war/engine/resource/resource_manager.h"
 
 namespace pyc::monster_war {
@@ -21,92 +23,43 @@ Renderer::Renderer(SDL_Renderer* sdl_renderer, ResourceManager* resource_manager
     spdlog::trace("Renderer 构造成功。");
 }
 
-// void Renderer::drawImage(const Camera& camera, const Image& image, const glm::vec2& position,
-//                           const glm::vec2& scale, double angle) {
-//     auto texture = resource_manager_->getTexture(image.getTextureId());
-//     if (!texture) {
-//         spdlog::error("无法为 ID {} 获取纹理。", image.getTextureId());
-//         return;
-//     }
+void Renderer::drawSprite(const Camera& camera, const Sprite& sprite, const glm::vec2& position,
+                          const glm::vec2& size, const float rotation) {
+    auto texture = resource_manager_->getTexture(sprite.texture_id_, sprite.texture_path_);
+    if (!texture) {
+        spdlog::error("无法为 ID {} 获取纹理。", sprite.texture_id_);
+        return;
+    }
 
-//     auto src_rect = getImageSrcRect(image);
-//     if (!src_rect) {
-//         spdlog::error("无法获取精灵的源矩形, ID: {}", image.getTextureId());
-//         return;
-//     }
+    // 应用相机变换
+    auto screen_pos = camera.worldToScreen(position);
 
-//     // 应用相机变换
-//     auto screen_pos = camera.worldToScreen(position);
+    // 计算目标矩形，注意 position 是精灵的左上角坐标
+    SDL_FRect dest_rect = {
+        screen_pos.x,
+        screen_pos.y,
+        size.x,
+        size.y,
+    };
 
-//     // 计算目标矩形，注意 position 是精灵的左上角坐标
-//     SDL_FRect dest_rect = {
-//         screen_pos.x,
-//         screen_pos.y,
-//         src_rect->w * scale.x,
-//         src_rect->h * scale.y,
-//     };
+    if (!isRectInViewport(camera, dest_rect)) {
+        // spdlog::debug("精灵超出视口范围, ID: {}", image.getTextureId());
+        return;
+    }
 
-//     if (!isRectInViewport(camera, dest_rect)) {
-//         // spdlog::debug("精灵超出视口范围, ID: {}", image.getTextureId());
-//         return;
-//     }
+    SDL_FRect src_rect = {
+        sprite.src_rect_.position.x,
+        sprite.src_rect_.position.y,
+        sprite.src_rect_.size.x,
+        sprite.src_rect_.size.y,
+    };
 
-//     // 执行绘制(默认旋转中心为精灵的中心点)
-//     if (!SDL_RenderTextureRotated(sdl_renderer_, texture, &src_rect.value(), &dest_rect, angle, nullptr,
-//                                   image.isFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
-//         spdlog::error("渲染旋转纹理失败 (ID: {}): {}", image.getTextureId(), SDL_GetError());
-//     }
-// }
-
-// void Renderer::drawParallax(const Camera& camera, const Image& image, const glm::vec2& position,
-//                             const glm::vec2& scroll_factor, glm::bvec2 repeat, const glm::vec2& scale) {
-//     auto texture = resource_manager_->getTexture(image.getTextureId());
-//     if (!texture) {
-//         spdlog::error("无法为 ID {} 获取纹理。", image.getTextureId());
-//         return;
-//     }
-
-//     auto src_rect = getImageSrcRect(image);
-//     if (!src_rect) {
-//         spdlog::error("无法获取精灵的源矩形, ID: {}", image.getTextureId());
-//         return;
-//     }
-
-//     // 应用相机变换
-//     auto screen_pos = camera.worldToScreenWithParallax(position, scroll_factor);
-
-//     // 计算缩放后的纹理尺寸
-//     float scaled_tex_w = src_rect->w * scale.x;
-//     float scaled_tex_h = src_rect->h * scale.y;
-
-//     glm::vec2 start{};
-//     glm::vec2 stop{};
-//     auto viewport_size = camera.getViewportSize();
-
-//     if (repeat.x) {
-//         start.x = glm::mod(screen_pos.x, scaled_tex_w) - scaled_tex_w;
-//         stop.x = viewport_size.x;
-//     } else {
-//         start.x = screen_pos.x;
-//         stop.x = glm::min(screen_pos.x + scaled_tex_w, viewport_size.x);
-//     }
-//     if (repeat.y) {
-//         start.y = glm::mod(screen_pos.y, scaled_tex_h) - scaled_tex_h;
-//         stop.y = viewport_size.y;
-//     } else {
-//         start.y = screen_pos.y;
-//         stop.y = glm::min(screen_pos.y + scaled_tex_h, viewport_size.y);
-//     }
-//     for (float y = start.y; y < stop.y; y += scaled_tex_h) {
-//         for (float x = start.x; x < stop.x; x += scaled_tex_w) {
-//             SDL_FRect dest_rect = {x, y, scaled_tex_w, scaled_tex_h};
-//             if (!SDL_RenderTexture(sdl_renderer_, texture, &src_rect.value(), &dest_rect)) {
-//                 spdlog::error("渲染视差纹理失败 (ID: {}): {}", image.getTextureId(), SDL_GetError());
-//                 return;
-//             }
-//         }
-//     }
-// }
+    // 执行绘制(默认旋转中心为精灵的中心点)
+    if (!SDL_RenderTextureRotated(sdl_renderer_, texture, &src_rect, &dest_rect, rotation, nullptr,
+                                  sprite.is_flipped_ ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
+        spdlog::error("渲染旋转纹理失败 (ID: {}): {}", sprite.texture_id_, SDL_GetError());
+    }
+}
 
 void Renderer::drawUIImage(const Image& image, const glm::vec2& position, std::optional<glm::vec2> size) {
     auto texture = resource_manager_->getTexture(image.getTextureId());

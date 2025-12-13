@@ -3,7 +3,8 @@
 #include <chrono>
 #include <memory>
 #include <string>
-#include <vector>
+
+#include <entt/entity/registry.hpp>
 
 #include "common/noncopyable.h"
 
@@ -11,7 +12,6 @@ namespace pyc::monster_war {
 
 class Context;
 class UIManager;
-class GameObject;
 
 /**
  * @brief 场景基类，负责管理场景中的游戏对象和场景生命周期。
@@ -38,21 +38,6 @@ public:
     virtual void render();                                         ///< @brief 渲染场景。
     virtual void clean();                                          ///< @brief 清理场景。
 
-    /// @brief 直接向场景中添加一个游戏对象。（初始化时可用，游戏进行中不安全）
-    virtual void addGameObject(std::unique_ptr<GameObject> game_object);
-
-    /// @brief 安全地添加游戏对象。（添加到pending_additions_中）
-    virtual void safeAddGameObject(std::unique_ptr<GameObject> game_object);
-
-    /// @brief 直接从场景中移除一个游戏对象。（一般不使用，但保留实现的逻辑）
-    virtual void removeGameObject(GameObject* game_object_ptr);
-
-    /// @brief 安全地移除游戏对象。（设置need_remove_标记）
-    virtual void safeRemoveGameObject(GameObject* game_object_ptr) const;
-
-    /// @brief 根据名称查找游戏对象（返回找到的第一个对象）。
-    GameObject* findGameObjectByName(std::string_view name) const;
-
     /// @brief 请求弹出当前场景。
     void requestPopScene();
 
@@ -71,22 +56,17 @@ public:
     void setInitialized(bool initialized) { is_initialized_ = initialized; }  ///< @brief 设置场景是否已初始化
     bool isInitialized() const { return is_initialized_; }                    ///< @brief 获取场景是否已初始化
 
-    Context& getContext() const { return context_; }  ///< @brief 获取上下文引用
-    ///< @brief 获取场景中的游戏对象
-    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const { return game_objects_; }
-
-protected:
-    void processPendingAdditions();  ///< @brief 处理待添加的游戏对象。（每轮更新的最后调用）
+    Context& getContext() const { return context_; }     ///< @brief 获取上下文引用
+    entt::registry& getRegistry() { return registry_; }  ///< @brief 获取注册表引用
 
 protected:
     std::string scene_name_;                 ///< @brief 场景名称
     Context& context_;                       ///< @brief 上下文引用（隐式，构造时传入）
     std::unique_ptr<UIManager> ui_manager_;  ///< @brief UI管理器(初始化时自动创建)
+    entt::registry registry_;                ///< @brief ECS注册表
 
     ///< @brief 场景是否已初始化(非当前场景很可能未被删除，因此需要初始化标志避免重复初始化)
     bool is_initialized_ = false;
-    std::vector<std::unique_ptr<GameObject>> game_objects_;       ///< @brief 场景中的游戏对象
-    std::vector<std::unique_ptr<GameObject>> pending_additions_;  ///< @brief 待添加的游戏对象（延时添加）
 };
 
 }  // namespace pyc::monster_war

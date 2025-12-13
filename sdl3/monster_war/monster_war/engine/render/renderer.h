@@ -1,10 +1,11 @@
 #pragma once
 
+#include <optional>
+
 #include <SDL3/SDL_rect.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 #include "common/noncopyable.h"
-#include "monster_war/engine/render/image.h"
 #include "monster_war/engine/utils/math.h"
 
 struct SDL_Renderer;
@@ -13,6 +14,9 @@ namespace pyc::monster_war {
 
 class Camera;
 class ResourceManager;
+
+class Sprite;
+class Image;
 
 /**
  * @brief 相机类负责管理相机位置和视口大小，并提供坐标转换功能。
@@ -32,25 +36,14 @@ public:
     /**
      * @brief 绘制一个精灵
      *
-     * @param image 包含纹理ID、源矩形和翻转状态的 Image 对象。
+     * @param camera 游戏相机，用于坐标转换。
+     * @param sprite 包含纹理ID、源矩形和翻转状态的 Sprite 对象。
      * @param position 世界坐标中的左上角位置。
-     * @param scale 缩放因子。
-     * @param angle 旋转角度（度）。
+     * @param size 精灵的大小。
+     * @param rotation 旋转角度（度）。
      */
-    // void drawImage(const Camera& camera, const Image& image, const glm::vec2& position,
-    //                 const glm::vec2& scale = {1.0f, 1.0f}, double angle = 0.0f);
-
-    /**
-     * @brief 绘制视差滚动背景
-     *
-     * @param image 包含纹理ID、源矩形和翻转状态的 Image 对象。
-     * @param position 世界坐标。
-     * @param scroll_factor 滚动因子。
-     * @param scale 缩放因子。
-     */
-    // void drawParallax(const Camera& camera, const Image& image, const glm::vec2& position,
-    //                   const glm::vec2& scroll_factor, glm::bvec2 repeat = {true, true},
-    //                   const glm::vec2& scale = {1.0f, 1.0f});
+    void drawSprite(const Camera& camera, const Sprite& sprite, const glm::vec2& position, const glm::vec2& size,
+                    const float rotation = 0.0f);
 
     /**
      * @brief 在屏幕坐标中直接渲染一个用于UI的Image对象。
@@ -82,6 +75,7 @@ public:
 private:
     ///< @brief 获取精灵的源矩形，用于具体绘制。出现错误则返回std::nullopt并跳过绘制
     std::optional<SDL_FRect> getImageSrcRect(const Image& image);
+
     ///< @brief 判断矩形是否在视口中，用于视口裁剪
     bool isRectInViewport(const Camera& camera, const SDL_FRect& rect);
 
