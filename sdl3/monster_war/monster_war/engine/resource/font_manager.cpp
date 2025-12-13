@@ -76,7 +76,6 @@ TTF_Font* FontManager::getFont(entt::hashed_string str_hs, int point_size) {
     return getFont(str_hs.value(), point_size, str_hs.data());
 }
 
-
 void FontManager::unloadFont(entt::id_type id, int point_size) {
     auto key = FontKey{id, point_size};
     auto it = fonts_.find(key);

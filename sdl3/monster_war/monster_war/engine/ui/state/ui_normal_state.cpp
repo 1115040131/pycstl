@@ -13,7 +13,7 @@ namespace pyc::monster_war {
 using namespace entt::literals;
 
 void UINormalState::enter() {
-    owner_->setSprite("normal"_hs);
+    owner_->setImage("normal"_hs);
     spdlog::debug("切换到正常状态");
 }
 

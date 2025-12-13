@@ -2,7 +2,7 @@
 
 #include "monster_war/engine/ui/ui_element.h"
 
-#include "monster_war/engine/render/sprite.h"
+#include "monster_war/engine/render/image.h"
 
 namespace pyc::monster_war {
 
@@ -39,33 +39,33 @@ public:
             std::optional<Rect> source_rect = std::nullopt, bool is_flipped = false);
 
     /**
-     * @brief 构造一个UIImage对象。（通过Sprite对象构造）
+     * @brief 构造一个UIImage对象。（通过Image对象构造）
      *
-     * @param sprite 要显示的Sprite对象。
+     * @param image 要显示的Image对象。
      * @param position 图像的局部位置。
      * @param size 图像元素的大小。（如果为{0,0}，则使用纹理的原始尺寸）
      */
-    UIImage(const Sprite& sprite, glm::vec2 position = {0.0f, 0.0f}, glm::vec2 size = {0.0f, 0.0f});
+    UIImage(const Image& image, glm::vec2 position = {0.0f, 0.0f}, glm::vec2 size = {0.0f, 0.0f});
 
     // --- 核心方法 ---
     void render(Context& context) override;
 
     // --- Setters & Getters ---
-    const Sprite& getSprite() const { return sprite_; }
-    void setSprite(Sprite sprite) { sprite_ = std::move(sprite); }
+    const Image& getImage() const { return image_; }
+    void setImage(Image image) { image_ = std::move(image); }
 
-    std::string_view getTexturePath() const { return sprite_.getTexturePath(); }
-    entt::id_type getTextureId() const { return sprite_.getTextureId(); }
-    void setTexture(std::string_view texture_id) { sprite_.setTexture(texture_id); }
+    std::string_view getTexturePath() const { return image_.getTexturePath(); }
+    entt::id_type getTextureId() const { return image_.getTextureId(); }
+    void setTexture(std::string_view texture_id) { image_.setTexture(texture_id); }
 
-    const std::optional<Rect>& getSourceRect() const { return sprite_.getSourceRect(); }
-    void setSourceRect(std::optional<Rect> source_rect) { sprite_.setSourceRect(std::move(source_rect)); }
+    const std::optional<Rect>& getSourceRect() const { return image_.getSourceRect(); }
+    void setSourceRect(std::optional<Rect> source_rect) { image_.setSourceRect(std::move(source_rect)); }
 
-    bool isFlipped() const { return sprite_.isFlipped(); }
-    void setFlipped(bool flipped) { sprite_.setFlipped(flipped); }
+    bool isFlipped() const { return image_.isFlipped(); }
+    void setFlipped(bool flipped) { image_.setFlipped(flipped); }
 
 private:
-    Sprite sprite_;
+    Image image_;
 };
 
 }  // namespace pyc::monster_war

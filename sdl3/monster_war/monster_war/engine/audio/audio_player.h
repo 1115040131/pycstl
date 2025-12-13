@@ -66,7 +66,6 @@ public:
      */
     bool playMusic(entt::hashed_string hashed_path, int loops = -1, std::chrono::milliseconds fade_in_ms = {});
 
-
     /**
      * @brief 停止当前正在播放的背景音乐。
      * @param fade_out_ms 淡出时间（毫秒）（0 表示立即停止）。默认为 0。

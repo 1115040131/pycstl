@@ -14,15 +14,15 @@ namespace pyc::monster_war {
  * @brief 表示要绘制的视觉精灵的数据。
  *
  * 包含纹理标识符、要绘制的纹理部分（源矩形）以及翻转状态。
- * 位置、缩放和旋转由外部（例如 SpriteComponent）标识。
- * 渲染工作由 Renderer 类完成。（传入Sprite作为参数）
+ * 位置、缩放和旋转由外部（例如 UIImage）标识。
+ * 渲染工作由 Renderer 类完成。（传入Image作为参数）
  */
-class Sprite final {
+class Image final {
 public:
     /**
      * @brief 默认构造函数（创建一个空的/无效的精灵）
      */
-    explicit Sprite() = default;
+    explicit Image() = default;
 
     /**
      * @brief 构造一个精灵 （通过纹理路径构造）
@@ -31,8 +31,8 @@ public:
      * @param source_rect 可选的源矩形（SDL_FRect），定义要使用的纹理部分。如果为 std::nullopt，则使用整个纹理。
      * @param is_flipped 是否水平翻转
      */
-    explicit Sprite(std::string_view texture_path, std::optional<Rect> source_rect = std::nullopt,
-                    bool is_flipped = false)
+    explicit Image(std::string_view texture_path, std::optional<Rect> source_rect = std::nullopt,
+                   bool is_flipped = false)
         : texture_path_(texture_path),
           texture_id_(entt::hashed_string(texture_path.data())),
           source_rect_(std::move(source_rect)),
@@ -46,8 +46,8 @@ public:
      * @param is_flipped 是否水平翻转
      * @note 用此方法，需确保对应ID的纹理已经加载到ResourceManager中，因此不需要再提供纹理路径。
      */
-    explicit Sprite(entt::id_type texture_id, std::optional<Rect> source_rect = std::nullopt,
-                    bool is_flipped = false)
+    explicit Image(entt::id_type texture_id, std::optional<Rect> source_rect = std::nullopt,
+                   bool is_flipped = false)
         : texture_id_(texture_id), source_rect_(std::move(source_rect)), is_flipped_(is_flipped) {}
 
     // --- getters and setters ---

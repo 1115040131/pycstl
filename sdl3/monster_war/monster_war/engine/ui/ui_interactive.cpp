@@ -4,8 +4,8 @@
 
 #include "monster_war/engine/audio/audio_player.h"
 #include "monster_war/engine/core/context.h"
+#include "monster_war/engine/render/image.h"
 #include "monster_war/engine/render/renderer.h"
-#include "monster_war/engine/render/sprite.h"
 #include "monster_war/engine/resource/resource_manager.h"
 #include "monster_war/engine/ui/state/ui_state.h"
 
@@ -18,20 +18,20 @@ UIInteractive::UIInteractive(Context& context, glm::vec2 position, glm::vec2 siz
 
 UIInteractive::~UIInteractive() = default;
 
-void UIInteractive::addSprite(entt::id_type name_id, Sprite sprite) {
+void UIInteractive::addImage(entt::id_type name_id, Image image) {
     // 可交互UI元素必须有一个size用于交互检测，因此如果参数列表中没有指定，则用图片大小作为size
     if (size_.x == 0.0f && size_.y == 0.0f) {
-        size_ = context_.getResourceManager().getTextureSize(sprite.getTextureId());
+        size_ = context_.getResourceManager().getTextureSize(image.getTextureId());
     }
     // 添加精灵
-    sprites_.emplace(name_id, std::move(sprite));
+    images_.emplace(name_id, std::move(image));
 }
 
-void UIInteractive::setSprite(entt::id_type name_id) {
-    if (sprites_.contains(name_id)) {
-        current_sprite_id_ = name_id;
+void UIInteractive::setImage(entt::id_type name_id) {
+    if (images_.contains(name_id)) {
+        current_image_id_ = name_id;
     } else {
-        spdlog::warn("Sprite '{}' 未找到", name_id);
+        spdlog::warn("Image '{}' 未找到", name_id);
     }
 }
 
@@ -85,7 +85,7 @@ void UIInteractive::render(Context& context) {
     if (!visible_) return;
 
     // 先渲染自身
-    context.getRenderer().drawUISprite(sprites_[current_sprite_id_], getScreenPosition(), size_);
+    context.getRenderer().drawUIImage(images_[current_image_id_], getScreenPosition(), size_);
 
     // 再渲染子元素（调用基类方法）
     UIElement::render(context);

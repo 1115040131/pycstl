@@ -1,4 +1,5 @@
 #include "monster_war/engine/resource/audio_manager.h"
+
 #include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
 
@@ -56,11 +57,9 @@ Mix_Chunk* AudioManager::loadSound(entt::id_type id, std::string_view file_path)
     return raw_chunk;
 }
 
-Mix_Chunk* AudioManager::loadSound(entt::hashed_string str_hs) {
-    return loadSound(str_hs.value(), str_hs.data());
-}
+Mix_Chunk* AudioManager::loadSound(entt::hashed_string str_hs) { return loadSound(str_hs.value(), str_hs.data()); }
 
-Mix_Chunk* AudioManager::getSound(entt::id_type id,std::string_view file_path) {
+Mix_Chunk* AudioManager::getSound(entt::id_type id, std::string_view file_path) {
     auto it = sounds_.find(id);
     if (it != sounds_.end()) {
         return it->second.get();
@@ -71,14 +70,11 @@ Mix_Chunk* AudioManager::getSound(entt::id_type id,std::string_view file_path) {
         return nullptr;
     }
 
-
     spdlog::warn("音效 '{}' 未找到缓存，尝试加载。", file_path);
     return loadSound(id, file_path);
 }
 
-Mix_Chunk* AudioManager::getSound(entt::hashed_string str_hs) {
-    return getSound(str_hs.value(), str_hs.data());
-}
+Mix_Chunk* AudioManager::getSound(entt::hashed_string str_hs) { return getSound(str_hs.value(), str_hs.data()); }
 
 void AudioManager::unloadSound(entt::id_type id) {
     auto it = sounds_.find(id);
@@ -118,11 +114,9 @@ Mix_Music* AudioManager::loadMusic(entt::id_type id, std::string_view file_path)
     return raw_music;
 }
 
-Mix_Music* AudioManager::loadMusic(entt::hashed_string str_hs) {
-    return loadMusic(str_hs.value(), str_hs.data());
-}
+Mix_Music* AudioManager::loadMusic(entt::hashed_string str_hs) { return loadMusic(str_hs.value(), str_hs.data()); }
 
-Mix_Music* AudioManager::getMusic(entt::id_type id,std::string_view file_path) {
+Mix_Music* AudioManager::getMusic(entt::id_type id, std::string_view file_path) {
     auto it = music_.find(id);
     if (it != music_.end()) {
         return it->second.get();
@@ -138,11 +132,9 @@ Mix_Music* AudioManager::getMusic(entt::id_type id,std::string_view file_path) {
     return loadMusic(id, file_path);
 }
 
-Mix_Music* AudioManager::getMusic(entt::hashed_string str_hs) {
-    return getMusic(str_hs.value(), str_hs.data());
-}
+Mix_Music* AudioManager::getMusic(entt::hashed_string str_hs) { return getMusic(str_hs.value(), str_hs.data()); }
 
-void AudioManager::unloadMusic(entt::id_type id ) {
+void AudioManager::unloadMusic(entt::id_type id) {
     auto it = music_.find(id);
     if (it != music_.end()) {
         spdlog::debug("卸载音乐: id = {}", id);

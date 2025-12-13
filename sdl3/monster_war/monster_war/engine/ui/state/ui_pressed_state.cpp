@@ -13,7 +13,7 @@ namespace pyc::monster_war {
 using namespace entt::literals;
 
 void UIPressedState::enter() {
-    owner_->setSprite("pressed"_hs);
+    owner_->setImage("pressed"_hs);
     owner_->playSound("pressed"_hs);
     spdlog::debug("切换到按下状态");
 }

@@ -9,7 +9,7 @@
 namespace pyc::monster_war {
 
 class Context;
-class Sprite;
+class Image;
 class UIState;
 
 /**
@@ -26,8 +26,8 @@ public:
 
     virtual void clicked() {}  ///< @brief 如果有点击事件，则重写该方法
 
-    void addSprite(entt::id_type name_id, Sprite sprite);                   ///< @brief 添加精灵
-    void setSprite(entt::id_type name_id);                                  ///< @brief 设置当前显示的精灵
+    void addImage(entt::id_type name_id, Image image);                      ///< @brief 添加精灵
+    void setImage(entt::id_type name_id);                                   ///< @brief 设置当前显示的精灵
     void addSound(entt::id_type name_id, entt::hashed_string hashed_path);  ///< @brief 添加音效
     void playSound(entt::id_type name_id);                                  ///< @brief 播放音效
 
@@ -46,9 +46,9 @@ protected:
     Context& context_;                ///< @brief 可交互元素很可能需要其他引擎组件
     std::unique_ptr<UIState> state_;  ///< @brief 当前状态
     ///< @brief 精灵集合
-    std::unordered_map<entt::id_type, Sprite> sprites_;        ///< @brief 精灵集合
+    std::unordered_map<entt::id_type, Image> images_;          ///< @brief 精灵集合
     std::unordered_map<entt::id_type, entt::id_type> sounds_;  ///< @brief 音效集合，key为音效名称ID，value为音效ID
-    entt::id_type current_sprite_id_;                          ///< @brief 当前显示的精灵ID
+    entt::id_type current_image_id_;                           ///< @brief 当前显示的精灵ID
     bool interactive_ = true;                                  ///< @brief 是否可交互
 };
 

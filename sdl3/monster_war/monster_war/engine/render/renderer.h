@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "common/noncopyable.h"
-#include "monster_war/engine/render/sprite.h"
+#include "monster_war/engine/render/image.h"
 #include "monster_war/engine/utils/math.h"
 
 struct SDL_Renderer;
@@ -32,35 +32,34 @@ public:
     /**
      * @brief 绘制一个精灵
      *
-     * @param sprite 包含纹理ID、源矩形和翻转状态的 Sprite 对象。
+     * @param image 包含纹理ID、源矩形和翻转状态的 Image 对象。
      * @param position 世界坐标中的左上角位置。
      * @param scale 缩放因子。
      * @param angle 旋转角度（度）。
      */
-    void drawSprite(const Camera& camera, const Sprite& sprite, const glm::vec2& position,
-                    const glm::vec2& scale = {1.0f, 1.0f}, double angle = 0.0f);
+    // void drawImage(const Camera& camera, const Image& image, const glm::vec2& position,
+    //                 const glm::vec2& scale = {1.0f, 1.0f}, double angle = 0.0f);
 
     /**
      * @brief 绘制视差滚动背景
      *
-     * @param sprite 包含纹理ID、源矩形和翻转状态的 Sprite 对象。
+     * @param image 包含纹理ID、源矩形和翻转状态的 Image 对象。
      * @param position 世界坐标。
      * @param scroll_factor 滚动因子。
      * @param scale 缩放因子。
      */
-    void drawParallax(const Camera& camera, const Sprite& sprite, const glm::vec2& position,
-                      const glm::vec2& scroll_factor, glm::bvec2 repeat = {true, true},
-                      const glm::vec2& scale = {1.0f, 1.0f});
+    // void drawParallax(const Camera& camera, const Image& image, const glm::vec2& position,
+    //                   const glm::vec2& scroll_factor, glm::bvec2 repeat = {true, true},
+    //                   const glm::vec2& scale = {1.0f, 1.0f});
 
     /**
-     * @brief 在屏幕坐标中直接渲染一个用于UI的Sprite对象。
+     * @brief 在屏幕坐标中直接渲染一个用于UI的Image对象。
      *
-     * @param sprite 包含纹理ID、源矩形和翻转状态的Sprite对象。
+     * @param image 包含纹理ID、源矩形和翻转状态的Image对象。
      * @param position 屏幕坐标中的左上角位置。
-     * @param size 可选：目标矩形的大小。如果为 std::nullopt，则使用Sprite的原始大小。
+     * @param size 可选：目标矩形的大小。如果为 std::nullopt，则使用Image的原始大小。
      */
-    void drawUISprite(const Sprite& sprite, const glm::vec2& position,
-                      std::optional<glm::vec2> size = std::nullopt);
+    void drawUIImage(const Image& image, const glm::vec2& position, std::optional<glm::vec2> size = std::nullopt);
 
     /**
      * @brief 绘制填充矩形
@@ -82,7 +81,7 @@ public:
 
 private:
     ///< @brief 获取精灵的源矩形，用于具体绘制。出现错误则返回std::nullopt并跳过绘制
-    std::optional<SDL_FRect> getSpriteSrcRect(const Sprite& sprite);
+    std::optional<SDL_FRect> getImageSrcRect(const Image& image);
     ///< @brief 判断矩形是否在视口中，用于视口裁剪
     bool isRectInViewport(const Camera& camera, const SDL_FRect& rect);
 

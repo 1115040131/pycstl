@@ -3,20 +3,20 @@
 #include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/render/sprite.h"
+#include "monster_war/engine/render/image.h"
 #include "monster_war/engine/ui/state/ui_state_factory.h"
 
 namespace pyc::monster_war {
 
 using namespace entt::literals;
 
-UIButton::UIButton(Context& context, std::string_view normal_sprite_id, std::string_view hover_sprite_id,
-                   std::string_view pressed_sprite_id, glm::vec2 position, glm::vec2 size,
+UIButton::UIButton(Context& context, std::string_view normal_image_id, std::string_view hover_image_id,
+                   std::string_view pressed_image_id, glm::vec2 position, glm::vec2 size,
                    std::function<void()> callback)
     : UIInteractive(context, std::move(position), std::move(size)), callback_(std::move(callback)) {
-    addSprite("normal"_hs, Sprite(normal_sprite_id));
-    addSprite("hover"_hs, Sprite(hover_sprite_id));
-    addSprite("pressed"_hs, Sprite(pressed_sprite_id));
+    addImage("normal"_hs, Image(normal_image_id));
+    addImage("hover"_hs, Image(hover_image_id));
+    addImage("pressed"_hs, Image(pressed_image_id));
 
     // 设置默认状态为"normal"
     setState(UIStateFactory::create<UINormalState>(this));

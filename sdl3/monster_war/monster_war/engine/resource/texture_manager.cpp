@@ -44,7 +44,7 @@ SDL_Texture* TextureManager::loadTexture(entt::hashed_string str_hs) {
     return loadTexture(str_hs.value(), str_hs.data());
 }
 
-SDL_Texture* TextureManager::getTexture(entt::id_type id, std::string_view file_path ) {
+SDL_Texture* TextureManager::getTexture(entt::id_type id, std::string_view file_path) {
     // 查找现有纹理
     auto it = textures_.find(id);
     if (it != textures_.end()) {
@@ -66,9 +66,9 @@ SDL_Texture* TextureManager::getTexture(entt::hashed_string str_hs) {
     return getTexture(str_hs.value(), str_hs.data());
 }
 
-glm::vec2 TextureManager::getTextureSize(entt::id_type id, std::string_view file_path ){
+glm::vec2 TextureManager::getTextureSize(entt::id_type id, std::string_view file_path) {
     // 获取纹理
-    auto texture = getTexture(id,file_path);
+    auto texture = getTexture(id, file_path);
     if (!texture) {
         spdlog::error("无法获取纹理: {}", file_path);
         return glm::vec2(0);
