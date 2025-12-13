@@ -36,6 +36,9 @@ public:
 
     void clear();  ///< @brief 清空所有资源
 
+    // 加载资源
+    void loadResources(std::string_view file_path);
+
     // --- 统一资源访问接口 ---
     // -- Texture --
     SDL_Texture* loadTexture(entt::id_type id, std::string_view file_path);         ///< @brief 载入纹理资源(通过id + 文件路径)
