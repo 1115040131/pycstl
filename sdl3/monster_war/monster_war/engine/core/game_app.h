@@ -14,6 +14,7 @@ struct SDL_Renderer;
 namespace pyc::monster_war {
 
 class Config;
+class GameState;
 class Time;
 class ResourceManager;
 class AudioPlayer;
@@ -21,7 +22,6 @@ class Renderer;
 class Camera;
 class TextRenderer;
 class InputManager;
-class GameState;
 class Context;
 class SceneManager;
 
@@ -57,6 +57,7 @@ private:
     [[nodiscard]] bool initDispatcher();
     [[nodiscard]] bool initConfig();
     [[nodiscard]] bool initSDL();
+    [[nodiscard]] bool initGameState();
     [[nodiscard]] bool initTime();
     [[nodiscard]] bool initResourceManager();
     [[nodiscard]] bool initAudioPlayer();
@@ -64,7 +65,6 @@ private:
     [[nodiscard]] bool initCamera();
     [[nodiscard]] bool initTextRenderer();
     [[nodiscard]] bool initInputManager();
-    [[nodiscard]] bool initGameState();
 
     [[nodiscard]] bool initContext();
     [[nodiscard]] bool initSceneManager();
@@ -84,6 +84,7 @@ private:
     // 引擎组件
     std::unique_ptr<entt::dispatcher> dispatcher_;
     std::unique_ptr<Config> config_;
+    std::unique_ptr<GameState> game_state_;
     std::unique_ptr<Time> time_;
     std::unique_ptr<ResourceManager> resource_manager_;
     std::unique_ptr<AudioPlayer> audio_player_;
@@ -91,7 +92,6 @@ private:
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<TextRenderer> text_renderer_;
     std::unique_ptr<InputManager> input_manager_;
-    std::unique_ptr<GameState> game_state_;
 
     std::unique_ptr<Context> context_;
     std::unique_ptr<SceneManager> scene_manager_;

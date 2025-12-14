@@ -2,10 +2,7 @@ load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
 
 cc_library(
     name = "ziyu_engine",
-    srcs = glob(
-        ["monster_war/engine/**/*.cpp"],
-        exclude = ["monster_war/engine/scene/level_loader.cpp"],
-    ),
+    srcs = glob(["monster_war/engine/**/*.cpp"]),
     hdrs = glob(["monster_war/engine/**/*.h"]),
     copts = STRICT_COPTS,
     defines = select({

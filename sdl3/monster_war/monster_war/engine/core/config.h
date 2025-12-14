@@ -15,9 +15,11 @@ namespace pyc::monster_war {
 struct ConfigDetail {
     // 窗口设置
     struct Window {
-        std::string title = "SunnyLand";
+        std::string title = "MonsterWar";
         int width = 1280;
         int height = 720;
+        float window_scale = 1.0f;
+        float logical_scale = 1.0f;
         bool resizable = true;
     } window;
 

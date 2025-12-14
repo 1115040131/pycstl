@@ -7,7 +7,8 @@
 
 namespace pyc::monster_war {
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Window, title, width, height, resizable);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Window, title, width, height, window_scale,
+                                                logical_scale, resizable);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Graphics, vsync);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Performance, target_fps);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Audio, music_volume, sound_volume);

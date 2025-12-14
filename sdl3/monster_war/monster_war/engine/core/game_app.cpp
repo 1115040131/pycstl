@@ -66,6 +66,7 @@ bool GameApp::init() {
     if (!initDispatcher() ||
         !initConfig() ||
         !initSDL() ||
+        !initGameState() ||
         !initTime() ||
         !initResourceManager() ||
         !initAudioPlayer() ||
@@ -73,7 +74,6 @@ bool GameApp::init() {
         !initCamera() ||
         !initTextRenderer() ||
         !initInputManager() ||
-        !initGameState() ||
         !initContext() ||
         !initSceneManager()) {
         return false;
@@ -165,8 +165,11 @@ bool GameApp::initSDL() {
         return false;
     }
 
-    SDL_CreateWindowAndRenderer("SunnyLand", config_->CONFIG(window.width), config_->CONFIG(window.height),
-                                SDL_WINDOW_RESIZABLE, &window_, &sdl_renderer_);
+    // 设置窗口大小
+    int window_width = config_->CONFIG(window.width) * config_->CONFIG(window.window_scale);
+    int window_height = config_->CONFIG(window.height) * config_->CONFIG(window.window_scale);
+    SDL_CreateWindowAndRenderer("SunnyLand", window_width, window_height, SDL_WINDOW_RESIZABLE, &window_,
+                                &sdl_renderer_);
     if (!window_ || !sdl_renderer_) {
         spdlog::error("无法创建窗口与渲染器! SDL错误: {}", SDL_GetError());
         return false;
@@ -182,9 +185,21 @@ bool GameApp::initSDL() {
     spdlog::trace("VSync 设置为: {}", config_->CONFIG(graphics.vsync) ? "Enabled" : "Disabled");
 
     // 设置逻辑分辨率
-    SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->CONFIG(window.width) / 2,
-                                     config_->CONFIG(window.height) / 2, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    int logical_width = static_cast<int>(config_->CONFIG(window.width) * config_->CONFIG(window.logical_scale));
+    int logical_height = static_cast<int>(config_->CONFIG(window.height) * config_->CONFIG(window.logical_scale));
+    SDL_SetRenderLogicalPresentation(sdl_renderer_, logical_width, logical_height,
+                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
     spdlog::trace("SDL 初始化成功。");
+    return true;
+}
+
+bool GameApp::initGameState() {
+    try {
+        game_state_ = std::make_unique<GameState>(window_, sdl_renderer_);
+    } catch (const std::exception& e) {
+        spdlog::error("初始化游戏状态失败: {}", e.what());
+        return false;
+    }
     return true;
 }
 
@@ -239,8 +254,7 @@ bool GameApp::initRenderer() {
 
 bool GameApp::initCamera() {
     try {
-        camera_ = std::make_unique<Camera>(
-            glm::vec2(config_->CONFIG(window.width) / 2, config_->CONFIG(window.height) / 2));
+        camera_ = std::make_unique<Camera>(game_state_->getLogicalSize());
     } catch (const std::exception& e) {
         spdlog::error("初始化相机失败: {}", e.what());
         return false;
@@ -268,16 +282,6 @@ bool GameApp::initInputManager() {
         return false;
     }
     spdlog::trace("输入管理器初始化成功。");
-    return true;
-}
-
-bool GameApp::initGameState() {
-    try {
-        game_state_ = std::make_unique<GameState>(window_, sdl_renderer_);
-    } catch (const std::exception& e) {
-        spdlog::error("初始化游戏状态失败: {}", e.what());
-        return false;
-    }
     return true;
 }
 

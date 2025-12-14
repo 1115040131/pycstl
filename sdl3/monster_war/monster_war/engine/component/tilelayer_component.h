@@ -28,10 +28,10 @@ enum class TileType {
  * @note 它只是辅助LevelLoader解析的临时数据，不会保存在游戏中。
  */
 struct TileInfo {
-    Sprite sprite_;                             ///< @brief 精灵
-    TileType type_;                             ///< @brief 类型
-    std::optional<Animation> animation_;        ///< @brief 动画（支持Tiled动画图块）
-    std::optional<nlohmann::json> properties_;  ///< @brief 属性（存放自定义属性，方便LevelLoader解析）
+    Sprite sprite_;                               ///< @brief 精灵
+    TileType type_;                               ///< @brief 类型
+    std::optional<Animation> animation_{};        ///< @brief 动画（支持Tiled动画图块）
+    std::optional<nlohmann::json> properties_{};  ///< @brief 属性（存放自定义属性，方便LevelLoader解析）
 };
 
 /**
