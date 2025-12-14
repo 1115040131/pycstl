@@ -70,6 +70,9 @@ public:
     ///< @brief 设置绘制颜色，包装 SDL_SetRenderDrawColorFloat 函数，使用 float 类型
     void setDrawColorFloat(float r, float g, float b, float a = 1.0f);
 
+    ///< @brief 设置背景颜色，使用 float 类型
+    void setBgColorFloat(float r, float g, float b, float a = 1.0f) { background_color_ = {r, g, b, a}; }
+
     SDL_Renderer* getSDLRenderer() const { return sdl_renderer_; }  ///< @brief 获取底层的 SDL_Renderer 指针
 
 private:
@@ -82,6 +85,8 @@ private:
 private:
     SDL_Renderer* sdl_renderer_{};         ///< @brief 指向 SDL_Renderer 的非拥有指针
     ResourceManager* resource_manager_{};  ///< @brief 指向 ResourceManager 的非拥有指针
+
+    FColor background_color_{};  ///< @brief 清除屏幕的颜色（默认黑色），可调用setBgColorFloat设置
 };
 
 }  // namespace pyc::monster_war

@@ -95,6 +95,7 @@ void Renderer::drawUIFilledRect(const Rect& rect, const FColor& color) {
 void Renderer::present() { SDL_RenderPresent(sdl_renderer_); }
 
 void Renderer::clearScreen() {
+    setDrawColorFloat(background_color_.r, background_color_.g, background_color_.b, background_color_.a);
     if (!SDL_RenderClear(sdl_renderer_)) {
         spdlog::error("清除渲染器失败：{}", SDL_GetError());
     }

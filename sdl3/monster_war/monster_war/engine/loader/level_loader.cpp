@@ -7,10 +7,12 @@
 
 #include "monster_war/engine/component/name_component.h"
 #include "monster_war/engine/component/parallax_component.h"
+#include "monster_war/engine/component/render_component.h"
 #include "monster_war/engine/component/sprite_component.h"
 #include "monster_war/engine/component/tilelayer_component.h"
 #include "monster_war/engine/component/transform_component.h"
 #include "monster_war/engine/core/context.h"
+#include "monster_war/engine/render/renderer.h"
 #include "monster_war/engine/resource/resource_manager.h"
 #include "monster_war/engine/scene/scene.h"
 
@@ -44,10 +46,15 @@ bool LevelLoader::loadLevel(std::string_view level_path, Scene* scene) {
         return false;
     }
 
-    // 3. 获取基本地图信息 (名称、地图尺寸、瓦片尺寸)
+    // 3. 获取基本地图信息 (名称、地图尺寸、瓦片尺寸)，并设置背景颜色
     map_path_ = level_path;
     map_size_ = glm::ivec2(json_data.value("width", 0), json_data.value("height", 0));
     tile_size_ = glm::ivec2(json_data.value("tilewidth", 0), json_data.value("tileheight", 0));
+    if (json_data.contains("backgroundcolor")) {
+        auto color_string = json_data["backgroundcolor"].get<std::string>();
+        auto color = parseHexColor(color_string);
+        scene_->getContext().getRenderer().setBgColorFloat(color.r, color.g, color.b, color.a);
+    }
 
     // 4. 加载 tileset 数据
     if (json_data.contains("tilesets") && json_data["tilesets"].is_array()) {
@@ -75,6 +82,15 @@ bool LevelLoader::loadLevel(std::string_view level_path, Scene* scene) {
         // 获取各图层对象中的类型（type）字段
         std::string layer_type = layer_json.value("type", "none");
 
+        // 可以指定当前图层的序号（默认从0开始，每载入一个图层，序号加1），这个序号用于决定渲染顺序
+        if (layer_json.contains("properties")) {
+            for (const auto& property : layer_json["properties"]) {
+                if (property.contains("name") && property["name"] == "order") {
+                    current_layer_ = property["value"].get<int>();
+                }
+            }
+        }
+
         // 根据图层类型决定加载方法
         if (layer_type == "imagelayer") {
             loadImageLayer(layer_json);
@@ -85,6 +101,9 @@ bool LevelLoader::loadLevel(std::string_view level_path, Scene* scene) {
         } else {
             spdlog::warn("不支持的图层类型: {}", layer_type);
         }
+
+        spdlog::info("当前图层: {}, 图层ID: {}", layer_json.value("name", "Unnamed"), current_layer_);
+        current_layer_++;  // 每加载一个图层，图层ID加1
     }
 
     spdlog::info("关卡加载完成: {}", level_path);
@@ -123,6 +142,7 @@ void LevelLoader::loadImageLayer(const nlohmann::json& layer_json) {
     registry.emplace<TransformComponent>(entity, offset);
     registry.emplace<ParallaxComponent>(entity, scroll_factor, repeat);
     registry.emplace<SpriteComponent>(entity, std::move(sprite));
+    registry.emplace<RenderComponent>(entity, current_layer_);
     /* 实体与组件创建完毕后即由registry自动管理，不需要“添加到场景”的步骤 */
 
     spdlog::info("加载图层: '{}' 完成", layer_name);
@@ -196,74 +216,6 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json) {
     }
 }
 
-// void LevelLoader::addAnimation(const nlohmann::json& anim_json, AnimationComponent* animation_component,
-//                                const glm::vec2& sprite_size) {
-//     // 检查 anim_json 必须是一个对象，并且 ac 不能为 nullptr
-//     if (!anim_json.is_object() || !animation_component) {
-//         spdlog::error("无效的动画 JSON 或 AnimationComponent 指针。");
-//         return;
-//     }
-//     // 遍历动画 JSON 对象中的每个键值对（动画名称 : 动画信息）
-//     for (const auto& anim : anim_json.items()) {
-//         std::string_view anim_name = anim.key();
-//         const auto& anim_info = anim.value();
-//         if (!anim_info.is_object()) {
-//             spdlog::warn("动画 '{}' 的信息无效或为空。", anim_name);
-//             continue;
-//         }
-//         // 获取可能存在的动画帧信息
-//         auto duration_ms = std::chrono::milliseconds(anim_info.value("duration", 100));  //
-//         默认持续时间为100毫秒 auto duration =
-//         std::chrono::duration_cast<std::chrono::duration<float>>(duration_ms);  // 转换为秒 auto row =
-//         anim_info.value("row", 0);                                                   // 默认行数为0
-//         // 帧信息（数组）是必须存在的
-//         if (!anim_info.contains("frames") || !anim_info["frames"].is_array()) {
-//             spdlog::warn("动画 '{}' 缺少 'frames' 数组。", anim_name);
-//             continue;
-//         }
-//         // 创建一个Animation对象 (默认为循环播放)
-//         auto animation = std::make_unique<Animation>(anim_name);
-
-//         // 遍历数组并进行添加帧信息到animation对象
-//         for (const auto& frame : anim_info["frames"]) {
-//             if (!frame.is_number_integer()) {
-//                 spdlog::warn("动画 {} 中 frames 数组格式错误！", anim_name);
-//                 continue;
-//             }
-//             auto column = frame.get<int>();
-//             // 计算源矩形
-//             SDL_FRect src_rect = {
-//                 column * sprite_size.x,
-//                 row * sprite_size.y,
-//                 sprite_size.x,
-//                 sprite_size.y,
-//             };
-//             // 添加动画帧到 Animation
-//             animation->addFrame(src_rect, duration);
-//         }
-//         // 将 Animation 对象添加到 AnimationComponent 中
-//         animation_component->addAnimation(std::move(animation));
-//     }
-// }
-
-// void LevelLoader::addSound(const nlohmann::json& sound_json, AudioComponent* audio_component) {
-//     if (!sound_json.is_object() || !audio_component) {
-//         spdlog::error("无效的音效 JSON 或 AudioComponent 指针。");
-//         return;
-//     }
-//     // 遍历音效 JSON 对象中的每个键值对（音效id : 音效路径）
-//     for (const auto& sound : sound_json.items()) {
-//         const std::string& sound_id = sound.key();
-//         const std::string& sound_path = sound.value();
-//         if (sound_id.empty() || sound_path.empty()) {
-//             spdlog::warn("音效 '{}' 缺少必要信息。", sound_id);
-//             continue;
-//         }
-//         // 添加音效到 AudioComponent
-//         audio_component->addSound(sound_id, resolvePath(sound_path, map_path_));
-//     }
-// }
-
 std::optional<Rect> LevelLoader::getColliderRect(const nlohmann::json& tile_json) const {
     if (!tile_json.contains("objectgroup")) {
         return std::nullopt;
@@ -325,6 +277,18 @@ std::optional<TileInfo> LevelLoader::getTileInfoByGid(int gid) const {
         return std::nullopt;
     }
 
+    // 判断并存储是否水平翻转 (最高的第32位为1)
+    bool is_flipped_horizontally = gid & 0x80000000;
+    /* 未来可添加其它翻转支持，目前sprite组件只支持水平翻转
+        // 判断垂直翻转 (最高的第31位为1)
+        bool is_flipped_vertically = gid & 0x40000000;
+        // 判断对角线翻转 (最高的第30位为1)
+        bool is_flipped_diagonally = gid & 0x20000000;
+    */
+
+    // 还原gid的实际值 (最高的三个标志位置为0，而其余位全为1。这个掩码的十六进制表示为 0x1FFFFFFF。)
+    gid = gid & 0x1FFFFFFF;
+
     // upper_bound：查找tileset_data_中键大于 gid 的第一个元素，返回迭代器
     auto tileset_it = tileset_data_.upper_bound(gid);
     if (tileset_it == tileset_data_.begin()) {
@@ -346,8 +310,15 @@ std::optional<TileInfo> LevelLoader::getTileInfoByGid(int gid) const {
         auto image_path = tileset["image"].get<std::string>();
         // 计算纹理绝对路径
         auto texture_path = resolvePath(image_path, file_path);
-        // 创建精灵
-        auto tile_info = TileInfo{Sprite{texture_path, texture_rect}, getTileTypeById(tileset, local_id)};
+        // 创建精灵，考虑水平翻转标志
+        auto tile_info = TileInfo{
+            Sprite{
+                texture_path,
+                texture_rect,
+                is_flipped_horizontally,
+            },
+            getTileTypeById(tileset, local_id),
+        };
 
         for (const auto& tile_json : tileset["tiles"]) {
             auto tile_id = tile_json.value("id", -1);
@@ -400,7 +371,14 @@ std::optional<TileInfo> LevelLoader::getTileInfoByGid(int gid) const {
                     glm::vec2(tile_json.value("x", 0.0f), tile_json.value("y", 0.0f)),
                     glm::vec2(tile_json.value("width", image_width), tile_json.value("height", image_height)),
                 };
-                auto tile_info = TileInfo{Sprite{texture_path, texture_rect}, getTileType(tile_json)};
+                auto tile_info = TileInfo{
+                    Sprite{
+                        texture_path,
+                        texture_rect,
+                        is_flipped_horizontally,
+                    },
+                    getTileType(tile_json),
+                };
                 // scene_->getContext().getResourceManager().loadTexture(entt::hashed_string(texture_path.c_str()),
                 // texture_path);  // 确保纹理被加载
                 // 补充属性信息
@@ -415,36 +393,6 @@ std::optional<TileInfo> LevelLoader::getTileInfoByGid(int gid) const {
     spdlog::error("图块集 '{}' 中未找到gid为 {} 的瓦片。", tileset_it->first, gid);
     return std::nullopt;
 }
-
-// std::optional<nlohmann::json> LevelLoader::getTileJsonByGid(int gid) const {
-//     if (gid == 0) {
-//         return std::nullopt;
-//     }
-
-//     // 1. 查找tileset_data_中键小于等于gid的最近元素
-//     auto tileset_it = tileset_data_.upper_bound(gid);
-//     if (tileset_it == tileset_data_.begin()) {
-//         spdlog::error("gid为 {} 的瓦片未找到图块集。", gid);
-//         return std::nullopt;
-//     }
-//     --tileset_it;
-//     // 2. 获取图块集json对象
-//     const auto& tileset = tileset_it->second;
-//     if (!tileset.contains("tiles")) {  // 没有tiles字段的话不符合数据格式要求，直接返回空
-//         spdlog::error("Tileset 文件 '{}' 缺少 'tiles' 属性。", tileset_it->first);
-//         return std::nullopt;
-//     }
-//     auto local_id = gid - tileset_it->first;  // 计算瓦片在图块集中的局部ID
-//     // 3. 遍历tiles数组，根据id查找对应的瓦片并返回瓦片json
-//     const auto& tiles_json = tileset["tiles"];
-//     for (const auto& tile_json : tiles_json) {
-//         auto tile_id = tile_json.value("id", 0);
-//         if (tile_id == local_id) {  // 找到对应的瓦片，返回瓦片json
-//             return tile_json;
-//         }
-//     }
-//     return std::nullopt;
-// }
 
 void LevelLoader::loadTileset(std::string_view tileset_path, int first_gid) {
     std::ifstream file(tileset_path.data());

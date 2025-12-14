@@ -9,6 +9,7 @@
 #include "monster_war/engine/system/animation_system.h"
 #include "monster_war/engine/system/movement_system.h"
 #include "monster_war/engine/system/render_system.h"
+#include "monster_war/engine/system/ysort_system.h"
 #include "monster_war/engine/ui/ui_manager.h"
 #include "monster_war/engine/utils/events.h"
 
@@ -21,6 +22,7 @@ GameScene::GameScene(Context& context) : Scene("GameScene", context) {
     render_system_ = std::make_unique<RenderSystem>();
     movement_system_ = std::make_unique<MovementSystem>();
     animation_system_ = std::make_unique<AnimationSystem>();
+    ysort_system_ = std::make_unique<YSortSystem>();
 
     spdlog::trace("GameScene 构造完成。");
 }
@@ -39,6 +41,7 @@ void GameScene::init() {
 void GameScene::update(std::chrono::duration<float> delta_time) {
     movement_system_->update(registry_, delta_time);
     animation_system_->update(registry_, delta_time);
+    ysort_system_->update(registry_);  // 调用顺序要在MovementSystem之后
 
     Scene::update(delta_time);
 }

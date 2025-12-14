@@ -22,6 +22,7 @@ private:
     std::unique_ptr<RenderSystem> render_system_;
     std::unique_ptr<MovementSystem> movement_system_;
     std::unique_ptr<AnimationSystem> animation_system_;
+    std::unique_ptr<YSortSystem> ysort_system_;
 };
 
 }  // namespace pyc::monster_war

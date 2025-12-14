@@ -5,6 +5,7 @@
 
 #include "monster_war/engine/component/animation_component.h"
 #include "monster_war/engine/component/name_component.h"
+#include "monster_war/engine/component/render_component.h"
 #include "monster_war/engine/component/sprite_component.h"
 #include "monster_war/engine/component/tilelayer_component.h"
 #include "monster_war/engine/component/transform_component.h"
@@ -73,6 +74,7 @@ BasicEntityBuilder* BasicEntityBuilder::build() {
     buildBase();
     buildSprite();
     buildTransform();
+    buildRender();
     buildAnimation();
     buildAudio();
     return this;
@@ -131,6 +133,13 @@ void BasicEntityBuilder::buildTransform() {
 
     // 添加 TransformComponent
     registry_.emplace<TransformComponent>(entity_id_, position_, scale, rotation);
+}
+
+void BasicEntityBuilder::buildRender() {
+    spdlog::trace("构建Render组件");
+    int layer = level_loader_.getCurrentLayer();  // 确定图层
+    float depth = position_.y;                    // 确定深度（默认y坐标）
+    registry_.emplace<RenderComponent>(entity_id_, layer, depth);
 }
 
 void BasicEntityBuilder::buildAnimation() {

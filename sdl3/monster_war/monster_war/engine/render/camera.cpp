@@ -1,5 +1,6 @@
 #include "monster_war/engine/render/camera.h"
 
+#include <glm/common.hpp>
 #include <spdlog/spdlog.h>
 
 namespace pyc::monster_war {

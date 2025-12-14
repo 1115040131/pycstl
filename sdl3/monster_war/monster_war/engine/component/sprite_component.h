@@ -2,6 +2,7 @@
 
 #include <entt/core/hashed_string.hpp>
 #include <entt/entity/entity.hpp>
+#include <glm/common.hpp>
 #include <glm/vec2.hpp>
 
 #include "monster_war/engine/utils/math.h"
