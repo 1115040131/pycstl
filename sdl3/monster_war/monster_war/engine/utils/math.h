@@ -1,5 +1,6 @@
 #pragma once
 
+#include <random>
 #include <string_view>
 
 #include <glm/vec2.hpp>
@@ -23,7 +24,7 @@ struct FColor {
  * @param hex_color 颜色字符串（支持 "#RRGGBB" 或 "#RRGGBBAA" 格式）
  * @return FColor 结构体，若解析失败则返回全 0
  */
-constexpr FColor parseHexColor(std::string_view hex_color) {
+constexpr inline FColor parseHexColor(std::string_view hex_color) {
     // 16进制符号（字符）转为10进制整数的工具函数
     auto hexToInt = [](char c) -> int {
         if ('0' <= c && c <= '9') {
@@ -65,6 +66,19 @@ constexpr FColor parseHexColor(std::string_view hex_color) {
         static_cast<float>(b) / 255.0f,
         static_cast<float>(a) / 255.0f,
     };
+}
+
+/**
+ * @brief 生成指定范围内的随机整数 [min, max]
+ * @param min 最小值（包含）
+ * @param max 最大值（包含）
+ * @return 随机整数
+ */
+inline int randomInt(int min, int max) {
+    // static thread_local 表示该变量在每个线程中各自独立，互不影响，避免多线程下的竞争条件
+    static thread_local std::mt19937 generator{std::random_device{}()};
+    std::uniform_int_distribution<int> distribution(min, max);
+    return distribution(generator);
 }
 
 }  // namespace pyc::monster_war
