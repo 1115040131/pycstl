@@ -6,4 +6,9 @@ namespace pyc::monster_war {
 
 struct DeadTag {};  ///< @brief 死亡标签，用于标记实体死亡并延时删除
 
+struct FaceLeftTag {};  ///< @brief 角色图片默认朝右，如果朝左就添加一个标签，用于翻转判断
+
+struct MeleeUnitTag {};   ///< @brief 近战单位标签
+struct RangedUnitTag {};  ///< @brief 远程单位标签
+
 }  // namespace pyc::monster_war

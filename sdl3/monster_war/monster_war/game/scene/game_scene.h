@@ -13,6 +13,9 @@
 
 namespace pyc::monster_war {
 
+class BlueprintManager;
+class EntityFactory;
+
 class GameScene final : public Scene {
 public:
     GameScene(Context& context);
@@ -26,6 +29,7 @@ public:
 private:
     [[nodiscard]] bool loadLevel();
     [[nodiscard]] bool initEventConnections();
+    [[nodiscard]] bool initEntityFactory();
 
     // 事件回调函数
     void onEnemyArriveHome(const EnemyArriveHomeEvent& event);
@@ -44,6 +48,11 @@ private:
 
     std::unordered_map<int, WaypointNode> waypoint_nodes_;  // 路径节点ID到节点数据的映射
     std::vector<int> start_points_;                         // 起点ID列表
+
+    std::unique_ptr<EntityFactory> entity_factory_;  // 实体工厂，负责创建和管理实体
+
+    // 管理数据的实例很可能同时被多个场景使用，因此使用共享指针
+    std::shared_ptr<BlueprintManager> blueprint_manager_;  // 蓝图管理器，负责管理蓝图数据
 };
 
 }  // namespace pyc::monster_war
