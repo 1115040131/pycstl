@@ -4,11 +4,8 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/render_component.h"
-#include "monster_war/engine/component/sprite_component.h"
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/component/velocity_component.h"
 #include "monster_war/engine/core/context.h"
+#include "monster_war/engine/input/input_manager.h"
 #include "monster_war/engine/loader/level_loader.h"
 #include "monster_war/engine/system/animation_system.h"
 #include "monster_war/engine/system/movement_system.h"
@@ -16,10 +13,11 @@
 #include "monster_war/engine/system/ysort_system.h"
 #include "monster_war/engine/ui/ui_manager.h"
 #include "monster_war/engine/utils/events.h"
-#include "monster_war/game/component/enemy_component.h"
+#include "monster_war/game/component/player_component.h"
 #include "monster_war/game/factory/blueprint_manager.h"
 #include "monster_war/game/factory/entity_factory.h"
 #include "monster_war/game/loader/entity_builder_mw.h"
+#include "monster_war/game/system/block_system.h"
 #include "monster_war/game/system/followpath_system.h"
 #include "monster_war/game/system/remove_dead_system.h"
 
@@ -28,14 +26,16 @@ namespace pyc::monster_war {
 using namespace entt::literals;
 
 GameScene::GameScene(Context& context) : Scene("GameScene", context) {
+    auto& dispatcher = context_.getDispatcher();
     // 初始化系统
     render_system_ = std::make_unique<RenderSystem>();
     movement_system_ = std::make_unique<MovementSystem>();
-    animation_system_ = std::make_unique<AnimationSystem>();
+    animation_system_ = std::make_unique<AnimationSystem>(registry_, dispatcher);
     ysort_system_ = std::make_unique<YSortSystem>();
 
     follow_path_system_ = std::make_unique<FollowPathSystem>();
     remove_dead_system_ = std::make_unique<RemoveDeadSystem>();
+    block_system_ = std::make_unique<BlockSystem>();
 
     spdlog::trace("GameScene 构造完成。");
 }
@@ -49,6 +49,10 @@ void GameScene::init() {
     }
     if (!initEventConnections()) {
         spdlog::error("初始化事件连接失败");
+        return;
+    }
+    if (!initInputConnections()) {
+        spdlog::error("初始化输入连接失败");
         return;
     }
     if (!initEntityFactory()) {
@@ -68,8 +72,9 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
 
     // 注意系统更新的顺序
     follow_path_system_->update(registry_, dispatcher, waypoint_nodes_);
+    block_system_->update(registry_, dispatcher);
     movement_system_->update(registry_, delta_time);
-    animation_system_->update(registry_, delta_time);
+    animation_system_->update(delta_time);
     ysort_system_->update(registry_);  // 调用顺序要在MovementSystem之后
 
     Scene::update(delta_time);
@@ -108,11 +113,20 @@ bool GameScene::initEventConnections() {
     return true;
 }
 
+bool GameScene::initInputConnections() {
+    auto& input_manager = context_.getInputManager();
+    input_manager.onAction("mouse_right"_hs).connect<&GameScene::onCreateTestPlayerMelee>(this);
+    input_manager.onAction("mouse_left"_hs).connect<&GameScene::onCreateTestPlayerRanged>(this);
+    input_manager.onAction("pause"_hs).connect<&GameScene::onClearAllPlayers>(this);
+    return true;
+}
+
 bool GameScene::initEntityFactory() {
     // 如果蓝图管理器为空，则创建一个（将来可能由构造函数传入）
     if (!blueprint_manager_) {
         blueprint_manager_ = std::make_shared<BlueprintManager>(context_.getResourceManager());
-        if (!blueprint_manager_->loadEnemyClassBlueprints("assets/data/enemy_data.json")) {
+        if (!blueprint_manager_->loadEnemyClassBlueprints("assets/data/enemy_data.json") ||
+            !blueprint_manager_->loadPlayerClassBlueprints("assets/data/player_data.json")) {
             spdlog::error("加载蓝图失败");
             return false;
         }
@@ -137,6 +151,28 @@ void GameScene::createTestEnemy() {
         entity_factory_->createEnemyUnit("goblin"_hs, position, start_index);
         entity_factory_->createEnemyUnit("dark_witch"_hs, position, start_index);
     }
+}
+
+bool GameScene::onCreateTestPlayerMelee() {
+    auto position = context_.getInputManager().getLogicalMousePosition();
+    entity_factory_->createPlayerUnit("warrior"_hs, position);
+    spdlog::info("创建战士: 位置: {}, {}", position.x, position.y);
+    return true;
+}
+
+bool GameScene::onCreateTestPlayerRanged() {
+    auto position = context_.getInputManager().getLogicalMousePosition();
+    entity_factory_->createPlayerUnit("archer"_hs, position);
+    spdlog::info("创建弓箭手: 位置: {}, {}", position.x, position.y);
+    return true;
+}
+
+bool GameScene::onClearAllPlayers() {
+    auto view = registry_.view<PlayerComponent>();
+    for (auto entity : view) {
+        registry_.destroy(entity);
+    }
+    return true;
 }
 
 }  // namespace pyc::monster_war

@@ -23,7 +23,7 @@ std::unique_ptr<UIState> UIHoverState::handleInput(Context& context) {
     if (!owner_->isPointInside(mouse_pos)) {  // 如果鼠标不在UI元素内，则返回正常状态
         return UIStateFactory::create<UINormalState>(owner_);
     }
-    if (input_manager.isActionPressed("MouseLeftClick")) {  // 如果鼠标按下，则返回按下状态
+    if (input_manager.isActionPressed("mouse_left"_hs)) {  // 如果鼠标按下，则返回按下状态
         return UIStateFactory::create<UIPressedState>(owner_);
     }
     return nullptr;

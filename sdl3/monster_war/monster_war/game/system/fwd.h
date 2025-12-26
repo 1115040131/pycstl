@@ -2,6 +2,7 @@
 
 namespace pyc::monster_war {
 
+class BlockSystem;
 class FollowPathSystem;
 class RemoveDeadSystem;
 

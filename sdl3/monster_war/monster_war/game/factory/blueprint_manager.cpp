@@ -13,6 +13,34 @@ namespace pyc::monster_war {
 
 BlueprintManager::BlueprintManager(ResourceManager& resource_manager) : resource_manager_(resource_manager) {}
 
+bool BlueprintManager::loadPlayerClassBlueprints(std::string_view player_json_path) {
+    auto path = std::filesystem::path(player_json_path);
+    std::ifstream file(path);
+    nlohmann::json json;
+    file >> json;
+    file.close();
+    // --- 解析蓝图 ---
+    try {
+        for (const auto& [class_name, data_json] : json.items()) {
+            entt::id_type class_id = entt::hashed_string(class_name.c_str());
+            player_class_blueprints_.emplace(class_id, PlayerClassBlueprint{
+                                                           class_id,
+                                                           class_name,
+                                                           parseStats(data_json),
+                                                           parsePlayer(data_json),
+                                                           parseSound(data_json),
+                                                           parseSprite(data_json),
+                                                           parseDisplayInfo(data_json),
+                                                           parseAnimationsMap(data_json),
+                                                       });
+        }
+    } catch (const std::exception& e) {
+        spdlog::error("加载玩家单位数据时出错: {}", e.what());
+        return false;
+    }
+    return true;
+}
+
 bool BlueprintManager::loadEnemyClassBlueprints(std::string_view enemy_json_path) {
     auto path = std::filesystem::path(enemy_json_path);
     std::ifstream file(path);
@@ -41,9 +69,16 @@ bool BlueprintManager::loadEnemyClassBlueprints(std::string_view enemy_json_path
     return true;
 }
 
+const PlayerClassBlueprint& BlueprintManager::getPlayerClassBlueprint(entt::id_type id) const {
+    if (auto it = player_class_blueprints_.find(id); it != player_class_blueprints_.end()) {
+        return it->second;
+    }
+    spdlog::error("未找到对应 id 的 PlayerClassBlueprint: {}", id);
+    return player_class_blueprints_.begin()->second;
+}
+
 const EnemyClassBlueprint& BlueprintManager::getEnemyClassBlueprint(entt::id_type id) const {
-    auto it = enemy_class_blueprints_.find(id);
-    if (it != enemy_class_blueprints_.end()) {
+    if (auto it = enemy_class_blueprints_.find(id); it != enemy_class_blueprints_.end()) {
         return it->second;
     }
     spdlog::error("未找到对应 id 的 EnemyClassBlueprint: {}", id);
@@ -106,6 +141,25 @@ SoundBlueprint BlueprintManager::parseSound(const nlohmann::json& json) {
         }
     }
     return sounds;
+}
+
+PlayerBlueprint BlueprintManager::parsePlayer(const nlohmann::json& json) {
+    // 解析类型
+    auto type_str = json["type"].get<std::string>();
+    auto type = type_str == "melee" ? PlayerType::MELEE :  // 三目运算符嵌套
+                    type_str == "ranged" ? PlayerType::RANGED
+                : type_str == "mixed"    ? PlayerType::MIXED
+                                         : PlayerType::UNKNOWN;
+    spdlog::info("type_str: {}, type: {}", type_str, static_cast<int>(type));
+    // 解析技能
+    entt::id_type skill_id = entt::null;
+    if (json.contains("skill")) {
+        skill_id = entt::hashed_string(json["skill"].get<std::string>().c_str());
+    }
+    // 解析其他数据并返回
+    return {
+        type, skill_id, json["healer"].get<bool>(), json["block"].get<int>(), json["cost"].get<int>(),
+    };
 }
 
 EnemyBlueprint BlueprintManager::parseEnemy(const nlohmann::json& json) {

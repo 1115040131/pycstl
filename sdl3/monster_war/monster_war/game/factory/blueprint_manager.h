@@ -20,9 +20,13 @@ class BlueprintManager {
 public:
     explicit BlueprintManager(ResourceManager& resource_manager);
 
+    ///< @brief 加载玩家职业蓝图, 返回是否成功
+    [[nodiscard]] bool loadPlayerClassBlueprints(std::string_view player_json_path);
     ///< @brief 加载敌人类型蓝图, 返回是否成功
     [[nodiscard]] bool loadEnemyClassBlueprints(std::string_view enemy_json_path);
 
+    ///< @brief 获取指定ID的玩家职业蓝图
+    const PlayerClassBlueprint& getPlayerClassBlueprint(entt::id_type id) const;
     ///< @brief 获取指定ID的敌人类型蓝图
     const EnemyClassBlueprint& getEnemyClassBlueprint(entt::id_type id) const;
 
@@ -32,13 +36,15 @@ private:
     SpriteBlueprint parseSprite(const nlohmann::json& json);
     std::unordered_map<entt::id_type, AnimationBlueprint> parseAnimationsMap(const nlohmann::json& json);
     SoundBlueprint parseSound(const nlohmann::json& json);
+    PlayerBlueprint parsePlayer(const nlohmann::json& json);
     EnemyBlueprint parseEnemy(const nlohmann::json& json);
     DisplayInfoBlueprint parseDisplayInfo(const nlohmann::json& json);
 
 private:
     ResourceManager& resource_manager_;
 
-    std::unordered_map<entt::id_type, EnemyClassBlueprint> enemy_class_blueprints_;  ///< @brief 敌人类型蓝图
+    std::unordered_map<entt::id_type, PlayerClassBlueprint> player_class_blueprints_;  ///< @brief 玩家职业蓝图
+    std::unordered_map<entt::id_type, EnemyClassBlueprint> enemy_class_blueprints_;    ///< @brief 敌人类型蓝图
 };
 
 }  // namespace pyc::monster_war

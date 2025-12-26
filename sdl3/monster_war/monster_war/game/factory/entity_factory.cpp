@@ -8,8 +8,10 @@
 #include "monster_war/engine/component/sprite_component.h"
 #include "monster_war/engine/component/transform_component.h"
 #include "monster_war/engine/component/velocity_component.h"
+#include "monster_war/game/component/blocker_component.h"
 #include "monster_war/game/component/class_name_component.h"
 #include "monster_war/game/component/enemy_component.h"
+#include "monster_war/game/component/player_component.h"
 #include "monster_war/game/component/stats_component.h"
 #include "monster_war/game/def/tag.h"
 #include "monster_war/game/factory/blueprint_manager.h"
@@ -20,6 +22,39 @@ using namespace entt::literals;
 
 EntityFactory::EntityFactory(entt::registry& registry, BlueprintManager& blueprint_manager)
     : registry_(registry), blueprint_manager_(blueprint_manager) {}
+
+entt::entity EntityFactory::createPlayerUnit(entt::id_type class_id, const glm::vec2& position, int level,
+                                             int rarity) {
+    auto entity = registry_.create();
+    const auto& blueprint = blueprint_manager_.getPlayerClassBlueprint(class_id);
+
+    // --- 添加组件 ---
+    // 添加Transform组件
+    addTransformComponent(entity, position);
+
+    // 添加Sprite组件
+    addSpriteComponent(entity, blueprint.sprite_);
+
+    // 添加Animation组件 (默认动画为“walk”)
+    addAnimationComponent(entity, blueprint.animations_, blueprint.sprite_, "idle"_hs);
+
+    // 添加Audio组件
+    addAudioComponent(entity, blueprint.sounds_);
+
+    // 添加Stats组件
+    addStatsComponent(entity, blueprint.stats_, level, rarity);
+
+    // 添加Player组件
+    addPlayerComponent(entity, blueprint.player_, rarity);
+
+    // 补充其他必要组件
+    registry_.emplace<ClassNameComponent>(entity, class_id, blueprint.display_info_.name_);
+    registry_.emplace<RenderComponent>(entity);  // 使用默认主图层
+
+    // 未来可添加其它组件
+
+    return entity;
+}
 
 entt::entity EntityFactory::createEnemyUnit(entt::id_type class_id, const glm::vec2& position,
                                             int target_waypoint_id, int level, int rarity) {
@@ -98,6 +133,22 @@ void EntityFactory::addStatsComponent(entt::entity entity, const StatsBlueprint&
 
     registry_.emplace<StatsComponent>(entity, hp, hp, atk, def, stats.range_, stats.atk_interval_,
                                       std::chrono::duration<float>::zero(), level, rarity);
+}
+
+void EntityFactory::addPlayerComponent(entt::entity entity, const PlayerBlueprint& player, int rarity) {
+    auto cost = static_cast<int>(std::round(player.cost_ * (0.9f + 0.1f * rarity)));
+    registry_.emplace<PlayerComponent>(entity, cost);
+    // 添加类型标签(近战、远程、治疗)
+    if (player.type_ == PlayerType::MELEE) {
+        registry_.emplace<MeleeUnitTag>(entity);  // 近战单位标签
+        // 近战类型添加阻挡者组件
+        registry_.emplace<BlockerComponent>(entity, player.block_);
+    } else if (player.type_ == PlayerType::RANGED) {
+        registry_.emplace<RangedUnitTag>(entity);  // 远程单位标签
+    }
+    if (player.healer_) {
+        registry_.emplace<HealerTag>(entity);  // 治疗单位标签
+    }
 }
 
 void EntityFactory::addEnemyComponent(entt::entity entity, const EnemyBlueprint& enemy, int target_waypoint_id) {

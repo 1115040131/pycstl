@@ -8,6 +8,7 @@
 #include "monster_war/engine/component/transform_component.h"
 #include "monster_war/engine/component/velocity_component.h"
 #include "monster_war/engine/utils/math.h"
+#include "monster_war/game/component/blocked_by_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/def/events.h"
 #include "monster_war/game/def/tag.h"
@@ -17,7 +18,9 @@ namespace pyc::monster_war {
 void FollowPathSystem::update(entt::registry& registry, entt::dispatcher& dispatcher,
                               std::unordered_map<int, WaypointNode>& waypoint_nodes) {
     spdlog::trace("FollowPathSystem::update");
-    auto view = registry.view<VelocityComponent, TransformComponent, EnemyComponent>();
+    // 筛选依据：速度组件、变换组件、敌人组件，排除“被阻挡的敌人”
+    auto view =
+        registry.view<VelocityComponent, TransformComponent, EnemyComponent>(entt::exclude<BlockedByComponent>);
     for (auto [entity, velocity, transform, enemy] : view.each()) {
         // 获取目标节点
         auto target_node = waypoint_nodes.at(enemy.target_waypoint_id_);

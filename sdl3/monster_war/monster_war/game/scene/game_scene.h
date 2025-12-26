@@ -29,6 +29,7 @@ public:
 private:
     [[nodiscard]] bool loadLevel();
     [[nodiscard]] bool initEventConnections();
+    [[nodiscard]] bool initInputConnections();
     [[nodiscard]] bool initEntityFactory();
 
     // 事件回调函数
@@ -36,6 +37,9 @@ private:
 
     // 测试函数
     void createTestEnemy();
+    bool onCreateTestPlayerMelee();
+    bool onCreateTestPlayerRanged();
+    bool onClearAllPlayers();
 
 private:
     std::unique_ptr<RenderSystem> render_system_;
@@ -45,6 +49,7 @@ private:
 
     std::unique_ptr<FollowPathSystem> follow_path_system_;
     std::unique_ptr<RemoveDeadSystem> remove_dead_system_;
+    std::unique_ptr<BlockSystem> block_system_;
 
     std::unordered_map<int, WaypointNode> waypoint_nodes_;  // 路径节点ID到节点数据的映射
     std::vector<int> start_points_;                         // 起点ID列表
