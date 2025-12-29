@@ -39,6 +39,7 @@ private:
     void createTestEnemy();
     bool onCreateTestPlayerMelee();
     bool onCreateTestPlayerRanged();
+    bool onCreateTestPlayerHealer();
     bool onClearAllPlayers();
 
 private:
@@ -50,6 +51,11 @@ private:
     std::unique_ptr<FollowPathSystem> follow_path_system_;
     std::unique_ptr<RemoveDeadSystem> remove_dead_system_;
     std::unique_ptr<BlockSystem> block_system_;
+    std::unique_ptr<SetTargetSystem> set_target_system_;
+    std::unique_ptr<AttackStarterSystem> attack_starter_system_;
+    std::unique_ptr<TimerSystem> timer_system_;
+    std::unique_ptr<OrientationSystem> orientation_system_;
+    std::unique_ptr<AnimationStateSystem> animation_state_system_;
 
     std::unordered_map<int, WaypointNode> waypoint_nodes_;  // 路径节点ID到节点数据的映射
     std::vector<int> start_points_;                         // 起点ID列表

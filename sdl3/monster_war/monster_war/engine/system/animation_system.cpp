@@ -17,7 +17,7 @@ AnimationSystem::~AnimationSystem() { dispatcher_.disconnect(this); }
 
 void AnimationSystem::update(std::chrono::duration<float> delta_time) {
     auto view = registry_.view<AnimationComponent, SpriteComponent>();
-    for (auto [_, animation, sprite] : view.each()) {
+    for (auto [entity, animation, sprite] : view.each()) {
         // 如果动画不存在, 则跳过
         auto it = animation.animations_.find(animation.current_animation_id_);
         if (it == animation.animations_.end()) {
@@ -49,6 +49,8 @@ void AnimationSystem::update(std::chrono::duration<float> delta_time) {
                 } else {
                     // 动画播放完毕且不循环，停在最后一帧
                     animation.current_frame_index_ = current_animation.frames_.size() - 1;
+                    // 发送动画播放完成事件
+                    dispatcher_.enqueue(AnimationFinishedEvent{entity, animation.current_animation_id_});
                 }
             }
         }

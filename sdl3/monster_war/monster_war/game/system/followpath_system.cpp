@@ -19,8 +19,8 @@ void FollowPathSystem::update(entt::registry& registry, entt::dispatcher& dispat
                               std::unordered_map<int, WaypointNode>& waypoint_nodes) {
     spdlog::trace("FollowPathSystem::update");
     // 筛选依据：速度组件、变换组件、敌人组件，排除“被阻挡的敌人”
-    auto view =
-        registry.view<VelocityComponent, TransformComponent, EnemyComponent>(entt::exclude<BlockedByComponent>);
+    auto view = registry.view<VelocityComponent, TransformComponent, EnemyComponent>(
+        entt::exclude<BlockedByComponent, ActionLockTag>);
     for (auto [entity, velocity, transform, enemy] : view.each()) {
         // 获取目标节点
         auto target_node = waypoint_nodes.at(enemy.target_waypoint_id_);

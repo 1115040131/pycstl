@@ -14,12 +14,19 @@
 #include "monster_war/engine/ui/ui_manager.h"
 #include "monster_war/engine/utils/events.h"
 #include "monster_war/game/component/player_component.h"
+#include "monster_war/game/component/stats_component.h"
+#include "monster_war/game/def/tag.h"
 #include "monster_war/game/factory/blueprint_manager.h"
 #include "monster_war/game/factory/entity_factory.h"
 #include "monster_war/game/loader/entity_builder_mw.h"
+#include "monster_war/game/system/animation_state_system.h"
+#include "monster_war/game/system/attack_starter_system.h"
 #include "monster_war/game/system/block_system.h"
 #include "monster_war/game/system/followpath_system.h"
+#include "monster_war/game/system/orientation_system.h"
 #include "monster_war/game/system/remove_dead_system.h"
+#include "monster_war/game/system/set_target_system.h"
+#include "monster_war/game/system/timer_system.h"
 
 namespace pyc::monster_war {
 
@@ -36,6 +43,11 @@ GameScene::GameScene(Context& context) : Scene("GameScene", context) {
     follow_path_system_ = std::make_unique<FollowPathSystem>();
     remove_dead_system_ = std::make_unique<RemoveDeadSystem>();
     block_system_ = std::make_unique<BlockSystem>();
+    set_target_system_ = std::make_unique<SetTargetSystem>();
+    attack_starter_system_ = std::make_unique<AttackStarterSystem>();
+    timer_system_ = std::make_unique<TimerSystem>();
+    orientation_system_ = std::make_unique<OrientationSystem>();
+    animation_state_system_ = std::make_unique<AnimationStateSystem>(registry_, dispatcher);
 
     spdlog::trace("GameScene 构造完成。");
 }
@@ -71,8 +83,12 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     remove_dead_system_->update(registry_);
 
     // 注意系统更新的顺序
+    timer_system_->update(registry_, delta_time);
+    set_target_system_->update(registry_);
+    orientation_system_->update(registry_);
     follow_path_system_->update(registry_, dispatcher, waypoint_nodes_);
     block_system_->update(registry_, dispatcher);
+    attack_starter_system_->update(registry_, dispatcher);
     movement_system_->update(registry_, delta_time);
     animation_system_->update(delta_time);
     ysort_system_->update(registry_);  // 调用顺序要在MovementSystem之后
@@ -90,7 +106,12 @@ void GameScene::clean() {
     // 断开所有事件连接
     auto& dispatcher = context_.getDispatcher();
     dispatcher.disconnect(this);
-
+    // 断开输入信号连接
+    auto& input_manager = context_.getInputManager();
+    input_manager.onAction("mouse_right"_hs).disconnect<&GameScene::onCreateTestPlayerMelee>(this);
+    input_manager.onAction("mouse_left"_hs).disconnect<&GameScene::onCreateTestPlayerRanged>(this);
+    input_manager.onAction("pause"_hs).disconnect<&GameScene::onClearAllPlayers>(this);
+    input_manager.onAction("move_left"_hs).disconnect<&GameScene::onCreateTestPlayerHealer>(this);
     Scene::clean();
 }
 
@@ -118,6 +139,7 @@ bool GameScene::initInputConnections() {
     input_manager.onAction("mouse_right"_hs).connect<&GameScene::onCreateTestPlayerMelee>(this);
     input_manager.onAction("mouse_left"_hs).connect<&GameScene::onCreateTestPlayerRanged>(this);
     input_manager.onAction("pause"_hs).connect<&GameScene::onClearAllPlayers>(this);
+    input_manager.onAction("move_left"_hs).connect<&GameScene::onCreateTestPlayerHealer>(this);
     return true;
 }
 
@@ -155,15 +177,30 @@ void GameScene::createTestEnemy() {
 
 bool GameScene::onCreateTestPlayerMelee() {
     auto position = context_.getInputManager().getLogicalMousePosition();
-    entity_factory_->createPlayerUnit("warrior"_hs, position);
+    auto entity = entity_factory_->createPlayerUnit("warrior"_hs, position);
+    // 让玩家处于受伤状态（治疗师不会锁定满血目标）
+    registry_.emplace<InjuredTag>(entity);
+    auto& stats = registry_.get<StatsComponent>(entity);
+    stats.hp_ = stats.max_hp_ / 2;
     spdlog::info("创建战士: 位置: {}, {}", position.x, position.y);
     return true;
 }
 
 bool GameScene::onCreateTestPlayerRanged() {
     auto position = context_.getInputManager().getLogicalMousePosition();
-    entity_factory_->createPlayerUnit("archer"_hs, position);
+    auto entity = entity_factory_->createPlayerUnit("archer"_hs, position);
+    // 让玩家处于受伤状态（治疗师不会锁定满血目标）
+    registry_.emplace<InjuredTag>(entity);
+    auto& stats = registry_.get<StatsComponent>(entity);
+    stats.hp_ = stats.max_hp_ / 2;
     spdlog::info("创建弓箭手: 位置: {}, {}", position.x, position.y);
+    return true;
+}
+
+bool GameScene::onCreateTestPlayerHealer() {
+    auto position = context_.getInputManager().getLogicalMousePosition();
+    entity_factory_->createPlayerUnit("witch"_hs, position);
+    spdlog::info("创建治疗者: 位置: {}, {}", position.x, position.y);
     return true;
 }
 
