@@ -118,11 +118,19 @@ std::unordered_map<entt::id_type, AnimationBlueprint> BlueprintManager::parseAni
     const nlohmann::json& json) {
     std::unordered_map<entt::id_type, AnimationBlueprint> animations;  // 先准备好容器
     for (const auto& [anim_name, anim_data] : json["animation"].items()) {
+        // 处理可能存在的事件信息
+        std::unordered_map<size_t, entt::id_type> events;
+        if (anim_data.contains("events")) {
+            for (const auto& [event_name, event_frame] : anim_data["events"].items()) {
+                events.emplace(event_frame.get<size_t>(), entt::hashed_string(event_name.c_str()));
+            }
+        }
         animations.emplace(entt::hashed_string(anim_name.c_str()),
                            AnimationBlueprint{
                                std::chrono::duration<double, std::milli>(anim_data.value("duration", 100.0f)),
                                anim_data.value("row", 0),
-                               anim_data["frames"].get<std::vector<int>>(),
+                               anim_data["frames"].get<std::vector<size_t>>(),
+                               std::move(events),
                            });
     }
     return animations;

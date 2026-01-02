@@ -29,18 +29,21 @@ struct AnimationFrame {
  * 包含动画名称、帧列表、总时长、当前播放时间、是否循环等属性。
  */
 struct Animation {
-    std::vector<AnimationFrame> frames_;             ///< @brief 动画帧
-    std::chrono::duration<float> total_duration_{};  ///< @brief 动画总时长
-    bool loop_{true};                                ///< @brief 是否循环
+    std::vector<AnimationFrame> frames_;                ///< @brief 动画帧
+    std::unordered_map<size_t, entt::id_type> events_;  ///< @brief 动画事件，键为帧索引，值为事件ID
+    std::chrono::duration<float> total_duration_{};     ///< @brief 动画总时长
+    bool loop_{true};                                   ///< @brief 是否循环
 
     /**
      * @brief 构造函数
      * @param name 动画名称
      * @param frames 动画帧
+     * @param events 动画事件，默认为空
      * @param loop 是否循环，默认true
      */
-    explicit Animation(std::vector<AnimationFrame> frames, bool loop = true)
-        : frames_(std::move(frames)), loop_(loop) {
+    explicit Animation(std::vector<AnimationFrame> frames, std::unordered_map<size_t, entt::id_type> events = {},
+                       bool loop = true)
+        : frames_(std::move(frames)), events_(std::move(events)), loop_(loop) {
         // 计算动画总时长 (总时长 = 所有帧时长之和)
         total_duration_ = {};
         for (const auto& frame : frames_) {

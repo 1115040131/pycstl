@@ -120,7 +120,7 @@ void EntityFactory::addAnimationComponent(
             src_rect.position.y += anim_blueprint.row_ * src_rect.size.y;
             frames.emplace_back(src_rect, anim_blueprint.per_frame_);
         }
-        animations.emplace(anim_id, std::move(frames));
+        animations.emplace(anim_id, Animation{std::move(frames), anim_blueprint.events_});
     }
     registry_.emplace<AnimationComponent>(entity, std::move(animations), default_animation_id);
 }

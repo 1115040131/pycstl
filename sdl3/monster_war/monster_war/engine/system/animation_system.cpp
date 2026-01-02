@@ -42,6 +42,12 @@ void AnimationSystem::update(std::chrono::duration<float> delta_time) {
             animation.current_time_ -= current_frame.duration_;
             animation.current_frame_index_++;
 
+            // 检查是否发送动画时间
+            auto event_it = current_animation.events_.find(animation.current_frame_index_);
+            if (event_it != current_animation.events_.end()) {
+                dispatcher_.enqueue(AnimationEvent{entity, event_it->second, animation.current_animation_id_});
+            }
+
             // 处理动画播放完成
             if (animation.current_frame_index_ >= current_animation.frames_.size()) {
                 if (current_animation.loop_) {

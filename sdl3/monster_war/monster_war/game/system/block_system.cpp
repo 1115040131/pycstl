@@ -12,6 +12,7 @@
 #include "monster_war/game/component/blocker_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/def/constants.h"
+#include "monster_war/game/def/tag.h"
 
 namespace pyc::monster_war {
 
@@ -24,9 +25,10 @@ void BlockSystem::update(entt::registry& registry, entt::dispatcher& dispatcher)
     for (auto [entity, blocked_by] : registry.view<BlockedByComponent>().each()) {
         // 如果BlockedBy指向的实体无效(例如死亡)，移除被阻挡组件，并发送播放动画“walk”事件
         if (!registry.valid(blocked_by.entity_)) {
-            registry.remove<BlockedByComponent>(entity);
-            dispatcher.enqueue(PlayAnimationEvent{entity, "walk"_hs});
             spdlog::info("阻挡者: ID: {}, 无效, 移除阻挡者组件", entt::to_integral(blocked_by.entity_));
+            registry.remove<BlockedByComponent>(entity);
+            registry.remove<ActionLockTag>(entity);  // 移除可能存在的动作锁定标签
+            dispatcher.enqueue(PlayAnimationEvent{entity, "walk"_hs});
         }
     }
 

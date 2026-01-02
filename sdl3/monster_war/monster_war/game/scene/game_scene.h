@@ -47,6 +47,7 @@ private:
     std::unique_ptr<MovementSystem> movement_system_;
     std::unique_ptr<AnimationSystem> animation_system_;
     std::unique_ptr<YSortSystem> ysort_system_;
+    std::unique_ptr<AudioSystem> audio_system_;
 
     std::unique_ptr<FollowPathSystem> follow_path_system_;
     std::unique_ptr<RemoveDeadSystem> remove_dead_system_;
@@ -56,6 +57,8 @@ private:
     std::unique_ptr<TimerSystem> timer_system_;
     std::unique_ptr<OrientationSystem> orientation_system_;
     std::unique_ptr<AnimationStateSystem> animation_state_system_;
+    std::unique_ptr<AnimationEventSystem> animation_event_system_;
+    std::unique_ptr<CombatResolveSystem> combat_resolve_system_;
 
     std::unordered_map<int, WaypointNode> waypoint_nodes_;  // 路径节点ID到节点数据的映射
     std::vector<int> start_points_;                         // 起点ID列表

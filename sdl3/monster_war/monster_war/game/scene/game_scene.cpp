@@ -8,6 +8,7 @@
 #include "monster_war/engine/input/input_manager.h"
 #include "monster_war/engine/loader/level_loader.h"
 #include "monster_war/engine/system/animation_system.h"
+#include "monster_war/engine/system/audio_system.h"
 #include "monster_war/engine/system/movement_system.h"
 #include "monster_war/engine/system/render_system.h"
 #include "monster_war/engine/system/ysort_system.h"
@@ -19,9 +20,11 @@
 #include "monster_war/game/factory/blueprint_manager.h"
 #include "monster_war/game/factory/entity_factory.h"
 #include "monster_war/game/loader/entity_builder_mw.h"
+#include "monster_war/game/system/animation_event_system.h"
 #include "monster_war/game/system/animation_state_system.h"
 #include "monster_war/game/system/attack_starter_system.h"
 #include "monster_war/game/system/block_system.h"
+#include "monster_war/game/system/combat_resolve_system.h"
 #include "monster_war/game/system/followpath_system.h"
 #include "monster_war/game/system/orientation_system.h"
 #include "monster_war/game/system/remove_dead_system.h"
@@ -39,6 +42,7 @@ GameScene::GameScene(Context& context) : Scene("GameScene", context) {
     movement_system_ = std::make_unique<MovementSystem>();
     animation_system_ = std::make_unique<AnimationSystem>(registry_, dispatcher);
     ysort_system_ = std::make_unique<YSortSystem>();
+    audio_system_ = std::make_unique<AudioSystem>(registry_, context_);
 
     follow_path_system_ = std::make_unique<FollowPathSystem>();
     remove_dead_system_ = std::make_unique<RemoveDeadSystem>();
@@ -48,6 +52,8 @@ GameScene::GameScene(Context& context) : Scene("GameScene", context) {
     timer_system_ = std::make_unique<TimerSystem>();
     orientation_system_ = std::make_unique<OrientationSystem>();
     animation_state_system_ = std::make_unique<AnimationStateSystem>(registry_, dispatcher);
+    animation_event_system_ = std::make_unique<AnimationEventSystem>(registry_, dispatcher);
+    combat_resolve_system_ = std::make_unique<CombatResolveSystem>(registry_, dispatcher);
 
     spdlog::trace("GameScene 构造完成。");
 }
@@ -84,10 +90,10 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
 
     // 注意系统更新的顺序
     timer_system_->update(registry_, delta_time);
-    set_target_system_->update(registry_);
-    orientation_system_->update(registry_);
-    follow_path_system_->update(registry_, dispatcher, waypoint_nodes_);
     block_system_->update(registry_, dispatcher);
+    set_target_system_->update(registry_);
+    follow_path_system_->update(registry_, dispatcher, waypoint_nodes_);
+    orientation_system_->update(registry_);  // 调用顺序要在Block、SetTarget、FollowPath之后
     attack_starter_system_->update(registry_, dispatcher);
     movement_system_->update(registry_, delta_time);
     animation_system_->update(delta_time);

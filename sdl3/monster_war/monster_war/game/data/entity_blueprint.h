@@ -34,7 +34,8 @@ struct SpriteBlueprint {
 struct AnimationBlueprint {
     std::chrono::duration<float> per_frame_{0.0f};
     int row_{0};
-    std::vector<int> frames_;  ///< @brief 动画帧索引数组
+    std::vector<size_t> frames_;                        ///< @brief 动画帧索引数组
+    std::unordered_map<size_t, entt::id_type> events_;  ///< @brief 动画事件，键为帧索引，值为事件ID
 };
 
 /// @brief 声音蓝图, 用于创建声音组件
