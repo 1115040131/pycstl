@@ -12,6 +12,7 @@
 #include "monster_war/game/component/class_name_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
+#include "monster_war/game/component/projectile_component.h"
 #include "monster_war/game/component/stats_component.h"
 #include "monster_war/game/def/tag.h"
 #include "monster_war/game/factory/blueprint_manager.h"
@@ -47,6 +48,9 @@ entt::entity EntityFactory::createPlayerUnit(entt::id_type class_id, const glm::
     // 添加Player组件
     addPlayerComponent(entity, blueprint.player_, rarity);
 
+    // 添加ProjectileID组件
+    addProjectileIDComponent(entity, blueprint.projectile_id_);
+
     // 补充其他必要组件
     registry_.emplace<ClassNameComponent>(entity, class_id, blueprint.display_info_.name_);
     registry_.emplace<RenderComponent>(entity);  // 使用默认主图层
@@ -80,12 +84,40 @@ entt::entity EntityFactory::createEnemyUnit(entt::id_type class_id, const glm::v
     // 添加Enemy组件
     addEnemyComponent(entity, blueprint.enemy_, target_waypoint_id);
 
+    // 添加ProjectileID组件
+    addProjectileIDComponent(entity, blueprint.projectile_id_);
+
     // 补充其他必要组件
     registry_.emplace<ClassNameComponent>(entity, class_id, blueprint.display_info_.name_);
     registry_.emplace<RenderComponent>(entity);  // 使用默认主图层
 
     // 未来可添加其它组件
 
+    return entity;
+}
+
+entt::entity EntityFactory::createProjectile(entt::id_type id, const glm::vec2& start_position,
+                                             const glm::vec2& target_position, entt::entity target, float damage) {
+    auto entity = registry_.create();
+    const auto& blueprint = blueprint_manager_.getProjectileBlueprint(id);
+
+    // --- 添加组件 ---
+    // 添加ProjectileComponent
+    registry_.emplace<ProjectileComponent>(entity, target, damage, start_position, target_position, start_position,
+                                           blueprint.arc_height_, blueprint.total_flight_time_,
+                                           std::chrono::duration<float>::zero());
+
+    // 添加SpriteComponent
+    addSpriteComponent(entity, blueprint.sprite_);
+
+    // 添加TransformComponent
+    addTransformComponent(entity, start_position);
+
+    // 添加AudioComponent
+    addAudioComponent(entity, blueprint.sounds_);
+
+    // 添加RenderComponent(让投射物位于主图层+1，即可以遮住角色)
+    registry_.emplace<RenderComponent>(entity, RenderComponent::kMainLayer + 1);
     return entity;
 }
 
@@ -162,10 +194,15 @@ void EntityFactory::addEnemyComponent(entt::entity entity, const EnemyBlueprint&
 }
 
 void EntityFactory::addAudioComponent(entt::entity entity, const SoundBlueprint& sounds) {
-    if (sounds.sounds_.empty()) {
-        return;
+    if (!sounds.sounds_.empty()) {
+        registry_.emplace<AudioComponent>(entity, sounds.sounds_);
     }
-    registry_.emplace<AudioComponent>(entity, sounds.sounds_);
+}
+
+void EntityFactory::addProjectileIDComponent(entt::entity entity, entt::id_type id) {
+    if (id != entt::null) {
+        registry_.emplace<ProjectileIDComponent>(entity, id);
+    }
 }
 
 }  // namespace pyc::monster_war

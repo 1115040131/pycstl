@@ -20,7 +20,8 @@ private:
     void onAnimationEvent(const AnimationEvent& event);
 
     // 拆分不同的事件类型
-    void handleHitEvent(const AnimationEvent& event);  ///< @brief 命中事件
+    void handleHitEvent(const AnimationEvent& event);   ///< @brief 命中事件
+    void handleEmitEvent(const AnimationEvent& event);  ///< @brief 发射事件
 
 private:
     entt::registry& registry_;

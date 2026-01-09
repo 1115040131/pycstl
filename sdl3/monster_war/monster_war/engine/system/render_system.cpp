@@ -18,7 +18,7 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
     for (auto [_, __, transform, sprite] : view.each()) {
         auto position = transform.position_ + sprite.offset_;
         auto size = sprite.size_ * transform.scale_;
-        renderer.drawSprite(camera, sprite.sprite_, position, size);
+        renderer.drawSprite(camera, sprite.sprite_, position, size, transform.rotation_);
     }
 }
 

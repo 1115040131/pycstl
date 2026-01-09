@@ -4,9 +4,11 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/component/transform_component.h"
 #include "monster_war/game/component/blocked_by_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
+#include "monster_war/game/component/projectile_component.h"
 #include "monster_war/game/component/stats_component.h"
 #include "monster_war/game/component/target_component.h"
 #include "monster_war/game/def/events.h"
@@ -30,6 +32,8 @@ void AnimationEventSystem::onAnimationEvent(const AnimationEvent& event) {
     // 根据不同的事件id，调用不同的处理函数
     if (event.event_name_id_ == "hit"_hs) {
         handleHitEvent(event);
+    } else if (event.event_name_id_ == "emit"_hs) {
+        handleEmitEvent(event);
     }
 }
 
@@ -54,6 +58,29 @@ void AnimationEventSystem::handleHitEvent(const AnimationEvent& event) {
             dispatcher_.enqueue(AttackEvent{event.entity_, blocked_by->entity_, stats.atk_});
         }
     }
+}
+
+void AnimationEventSystem::handleEmitEvent(const AnimationEvent& event) {
+    // 确认“目标组件”依然存在，且其中的实体也有效
+    auto target = registry_.try_get<TargetComponent>(event.entity_);
+    if (!target || !registry_.valid(target->entity_)) {
+        return;
+    }
+
+    const auto [transform, stats, projectile_id] =
+        registry_.get<TransformComponent, StatsComponent, ProjectileIDComponent>(event.entity_);
+
+    // 发射投射物事件
+    dispatcher_.enqueue(EmitProjectileEvent{
+        projectile_id.id_,
+        target->entity_,
+        transform.position_,
+        registry_.get<TransformComponent>(target->entity_).position_,
+        stats.atk_,
+    });
+
+    // 播放“emit”音效
+    dispatcher_.enqueue(PlaySoundEvent{event.entity_, "emit"_hs});
 }
 
 }  // namespace pyc::monster_war

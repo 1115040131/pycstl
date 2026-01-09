@@ -25,6 +25,7 @@ bool BlueprintManager::loadPlayerClassBlueprints(std::string_view player_json_pa
             entt::id_type class_id = entt::hashed_string(class_name.c_str());
             player_class_blueprints_.emplace(class_id, PlayerClassBlueprint{
                                                            class_id,
+                                                           parseProjectileID(data_json),
                                                            class_name,
                                                            parseStats(data_json),
                                                            parsePlayer(data_json),
@@ -53,6 +54,7 @@ bool BlueprintManager::loadEnemyClassBlueprints(std::string_view enemy_json_path
             entt::id_type class_id = entt::hashed_string(class_name.c_str());
             enemy_class_blueprints_.emplace(class_id, EnemyClassBlueprint{
                                                           class_id,
+                                                          parseProjectileID(data_json),
                                                           class_name,
                                                           parseStats(data_json),
                                                           parseEnemy(data_json),
@@ -64,6 +66,35 @@ bool BlueprintManager::loadEnemyClassBlueprints(std::string_view enemy_json_path
         }
     } catch (const std::exception& e) {
         spdlog::error("加载敌人单位数据时出错: {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool BlueprintManager::loadProjectileBlueprints(std::string_view projectile_json_path) {
+    auto path = std::filesystem::path(projectile_json_path);
+    std::ifstream file(path);
+    nlohmann::json json;
+    file >> json;
+    file.close();
+    // --- 解析蓝图 ---
+    try {
+        for (const auto& [name, data_json] : json.items()) {
+            // 解析基础数据
+            entt::id_type id = entt::hashed_string(name.c_str());
+            // 解析其它数据，组合蓝图并插入容器
+            projectile_blueprints_.emplace(
+                id, ProjectileBlueprint{
+                        id,
+                        name,
+                        data_json["arc_height"].get<float>(),
+                        std::chrono::duration<float>(data_json["total_flight_time"].get<float>()),
+                        parseSprite(data_json),
+                        parseSound(data_json),
+                    });
+        }
+    } catch (const std::exception& e) {
+        spdlog::error("加载投射物数据时出错: {}", e.what());
         return false;
     }
     return true;
@@ -83,6 +114,21 @@ const EnemyClassBlueprint& BlueprintManager::getEnemyClassBlueprint(entt::id_typ
     }
     spdlog::error("未找到对应 id 的 EnemyClassBlueprint: {}", id);
     return enemy_class_blueprints_.begin()->second;
+}
+
+const ProjectileBlueprint& BlueprintManager::getProjectileBlueprint(entt::id_type id) const {
+    if (auto it = projectile_blueprints_.find(id); it != projectile_blueprints_.end()) {
+        return it->second;
+    }
+    spdlog::error("未找到对应 id 的 ProjectileBlueprint: {}", id);
+    return projectile_blueprints_.begin()->second;
+}
+
+entt::id_type BlueprintManager::parseProjectileID(const nlohmann::json& json) {
+    if (json.contains("projectile")) {
+        return entt::hashed_string(json["projectile"].get<std::string>().c_str());
+    }
+    return entt::null;
 }
 
 StatsBlueprint BlueprintManager::parseStats(const nlohmann::json& json) {

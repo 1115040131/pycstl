@@ -45,6 +45,9 @@ void GameApp::run() {
         update(delta_time);
         render();
 
+        // 分发事件（让新创建的实体先更新再渲染）
+        dispatcher_->update();
+
         // spdlog::info("delta_time: {:.6f}s", delta_time.count());
     }
 
@@ -101,9 +104,6 @@ void GameApp::handleEvents() {
 void GameApp::update(std::chrono::duration<float> delta_time) {
     // 游戏逻辑更新
     scene_manager_->update(delta_time);
-
-    // 分发事件
-    dispatcher_->update();
 }
 
 void GameApp::render() {
