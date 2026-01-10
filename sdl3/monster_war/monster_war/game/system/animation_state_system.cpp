@@ -4,6 +4,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/utils/events.h"
 #include "monster_war/game/component/blocked_by_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
@@ -42,6 +43,9 @@ void AnimationStateSystem::onAnimationFinishedEvent(const AnimationFinishedEvent
         // 玩家动画结束，直接返回idle动画
         dispatcher_.enqueue(PlayAnimationEvent{event.entity_, "idle"_hs, true});
         spdlog::info("玩家动画结束, 返回idle动画, ID: {}", entt::to_integral(event.entity_));
+    } else if (registry_.all_of<OneShotRemoveTag>(event.entity_)) {
+        // 如果是一次性动画实体（例如死亡特效），则标记死亡待移除
+        registry_.emplace_or_replace<DeadTag>(event.entity_);
     }
 }
 

@@ -25,7 +25,9 @@
 #include "monster_war/game/system/attack_starter_system.h"
 #include "monster_war/game/system/block_system.h"
 #include "monster_war/game/system/combat_resolve_system.h"
+#include "monster_war/game/system/effect_system.h"
 #include "monster_war/game/system/followpath_system.h"
+#include "monster_war/game/system/health_bar_system.h"
 #include "monster_war/game/system/orientation_system.h"
 #include "monster_war/game/system/projectile_system.h"
 #include "monster_war/game/system/remove_dead_system.h"
@@ -89,7 +91,11 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
 }
 
 void GameScene::render() {
-    render_system_->update(registry_, context_.getRenderer(), context_.getCamera());
+    auto& renderer = context_.getRenderer();
+    auto& camera = context_.getCamera();
+
+    render_system_->update(registry_, renderer, camera);
+    health_bar_system_->update(registry_, renderer, camera);
 
     Scene::render();
 }
@@ -171,6 +177,9 @@ bool GameScene::initSystems() {
     animation_event_system_ = std::make_unique<AnimationEventSystem>(registry_, dispatcher);
     combat_resolve_system_ = std::make_unique<CombatResolveSystem>(registry_, dispatcher);
     projectile_system_ = std::make_unique<ProjectileSystem>(registry_, dispatcher, *entity_factory_);
+    effect_system_ = std::make_unique<EffectSystem>(registry_, dispatcher, *entity_factory_);
+    health_bar_system_ = std::make_unique<HealthBarSystem>();
+
     spdlog::info("系统初始化完成");
     return true;
 }

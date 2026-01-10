@@ -5,11 +5,10 @@
 #include <entt/entity/fwd.hpp>
 #include <entt/signal/fwd.hpp>
 
-#include "monster_war/game/def/events.h"
-
 namespace pyc::monster_war {
 
 class EntityFactory;
+class EmitProjectileEvent;
 
 /**
  * @brief 投射物系统

@@ -4,8 +4,11 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/component/sprite_component.h"
+#include "monster_war/engine/component/transform_component.h"
 #include "monster_war/game/component/blocked_by_component.h"
 #include "monster_war/game/component/blocker_component.h"
+#include "monster_war/game/component/class_name_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
 #include "monster_war/game/component/stats_component.h"
@@ -48,6 +51,13 @@ void CombatResolveSystem::onAttackEvent(const AttackEvent& event) {
             target_stats.hp_ = 0;
             registry_.emplace_or_replace<DeadTag>(event.target_);
             spdlog::info("敌人 ID: {} 死亡", entt::to_integral(event.target_));
+
+            // 发送死亡特效事件，需要先获取class_id、位置和是否翻转
+            const auto [class_name, transform, sprite] =
+                registry_.get<ClassNameComponent, TransformComponent, SpriteComponent>(event.target_);
+            dispatcher_.enqueue(
+                EnemyDeadEffectEvent{class_name.class_id_, transform.position_, sprite.sprite_.is_flipped_});
+
             // 如果敌人被阻挡，减少阻挡者的阻挡计数
             if (auto blocked_by = registry_.try_get<BlockedByComponent>(event.target_)) {
                 if (registry_.valid(blocked_by->entity_)) {

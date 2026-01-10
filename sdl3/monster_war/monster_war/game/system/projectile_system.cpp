@@ -9,6 +9,7 @@
 #include "monster_war/engine/component/transform_component.h"
 #include "monster_war/engine/utils/events.h"
 #include "monster_war/game/component/projectile_component.h"
+#include "monster_war/game/def/events.h"
 #include "monster_war/game/def/tag.h"
 #include "monster_war/game/factory/entity_factory.h"
 
@@ -56,10 +57,6 @@ void ProjectileSystem::update(std::chrono::duration<float> delta_time) {
         // 4. 根据上一帧的位置计算朝向，并更新TransformComponent的旋转参数
         auto direction = transform.position_ - projectile.previous_position_;
         transform.rotation_ = glm::atan(direction.y, direction.x) * 180.0f / std::numbers::pi;
-
-        spdlog::info("({:.2f}, {:.2f}) -> ({:.2f}, {:.2f}) direction: ({:.2f}, {:.2f}), rotation: {}",
-                     projectile.previous_position_.x, projectile.previous_position_.y, transform.position_.x,
-                     transform.position_.y, direction.x, direction.y, transform.rotation_);
 
         // 5. 更新上一帧的位置
         projectile.previous_position_ = transform.position_;

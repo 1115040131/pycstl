@@ -54,8 +54,7 @@ entt::entity EntityFactory::createPlayerUnit(entt::id_type class_id, const glm::
     // 补充其他必要组件
     registry_.emplace<ClassNameComponent>(entity, class_id, blueprint.display_info_.name_);
     registry_.emplace<RenderComponent>(entity);  // 使用默认主图层
-
-    // 未来可添加其它组件
+    registry_.emplace<HasHealthBarTag>(entity);
 
     return entity;
 }
@@ -90,8 +89,7 @@ entt::entity EntityFactory::createEnemyUnit(entt::id_type class_id, const glm::v
     // 补充其他必要组件
     registry_.emplace<ClassNameComponent>(entity, class_id, blueprint.display_info_.name_);
     registry_.emplace<RenderComponent>(entity);  // 使用默认主图层
-
-    // 未来可添加其它组件
+    registry_.emplace<HasHealthBarTag>(entity);
 
     return entity;
 }
@@ -118,6 +116,27 @@ entt::entity EntityFactory::createProjectile(entt::id_type id, const glm::vec2& 
 
     // 添加RenderComponent(让投射物位于主图层+1，即可以遮住角色)
     registry_.emplace<RenderComponent>(entity, RenderComponent::kMainLayer + 1);
+    return entity;
+}
+
+entt::entity EntityFactory::createEnemyDeadEffect(entt::id_type class_id, const glm::vec2& position,
+                                                  const bool is_flipped) {
+    auto entity = registry_.create();
+    const auto& blueprint = blueprint_manager_.getEnemyClassBlueprint(class_id);
+
+    // --- 添加组件 ---
+    // 添加Transform组件
+    addTransformComponent(entity, position);
+
+    // 添加Sprite组件
+    addSpriteComponent(entity, blueprint.sprite_, is_flipped);
+
+    // 添加Animation组件(死亡动画名称为“damage”)
+    addOneAnimationComponent(entity, blueprint.animations_.at("damage"_hs), blueprint.sprite_, "damage"_hs);
+
+    // 补充其他必要组件
+    registry_.emplace<RenderComponent>(entity);
+    registry_.emplace<OneShotRemoveTag>(entity);
     return entity;
 }
 
@@ -155,6 +174,21 @@ void EntityFactory::addAnimationComponent(
         animations.emplace(anim_id, Animation{std::move(frames), anim_blueprint.events_});
     }
     registry_.emplace<AnimationComponent>(entity, std::move(animations), default_animation_id);
+}
+
+void EntityFactory::addOneAnimationComponent(entt::entity entity, const AnimationBlueprint& animation_blueprint,
+                                             const SpriteBlueprint& sprite_blueprint, entt::id_type animation_id,
+                                             bool loop) {
+    std::vector<AnimationFrame> frames;
+    for (const auto& frame_blueprint : animation_blueprint.frames_) {
+        Rect src_rect = sprite_blueprint.src_rect_;
+        src_rect.position.x += frame_blueprint * src_rect.size.x;
+        src_rect.position.y += animation_blueprint.row_ * src_rect.size.y;
+        frames.emplace_back(src_rect, animation_blueprint.per_frame_);
+    }
+    std::unordered_map<entt::id_type, Animation> animations = {
+        {animation_id, Animation{std::move(frames), animation_blueprint.events_, loop}}};
+    registry_.emplace<AnimationComponent>(entity, std::move(animations), animation_id);
 }
 
 void EntityFactory::addStatsComponent(entt::entity entity, const StatsBlueprint& stats, int level, int rarity) {
