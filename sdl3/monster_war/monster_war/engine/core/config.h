@@ -3,8 +3,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-
-#include <nlohmann/json_fwd.hpp>
+#include <vector>
 
 #include "common/noncopyable.h"
 #include "common/string_hash.h"

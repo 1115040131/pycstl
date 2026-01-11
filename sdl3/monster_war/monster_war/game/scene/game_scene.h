@@ -7,6 +7,7 @@
 
 #include "monster_war/engine/scene/scene.h"
 #include "monster_war/engine/system/fwd.h"
+#include "monster_war/game/data/session_data.h"
 #include "monster_war/game/data/waypoint_node.h"
 #include "monster_war/game/def/events.h"
 #include "monster_war/game/system/fwd.h"
@@ -27,6 +28,7 @@ public:
     void clean() override;
 
 private:
+    [[nodiscard]] bool initSessionData();
     [[nodiscard]] bool loadLevel();
     [[nodiscard]] bool initEventConnections();
     [[nodiscard]] bool initInputConnections();
@@ -37,6 +39,7 @@ private:
     void onEnemyArriveHome(const EnemyArriveHomeEvent& event);
 
     // 测试函数
+    void testSessionData();
     void createTestEnemy();
     bool onCreateTestPlayerMelee();
     bool onCreateTestPlayerRanged();
@@ -71,6 +74,10 @@ private:
 
     // 管理数据的实例很可能同时被多个场景使用，因此使用共享指针
     std::shared_ptr<BlueprintManager> blueprint_manager_;  // 蓝图管理器，负责管理蓝图数据
+    std::shared_ptr<SessionData> session_data_;            // 会话数据，关卡切换时需要传递的数据
+
+    // --- 其他场景数据 ---
+    int level_number_{1};
 };
 
 }  // namespace pyc::monster_war
