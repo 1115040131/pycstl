@@ -26,7 +26,6 @@ public:
     Context& getContext() const { return context_; }  ///< @brief 获取引擎上下文引用。
 
     // 核心循环函数
-    void handleInput() const;
     void update(std::chrono::duration<float> delta_time);
     void render() const;
     void clean();

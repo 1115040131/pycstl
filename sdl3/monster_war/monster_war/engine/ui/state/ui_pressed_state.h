@@ -13,12 +13,13 @@ class UIPressedState final : public UIState {
     friend class UIInteractive;
 
 public:
-    UIPressedState(UIInteractive* owner) : UIState(owner) {}
-    ~UIPressedState() override = default;
+    UIPressedState(UIInteractive* owner);
+    ~UIPressedState();
 
 private:
     void enter() override;
-    std::unique_ptr<UIState> handleInput(Context& context) override;
+
+    bool onMouseReleased();
 };
 
 }  // namespace pyc::monster_war

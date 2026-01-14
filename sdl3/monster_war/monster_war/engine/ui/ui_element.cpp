@@ -7,28 +7,8 @@ namespace pyc::monster_war {
 UIElement::UIElement(glm::vec2 position, glm::vec2 size)
     : position_(std::move(position)), size_(std::move(size)) {}
 
-bool UIElement::handleInput(Context& context) {
-    if (!visible_) {
-        return false;
-    }
-
-    bool event_handled = false;
-    auto partition_it =
-        std::partition(children_.begin(), children_.end(), [&](const std::unique_ptr<UIElement>& child) {
-            if (child && !child->need_remove_) {
-                if (!event_handled) {
-                    event_handled = child->handleInput(context);
-                }
-                return true;
-            } else {
-                return false;
-            }
-        });
-    children_.erase(partition_it, children_.end());
-    return event_handled;
-}
-
 void UIElement::update(std::chrono::duration<float> delta_time, Context& context) {
+    // 如果元素不可见，直接返回
     if (!visible_) {
         return;
     }
@@ -54,17 +34,32 @@ void UIElement::render(Context& context) {
     }
 }
 
-void UIElement::addChild(std::unique_ptr<UIElement> child) {
+void UIElement::addChild(std::unique_ptr<UIElement> child, int order_index) {
     if (child) {
         child->setParent(this);
+        if (order_index >= 0) {
+            child->setOrderIndex(order_index);
+        }
         children_.push_back(std::move(child));
     }
 }
 
 std::unique_ptr<UIElement> UIElement::removeChild(UIElement* child_ptr) {
-    auto it =
-        std::find_if(children_.begin(), children_.end(),
-                     [child_ptr](const std::unique_ptr<UIElement>& child) { return child.get() == child_ptr; });
+    auto it = std::ranges::find_if(
+        children_, [child_ptr](const std::unique_ptr<UIElement>& child) { return child.get() == child_ptr; });
+    if (it != children_.end()) {
+        std::unique_ptr<UIElement> removed_child = std::move(*it);
+        children_.erase(it);
+        removed_child->setParent(nullptr);
+        return removed_child;
+    }
+    return nullptr;
+}
+
+std::unique_ptr<UIElement> UIElement::removeChildById(entt::id_type id) {
+    auto it = std::ranges::find_if(children_,
+                                   [id](const std::unique_ptr<UIElement>& child) { return child->getId() == id; });
+
     if (it != children_.end()) {
         std::unique_ptr<UIElement> removed_child = std::move(*it);
         children_.erase(it);
@@ -75,6 +70,23 @@ std::unique_ptr<UIElement> UIElement::removeChild(UIElement* child_ptr) {
 }
 
 void UIElement::removeAllChildren() { children_.clear(); }
+
+UIElement* UIElement::getChildById(entt::id_type id) const {
+    auto it = std::ranges::find_if(children_,
+                                   [id](const std::unique_ptr<UIElement>& child) { return child->getId() == id; });
+    if (it != children_.end()) {
+        return it->get();
+    }
+    return nullptr;
+}
+
+void UIElement::sortChildrenByOrderIndex() {
+    // 使用 stable_sort 避免破坏原来相等元素的顺序
+    std::ranges::stable_sort(children_,
+                             [](const std::unique_ptr<UIElement>& lhs, const std::unique_ptr<UIElement>& rhs) {
+                                 return lhs->getOrderIndex() < rhs->getOrderIndex();
+                             });
+}
 
 Rect UIElement::getBounds() const {
     auto screen_pos = getScreenPosition();

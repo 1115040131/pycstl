@@ -16,6 +16,9 @@ namespace pyc::monster_war {
 
 class BlueprintManager;
 class EntityFactory;
+class UIConfig;
+
+class UIElement;
 
 class GameScene final : public Scene {
 public:
@@ -29,11 +32,17 @@ public:
 
 private:
     [[nodiscard]] bool initSessionData();
+    [[nodiscard]] bool initUIConfig();
     [[nodiscard]] bool loadLevel();
     [[nodiscard]] bool initEventConnections();
     [[nodiscard]] bool initInputConnections();
     [[nodiscard]] bool initEntityFactory();
     [[nodiscard]] bool initSystems();
+
+    void createUnitsPortraitUI();  ///< @brief 创建画面下方的单位肖像UI
+
+    ///< @brief 排列画面下方的单位肖像UI (肖像增/减时调用)
+    void arrangeUnitsPortraitUI(UIElement* anchor_panel, const glm::vec2& frame_size, float padding);
 
     // 事件回调函数
     void onEnemyArriveHome(const EnemyArriveHomeEvent& event);
@@ -75,6 +84,7 @@ private:
     // 管理数据的实例很可能同时被多个场景使用，因此使用共享指针
     std::shared_ptr<BlueprintManager> blueprint_manager_;  // 蓝图管理器，负责管理蓝图数据
     std::shared_ptr<SessionData> session_data_;            // 会话数据，关卡切换时需要传递的数据
+    std::shared_ptr<UIConfig> ui_config_;                  // UI配置，负责管理UI数据
 
     // --- 其他场景数据 ---
     int level_number_{1};

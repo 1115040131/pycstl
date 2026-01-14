@@ -20,14 +20,6 @@ bool UIManager::init(const glm::vec2& window_size) {
     return true;
 }
 
-bool UIManager::handleInput(Context& context) {
-    if (root_element_ && root_element_->isVisible()) {
-        // 从根元素开始向下分发事件
-        if (root_element_->handleInput(context)) return true;
-    }
-    return false;
-}
-
 void UIManager::update(std::chrono::duration<float> delta_time, Context& context) {
     if (root_element_ && root_element_->isVisible()) {
         // 从根元素开始向下更新

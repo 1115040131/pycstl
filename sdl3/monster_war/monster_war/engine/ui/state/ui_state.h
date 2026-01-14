@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory>
+#include <chrono>
 
 #include "common/noncopyable.h"
 
@@ -29,7 +29,7 @@ public:
 protected:
     // --- 核心方法 ---
     virtual void enter() {}
-    virtual std::unique_ptr<UIState> handleInput(Context& context) = 0;
+    virtual void update(std::chrono::duration<float>, Context&) {}
 
 protected:
     UIInteractive* owner_{};  ///< @brief 指向父节点

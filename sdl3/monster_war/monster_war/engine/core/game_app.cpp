@@ -97,8 +97,6 @@ bool GameApp::init() {
 void GameApp::handleEvents() {
     // 处理并分发事件
     input_manager_->update();
-
-    scene_manager_->handleInput();
 }
 
 void GameApp::update(std::chrono::duration<float> delta_time) {

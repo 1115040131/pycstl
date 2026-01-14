@@ -18,7 +18,7 @@ public:
 
 private:
     void enter() override;
-    std::unique_ptr<UIState> handleInput(Context& context) override;
+    void update(std::chrono::duration<float> delta_time, Context& context) override;
 };
 
 }  // namespace pyc::monster_war

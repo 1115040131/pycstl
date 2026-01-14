@@ -13,12 +13,14 @@ class UIHoverState final : public UIState {
     friend class UIInteractive;
 
 public:
-    UIHoverState(UIInteractive* owner) : UIState(owner) {}
-    ~UIHoverState() override = default;
+    UIHoverState(UIInteractive* owner);
+    ~UIHoverState() override;
 
 private:
     void enter() override;
-    std::unique_ptr<UIState> handleInput(Context& context) override;
+    void update(std::chrono::duration<float> delta_time, Context& context) override;
+
+    bool onMousePressed();  ///< @brief 鼠标按下回调函数 (不再使用轮询“isActionPressed”)
 };
 
 }  // namespace pyc::monster_war

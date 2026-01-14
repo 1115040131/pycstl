@@ -33,7 +33,6 @@ public:
 
     // 核心循环方法
     virtual void init();                                           ///< @brief 初始化场景。
-    virtual void handleInput();                                    ///< @brief 处理输入。
     virtual void update(std::chrono::duration<float> delta_time);  ///< @brief 更新场景。
     virtual void render();                                         ///< @brief 渲染场景。
     virtual void clean();                                          ///< @brief 清理场景。

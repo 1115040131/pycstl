@@ -31,7 +31,6 @@ public:
     void clearElements();                                   ///< @brief 清除所有UI元素，通常用于重置UI状态。
 
     // --- 核心循环方法 ---
-    bool handleInput(Context& context);  ///< @brief 处理输入事件，如果事件被处理则返回true。
     void update(std::chrono::duration<float> delta_time, Context& context);
     void render(Context& context);
 

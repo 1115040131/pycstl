@@ -29,12 +29,6 @@ Scene* SceneManager::getCurrentScene() const {
     return scene_stack_.back().get();
 }
 
-void SceneManager::handleInput() const {  // 只考虑栈顶场景
-    if (auto current_scene = getCurrentScene()) {
-        current_scene->handleInput();
-    }
-}
-
 void SceneManager::update(std::chrono::duration<float> delta_time) {
     // 只更新栈顶（当前）场景
     if (auto current_scene = getCurrentScene()) {

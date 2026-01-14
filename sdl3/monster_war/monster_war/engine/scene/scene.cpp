@@ -21,17 +21,6 @@ void Scene::init() {
     spdlog::trace("场景 '{}' 初始化完成。", scene_name_);
 }
 
-void Scene::handleInput() {
-    if (!is_initialized_) {
-        return;
-    }
-
-    // 处理UI管理器输入
-    if (ui_manager_->handleInput(context_)) {
-        return;  // 如果输入事件被UI处理则返回，不再处理游戏对象输入
-    }
-}
-
 void Scene::update(std::chrono::duration<float> delta_time) {
     if (!is_initialized_) {
         return;
