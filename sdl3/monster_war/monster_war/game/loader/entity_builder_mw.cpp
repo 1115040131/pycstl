@@ -3,6 +3,9 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/component/tilelayer_component.h"
+#include "monster_war/game/def/tag.h"
+
 namespace pyc::monster_war {
 
 EntityBuilderMW::EntityBuilderMW(LevelLoader& level_loader, Context& context, entt::registry& registry,
@@ -17,6 +20,7 @@ EntityBuilderMW* EntityBuilderMW ::build() {
         buildPath();
     } else {
         BasicEntityBuilder::build();
+        buildPlace();
     }
 
     return this;
@@ -52,6 +56,21 @@ void EntityBuilderMW::buildPath() {
     // 添加到节点容器中
     waypoint_nodes_[id] = WaypointNode{id, std::move(position), std::move(next_node_ids)};
     spdlog::trace("waypoint_nodes_ size: {}", waypoint_nodes_.size());
+}
+
+void EntityBuilderMW::buildPlace() {
+    if (tile_info_ && tile_info_->properties_) {
+        for (const auto& property : tile_info_->properties_.value()) {
+            if (property.value("name", "") == "place") {
+                auto type = property.value("value", "");
+                if (type == "melee") {
+                    registry_.emplace<MeleePlaceTag>(entity_id_);
+                } else if (type == "range") {
+                    registry_.emplace<RangedPlaceTag>(entity_id_);
+                }
+            }
+        }
+    }
 }
 
 }  // namespace pyc::monster_war

@@ -12,6 +12,7 @@
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
 #include "monster_war/game/component/stats_component.h"
+#include "monster_war/game/data/game_stats.h"
 #include "monster_war/game/def/tag.h"
 
 namespace pyc::monster_war {
@@ -57,6 +58,14 @@ void CombatResolveSystem::onAttackEvent(const AttackEvent& event) {
                 registry_.get<ClassNameComponent, TransformComponent, SpriteComponent>(event.target_);
             dispatcher_.enqueue(
                 EnemyDeadEffectEvent{class_name.class_id_, transform.position_, sprite.sprite_.is_flipped_});
+
+            // 更新统计信息
+            auto& game_stats = registry_.ctx().get<GameStats&>();
+            game_stats.enemy_killed_count_++;  // 敌人击杀数量+1
+            if ((game_stats.enemy_killed_count_ + game_stats.enemy_arrived_count_) >= game_stats.enemy_count_) {
+                spdlog::warn("敌人全部死亡");
+                // TODO: 切换场景逻辑
+            }
 
             // 如果敌人被阻挡，减少阻挡者的阻挡计数
             if (auto blocked_by = registry_.try_get<BlockedByComponent>(event.target_)) {

@@ -28,7 +28,8 @@ public:
     EntityBuilderMW* build() override;
 
 private:
-    void buildPath();  ///< @brief 生成路径节点
+    void buildPath();   ///< @brief 生成路径节点
+    void buildPlace();  ///< @brief 生成单位放置区域标签
 
 private:
     // 保存路径节点和起点数据（非拥有）

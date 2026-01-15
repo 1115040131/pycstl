@@ -7,18 +7,17 @@
 
 #include "monster_war/engine/scene/scene.h"
 #include "monster_war/engine/system/fwd.h"
-#include "monster_war/game/data/session_data.h"
+#include "monster_war/game/data/game_stats.h"
 #include "monster_war/game/data/waypoint_node.h"
-#include "monster_war/game/def/events.h"
 #include "monster_war/game/system/fwd.h"
 
 namespace pyc::monster_war {
 
 class BlueprintManager;
 class EntityFactory;
+class SessionData;
 class UIConfig;
-
-class UIElement;
+class UnitsPortraitUI;
 
 class GameScene final : public Scene {
 public:
@@ -37,15 +36,9 @@ private:
     [[nodiscard]] bool initEventConnections();
     [[nodiscard]] bool initInputConnections();
     [[nodiscard]] bool initEntityFactory();
+    [[nodiscard]] bool initRegistryContext();
+    [[nodiscard]] bool initUnitsPortraitUI();
     [[nodiscard]] bool initSystems();
-
-    void createUnitsPortraitUI();  ///< @brief 创建画面下方的单位肖像UI
-
-    ///< @brief 排列画面下方的单位肖像UI (肖像增/减时调用)
-    void arrangeUnitsPortraitUI(UIElement* anchor_panel, const glm::vec2& frame_size, float padding);
-
-    // 事件回调函数
-    void onEnemyArriveHome(const EnemyArriveHomeEvent& event);
 
     // 测试函数
     void testSessionData();
@@ -75,9 +68,13 @@ private:
     std::unique_ptr<ProjectileSystem> projectile_system_;
     std::unique_ptr<EffectSystem> effect_system_;
     std::unique_ptr<HealthBarSystem> health_bar_system_;
+    std::unique_ptr<GameRuleSystem> game_rule_system_;
+
+    std::unique_ptr<UnitsPortraitUI> units_portrait_ui_;  // 封装的单位肖像UI，负责管理单位肖像UI的创建、更新和排列
 
     std::unordered_map<int, WaypointNode> waypoint_nodes_;  // 路径节点ID到节点数据的映射
     std::vector<int> start_points_;                         // 起点ID列表
+    GameStats game_stats_;                                  // 关卡内游戏统计数据
 
     std::unique_ptr<EntityFactory> entity_factory_;  // 实体工厂，负责创建和管理实体
 

@@ -9,6 +9,7 @@ class BlockSystem;
 class CombatResolveSystem;
 class EffectSystem;
 class FollowPathSystem;
+class GameRuleSystem;
 class HealthBarSystem;
 class OrientationSystem;
 class ProjectileSystem;
