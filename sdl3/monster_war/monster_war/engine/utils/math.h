@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <random>
 #include <string_view>
 
@@ -114,6 +115,17 @@ inline float statModify(float base, int level = 1, int rarity = 1) {
  */
 inline float distanceSquared(const glm::vec2& a, const glm::vec2& b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
+}
+
+/**
+ * @brief 打乱容器中元素的顺序（Fisher-Yates 洗牌算法）
+ * @tparam Container 容器类型
+ * @param container 容器
+ */
+template <typename Container>
+void shuffle(Container&& container) {
+    static thread_local std::mt19937 generator{std::random_device{}()};
+    std::ranges::shuffle(container, generator);
 }
 
 }  // namespace pyc::monster_war

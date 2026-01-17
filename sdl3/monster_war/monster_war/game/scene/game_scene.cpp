@@ -13,12 +13,14 @@
 #include "monster_war/engine/system/render_system.h"
 #include "monster_war/engine/system/ysort_system.h"
 #include "monster_war/game/component/player_component.h"
+#include "monster_war/game/data/level_config.h"
 #include "monster_war/game/data/session_data.h"
 #include "monster_war/game/data/ui_config.h"
 #include "monster_war/game/def/events.h"
 #include "monster_war/game/factory/blueprint_manager.h"
 #include "monster_war/game/factory/entity_factory.h"
 #include "monster_war/game/loader/entity_builder_mw.h"
+#include "monster_war/game/spawner/enemy_spawner.h"
 #include "monster_war/game/system/animation_event_system.h"
 #include "monster_war/game/system/animation_state_system.h"
 #include "monster_war/game/system/attack_starter_system.h"
@@ -50,6 +52,10 @@ void GameScene::init() {
         spdlog::error("初始化session_data_失败");
         return;
     }
+    if (!initLevelConfig()) {
+        spdlog::error("初始化关卡配置失败");
+        return;
+    }
     if (!initUIConfig()) {
         spdlog::error("初始化UI配置失败");
         return;
@@ -74,16 +80,18 @@ void GameScene::init() {
         spdlog::error("初始化注册表上下文失败");
         return;
     }
-    if (!initUnitsPortraitUI()) {
-        spdlog::error("初始化单位肖像UI失败");
-        return;
-    }
     if (!initSystems()) {
         spdlog::error("初始化系统失败");
         return;
     }
-
-    createTestEnemy();
+    if (!initEnemySpawner()) {
+        spdlog::error("初始化敌人生成器失败");
+        return;
+    }
+    if (!initUnitsPortraitUI()) {
+        spdlog::error("初始化单位肖像UI失败");
+        return;
+    }
 
     Scene::init();
 }
@@ -109,6 +117,7 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     ysort_system_->update(registry_);  // 调用顺序要在MovementSystem之后
 
     // 场景中其他更新函数
+    enemy_spawner_->update(delta_time);
     units_portrait_ui_->update(delta_time);
     Scene::update(delta_time);
 }
@@ -146,6 +155,19 @@ bool GameScene::initSessionData() {
     return true;
 }
 
+bool GameScene::initLevelConfig() {
+    if (!level_config_) {
+        level_config_ = std::make_shared<LevelConfig>();
+        if (!level_config_->loadFromFile("assets/data/level_config.json")) {
+            spdlog::error("加载关卡配置失败");
+            return false;
+        }
+    }
+    waves_ = level_config_->getWavesData(level_number_);
+    game_stats_.enemy_count_ = level_config_->getTotalEnemyCount(level_number_);
+    return true;
+}
+
 bool GameScene::initUIConfig() {
     if (!ui_config_) {
         ui_config_ = std::make_shared<UIConfig>();
@@ -163,7 +185,9 @@ bool GameScene::loadLevel() {
     level_loader.setEntityBuilder(
         std::make_unique<EntityBuilderMW>(level_loader, context_, registry_, waypoint_nodes_, start_points_));
 
-    if (!level_loader.loadLevel("assets/maps/level1.tmj", this)) {
+    // 获取关卡地图路径
+    auto map_path = level_config_->getMapPath(level_number_);
+    if (!level_loader.loadLevel(map_path, this)) {
         spdlog::error("加载关卡失败");
         return false;
     }
@@ -199,18 +223,13 @@ bool GameScene::initRegistryContext() {
     registry_.ctx().emplace<std::shared_ptr<BlueprintManager>>(blueprint_manager_);
     registry_.ctx().emplace<std::shared_ptr<SessionData>>(session_data_);
     registry_.ctx().emplace<std::shared_ptr<UIConfig>>(ui_config_);
+    registry_.ctx().emplace<std::shared_ptr<LevelConfig>>(level_config_);
+    registry_.ctx().emplace<std::unordered_map<int, WaypointNode>&>(waypoint_nodes_);
+    registry_.ctx().emplace<std::vector<int>&>(start_points_);
     registry_.ctx().emplace<GameStats&>(game_stats_);
+    registry_.ctx().emplace<Waves&>(waves_);
+    registry_.ctx().emplace<int&>(level_number_);
     spdlog::info("registry_ 上下文初始化完成");
-    return true;
-}
-
-bool GameScene::initUnitsPortraitUI() {
-    try {
-        units_portrait_ui_ = std::make_unique<UnitsPortraitUI>(registry_, *ui_manager_, context_);
-    } catch (const std::exception& e) {
-        spdlog::error("初始化单位肖像UI失败: {}", e.what());
-        return false;
-    }
     return true;
 }
 
@@ -244,16 +263,20 @@ bool GameScene::initSystems() {
     return true;
 }
 
-void GameScene::createTestEnemy() {
-    // 每个起点创建一个敌人
-    for (auto start_index : start_points_) {
-        auto position = waypoint_nodes_[start_index].position_;
+bool GameScene::initEnemySpawner() {
+    enemy_spawner_ = std::make_unique<EnemySpawner>(registry_, *entity_factory_);
+    spdlog::info("敌人生成器初始化完成");
+    return true;
+}
 
-        entity_factory_->createEnemyUnit("wolf"_hs, position, start_index);
-        entity_factory_->createEnemyUnit("slime"_hs, position, start_index);
-        entity_factory_->createEnemyUnit("goblin"_hs, position, start_index);
-        entity_factory_->createEnemyUnit("dark_witch"_hs, position, start_index);
+bool GameScene::initUnitsPortraitUI() {
+    try {
+        units_portrait_ui_ = std::make_unique<UnitsPortraitUI>(registry_, *ui_manager_, context_);
+    } catch (const std::exception& e) {
+        spdlog::error("初始化单位肖像UI失败: {}", e.what());
+        return false;
     }
+    return true;
 }
 
 bool GameScene::onClearAllPlayers() {

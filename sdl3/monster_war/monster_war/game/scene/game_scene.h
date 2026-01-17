@@ -8,13 +8,16 @@
 #include "monster_war/engine/scene/scene.h"
 #include "monster_war/engine/system/fwd.h"
 #include "monster_war/game/data/game_stats.h"
+#include "monster_war/game/data/level_data.h"
 #include "monster_war/game/data/waypoint_node.h"
 #include "monster_war/game/system/fwd.h"
 
 namespace pyc::monster_war {
 
 class BlueprintManager;
+class EnemySpawner;
 class EntityFactory;
+class LevelConfig;
 class SessionData;
 class UIConfig;
 class UnitsPortraitUI;
@@ -31,17 +34,18 @@ public:
 
 private:
     [[nodiscard]] bool initSessionData();
+    [[nodiscard]] bool initLevelConfig();
     [[nodiscard]] bool initUIConfig();
     [[nodiscard]] bool loadLevel();
     [[nodiscard]] bool initEventConnections();
     [[nodiscard]] bool initInputConnections();
     [[nodiscard]] bool initEntityFactory();
     [[nodiscard]] bool initRegistryContext();
-    [[nodiscard]] bool initUnitsPortraitUI();
     [[nodiscard]] bool initSystems();
+    [[nodiscard]] bool initEnemySpawner();
+    [[nodiscard]] bool initUnitsPortraitUI();
 
     // 测试函数
-    void createTestEnemy();
     bool onClearAllPlayers();
 
 private:
@@ -68,11 +72,13 @@ private:
     std::unique_ptr<PlaceUnitSystem> place_unit_system_;
     std::unique_ptr<RenderRangeSystem> render_range_system_;
 
+    std::unique_ptr<EnemySpawner> enemy_spawner_;         // 敌人生成器，负责生成敌人
     std::unique_ptr<UnitsPortraitUI> units_portrait_ui_;  // 封装的单位肖像UI，负责管理单位肖像UI的创建、更新和排列
 
     std::unordered_map<int, WaypointNode> waypoint_nodes_;  // 路径节点ID到节点数据的映射
     std::vector<int> start_points_;                         // 起点ID列表
     GameStats game_stats_;                                  // 关卡内游戏统计数据
+    Waves waves_;                                           // 关卡波次数据
 
     std::unique_ptr<EntityFactory> entity_factory_;  // 实体工厂，负责创建和管理实体
 
@@ -80,6 +86,7 @@ private:
     std::shared_ptr<BlueprintManager> blueprint_manager_;  // 蓝图管理器，负责管理蓝图数据
     std::shared_ptr<SessionData> session_data_;            // 会话数据，关卡切换时需要传递的数据
     std::shared_ptr<UIConfig> ui_config_;                  // UI配置，负责管理UI数据
+    std::shared_ptr<LevelConfig> level_config_;            // 关卡配置，负责管理关卡数据
 
     // --- 其他场景数据 ---
     int level_number_{1};
