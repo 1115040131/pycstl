@@ -18,6 +18,8 @@ struct FColor {
     float b{};
     float a{1.0f};
 
+    constexpr auto operator<=>(const FColor& other) const = default;
+
     // -- 创建一些预设颜色，方便使用 ---
     static constexpr FColor red() noexcept { return {1.0f, 0.0f, 0.0f, 1.0f}; }
     static constexpr FColor green() noexcept { return {0.0f, 1.0f, 0.0f, 1.0f}; }

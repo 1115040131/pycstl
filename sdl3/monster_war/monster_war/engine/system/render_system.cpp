@@ -15,10 +15,11 @@ void RenderSystem::update(entt::registry& registry, Renderer& renderer, const Ca
 
     // 执行渲染，注意排序组件 RenderComponent 必须放在最前面
     auto view = registry.view<RenderComponent, TransformComponent, SpriteComponent>();
-    for (auto [_, __, transform, sprite] : view.each()) {
+    for (auto [_, render, transform, sprite] : view.each()) {
         auto position = transform.position_ + sprite.offset_;
         auto size = sprite.size_ * transform.scale_;
-        renderer.drawSprite(camera, sprite.sprite_, position, size, transform.rotation_);
+        // 绘制时应用Render组件中的颜色调整参数
+        renderer.drawSprite(camera, sprite.sprite_, position, size, transform.rotation_, render.color_);
     }
 }
 

@@ -5,6 +5,7 @@
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/component/transform_component.h"
+#include "monster_war/engine/utils/events.h"
 #include "monster_war/game/component/blocked_by_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"

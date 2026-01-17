@@ -3,9 +3,9 @@
 #include <entt/entity/fwd.hpp>
 #include <entt/signal/fwd.hpp>
 
-#include "monster_war/engine/utils/events.h"
-
 namespace pyc::monster_war {
+
+class AnimationEvent;
 
 /**
  * @brief 动画事件系统，用于处理各种动画事件

@@ -13,6 +13,7 @@
 #include "monster_war/game/component/player_component.h"
 #include "monster_war/game/component/stats_component.h"
 #include "monster_war/game/data/game_stats.h"
+#include "monster_war/game/def/events.h"
 #include "monster_war/game/def/tag.h"
 
 namespace pyc::monster_war {
@@ -39,8 +40,8 @@ void CombatResolveSystem::onAttackEvent(const AttackEvent& event) {
                      entt::to_integral(event.attacker_), target_stats.hp_);
         if (target_stats.hp_ <= 0) {  //  死亡情况
             target_stats.hp_ = 0;
-            // 用emplace重复添加会报错，用emplace_or_replace更加健壮，可重复添加
-            registry_.emplace_or_replace<DeadTag>(event.target_);
+            // 发送移除单位事件
+            dispatcher_.enqueue(RemovePlayerUnitEvent{event.target_});
             spdlog::info("玩家 ID: {} 死亡", entt::to_integral(event.target_));
         } else if (target_stats.hp_ < target_stats.max_hp_) {  // 受伤情况
             registry_.emplace_or_replace<InjuredTag>(event.target_);

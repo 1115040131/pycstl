@@ -12,6 +12,8 @@ class Context;
 class UIPanel;
 class UIManager;
 
+class RemoveUIPortraitEvent;
+
 /**
  * @brief 单位肖像UI
  *
@@ -36,6 +38,9 @@ private:
     void updatePortraitCover();     ///< @brief 更新肖像遮盖
     void createUnitsPortraitUI();   ///< @brief 创建单位肖像UI
     void arrangeUnitsPortraitUI();  ///< @brief 排列单位肖像UI（肖像增/减时调用）
+
+    // 事件回调函数
+    void onRemoveUIPortraitEvent(const RemoveUIPortraitEvent& event);
 
 private:
     // --- 构造函数传入的外部组件引用 ---

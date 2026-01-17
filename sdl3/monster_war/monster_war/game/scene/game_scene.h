@@ -41,11 +41,7 @@ private:
     [[nodiscard]] bool initSystems();
 
     // 测试函数
-    void testSessionData();
     void createTestEnemy();
-    bool onCreateTestPlayerMelee();
-    bool onCreateTestPlayerRanged();
-    bool onCreateTestPlayerHealer();
     bool onClearAllPlayers();
 
 private:
@@ -69,6 +65,8 @@ private:
     std::unique_ptr<EffectSystem> effect_system_;
     std::unique_ptr<HealthBarSystem> health_bar_system_;
     std::unique_ptr<GameRuleSystem> game_rule_system_;
+    std::unique_ptr<PlaceUnitSystem> place_unit_system_;
+    std::unique_ptr<RenderRangeSystem> render_range_system_;
 
     std::unique_ptr<UnitsPortraitUI> units_portrait_ui_;  // 封装的单位肖像UI，负责管理单位肖像UI的创建、更新和排列
 

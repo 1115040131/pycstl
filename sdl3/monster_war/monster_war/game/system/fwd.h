@@ -12,8 +12,10 @@ class FollowPathSystem;
 class GameRuleSystem;
 class HealthBarSystem;
 class OrientationSystem;
+class PlaceUnitSystem;
 class ProjectileSystem;
 class RemoveDeadSystem;
+class RenderRangeSystem;
 class SetTargetSystem;
 class TimerSystem;
 

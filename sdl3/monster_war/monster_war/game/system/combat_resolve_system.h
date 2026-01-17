@@ -3,9 +3,10 @@
 #include <entt/entity/fwd.hpp>
 #include <entt/signal/fwd.hpp>
 
-#include "monster_war/game/def/events.h"
-
 namespace pyc::monster_war {
+
+class AttackEvent;
+class HealEvent;
 
 /**
  * @brief 战斗结算系统，用于处理战斗结算

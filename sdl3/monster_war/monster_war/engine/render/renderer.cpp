@@ -10,6 +10,8 @@
 
 namespace pyc::monster_war {
 
+using namespace entt::literals;
+
 Renderer::Renderer(SDL_Renderer* sdl_renderer, ResourceManager* resource_manager)
     : sdl_renderer_(sdl_renderer), resource_manager_(resource_manager) {
     spdlog::trace("构造 Renderer...");
@@ -24,7 +26,7 @@ Renderer::Renderer(SDL_Renderer* sdl_renderer, ResourceManager* resource_manager
 }
 
 void Renderer::drawSprite(const Camera& camera, const Sprite& sprite, const glm::vec2& position,
-                          const glm::vec2& size, const float rotation) {
+                          const glm::vec2& size, const float rotation, const FColor& color) {
     auto texture = resource_manager_->getTexture(sprite.texture_id_, sprite.texture_path_);
     if (!texture) {
         spdlog::error("无法为 ID {} 获取纹理。", sprite.texture_id_);
@@ -54,10 +56,34 @@ void Renderer::drawSprite(const Camera& camera, const Sprite& sprite, const glm:
         sprite.src_rect_.size.y,
     };
 
+    // 设置调整颜色与透明度
+    SDL_SetTextureColorModFloat(texture, color.r, color.g, color.b);
+    SDL_SetTextureAlphaModFloat(texture, color.a);
+
     // 执行绘制(默认旋转中心为精灵的中心点)
     if (!SDL_RenderTextureRotated(sdl_renderer_, texture, &src_rect, &dest_rect, rotation, nullptr,
                                   sprite.is_flipped_ ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
         spdlog::error("渲染旋转纹理失败 (ID: {}): {}", sprite.texture_id_, SDL_GetError());
+    }
+}
+
+void Renderer::drawFilledCircle(const Camera& camera, const glm::vec2& position, const float radius,
+                                const FColor& color) {
+    // 获取引擎自带的圆形纹理
+    auto circle_texture = resource_manager_->getTexture("assets/textures/UI/circle.png"_hs);
+    if (!circle_texture) {
+        spdlog::error("无法获取引擎自带的圆形纹理。");
+        return;
+    }
+    auto screen_position = camera.worldToScreen(position);
+    // 设置颜色和透明度
+    SDL_SetTextureColorModFloat(circle_texture, color.r, color.g, color.b);
+    SDL_SetTextureAlphaModFloat(circle_texture, color.a);
+    // 绘制
+    SDL_FRect dest_rect = {screen_position.x - radius, screen_position.y - radius, radius * 2, radius * 2};
+    if (!SDL_RenderTextureRotated(sdl_renderer_, circle_texture, nullptr, &dest_rect, 0.0, nullptr,
+                                  SDL_FLIP_NONE)) {
+        spdlog::error("绘制填充圆形失败：{}", SDL_GetError());
     }
 }
 
