@@ -5,6 +5,7 @@
 #include "monster_war/engine/component/transform_component.h"
 #include "monster_war/engine/render/camera.h"
 #include "monster_war/engine/render/renderer.h"
+#include "monster_war/game/component/stats_component.h"
 #include "monster_war/game/component/unit_prep_component.h"
 #include "monster_war/game/def/tag.h"
 
@@ -17,7 +18,12 @@ void RenderRangeSystem::update(entt::registry& registry, Renderer& renderer, con
         // 攻击范围显示为透明绿色圆形
         renderer.drawFilledCircle(camera, transform.position_, unit_prep.range_, RANGE_COLOR);
     }
-    // TODO: 地图上的远程单位
+    // 地图上的单位
+    auto view_remote = registry.view<ShowRangeTag, TransformComponent, StatsComponent>();
+    for (auto [entity, transform, stats] : view_remote.each()) {
+        // 攻击范围显示为透明绿色圆形
+        renderer.drawFilledCircle(camera, transform.position_, stats.range_, RANGE_COLOR);
+    }
 }
 
 }  // namespace pyc::monster_war

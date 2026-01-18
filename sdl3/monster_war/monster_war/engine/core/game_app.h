@@ -68,6 +68,7 @@ private:
 
     [[nodiscard]] bool initContext();
     [[nodiscard]] bool initSceneManager();
+    [[nodiscard]] bool initImGui();
 #pragma endregion
 
     // 事件处理函数

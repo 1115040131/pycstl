@@ -49,4 +49,18 @@ void GameState::setLogicalSize(const glm::vec2& logical_size) {
     spdlog::trace("逻辑分辨率设置为: {}x{}", logical_size.x, logical_size.y);
 }
 
+bool GameState::disableLogicalPresentation() {
+    int width{};
+    int height{};
+    SDL_GetRenderLogicalPresentation(renderer_, &width, &height, NULL);
+    return SDL_SetRenderLogicalPresentation(renderer_, width, height, SDL_LOGICAL_PRESENTATION_DISABLED);
+}
+
+bool GameState::enableLogicalPresentation() {
+    int width{};
+    int height{};
+    SDL_GetRenderLogicalPresentation(renderer_, &width, &height, NULL);
+    return SDL_SetRenderLogicalPresentation(renderer_, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+}
+
 }  // namespace pyc::monster_war

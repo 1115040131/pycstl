@@ -4,7 +4,7 @@ cc_library(
     name = "ziyu_engine",
     srcs = glob(["monster_war/engine/**/*.cpp"]),
     hdrs = glob(["monster_war/engine/**/*.h"]),
-    copts = STRICT_COPTS,
+    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
@@ -18,6 +18,8 @@ cc_library(
         "//sdl3:sdl3_ttf",
         "@entt",
         "@glm",
+        "@imgui_backends//:platform-sdl3",
+        "@imgui_backends//:renderer-sdlrenderer3",
         "@nlohmann_json//:json",
         "@spdlog",
     ],
@@ -29,7 +31,7 @@ cc_binary(
         "monster_war/game/**/*.cpp",
         "monster_war/game/**/*.h",
     ]) + ["monster_war/main.cpp"],
-    copts = STRICT_COPTS,
+    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
     data = glob(["assets/**"]),
     defines = select({
         "//conditions:default": [],

@@ -7,6 +7,7 @@ class AnimationStateSystem;
 class AttackStarterSystem;
 class BlockSystem;
 class CombatResolveSystem;
+class DebugUISystem;
 class EffectSystem;
 class FollowPathSystem;
 class GameRuleSystem;
@@ -16,6 +17,7 @@ class PlaceUnitSystem;
 class ProjectileSystem;
 class RemoveDeadSystem;
 class RenderRangeSystem;
+class SelectionSystem;
 class SetTargetSystem;
 class TimerSystem;
 

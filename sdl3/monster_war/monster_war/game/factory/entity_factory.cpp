@@ -222,7 +222,7 @@ void EntityFactory::addStatsComponent(entt::entity entity, const StatsBlueprint&
     auto def = statModify(stats.def_, level, rarity);
 
     registry_.emplace<StatsComponent>(entity, hp, hp, atk, def, stats.range_, stats.atk_interval_,
-                                      std::chrono::duration<float>::zero(), level, rarity);
+                                      stats.atk_interval_, level, rarity);
 }
 
 void EntityFactory::addPlayerComponent(entt::entity entity, const PlayerBlueprint& player, int rarity) {

@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <entt/entity/entity.hpp>
+
 #include "monster_war/engine/scene/scene.h"
 #include "monster_war/engine/system/fwd.h"
 #include "monster_war/game/data/game_stats.h"
@@ -71,6 +73,8 @@ private:
     std::unique_ptr<GameRuleSystem> game_rule_system_;
     std::unique_ptr<PlaceUnitSystem> place_unit_system_;
     std::unique_ptr<RenderRangeSystem> render_range_system_;
+    std::unique_ptr<DebugUISystem> debug_ui_system_;
+    std::unique_ptr<SelectionSystem> selection_system_;
 
     std::unique_ptr<EnemySpawner> enemy_spawner_;         // 敌人生成器，负责生成敌人
     std::unique_ptr<UnitsPortraitUI> units_portrait_ui_;  // 封装的单位肖像UI，负责管理单位肖像UI的创建、更新和排列
@@ -90,6 +94,8 @@ private:
 
     // --- 其他场景数据 ---
     int level_number_{1};
+    entt::entity selected_unit_{entt::null};  // 游戏中鼠标选中的单位
+    entt::entity hovered_unit_{entt::null};   // 游戏中鼠标悬浮的单位
 };
 
 }  // namespace pyc::monster_war
