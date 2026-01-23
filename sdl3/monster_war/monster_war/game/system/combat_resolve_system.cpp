@@ -18,6 +18,8 @@
 
 namespace pyc::monster_war {
 
+using namespace entt::literals;
+
 CombatResolveSystem::CombatResolveSystem(entt::registry& registry, entt::dispatcher& dispatcher)
     : registry_(registry), dispatcher_(dispatcher) {
     dispatcher_.sink<AttackEvent>().connect<&CombatResolveSystem::onAttackEvent>(this);
@@ -98,6 +100,9 @@ void CombatResolveSystem::onHealEvent(const HealEvent& event) {
         target_stats.hp_ = target_stats.max_hp_;
         registry_.remove<InjuredTag>(event.target_);
     }
+    // 添加治疗特效
+    const auto& transform = registry_.get<TransformComponent>(event.target_);
+    dispatcher_.enqueue(EffectEvent{"heal"_hs, transform.position_, false});
 }
 
 float CombatResolveSystem::calculateEffectiveDamage(float attacker_atk, float target_def) {

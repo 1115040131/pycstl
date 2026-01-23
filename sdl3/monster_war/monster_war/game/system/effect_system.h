@@ -7,6 +7,7 @@ namespace pyc::monster_war {
 
 class EntityFactory;
 class EnemyDeadEffectEvent;
+class EffectEvent;
 
 /**
  * @brief 特效系统，处理所有特效的创建
@@ -19,7 +20,7 @@ public:
 private:
     // 事件回调函数
     void onEnemyDeadEffectEvent(const EnemyDeadEffectEvent& event);  ///< @brief 敌人死亡特效事件
-    // TODO: 未来添加其他特效事件回调函数
+    void onEffectEvent(const EffectEvent& event);                    ///< @brief (通用)特效事件
 
 private:
     entt::registry& registry_;

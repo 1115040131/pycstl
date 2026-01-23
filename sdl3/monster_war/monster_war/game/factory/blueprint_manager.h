@@ -26,6 +26,8 @@ public:
     [[nodiscard]] bool loadEnemyClassBlueprints(std::string_view enemy_json_path);
     ///< @brief 加载投射物蓝图, 返回是否成功
     [[nodiscard]] bool loadProjectileBlueprints(std::string_view projectile_json_path);
+    ///< @brief 加载特效蓝图, 返回是否成功
+    [[nodiscard]] bool loadEffectBlueprints(std::string_view effect_json_path);
 
     ///< @brief 获取指定ID的玩家职业蓝图
     const PlayerClassBlueprint& getPlayerClassBlueprint(entt::id_type id) const;
@@ -33,6 +35,8 @@ public:
     const EnemyClassBlueprint& getEnemyClassBlueprint(entt::id_type id) const;
     ///< @brief 获取指定ID的投射物蓝图
     const ProjectileBlueprint& getProjectileBlueprint(entt::id_type id) const;
+    ///< @brief 获取指定ID的特效蓝图
+    const EffectBlueprint& getEffectBlueprint(entt::id_type id) const;
 
 private:
     // --- 分别针对各个子蓝图进行json解析，并创建(返回)对应的蓝图结构体 ---
@@ -40,6 +44,7 @@ private:
     StatsBlueprint parseStats(const nlohmann::json& json);
     SpriteBlueprint parseSprite(const nlohmann::json& json);
     std::unordered_map<entt::id_type, AnimationBlueprint> parseAnimationsMap(const nlohmann::json& json);
+    AnimationBlueprint parseOneAnimation(const nlohmann::json& json);
     SoundBlueprint parseSound(const nlohmann::json& json);
     PlayerBlueprint parsePlayer(const nlohmann::json& json);
     EnemyBlueprint parseEnemy(const nlohmann::json& json);
@@ -51,6 +56,7 @@ private:
     std::unordered_map<entt::id_type, PlayerClassBlueprint> player_class_blueprints_;  ///< @brief 玩家职业蓝图
     std::unordered_map<entt::id_type, EnemyClassBlueprint> enemy_class_blueprints_;    ///< @brief 敌人类型蓝图
     std::unordered_map<entt::id_type, ProjectileBlueprint> projectile_blueprints_;     ///< @brief 投射物蓝图
+    std::unordered_map<entt::id_type, EffectBlueprint> effect_blueprints_;             ///< @brief 特效蓝图
 };
 
 }  // namespace pyc::monster_war
