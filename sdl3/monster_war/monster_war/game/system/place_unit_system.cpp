@@ -158,6 +158,11 @@ bool PlaceUnitSystem::onPlaceUnit() {
             auto& render_player = registry_.get<RenderComponent>(unit_entity);
             render_player.layer = render_place.layer + 1;
         }
+
+        // 如果拥有被动技能，则立刻释放技能
+        if (registry_.all_of<PassiveSkillTag>(unit_entity)) {
+            context_.getDispatcher().enqueue(SkillActiveEvent{unit_entity});
+        }
     }
     // 播放放置音效
     context_.getAudioPlayer().playSound("unit_placed"_hs);

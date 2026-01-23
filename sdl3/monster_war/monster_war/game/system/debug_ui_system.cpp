@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 #include <entt/entity/registry.hpp>
+#include <entt/signal/dispatcher.hpp>
 #include <imgui/imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
@@ -13,7 +14,10 @@
 #include "monster_war/engine/render/renderer.h"
 #include "monster_war/game/component/blocker_component.h"
 #include "monster_war/game/component/class_name_component.h"
+#include "monster_war/game/component/skill_component.h"
 #include "monster_war/game/component/stats_component.h"
+#include "monster_war/game/def/events.h"
+#include "monster_war/game/def/tag.h"
 
 namespace pyc::monster_war {
 
@@ -124,7 +128,40 @@ void DebugUISystem::renderSelectedUnit() {
     if (blocker) {
         ImGui::Text("阻挡数量: %d/%d", blocker->current_count_, blocker->max_count_);
     }
-    // TODO: 技能相关按钮与信息
+
+    // 技能显示与交互
+    if (auto skill = registry_.try_get<SkillComponent>(entity)) {
+        // 如果技能准备就绪，则按钮可用（激活技能），否则按钮不可用
+        auto ready = registry_.all_of<SkillReadyTag>(entity);
+        ImGui::BeginDisabled(!ready);
+        // 设置快捷键 S 激活技能
+        ImGui::SetNextItemShortcut(ImGuiKey_S, ImGuiInputFlags_RouteAlways | ImGuiInputFlags_Tooltip);
+        if (ImGui::Button(skill->name_.c_str())) {
+            // 激活技能
+            context_.getDispatcher().enqueue<SkillActiveEvent>(entity);
+        }
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        // 如果技能激活中，则显示"剩余时间"或"被动技能激活中"
+        if (registry_.all_of<SkillActiveTag>(entity)) {
+            if (registry_.all_of<PassiveSkillTag>(entity)) {
+                ImGui::Text("被动技能激活中");
+            } else {
+                ImGui::Text("激活中，剩余时间: %.1f 秒", (skill->duration_ - skill->duration_timer_).count());
+            }
+        } else {  // 否则显示冷却时间
+            ImGui::Text("快捷键 S: ");
+            ImGui::SameLine();
+            if (registry_.all_of<SkillReadyTag>(entity)) {
+                ImGui::Text("技能准备就绪");
+            } else {
+                // 用进度条显示冷却时间百分比
+                ImGui::ProgressBar(skill->cooldown_timer_ / skill->cooldown_);
+            }
+        }
+        // 显示技能描述
+        ImGui::TextWrapped("%s", skill->description_.c_str());
+    }
     ImGui::End();
 }
 

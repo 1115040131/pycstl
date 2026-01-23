@@ -4,6 +4,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/game/component/cost_regen_component.h"
 #include "monster_war/game/data/game_stats.h"
 #include "monster_war/game/def/events.h"
 
@@ -18,6 +19,11 @@ void GameRuleSystem::update(std::chrono::duration<float> delta_time) {
     // 更新Cost
     auto& game_stats = registry_.ctx().get<GameStats&>();
     game_stats.cost_ += game_stats.cost_gen_per_second_ * delta_time.count();
+    // 更新COST恢复
+    auto view_cost_regen = registry_.view<CostRegenComponent>();
+    for (auto [_, cost_regen] : view_cost_regen.each()) {
+        game_stats.cost_ += cost_regen.rate_ * delta_time.count();
+    }
 }
 
 void GameRuleSystem::onEnemyArriveHome(const EnemyArriveHomeEvent&) {

@@ -19,6 +19,7 @@ class RemoveDeadSystem;
 class RenderRangeSystem;
 class SelectionSystem;
 class SetTargetSystem;
+class SkillSystem;
 class TimerSystem;
 
 }  // namespace pyc::monster_war

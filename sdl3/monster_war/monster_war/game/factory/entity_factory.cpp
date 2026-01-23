@@ -13,6 +13,7 @@
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
 #include "monster_war/game/component/projectile_component.h"
+#include "monster_war/game/component/skill_component.h"
 #include "monster_war/game/component/stats_component.h"
 #include "monster_war/game/component/unit_prep_component.h"
 #include "monster_war/game/def/tag.h"
@@ -51,6 +52,9 @@ entt::entity EntityFactory::createPlayerUnit(entt::id_type class_id, const glm::
 
     // 添加ProjectileID组件
     addProjectileIDComponent(entity, blueprint.projectile_id_);
+
+    // 添加Skill组件
+    addSkillComponent(entity, blueprint.player_.skill_id_);
 
     // 补充其他必要组件
     registry_.emplace<ClassNameComponent>(entity, class_id, blueprint.display_info_.name_);
@@ -168,6 +172,8 @@ entt::entity EntityFactory::createEffect(entt::id_type effect_id, const glm::vec
                                          const bool is_flipped) {
     auto entity = registry_.create();
     const auto& blueprint = blueprint_manager_.getEffectBlueprint(effect_id);
+
+    // --- 添加组件 ---
     // 添加Transform组件
     addTransformComponent(entity, position);
 
@@ -180,6 +186,25 @@ entt::entity EntityFactory::createEffect(entt::id_type effect_id, const glm::vec
     // 补充其他必要组件
     registry_.emplace<RenderComponent>(entity, RenderComponent::kMainLayer + 10);
     registry_.emplace<OneShotRemoveTag>(entity);
+    return entity;
+}
+
+entt::entity EntityFactory::createSkillDisplay(entt::id_type effect_id, const glm::vec2& position) {
+    auto entity = registry_.create();
+    const auto& effect_blueprint = blueprint_manager_.getEffectBlueprint(effect_id);
+
+    // --- 添加组件 ---
+    // 添加Transform组件
+    addTransformComponent(entity, position);
+
+    // 添加Sprite组件
+    addSpriteComponent(entity, effect_blueprint.sprite_);
+
+    // 添加Animation组件 (角色上方的技能标识，循环播放)
+    addOneAnimationComponent(entity, effect_blueprint.animation_, effect_blueprint.sprite_, effect_id, true);
+
+    // 补充其他必要组件
+    registry_.emplace<RenderComponent>(entity, RenderComponent::kMainLayer + 20);
     return entity;
 }
 
@@ -279,6 +304,19 @@ void EntityFactory::addAudioComponent(entt::entity entity, const SoundBlueprint&
 void EntityFactory::addProjectileIDComponent(entt::entity entity, entt::id_type id) {
     if (id != entt::null) {
         registry_.emplace<ProjectileIDComponent>(entity, id);
+    }
+}
+
+void EntityFactory::addSkillComponent(entt::entity entity, entt::id_type skill_id) {
+    const auto& skill = blueprint_manager_.getSkillBlueprint(skill_id);
+    registry_.emplace<SkillComponent>(entity, skill_id, entt::null, skill.name_, skill.description_,
+                                      skill.cooldown_, skill.duration_,
+                                      skill.cooldown_ / 2.0f,  // 初始技能冷却时间为技能冷却时间的一半
+                                      std::chrono::duration<float>::zero());
+    // 如果是被动技能，则添加PassiveSkillTag与SkillReadyTag
+    if (skill.passive_) {
+        registry_.emplace<PassiveSkillTag>(entity);
+        registry_.emplace<SkillReadyTag>(entity);
     }
 }
 

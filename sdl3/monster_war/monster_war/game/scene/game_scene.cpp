@@ -38,6 +38,7 @@
 #include "monster_war/game/system/render_range_system.h"
 #include "monster_war/game/system/selection_system.h"
 #include "monster_war/game/system/set_target_system.h"
+#include "monster_war/game/system/skill_system.h"
 #include "monster_war/game/system/timer_system.h"
 #include "monster_war/game/ui/units_portrait_ui.h"
 
@@ -105,7 +106,7 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     remove_dead_system_->update(registry_);
 
     // 注意系统更新的顺序
-    timer_system_->update(registry_, delta_time);
+    timer_system_->update(delta_time);
     game_rule_system_->update(delta_time);
     block_system_->update(registry_, dispatcher);
     set_target_system_->update(registry_);
@@ -120,7 +121,7 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     selection_system_->update();
 
     // 场景中其他更新函数
-    enemy_spawner_->update(delta_time);
+    // enemy_spawner_->update(delta_time);
     units_portrait_ui_->update(delta_time);
     Scene::update(delta_time);
 }
@@ -213,7 +214,8 @@ bool GameScene::initEntityFactory() {
         if (!blueprint_manager_->loadEnemyClassBlueprints("assets/data/enemy_data.json") ||
             !blueprint_manager_->loadPlayerClassBlueprints("assets/data/player_data.json") ||
             !blueprint_manager_->loadProjectileBlueprints("assets/data/projectile_data.json") ||
-            !blueprint_manager_->loadEffectBlueprints("assets/data/effect_data.json")) {
+            !blueprint_manager_->loadEffectBlueprints("assets/data/effect_data.json") ||
+            !blueprint_manager_->loadSkillBlueprints("assets/data/skill_data.json")) {
             spdlog::error("加载蓝图失败");
             return false;
         }
@@ -254,7 +256,7 @@ bool GameScene::initSystems() {
     block_system_ = std::make_unique<BlockSystem>();
     set_target_system_ = std::make_unique<SetTargetSystem>();
     attack_starter_system_ = std::make_unique<AttackStarterSystem>();
-    timer_system_ = std::make_unique<TimerSystem>();
+    timer_system_ = std::make_unique<TimerSystem>(registry_, dispatcher);
     orientation_system_ = std::make_unique<OrientationSystem>();
     animation_state_system_ = std::make_unique<AnimationStateSystem>(registry_, dispatcher);
     animation_event_system_ = std::make_unique<AnimationEventSystem>(registry_, dispatcher);
@@ -267,6 +269,7 @@ bool GameScene::initSystems() {
     render_range_system_ = std::make_unique<RenderRangeSystem>();
     debug_ui_system_ = std::make_unique<DebugUISystem>(registry_, context_);
     selection_system_ = std::make_unique<SelectionSystem>(registry_, context_);
+    skill_system_ = std::make_unique<SkillSystem>(registry_, dispatcher, *entity_factory_);
 
     spdlog::info("系统初始化完成");
     return true;

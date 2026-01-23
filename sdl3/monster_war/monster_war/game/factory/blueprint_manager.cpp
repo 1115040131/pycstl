@@ -124,6 +124,34 @@ bool BlueprintManager::loadEffectBlueprints(std::string_view effect_json_path) {
     return true;
 }
 
+bool BlueprintManager::loadSkillBlueprints(std::string_view skill_json_path) {
+    auto path = std::filesystem::path(skill_json_path);
+    std::ifstream file(path);
+    nlohmann::json json;
+    file >> json;
+    file.close();
+    // --- 解析蓝图 ---
+    try {
+        for (auto& [key, data_json] : json.items()) {
+            // 解析基础数据
+            entt::id_type id = entt::hashed_string(key.c_str());
+
+            // 解析完毕，组合蓝图并插入容器
+            skill_blueprints_.emplace(id, SkillBlueprint{
+                                              id, data_json.value("name", ""), data_json.value("description", ""),
+                                              data_json.value("passive", false),
+                                              std::chrono::duration<float>(data_json.value("cooldown", 0.0f)),
+                                              std::chrono::duration<float>(data_json.value("duration", 0.0f)),
+                                              parseBuff(data_json),  // 解析 Buff
+                                          });
+        }
+    } catch (const std::exception& e) {
+        spdlog::error("加载技能数据时出错: {}", e.what());
+        return false;
+    }
+    return true;
+}
+
 const PlayerClassBlueprint& BlueprintManager::getPlayerClassBlueprint(entt::id_type id) const {
     if (auto it = player_class_blueprints_.find(id); it != player_class_blueprints_.end()) {
         return it->second;
@@ -154,6 +182,14 @@ const EffectBlueprint& BlueprintManager::getEffectBlueprint(entt::id_type id) co
     }
     spdlog::error("未找到对应 id 的 EffectBlueprint: {}", id);
     return effect_blueprints_.begin()->second;
+}
+
+const SkillBlueprint& BlueprintManager::getSkillBlueprint(entt::id_type id) const {
+    if (auto it = skill_blueprints_.find(id); it != skill_blueprints_.end()) {
+        return it->second;
+    }
+    spdlog::error("未找到对应 id 的 SkillBlueprint: {}", id);
+    return skill_blueprints_.begin()->second;
 }
 
 entt::id_type BlueprintManager::parseProjectileID(const nlohmann::json& json) {
@@ -277,6 +313,14 @@ DisplayInfoBlueprint BlueprintManager::parseDisplayInfo(const nlohmann::json& js
     return {
         json.value("name", ""),
         json.value("description", ""),
+    };
+}
+
+BuffBlueprint BlueprintManager::parseBuff(const nlohmann::json& json) {
+    // 下面的属性有则设置，无则按默认
+    return BuffBlueprint{
+        json.value("hp", 1.0f),    json.value("atk", 1.0f),          json.value("def", 1.0f),
+        json.value("range", 1.0f), json.value("atk_interval", 1.0f), json.value("cost_regen", 0.0f),
     };
 }
 
