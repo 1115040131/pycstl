@@ -4,6 +4,7 @@
 #include <entt/signal/dispatcher.hpp>
 
 #include "monster_war/engine/component/transform_component.h"
+#include "monster_war/engine/utils/events.h"
 #include "monster_war/game/component/cost_regen_component.h"
 #include "monster_war/game/component/skill_component.h"
 #include "monster_war/game/component/stats_component.h"
@@ -67,6 +68,11 @@ void SkillSystem::onSkillActiveEvent(const SkillActiveEvent& event) {
     registry_.remove<SkillReadyTag>(event.entity_);
     registry_.emplace<SkillActiveTag>(event.entity_);
 
+    // 如果技能是盾御，且动作未锁定，则播放guard动画
+    if (skill.skill_id_ == "shield"_hs && !registry_.any_of<ActionLockTag>(event.entity_)) {
+        dispatcher_.enqueue(PlayAnimationEvent{event.entity_, "idle"_hs, true});
+    }
+
     // 添加Buff
     addBuff(event.entity_, skill.skill_id_);
 }
@@ -84,6 +90,11 @@ void SkillSystem::onSkillDurationEndEvent(const SkillDurationEndEvent& event) {
 
     // 移除技能激活标签
     registry_.remove<SkillActiveTag>(event.entity_);
+
+    // 如果技能是盾御，且动作未锁定，则播放idle动画
+    if (skill.skill_id_ == "shield"_hs && !registry_.any_of<ActionLockTag>(event.entity_)) {
+        dispatcher_.enqueue(PlayAnimationEvent{event.entity_, "idle"_hs, true});
+    }
 
     // 移除Buff
     removeBuff(event.entity_, skill.skill_id_);

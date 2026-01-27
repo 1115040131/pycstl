@@ -5,14 +5,13 @@
 #include <spdlog/spdlog.h>
 
 #include "monster_war/engine/core/context.h"
-#include "monster_war/engine/input/input_manager.h"
+#include "monster_war/engine/core/game_state.h"
 #include "monster_war/engine/loader/level_loader.h"
 #include "monster_war/engine/system/animation_system.h"
 #include "monster_war/engine/system/audio_system.h"
 #include "monster_war/engine/system/movement_system.h"
 #include "monster_war/engine/system/render_system.h"
 #include "monster_war/engine/system/ysort_system.h"
-#include "monster_war/game/component/player_component.h"
 #include "monster_war/game/data/level_config.h"
 #include "monster_war/game/data/session_data.h"
 #include "monster_war/game/data/ui_config.h"
@@ -46,7 +45,16 @@ namespace pyc::monster_war {
 
 using namespace entt::literals;
 
-GameScene::GameScene(Context& context) : Scene("GameScene", context) { spdlog::trace("GameScene 构造完成。"); }
+GameScene::GameScene(Context& context, std::shared_ptr<BlueprintManager> blueprint_manager,
+                     std::shared_ptr<SessionData> session_data, std::shared_ptr<UIConfig> ui_config,
+                     std::shared_ptr<LevelConfig> level_config)
+    : Scene("GameScene", context),
+      blueprint_manager_(blueprint_manager),
+      session_data_(session_data),
+      ui_config_(ui_config),
+      level_config_(level_config) {
+    spdlog::trace("GameScene 构造完成。");
+}
 
 GameScene::~GameScene() = default;
 
@@ -96,6 +104,7 @@ void GameScene::init() {
         return;
     }
 
+    context_.getGameState().setState(State::Playing);
     Scene::init();
 }
 
@@ -104,6 +113,16 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
 
     // 每一帧最先清理死亡实体(要在dispatcher处理完事件后再清理，因此放在下一帧开头)
     remove_dead_system_->update(registry_);
+
+    // 暂停状态下，有些功能依然正常运行
+    if (context_.getGameState().isPaused()) {
+        place_unit_system_->update(delta_time);
+        ysort_system_->update(registry_);
+        selection_system_->update();
+        units_portrait_ui_->update(delta_time);
+        Scene::update(delta_time);
+        return;
+    }
 
     // 注意系统更新的顺序
     timer_system_->update(delta_time);
@@ -121,7 +140,7 @@ void GameScene::update(std::chrono::duration<float> delta_time) {
     selection_system_->update();
 
     // 场景中其他更新函数
-    // enemy_spawner_->update(delta_time);
+    enemy_spawner_->update(delta_time);
     units_portrait_ui_->update(delta_time);
     Scene::update(delta_time);
 }
@@ -143,8 +162,6 @@ void GameScene::clean() {
     auto& dispatcher = context_.getDispatcher();
     dispatcher.disconnect(this);
     // 断开输入信号连接
-    auto& input_manager = context_.getInputManager();
-    input_manager.onAction("pause"_hs).disconnect<&GameScene::onClearAllPlayers>(this);
     Scene::clean();
 }
 
@@ -199,13 +216,15 @@ bool GameScene::loadLevel() {
     return true;
 }
 
-bool GameScene::initEventConnections() { return true; }
-
-bool GameScene::initInputConnections() {
-    auto& input_manager = context_.getInputManager();
-    input_manager.onAction("pause"_hs).connect<&GameScene::onClearAllPlayers>(this);
+bool GameScene::initEventConnections() {
+    auto& dispatcher = context_.getDispatcher();
+    dispatcher.sink<RestartEvent>().connect<&GameScene::onRestart>(this);
+    dispatcher.sink<BackToTitleEvent>().connect<&GameScene::onBackToTitle>(this);
+    dispatcher.sink<SaveEvent>().connect<&GameScene::onSave>(this);
     return true;
 }
+
+bool GameScene::initInputConnections() { return true; }
 
 bool GameScene::initEntityFactory() {
     // 如果蓝图管理器为空，则创建一个（将来可能由构造函数传入）
@@ -291,12 +310,16 @@ bool GameScene::initUnitsPortraitUI() {
     return true;
 }
 
-bool GameScene::onClearAllPlayers() {
-    auto view = registry_.view<PlayerComponent>();
-    for (auto entity : view) {
-        context_.getDispatcher().enqueue(RemovePlayerUnitEvent{entity});
-    }
-    return true;
+void GameScene::onRestart() {
+    spdlog::info("重新开始关卡");
+    requestReplaceScene(
+        std::make_unique<GameScene>(context_, blueprint_manager_, session_data_, ui_config_, level_config_));
 }
+
+void GameScene::onBackToTitle() {}
+
+void GameScene::onSave() {}
+
+void GameScene::onLevelClear() {}
 
 }  // namespace pyc::monster_war

@@ -49,6 +49,7 @@ public:
     [[nodiscard]] int getLevelNumber() const { return level_number_; }
     [[nodiscard]] int getPoint() const { return point_; }
     [[nodiscard]] bool isLevelClear() const { return level_clear_; }
+    [[nodiscard]] UnitData& getUnitData(entt::id_type name_id) { return unit_map_[name_id]; }
 
 private:
     int level_number_{1};      ///< @brief 当前关卡

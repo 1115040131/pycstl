@@ -8,6 +8,7 @@
 #include "monster_war/game/component/blocked_by_component.h"
 #include "monster_war/game/component/enemy_component.h"
 #include "monster_war/game/component/player_component.h"
+#include "monster_war/game/component/skill_component.h"
 #include "monster_war/game/def/tag.h"
 
 namespace pyc::monster_war {
@@ -40,9 +41,17 @@ void AnimationStateSystem::onAnimationFinishedEvent(const AnimationFinishedEvent
         // 移除动作锁定（硬直）标签
         registry_.remove<ActionLockTag>(event.entity_);
     } else if (registry_.all_of<PlayerComponent>(event.entity_)) {
-        // 玩家动画结束，直接返回idle动画
-        dispatcher_.enqueue(PlayAnimationEvent{event.entity_, "idle"_hs, true});
-        spdlog::info("玩家动画结束, 返回idle动画, ID: {}", entt::to_integral(event.entity_));
+        // 如果技能是盾御，且技能正在激活中，则返回guard动画
+        const auto& skill = registry_.get<SkillComponent>(event.entity_);
+        if (skill.skill_id_ == "shield"_hs && registry_.any_of<SkillActiveTag>(event.entity_)) {
+            dispatcher_.enqueue(PlayAnimationEvent{event.entity_, "guard"_hs, true});
+            spdlog::info("玩家动画结束, 返回shield动画, ID: {}", entt::to_integral(event.entity_));
+        } else {  // 玩家动画结束，直接返回idle动画
+            dispatcher_.enqueue(PlayAnimationEvent{event.entity_, "idle"_hs, true});
+            spdlog::info("玩家动画结束, 返回idle动画, ID: {}", entt::to_integral(event.entity_));
+        }
+        // 移除动作锁定（硬直）标签
+        registry_.remove<ActionLockTag>(event.entity_);
     } else if (registry_.all_of<OneShotRemoveTag>(event.entity_)) {
         // 如果是一次性动画实体（例如死亡特效），则标记死亡待移除
         registry_.emplace_or_replace<DeadTag>(event.entity_);

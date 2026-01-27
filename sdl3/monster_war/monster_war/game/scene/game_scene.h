@@ -26,7 +26,17 @@ class UnitsPortraitUI;
 
 class GameScene final : public Scene {
 public:
-    GameScene(Context& context);
+    /**
+     * @brief 构造函数
+     * @param context 上下文
+     * @param blueprint_manager 蓝图管理器
+     * @param session_data 场景间传递的关卡数据
+     * @param ui_config UI配置
+     * @param level_config 关卡配置
+     */
+    GameScene(Context& context, std::shared_ptr<BlueprintManager> blueprint_manager = nullptr,
+              std::shared_ptr<SessionData> session_data = nullptr, std::shared_ptr<UIConfig> ui_config = nullptr,
+              std::shared_ptr<LevelConfig> level_config = nullptr);
     ~GameScene() override;
 
     void init() override;
@@ -47,8 +57,11 @@ private:
     [[nodiscard]] bool initEnemySpawner();
     [[nodiscard]] bool initUnitsPortraitUI();
 
-    // 测试函数
-    bool onClearAllPlayers();
+    // 场景相关函数
+    void onRestart();
+    void onBackToTitle();
+    void onSave();
+    void onLevelClear();
 
 private:
     std::unique_ptr<RenderSystem> render_system_;

@@ -50,13 +50,15 @@ void AttackStarterSystem::updatePlayer(entt::registry& registry, entt::dispatche
     // 筛选条件：有目标的玩家，攻击冷却完毕（有“可攻击”标签）
     auto view_player = registry.view<PlayerComponent, TargetComponent, AttackReadyTag>();
     for (auto [entity, player, target] : view_player.each()) {
-        /* 玩家静止不动，不需要添加动作锁定标签 */
+        // 攻击或治疗单位播放不同的动画
         registry.remove<AttackReadyTag>(entity);
         if (registry.all_of<HealerTag>(entity)) {
             dispatcher.enqueue(PlayAnimationEvent{entity, "heal"_hs, false});
         } else {
             dispatcher.enqueue(PlayAnimationEvent{entity, "attack"_hs, false});
         }
+        // 添加“动作锁定”标签，确保攻击动画执行完毕再进行其他动作
+        registry.emplace_or_replace<ActionLockTag>(entity);
     }
 }
 

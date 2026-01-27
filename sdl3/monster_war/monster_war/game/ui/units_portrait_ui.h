@@ -39,6 +39,9 @@ private:
     void createUnitsPortraitUI();   ///< @brief 创建单位肖像UI
     void arrangeUnitsPortraitUI();  ///< @brief 排列单位肖像UI（肖像增/减时调用）
 
+    void movePortraitPanelRight(std::chrono::duration<float> delta_time);  ///< @brief 向右移动单位肖像UI
+    void movePortraitPanelLeft(std::chrono::duration<float> delta_time);   ///< @brief 向左移动单位肖像UI
+
     // 事件回调函数
     void onRemoveUIPortraitEvent(const RemoveUIPortraitEvent& event);
 

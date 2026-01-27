@@ -8,6 +8,8 @@
 namespace pyc::monster_war {
 
 class EnemyArriveHomeEvent;
+class UpgradeUnitEvent;
+class RetreatEvent;
 
 /**
  * @brief 游戏规则系统
@@ -24,6 +26,8 @@ public:
 private:
     // 事件回调函数
     void onEnemyArriveHome(const EnemyArriveHomeEvent& event);
+    void onUpgradeUnitEvent(const UpgradeUnitEvent& event);
+    void onRetreatEvent(const RetreatEvent& event);
 
 private:
     entt::registry& registry_;
