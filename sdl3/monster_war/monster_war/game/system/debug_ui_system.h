@@ -6,6 +6,7 @@
 namespace pyc::monster_war {
 
 class Context;
+class TitleScene;
 
 class UIPortraitHoverEnterEvent;
 
@@ -21,20 +22,36 @@ public:
     ~DebugUISystem();
 
     // ImGui 步骤3: 一轮循环内，ImGui 需要做的操作（逻辑+渲染）
-    void update();
+    void update();  ///<@brief 针对GameScene的更新
+    void updateTitle(
+        TitleScene& title_scene);  ///<@brief 针对TitleScene的更新 (直接传入场景引用，提升便捷但增加耦合)
 
 private:
     // 封装开始、结束帧的方法
     void beginFrame();
     void endFrame();
 
-    // 封装每个UI显示模块
+// 封装每个UI显示模块
+#pragma region GameScene
     void renderHoveredPortrait();
     void renderHoveredUnit();
     void renderSelectedUnit();
     void renderInfoUI();
     void renderSettingUI();
     void renderDebugUI();
+#pragma endregion
+
+#pragma region TitleScene
+    void renderTitleLogo();
+    void renderTitleButtons(TitleScene& title_scene);
+#pragma endregion
+
+#pragma region Shared
+    void renderUnitInfoUI(bool& show_unit_info);
+    void renderSavePanelUI(bool& show_save_panel);
+    void renderLoadPanelUI(bool& show_load_panel);
+    void renderUnitTable();
+#pragma endregion
 
     // 事件回调函数
     void onUIPortraitHoverEnterEvent(const UIPortraitHoverEnterEvent& event);

@@ -19,6 +19,7 @@
 #include "monster_war/game/factory/blueprint_manager.h"
 #include "monster_war/game/factory/entity_factory.h"
 #include "monster_war/game/loader/entity_builder_mw.h"
+#include "monster_war/game/scene/title_scene.h"
 #include "monster_war/game/spawner/enemy_spawner.h"
 #include "monster_war/game/system/animation_event_system.h"
 #include "monster_war/game/system/animation_state_system.h"
@@ -257,6 +258,7 @@ bool GameScene::initRegistryContext() {
     registry_.ctx().emplace<int&>(level_number_);
     registry_.ctx().emplace_as<entt::entity&>("selected_unit"_hs, selected_unit_);
     registry_.ctx().emplace_as<entt::entity&>("hovered_unit"_hs, hovered_unit_);
+    registry_.ctx().emplace_as<bool&>("show_save_panel"_hs, show_save_panel_);
     spdlog::info("registry_ 上下文初始化完成");
     return true;
 }
@@ -316,10 +318,20 @@ void GameScene::onRestart() {
         std::make_unique<GameScene>(context_, blueprint_manager_, session_data_, ui_config_, level_config_));
 }
 
-void GameScene::onBackToTitle() {}
+void GameScene::onBackToTitle() {
+    spdlog::info("返回标题");
+    requestReplaceScene(std::make_unique<TitleScene>(context_));
+}
 
-void GameScene::onSave() {}
+void GameScene::onSave() {
+    spdlog::info("保存");
+    show_save_panel_ = !show_save_panel_;
+    /* 用ImGui快速实现逻辑，未来再完善游戏内UI */
+}
 
-void GameScene::onLevelClear() {}
+void GameScene::onLevelClear() {
+    spdlog::info("关卡通关");
+    // TODO: 关卡通关
+}
 
 }  // namespace pyc::monster_war

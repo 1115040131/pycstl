@@ -6,7 +6,7 @@
 #include "monster_war/engine/core/context.h"
 #include "monster_war/engine/core/game_app.h"
 #include "monster_war/engine/utils/events.h"
-#include "monster_war/game/scene/game_scene.h"
+#include "monster_war/game/scene/title_scene.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
 namespace fs = std::filesystem;
@@ -59,7 +59,7 @@ bool setup_working_directory(int, char** argv) {
 
 void setupInitialScene(Context& context) {
     // GameApp在调用run方法之前，先创建并设置初始场景
-    auto title_scene = std::make_unique<GameScene>(context);
+    auto title_scene = std::make_unique<TitleScene>(context);
     context.getDispatcher().trigger<PushSceneEvent>(PushSceneEvent{std::move(title_scene)});
 }
 
