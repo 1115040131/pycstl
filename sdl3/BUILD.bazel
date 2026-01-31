@@ -1,5 +1,7 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
+package(default_visibility = ["//visibility:public"])
+
 # sdl3
 cmake(
     name = "sdl3",
@@ -16,7 +18,7 @@ cmake(
     name = "sdl3_image",
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
-        "SDLIMAGE_AVIF": "OFF", # disable for ninja compile error
+        "SDLIMAGE_AVIF": "OFF",  # disable for ninja compile error
     },
     # data = ["@nasm"],
     # env = {

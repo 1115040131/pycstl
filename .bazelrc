@@ -8,7 +8,6 @@ build:release --compilation_mode=opt
 build:fastbuild --compilation_mode=fastbuild
 
 common --enable_bzlmod
-common --enable_workspace
 common --incompatible_disallow_empty_glob=false
 common --enable_platform_specific_config
 

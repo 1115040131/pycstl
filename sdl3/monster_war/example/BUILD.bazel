@@ -1,0 +1,34 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_binary(
+    name = "entt_example",
+    srcs = [
+        "entt_base.cpp",
+        "entt_example.cpp",
+        "entt_signal.cpp",
+        "entt_struct.h",
+    ],
+    copts = STRICT_COPTS,
+    deps = [
+        "@entt",
+        "@fmt",
+        "@glm",
+    ],
+)
+
+cc_binary(
+    name = "imgui_example",
+    srcs = [
+        "imgui_example.cpp",
+    ],
+    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    data = glob(["assets/**"]),
+    deps = [
+        "//sdl3:sdl3_image",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@glm",
+        "@imgui_backends//:platform-sdl3",
+        "@imgui_backends//:renderer-sdlrenderer3",
+        "@spdlog",
+    ],
+)

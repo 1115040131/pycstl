@@ -1,0 +1,44 @@
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
+cc_library(
+    name = "ziyu_engine",
+    srcs = glob(["monster_war/engine/**/*.cpp"]),
+    hdrs = glob(["monster_war/engine/**/*.h"]),
+    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    defines = select({
+        "//conditions:default": [],
+        "//:debug": ["DEBUG_MODE"],
+    }),
+    includes = [""],
+    deps = [
+        "//common",
+        "//sdl3",
+        "//sdl3:sdl3_image",
+        "//sdl3:sdl3_mixer",
+        "//sdl3:sdl3_ttf",
+        "@entt",
+        "@glm",
+        "@imgui_backends//:platform-sdl3",
+        "@imgui_backends//:renderer-sdlrenderer3",
+        "@nlohmann_json//:json",
+        "@spdlog",
+    ],
+)
+
+cc_binary(
+    name = "monster_war",
+    srcs = glob([
+        "monster_war/game/**/*.cpp",
+        "monster_war/game/**/*.h",
+    ]) + ["monster_war/main.cpp"],
+    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    data = glob(["assets/**"]),
+    defines = select({
+        "//conditions:default": [],
+        "//:debug": ["DEBUG_MODE"],
+    }),
+    deps = [
+        "ziyu_engine",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)
