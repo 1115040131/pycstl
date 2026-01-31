@@ -1,7 +1,7 @@
 {
     "level": 1,
     "level_clear": true,
-    "point": 0,
+    "point": 15,
     "unit": {
         "伊格纳茨": {
             "class": "lancer",
@@ -20,7 +20,7 @@
         },
         "加尔隆": {
             "class": "warrior",
-            "level": 1,
+            "level": 2,
             "rarity": 1
         },
         "布鲁南": {
@@ -30,7 +30,7 @@
         },
         "希尔维娅": {
             "class": "witch",
-            "level": 3,
+            "level": 2,
             "rarity": 1
         },
         "摩根娜": {
@@ -50,7 +50,7 @@
         },
         "莫迪凯": {
             "class": "lancer",
-            "level": 3,
+            "level": 2,
             "rarity": 1
         },
         "莱拉娜": {

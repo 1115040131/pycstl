@@ -2,6 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/audio/audio_player.h"
 #include "monster_war/engine/core/context.h"
 #include "monster_war/engine/core/game_state.h"
 #include "monster_war/engine/core/time.h"
@@ -19,6 +20,8 @@
 #include "monster_war/game/system/debug_ui_system.h"
 
 namespace pyc::monster_war {
+
+using namespace entt::literals;
 
 TitleScene::TitleScene(Context& context, std::shared_ptr<BlueprintManager> blueprint_manager,
                        std::shared_ptr<SessionData> session_data, std::shared_ptr<UIConfig> ui_config,
@@ -66,7 +69,8 @@ void TitleScene::init() {
     }
 
     context_.getGameState().setState(State::Title);
-    context_.getTime().setTimeScale(1.0f);  // 重置游戏速度
+    context_.getTime().setTimeScale(1.0f);                // 重置游戏速度
+    context_.getAudioPlayer().playMusic("title_bgm"_hs);  // 设置标题场景背景音乐
 
     Scene::init();
 }

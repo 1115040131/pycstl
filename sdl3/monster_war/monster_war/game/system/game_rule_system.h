@@ -8,6 +8,7 @@
 namespace pyc::monster_war {
 
 class EnemyArriveHomeEvent;
+class LevelClearDelayedEvent;
 class UpgradeUnitEvent;
 class RetreatEvent;
 
@@ -28,10 +29,14 @@ private:
     void onEnemyArriveHome(const EnemyArriveHomeEvent& event);
     void onUpgradeUnitEvent(const UpgradeUnitEvent& event);
     void onRetreatEvent(const RetreatEvent& event);
+    void onLevelClearDelayedEvent(const LevelClearDelayedEvent& event);
 
 private:
     entt::registry& registry_;
     entt::dispatcher& dispatcher_;
+
+    bool is_level_clear_{false};                            ///< @brief 是否关卡通关
+    std::chrono::duration<float> level_clear_timer_{0.0f};  ///< @brief 关卡通关计时器(实现延迟切换场景)
 };
 
 }  // namespace pyc::monster_war

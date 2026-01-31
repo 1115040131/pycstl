@@ -4,6 +4,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
+#include "monster_war/engine/audio/audio_player.h"
 #include "monster_war/engine/core/context.h"
 #include "monster_war/engine/core/game_state.h"
 #include "monster_war/engine/loader/level_loader.h"
@@ -19,6 +20,8 @@
 #include "monster_war/game/factory/blueprint_manager.h"
 #include "monster_war/game/factory/entity_factory.h"
 #include "monster_war/game/loader/entity_builder_mw.h"
+#include "monster_war/game/scene/end_scene.h"
+#include "monster_war/game/scene/level_clear_scene.h"
 #include "monster_war/game/scene/title_scene.h"
 #include "monster_war/game/spawner/enemy_spawner.h"
 #include "monster_war/game/system/animation_event_system.h"
@@ -106,6 +109,7 @@ void GameScene::init() {
     }
 
     context_.getGameState().setState(State::Playing);
+    context_.getAudioPlayer().playMusic("battle_bgm"_hs);
     Scene::init();
 }
 
@@ -155,7 +159,10 @@ void GameScene::render() {
     render_range_system_->update(registry_, renderer, camera);
 
     Scene::render();
-    debug_ui_system_->update();  // 调试UI的显示优先级最高，最后渲染
+    // 当场景栈中只有GameScene时才渲染调试UI, 不然上层有其它场景时会冲突
+    if (context_.getGameState().isPlaying() || context_.getGameState().isPaused()) {
+        debug_ui_system_->update();  // 调试UI的显示优先级最高，最后渲染
+    }
 }
 
 void GameScene::clean() {
@@ -222,6 +229,8 @@ bool GameScene::initEventConnections() {
     dispatcher.sink<RestartEvent>().connect<&GameScene::onRestart>(this);
     dispatcher.sink<BackToTitleEvent>().connect<&GameScene::onBackToTitle>(this);
     dispatcher.sink<SaveEvent>().connect<&GameScene::onSave>(this);
+    dispatcher.sink<LevelClearEvent>().connect<&GameScene::onLevelClear>(this);
+    dispatcher.sink<GameEndEvent>().connect<&GameScene::onGameEndEvent>(this);
     return true;
 }
 
@@ -331,7 +340,23 @@ void GameScene::onSave() {
 
 void GameScene::onLevelClear() {
     spdlog::info("关卡通关");
-    // TODO: 关卡通关
+    // 奖励点数 = 击杀数 + 基地血量 * 5
+    const auto point = game_stats_.enemy_killed_count_ + game_stats_.home_hp_ * 5;
+    session_data_->setLevelClear(true);
+    session_data_->addPoint(point);
+
+    // 如果当前关卡是最后一关，则进入结束场景；否则进入通关结算场景
+    if (level_config_->isFinalLevel(level_number_)) {
+        requestPushScene(std::make_unique<EndScene>(context_, true));
+    } else {
+        requestPushScene(std::make_unique<LevelClearScene>(context_, game_stats_, blueprint_manager_,
+                                                           session_data_, ui_config_, level_config_));
+    }
+}
+
+void GameScene::onGameEndEvent(const GameEndEvent& event) {
+    spdlog::info("游戏结束");
+    requestPushScene(std::make_unique<EndScene>(context_, event.is_win_));
 }
 
 }  // namespace pyc::monster_war

@@ -22,6 +22,7 @@ GameRuleSystem::GameRuleSystem(entt::registry& registry, entt::dispatcher& dispa
     dispatcher_.sink<EnemyArriveHomeEvent>().connect<&GameRuleSystem::onEnemyArriveHome>(this);
     dispatcher_.sink<UpgradeUnitEvent>().connect<&GameRuleSystem::onUpgradeUnitEvent>(this);
     dispatcher_.sink<RetreatEvent>().connect<&GameRuleSystem::onRetreatEvent>(this);
+    dispatcher_.sink<LevelClearDelayedEvent>().connect<&GameRuleSystem::onLevelClearDelayedEvent>(this);
 }
 
 GameRuleSystem::~GameRuleSystem() { dispatcher_.disconnect(this); }
@@ -35,6 +36,14 @@ void GameRuleSystem::update(std::chrono::duration<float> delta_time) {
     for (auto [_, cost_regen] : view_cost_regen.each()) {
         game_stats.cost_ += cost_regen.rate_ * delta_time.count();
     }
+    // 如果已经通关，计时器归零后切换场景
+    if (is_level_clear_) {
+        level_clear_timer_ -= delta_time;
+        if (level_clear_timer_ <= std::chrono::duration<float>::zero()) {
+            dispatcher_.enqueue(LevelClearEvent{});
+            is_level_clear_ = false;  // 重置关卡通关标志, 避免重复触发
+        }
+    }
 }
 
 void GameRuleSystem::onEnemyArriveHome(const EnemyArriveHomeEvent&) {
@@ -44,7 +53,11 @@ void GameRuleSystem::onEnemyArriveHome(const EnemyArriveHomeEvent&) {
     game_stats.home_hp_ -= 1;           // 基地血量-1
     if (game_stats.home_hp_ <= 0) {
         spdlog::warn("基地被摧毁");
-        // TODO: 切换场景逻辑
+        // 游戏失败
+        dispatcher_.enqueue(GameEndEvent{false});
+    } else if ((game_stats.enemy_arrived_count_ + game_stats.enemy_killed_count_) >= game_stats.enemy_count_) {
+        // 通关成功，延迟切换场景
+        dispatcher_.enqueue(LevelClearDelayedEvent{});
     }
 }
 
@@ -82,6 +95,12 @@ void GameRuleSystem::onRetreatEvent(const RetreatEvent& event) {
     game_stats.cost_ += event.cost_;
     // 发送移除单位事件
     dispatcher_.enqueue(RemovePlayerUnitEvent{event.entity_});
+}
+
+void GameRuleSystem::onLevelClearDelayedEvent(const LevelClearDelayedEvent& event) {
+    // 设置关卡通关标志和计时器
+    is_level_clear_ = true;
+    level_clear_timer_ = event.delay_time_;
 }
 
 }  // namespace pyc::monster_war

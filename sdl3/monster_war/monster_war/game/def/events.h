@@ -1,9 +1,13 @@
 #pragma once
 
+#include <chrono>
+
 #include <entt/entity/entity.hpp>
 #include <glm/vec2.hpp>
 
 namespace pyc::monster_war {
+
+using namespace std::chrono_literals;
 
 struct EnemyArriveHomeEvent {};  ///< @brief 敌人到达基地的事件
 
@@ -100,6 +104,12 @@ struct RetreatEvent {
 struct RestartEvent {};
 struct BackToTitleEvent {};
 struct SaveEvent {};
-struct LevelClearEvent {};
+struct LevelClearEvent {};       ///< @brief 关卡通关事件(立刻切换场景)
+struct LevelClearDelayedEvent {  ///< @brief 关卡通关事件(延迟切换场景)
+    std::chrono::duration<float> delay_time_{3s};
+};
+struct GameEndEvent {
+    bool is_win_{false};  ///< @brief 是否获胜
+};
 
 }  // namespace pyc::monster_war

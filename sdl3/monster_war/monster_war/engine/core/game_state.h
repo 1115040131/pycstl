@@ -12,10 +12,11 @@ namespace pyc::monster_war {
  * @brief 定义游戏可能处于的宏观状态。
  */
 enum class State {
-    Title,     ///< @brief 标题界面
-    Playing,   ///< @brief 正常游戏进行中
-    Paused,    ///< @brief 游戏暂停（通常覆盖菜单界面）
-    GameOver,  ///< @brief 游戏结束界面
+    Title,      ///< @brief 标题界面
+    Playing,    ///< @brief 正常游戏进行中
+    Paused,     ///< @brief 游戏暂停（通常覆盖菜单界面）
+    GameOver,   ///< @brief 游戏结束界面
+    LevelClear  ///< @brief 关卡过关界面
     // 可以根据需要添加更多状态，如 Cutscene, SettingsMenu 等
 };
 
@@ -51,6 +52,7 @@ public:
     bool isPlaying() const { return current_state_ == State::Playing; }
     bool isPaused() const { return current_state_ == State::Paused; }
     bool isGameOver() const { return current_state_ == State::GameOver; }
+    bool isLevelClear() const { return current_state_ == State::LevelClear; }
 
 private:
     SDL_Window* window_ = nullptr;        ///< @brief SDL窗口，用于获取窗口大小

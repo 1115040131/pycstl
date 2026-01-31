@@ -24,6 +24,8 @@ class SessionData;
 class UIConfig;
 class UnitsPortraitUI;
 
+class GameEndEvent;
+
 class GameScene final : public Scene {
 public:
     /**
@@ -62,6 +64,7 @@ private:
     void onBackToTitle();
     void onSave();
     void onLevelClear();
+    void onGameEndEvent(const GameEndEvent& event);
 
 private:
     std::unique_ptr<RenderSystem> render_system_;
