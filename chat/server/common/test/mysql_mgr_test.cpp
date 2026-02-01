@@ -1,6 +1,10 @@
 #include <fmt/chrono.h>
 #include <gtest/gtest.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #include <mysqlx/xdevapi.h>
+#pragma GCC diagnostic pop
 
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/mysql_mgr.h"
@@ -82,14 +86,14 @@ TEST_F(MysqlMgrTest, ConnectionTest) {
     {
         auto result = session.sql("SELECT hello_world()").execute();
         for (const auto& row : result) {
-            EXPECT_EQ(row.colCount(), 1);
+            EXPECT_EQ(row.colCount(), 1u);
             EXPECT_EQ(row[0].getType(), mysqlx::Value::Type::STRING);
             EXPECT_EQ(row[0].get<std::string>(), "Hello, World!");
         }
     }
     {
-        EXPECT_EQ(table.insert("value1", "value2").values("1_1", "1_2").execute().getAutoIncrementValue(), 1);
-        EXPECT_EQ(table.insert("value1", "value2").values("2_1", "2_2").execute().getAutoIncrementValue(), 2);
+        EXPECT_EQ(table.insert("value1", "value2").values("1_1", "1_2").execute().getAutoIncrementValue(), 1u);
+        EXPECT_EQ(table.insert("value1", "value2").values("2_1", "2_2").execute().getAutoIncrementValue(), 2u);
     }
     {
         mysqlx::RowResult result = table.select("*").execute();
@@ -215,18 +219,18 @@ TEST_F(MysqlMgrTest, GetApplyList) {
     // 获取申请列表
     {
         auto apply_list = mysql_mgr.GetApplyList(to_id, 0).value();
-        ASSERT_EQ(apply_list.size(), 10);
+        ASSERT_EQ(apply_list.size(), 10u);
         for (size_t i = 0; i < apply_list.size(); i++) {
-            EXPECT_EQ(apply_list[i].uid, 102 + i);
+            EXPECT_EQ(apply_list[i].uid, static_cast<int>(102 + i));
             EXPECT_EQ(apply_list[i].name, fmt::format("test_user_{}", 2 + i));
             EXPECT_EQ(apply_list[i].nick, fmt::format("test_nick_{}", 2 + i));
         }
     }
     {
         auto apply_list = mysql_mgr.GetApplyList(to_id, 0, 25).value();
-        ASSERT_EQ(apply_list.size(), 19);
+        ASSERT_EQ(apply_list.size(), 19u);
         for (size_t i = 0; i < apply_list.size(); i++) {
-            EXPECT_EQ(apply_list[i].uid, 102 + i);
+            EXPECT_EQ(apply_list[i].uid, static_cast<int>(102 + i));
             EXPECT_EQ(apply_list[i].name, fmt::format("test_user_{}", 2 + i));
             EXPECT_EQ(apply_list[i].nick, fmt::format("test_nick_{}", 2 + i));
         }
@@ -274,18 +278,18 @@ TEST_F(MysqlMgrTest, GetFriendList) {
 
     {
         auto friend_list = mysql_mgr.GetFriendList(uid_1).value();
-        ASSERT_EQ(friend_list.size(), 2);
+        ASSERT_EQ(friend_list.size(), 2u);
         EXPECT_EQ(friend_list[0].uid, uid_2);
         EXPECT_EQ(friend_list[1].uid, uid_3);
     }
     {
         auto friend_list = mysql_mgr.GetFriendList(uid_2).value();
-        ASSERT_EQ(friend_list.size(), 1);
+        ASSERT_EQ(friend_list.size(), 1u);
         EXPECT_EQ(friend_list[0].uid, uid_1);
     }
     {
         auto friend_list = mysql_mgr.GetFriendList(uid_3).value();
-        ASSERT_EQ(friend_list.size(), 1);
+        ASSERT_EQ(friend_list.size(), 1u);
         EXPECT_EQ(friend_list[0].uid, uid_1);
     }
 }

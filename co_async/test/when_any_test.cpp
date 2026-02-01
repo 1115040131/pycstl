@@ -32,7 +32,7 @@ static Task<int> hello1() {
     auto var = co_await when_any(sleep1(), sleep2(), sleep2());
     EXPECT_ELAPSED_TIME(timer.elapsed(), 100ms);
 
-    EXPECT_EQ(var.index(), 0);
+    EXPECT_EQ(var.index(), 0u);
     co_return std::get<0>(var);
 }
 
@@ -49,7 +49,7 @@ static Task<int> hello2() {
     auto var = co_await when_any(sleep2(), sleep1(), sleep2());
     EXPECT_ELAPSED_TIME(timer.elapsed(), 100ms);
 
-    EXPECT_EQ(var.index(), 1);
+    EXPECT_EQ(var.index(), 1u);
     co_return std::get<1>(var);
 }
 

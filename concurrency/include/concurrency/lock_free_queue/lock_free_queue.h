@@ -30,7 +30,7 @@ class LockFreeQueue : public Noncopyable {
         std::atomic<NodeCounter> count;
         std::atomic<CountedNodePtr> next;
 
-        Node(int external_count = 2) {
+        Node(unsigned external_count = 2) {
             count.store(NodeCounter{0, external_count});
             next.store(CountedNodePtr{0, nullptr});
         }

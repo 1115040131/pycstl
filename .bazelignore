@@ -1,3 +1,9 @@
-chat/server/mysql
+bazel-bin
+bazel-out
+bazel-pycstl
+bazel-testlogs
+external
 node_modules
 third_party
+
+chat/server/mysql

@@ -19,6 +19,13 @@ sudo apt update && sudo apt install bazel # 安装
 sudo apt update && sudo apt full-upgrade  # 升级 bazel 版本
 ```
 
+或者安装 bazelisk (推荐)
+```bash
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64
+chmod +x bazelisk-linux-amd64
+sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
+```
+
 ### 编译器
 
 ```bash

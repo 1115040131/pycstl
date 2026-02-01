@@ -127,7 +127,7 @@ TEST(EvaluatorTest, EvalArrayLiteral) {
 
     auto array = std::dynamic_pointer_cast<Array>(evaluated);
     ASSERT_TRUE(array != nullptr) << "Input: " << input;
-    ASSERT_EQ(array->elements().size(), 3) << "Input: " << input;
+    ASSERT_EQ(array->elements().size(), 3u) << "Input: " << input;
     TEST_INTEGER_OBJECT(array->elements()[0], 1, input);
     TEST_INTEGER_OBJECT(array->elements()[1], 4, input);
     TEST_INTEGER_OBJECT(array->elements()[2], 6, input);
@@ -179,7 +179,7 @@ let two = "two";
 }
     )"";
 
-    std::map<HashKey, uint64_t> expected{
+    std::map<HashKey, int> expected{
         {String("one").getHashKey(), 1}, {String("two").getHashKey(), 2}, {String("three").getHashKey(), 3},
         {Integer(4).getHashKey(), 4},    {kTrueObj->getHashKey(), 5},     {kFalseObj->getHashKey(), 6},
     };
@@ -189,7 +189,7 @@ let two = "two";
 
     auto hash = std::dynamic_pointer_cast<Hash>(evaluated);
     ASSERT_TRUE(hash != nullptr) << "Input: " << input;
-    ASSERT_EQ(hash->pairs().size(), 6) << "Input: " << input;
+    ASSERT_EQ(hash->pairs().size(), 6u) << "Input: " << input;
     for (const auto& [key, value] : expected) {
         auto iter = hash->pairs().find(key);
         ASSERT_TRUE(iter != hash->pairs().end());
@@ -377,7 +377,7 @@ TEST(EvaluatorTest, EvalFunctionObject) {
     ASSERT_TRUE(evaluated != nullptr) << "Input: " << input;
     auto function = std::dynamic_pointer_cast<Function>(evaluated);
     ASSERT_TRUE(function != nullptr) << "Input: " << input;
-    EXPECT_EQ(function->parameters().size(), 1) << "Input: " << input;
+    EXPECT_EQ(function->parameters().size(), 1u) << "Input: " << input;
     EXPECT_EQ(function->parameters()[0]->tokenLiteral(), "x") << "Input: " << input;
     EXPECT_EQ(function->body()->toString(), "{ (x + 2) }") << "Input: " << input;
 }

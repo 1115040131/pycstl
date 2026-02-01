@@ -165,7 +165,7 @@ std::shared_ptr<Object> VM::run() {
 
             case OpcodeType::OpGetBuiltin: {
                 auto definition = GetBuiltinList()[operands[0]];
-                auto result = push(definition.Builtin);
+                auto result = push(definition.builtin);
                 if (IsError(result)) {
                     return result;
                 }

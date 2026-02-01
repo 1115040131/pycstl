@@ -34,25 +34,25 @@ void PushWhilePop(T& lock_free_stack) {
 
 TEST(LockFreeStackTest, LockFreeStackTest) {
     LockFreeStack<HeapData> lock_free_stack;
-    EXPECT_EQ(sizeof(lock_free_stack), 24);
+    EXPECT_EQ(sizeof(lock_free_stack), 24u);
     PushWhilePop<10000, 16>(lock_free_stack);
 }
 
 TEST(LockFreeStackTest, HazardPointerStackTest) {
     HazardPointerStack<HeapData> lock_free_stack;
-    EXPECT_EQ(sizeof(lock_free_stack), 16);
+    EXPECT_EQ(sizeof(lock_free_stack), 16u);
     PushWhilePop<10000, 16>(lock_free_stack);
 }
 
 TEST(DISABLED_LockFreeStackTest, RefCountStackTest) {
     RefCountStack<HeapData, false> lock_free_stack;
-    EXPECT_EQ(sizeof(lock_free_stack), 16);
+    EXPECT_EQ(sizeof(lock_free_stack), 16u);
     PushWhilePop<100000, 16>(lock_free_stack);
 }
 
 TEST(DISABLED_LockFreeStackTest, RefCountStackUseMemoryOrderTest) {
     RefCountStack<HeapData, true> lock_free_stack;
-    EXPECT_EQ(sizeof(lock_free_stack), 16);
+    EXPECT_EQ(sizeof(lock_free_stack), 16u);
     PushWhilePop<100000, 16>(lock_free_stack);
 }
 

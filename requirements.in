@@ -1,4 +1,4 @@
 mysql-connector-python
-protobuf
+protobuf>=6.33.5
 redis
 requests

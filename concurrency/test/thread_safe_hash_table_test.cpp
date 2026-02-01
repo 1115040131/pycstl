@@ -41,7 +41,7 @@ void AddWhileRemove() {
         auto iter = data.find(i);
         EXPECT_TRUE(iter != data.end());
         if (iter != data.end()) {
-            EXPECT_EQ(iter->second->data, i);
+            EXPECT_EQ(iter->second->data, static_cast<int>(i));
         }
     }
 }

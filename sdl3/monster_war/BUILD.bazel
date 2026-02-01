@@ -1,10 +1,11 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_library(
     name = "ziyu_engine",
     srcs = glob(["monster_war/engine/**/*.cpp"]),
     hdrs = glob(["monster_war/engine/**/*.h"]),
-    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    copts = STRICT_COPTS,
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
@@ -31,7 +32,7 @@ cc_binary(
         "monster_war/game/**/*.cpp",
         "monster_war/game/**/*.h",
     ]) + ["monster_war/main.cpp"],
-    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    copts = STRICT_COPTS,
     data = glob(["assets/**"]),
     defines = select({
         "//conditions:default": [],

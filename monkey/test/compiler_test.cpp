@@ -602,35 +602,35 @@ TEST(CompilerTest, CompileScopeTest) {
     auto compiler = Compiler::New();
     auto global_symbol_table = compiler->symbol_table_;
 
-    EXPECT_EQ(compiler->scope_index_, 0);
+    EXPECT_EQ(compiler->scope_index_, 0u);
     TEST_INSTRUCTIONS({}, compiler->instructions(), "");
 
     compiler->emit(OpcodeType::OpMul, {});
 
-    EXPECT_EQ(compiler->scope_index_, 0);
+    EXPECT_EQ(compiler->scope_index_, 0u);
     TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpMul, {})}, compiler->instructions(), "");
 
     compiler->enterScope();
     EXPECT_EQ(compiler->symbol_table_->outer_, global_symbol_table);
 
-    EXPECT_EQ(compiler->scope_index_, 1);
+    EXPECT_EQ(compiler->scope_index_, 1u);
     TEST_INSTRUCTIONS({}, compiler->instructions(), "");
 
     compiler->emit(OpcodeType::OpSub, {});
 
-    EXPECT_EQ(compiler->scope_index_, 1);
+    EXPECT_EQ(compiler->scope_index_, 1u);
     TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpSub, {})}, compiler->instructions(), "");
 
     compiler->leaveScope();
     EXPECT_EQ(compiler->symbol_table_, global_symbol_table);
     EXPECT_EQ(compiler->symbol_table_->outer_, nullptr);
 
-    EXPECT_EQ(compiler->scope_index_, 0);
+    EXPECT_EQ(compiler->scope_index_, 0u);
     TEST_INSTRUCTIONS({ByteCode::Make(OpcodeType::OpMul, {})}, compiler->instructions(), "");
 
     compiler->emit(OpcodeType::OpAdd, {});
 
-    EXPECT_EQ(compiler->scope_index_, 0);
+    EXPECT_EQ(compiler->scope_index_, 0u);
     {
         auto expected_instructions = {ByteCode::Make(OpcodeType::OpMul, {}),
                                       ByteCode::Make(OpcodeType::OpAdd, {})};

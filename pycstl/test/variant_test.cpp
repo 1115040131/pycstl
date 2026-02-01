@@ -44,22 +44,22 @@ namespace pycstl {
 TEST_F(VariantTest, CopyConstructTest) {
     {
         VariantType v{v0_};
-        EXPECT_EQ(v.index(), 0);
+        EXPECT_EQ(v.index(), 0u);
         EXPECT_EQ(v.get<std::string>(), "abcd");
     }
     {
         VariantType v{v1_};
-        EXPECT_EQ(v.index(), 1);
+        EXPECT_EQ(v.index(), 1u);
         EXPECT_EQ(v.get<int>(), 6);
     }
     {
         VariantType v{v2_};
-        EXPECT_EQ(v.index(), 2);
+        EXPECT_EQ(v.index(), 2u);
         EXPECT_EQ(v.get<double>(), 3.1415);
     }
     {
         VariantType v{v3_};
-        EXPECT_EQ(v.index(), 3);
+        EXPECT_EQ(v.index(), 3u);
         EXPECT_EQ(v.get<Point>(), (Point{4, 8}));
     }
 }
@@ -68,108 +68,108 @@ TEST_F(VariantTest, MoveConstructTest) {
     {
         auto v0 = v0_;
         VariantType v{std::move(v0)};
-        EXPECT_EQ(v.index(), 0);
+        EXPECT_EQ(v.index(), 0u);
         EXPECT_EQ(v.get<std::string>(), "abcd");
     }
     {
         auto v1 = v1_;
         VariantType v{std::move(v1)};
-        EXPECT_EQ(v.index(), 1);
+        EXPECT_EQ(v.index(), 1u);
         EXPECT_EQ(v.get<int>(), 6);
     }
     {
         auto v2 = v2_;
         VariantType v{std::move(v2)};
-        EXPECT_EQ(v.index(), 2);
+        EXPECT_EQ(v.index(), 2u);
         EXPECT_EQ(v.get<double>(), 3.1415);
     }
     {
         auto v3 = v3_;
         VariantType v{std::move(v3)};
-        EXPECT_EQ(v.index(), 3);
+        EXPECT_EQ(v.index(), 3u);
         EXPECT_EQ(v.get<Point>(), (Point{4, 8}));
     }
 }
 
 TEST_F(VariantTest, CopyAssignmentTest) {
     VariantType v{std::string("abcd")};
-    EXPECT_EQ(v.index(), 0);
+    EXPECT_EQ(v.index(), 0u);
     EXPECT_EQ(v.get<std::string>(), "abcd");
 
     v = v1_;
-    EXPECT_EQ(v.index(), 1);
+    EXPECT_EQ(v.index(), 1u);
     EXPECT_EQ(v.get<int>(), 6);
 
     v = v2_;
-    EXPECT_EQ(v.index(), 2);
+    EXPECT_EQ(v.index(), 2u);
     EXPECT_EQ(v.get<double>(), 3.1415);
 
     v = v3_;
-    EXPECT_EQ(v.index(), 3);
+    EXPECT_EQ(v.index(), 3u);
     EXPECT_EQ(v.get<Point>(), (Point{4, 8}));
 
     v = v0_;
-    EXPECT_EQ(v.index(), 0);
+    EXPECT_EQ(v.index(), 0u);
     EXPECT_EQ(v.get<std::string>(), "abcd");
 }
 
 TEST_F(VariantTest, MoveAssignmentTest) {
     VariantType v{std::string("abcd")};
-    EXPECT_EQ(v.index(), 0);
+    EXPECT_EQ(v.index(), 0u);
     EXPECT_EQ(v.get<std::string>(), "abcd");
 
     auto v1 = v1_;
     v = std::move(v1);
-    EXPECT_EQ(v.index(), 1);
+    EXPECT_EQ(v.index(), 1u);
     EXPECT_EQ(v.get<int>(), 6);
 
     auto v2 = v2_;
     v = std::move(v2);
-    EXPECT_EQ(v.index(), 2);
+    EXPECT_EQ(v.index(), 2u);
     EXPECT_EQ(v.get<double>(), 3.1415);
 
     auto v3 = v3_;
     v = std::move(v3);
-    EXPECT_EQ(v.index(), 3);
+    EXPECT_EQ(v.index(), 3u);
     EXPECT_EQ(v.get<Point>(), (Point{4, 8}));
 
     auto v0 = v0_;
     v = std::move(v0);
-    EXPECT_EQ(v.index(), 0);
+    EXPECT_EQ(v.index(), 0u);
     EXPECT_EQ(v.get<std::string>(), "abcd");
 }
 
 TEST_F(VariantTest, ConstructTest) {
     {
         auto v = VariantType(InPlaceIndex<0>(), "abcd");
-        EXPECT_EQ(v.index(), 0);
+        EXPECT_EQ(v.index(), 0u);
         EXPECT_TRUE(v.holds_alternative<std::string>());
         EXPECT_EQ(v.get<std::string>(), "abcd");
     }
     {
         auto v = VariantType(InPlaceIndex<1>(), 6);
-        EXPECT_EQ(v.index(), 1);
+        EXPECT_EQ(v.index(), 1u);
         EXPECT_TRUE(v.holds_alternative<int>());
         EXPECT_EQ(v.get<int>(), 6);
     }
     {
         auto v = VariantType(InPlaceIndex<2>(), 3.1415);
-        EXPECT_EQ(v.index(), 2);
+        EXPECT_EQ(v.index(), 2u);
         EXPECT_TRUE(v.holds_alternative<double>());
         EXPECT_EQ(v.get<double>(), 3.1415);
     }
     {
         auto v = VariantType(InPlaceIndex<3>(), 4, 8);
-        EXPECT_EQ(v.index(), 3);
+        EXPECT_EQ(v.index(), 3u);
         EXPECT_TRUE(v.holds_alternative<Point>());
         EXPECT_EQ(v.get<Point>(), (Point{4, 8}));
     }
 }
 
 TEST_F(VariantTest, IndexTest) {
-    EXPECT_EQ(v0_.index(), 0);
-    EXPECT_EQ(v1_.index(), 1);
-    EXPECT_EQ(v2_.index(), 2);
+    EXPECT_EQ(v0_.index(), 0u);
+    EXPECT_EQ(v1_.index(), 1u);
+    EXPECT_EQ(v2_.index(), 2u);
 }
 
 TEST_F(VariantTest, HoldsAlernativeTest) {

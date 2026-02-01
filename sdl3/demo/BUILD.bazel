@@ -1,4 +1,5 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "demo",

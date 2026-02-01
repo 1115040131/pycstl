@@ -1,4 +1,5 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,8 +20,8 @@ cc_library(
         "@boost.asio",
         "@boost.beast",
         "@boost.uuid",
-        "@com_github_grpc_grpc//:grpc++",
         "@fmt",
+        "@grpc//:grpc++",
         "@nlohmann_json//:json",
     ],
 )

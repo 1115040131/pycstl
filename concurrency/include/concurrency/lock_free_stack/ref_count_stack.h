@@ -23,18 +23,18 @@ private:
         std::atomic<int> dec_count{0};  // 减少的数量
 
         template <typename... Args>
-        Node(const RefNode& next_, Args&&... args) : next(next_), data(std::forward<Args>(args)...) {}
+        Node(const RefNode& next_, Args&&... args) : data(std::forward<Args>(args)...), next(next_) {}
     };
 
     struct RefNode {
         int ref_count;  // 引用计数
         Node* node_ptr;
 
-        RefNode() : node_ptr(nullptr), ref_count(0) {}
+        RefNode() : ref_count(0), node_ptr(nullptr) {}
 
         template <typename... Args>
         RefNode(const RefNode& next_, Args&&... args)
-            : node_ptr(new Node(next_, std::forward<Args>(args)...)), ref_count(1) {}
+            : ref_count(1), node_ptr(new Node(next_, std::forward<Args>(args)...)) {}
     };
 
 public:

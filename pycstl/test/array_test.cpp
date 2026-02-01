@@ -24,18 +24,18 @@ TEST(ArrayTest, ModifyArray) {
 
 TEST(ArrayTest, SizeCompare) {
     Array<int, 32> arr{1, 2, 3};
-    EXPECT_EQ(decltype(arr)::Size(), 32);
-    EXPECT_EQ(arr.size(), 32);
+    EXPECT_EQ(decltype(arr)::Size(), 32u);
+    EXPECT_EQ(arr.size(), 32u);
 
     Array<int8_t, decltype(arr)::Size()> arr2;
-    EXPECT_EQ(arr2.size(), 32);
+    EXPECT_EQ(arr2.size(), 32u);
 
     Array arr3{4, 5, 6};
-    EXPECT_EQ(arr3.size(), 3);
+    EXPECT_EQ(arr3.size(), 3u);
 
     int ca[] = {7, 8, 9, 10};
     auto arr4 = to_array(ca);
-    EXPECT_EQ(arr4.size(), 4);
+    EXPECT_EQ(arr4.size(), 4u);
 }
 
 TEST(ArrayTest, IteratorVisit) {
