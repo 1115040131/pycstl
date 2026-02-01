@@ -224,7 +224,7 @@ use_repo(pip, "pycstl_deps")
 # Test only
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "googletest", version = "1.17.0")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
 
 # 导出 compile_commands.json
 # Hedron's Compile Commands Extractor for Bazel
