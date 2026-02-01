@@ -17,15 +17,18 @@ cmake(
 
 cmake(
     name = "sdl3_image",
-    cache_entries = {
-        "SDLIMAGE_VENDORED": "ON",
-        "SDLIMAGE_AVIF": "OFF",  # disable for ninja compile error
+    cache_entries = select({
+        "//conditions:default": {"SDLIMAGE_VENDORED": "ON"},
+        "//:debug": {
+            "SDLIMAGE_VENDORED": "ON",
+            "DAV1D_ASM": "OFF",  # debug not use asm
+        },
+    }),
+    data = ["@nasm"],
+    env = {
+        "ASM_NASM": "$(execpath @nasm//:nasm)",
+        "NASM_PATH": "$(execpath @nasm//:nasm)/..",
     },
-    # data = ["@nasm"],
-    # env = {
-    #     "ASM_NASM": "$(execpath @nasm//:nasm)",
-    #     "NASM_PATH": "$(execpath @nasm//:nasm)/..",
-    # },
     generate_args = ["-GNinja"],
     lib_source = "@sdl3_image//:all_srcs",
     out_shared_libs = [

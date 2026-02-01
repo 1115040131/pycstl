@@ -135,9 +135,9 @@ public:
 
     const _Tp& at(std::size_t _Pos) const { throwOutOfRange(_Pos); }
 
-    _Tp& operator[](std::size_t _Pos) noexcept { _LIBPYCCXX_UNREACHABLE(); }
+    _Tp& operator[](std::size_t) noexcept { _LIBPYCCXX_UNREACHABLE(); }
 
-    const _Tp& operator[](std::size_t _Pos) const noexcept { _LIBPYCCXX_UNREACHABLE(); }
+    const _Tp& operator[](std::size_t) const noexcept { _LIBPYCCXX_UNREACHABLE(); }
 
     _Tp& front() noexcept { _LIBPYCCXX_UNREACHABLE(); }
 
@@ -177,9 +177,9 @@ public:
 
     // 操作
 
-    void fill(const _Tp& _Val) noexcept {}
+    void fill(const _Tp&) noexcept {}
 
-    void swap(Array& _Other) noexcept {}
+    void swap(Array&) noexcept {}
 
 private:
     void throwOutOfRange(std::size_t _Pos) {
