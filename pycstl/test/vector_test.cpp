@@ -57,7 +57,7 @@ TEST(VectorTest, test_construction) {
 
     auto bar = std::move(vec1);
     COMPARE_CONTENT(bar, stl_vec1);
-    EXPECT_EQ(vec1.size(), 0);
+    EXPECT_EQ(vec1.size(), 0u);
 }
 
 TEST(VectorTest, test_initialization) {

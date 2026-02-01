@@ -1,13 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+
 cc_test(
     name = "cpp20_stl_all_test",
     srcs = glob([
         "*_test.cpp",
         "*.h",
     ]),
-    copts = [
-        "-std=c++23",
-        "-Wno-unknown-pragmas",
-    ],
+    copts = STRICT_COPTS,
     data = glob(["resource/**"]),
     deps = [
         "//common",

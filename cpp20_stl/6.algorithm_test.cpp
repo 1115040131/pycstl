@@ -164,8 +164,8 @@ TEST(AlgorithmTest, TransformTest) {
 
 TEST(AlgorithmTest, FindTest) {
     struct City {
-        std::string name;
-        int population;
+        std::string name{};
+        int population{};
 
         bool operator==(const City& that) const { return name == that.name; }
     };

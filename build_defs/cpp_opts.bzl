@@ -15,7 +15,6 @@ STRICT_COPTS = select({
         "-Wextra",
         "-Werror",
         "-Wno-unknown-pragmas",
-        "-Wold-style-cast",
         "-Wreturn-type",
         "-Wnon-virtual-dtor",
     ],

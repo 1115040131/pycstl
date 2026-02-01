@@ -25,7 +25,7 @@ TEST(CmpTest, CmpTest) {
     unsigned y{7};
 
     // 无符号数和有符号数比较时, 有符号数会被转换为无符号数
-    EXPECT_EQ(x < y, false);
+    // EXPECT_EQ(x < y, false); // compile warning
 
     // C++20 标准在 <utility> 中包含了一组安全的整数比较函数
     EXPECT_EQ(std::cmp_equal(x, y), false);

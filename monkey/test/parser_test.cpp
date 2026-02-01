@@ -118,7 +118,7 @@ TEST(ParserTest, LetStatementTest) {
         auto program = parser->parseProgram();
 
         ASSERT_TRUE(program && parser->errors().empty());
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::LetStatement);
 
@@ -143,7 +143,7 @@ TEST(ParserTest, ReturnStatementTest) {
         auto program = parser->parseProgram();
 
         ASSERT_TRUE(program && parser->errors().empty());
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::ReturnStatement);
 
@@ -158,7 +158,7 @@ TEST(ParserTest, IdentifierTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -183,7 +183,7 @@ TEST(ParserTest, BooleanTest) {
         auto program = parser->parseProgram();
 
         ASSERT_TRUE(program && parser->errors().empty());
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
         const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -200,7 +200,7 @@ TEST(ParserTest, IntegerLiteralTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
@@ -216,7 +216,7 @@ TEST(ParserTest, StringLiteralTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
@@ -232,14 +232,14 @@ TEST(ParserTest, ArrayLiteralTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
     EXPECT_EQ(expression->type(), Expression::Type::ArrayLiteral);
 
     auto array_literal = reinterpret_cast<ArrayLiteral*>(expression.get());
-    EXPECT_EQ(array_literal->elements().size(), 3);
+    EXPECT_EQ(array_literal->elements().size(), 3u);
     TEST_INTEGER_LITERAL(array_literal->elements()[0], "1");
     TEST_INFIX_EXPRESSION(array_literal->elements()[1], 2, "*", 2);
     TEST_INFIX_EXPRESSION(array_literal->elements()[2], 3, "+", 3);
@@ -253,14 +253,14 @@ TEST(ParserTest, HashLiteralTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
     EXPECT_EQ(expression->type(), Expression::Type::HashLiteral);
 
     auto hash_literal = reinterpret_cast<HashLiteral*>(expression.get());
-    EXPECT_EQ(hash_literal->pairs().size(), 3);
+    EXPECT_EQ(hash_literal->pairs().size(), 3u);
     for (const auto& [key, value] : hash_literal->pairs()) {
         auto key_str = std::dynamic_pointer_cast<StringLiteral>(key);
         ASSERT_TRUE(key_str);
@@ -276,7 +276,7 @@ TEST(ParserTest, EmptyHashLiteralTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
@@ -298,14 +298,14 @@ TEST(ParserTest, HashLiteralWithExpressionTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
     EXPECT_EQ(expression->type(), Expression::Type::HashLiteral);
 
     auto hash_literal = reinterpret_cast<HashLiteral*>(expression.get());
-    EXPECT_EQ(hash_literal->pairs().size(), 3);
+    EXPECT_EQ(hash_literal->pairs().size(), 3u);
     for (const auto& [key, value] : hash_literal->pairs()) {
         auto key_str = std::dynamic_pointer_cast<StringLiteral>(key);
         ASSERT_TRUE(key_str);
@@ -321,7 +321,7 @@ TEST(ParserTest, IndexExpressionTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
@@ -349,7 +349,7 @@ TEST(ParserTest, PrefixExpressionTest) {
         auto program = parser->parseProgram();
 
         ASSERT_TRUE(program && parser->errors().empty());
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
         const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
@@ -394,7 +394,7 @@ TEST(ParserTest, InfixExpressionTest) {
         auto program = parser->parseProgram();
 
         EXPECT_TRUE(program && parser->errors().empty());
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
         const auto& expression = reinterpret_cast<const ExpressionStatement*>(statement.get())->expression();
@@ -528,7 +528,7 @@ TEST(ParserTest, IfExpressionTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -540,7 +540,7 @@ TEST(ParserTest, IfExpressionTest) {
     TEST_INFIX_EXPRESSION(if_expression->condition(), "x", "<", "y");
 
     // consequence
-    EXPECT_EQ(if_expression->consequence()->statements().size(), 1);
+    EXPECT_EQ(if_expression->consequence()->statements().size(), 1u);
     const auto& consequence = if_expression->consequence()->statements()[0];
     EXPECT_EQ(consequence->type(), Statement::Type::ExpressionStatement);
     const auto& consequence_expression = reinterpret_cast<ExpressionStatement*>(consequence.get())->expression();
@@ -560,7 +560,7 @@ TEST(ParserTest, IfElseExpressionTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -572,7 +572,7 @@ TEST(ParserTest, IfElseExpressionTest) {
     TEST_INFIX_EXPRESSION(if_expression->condition(), "x", "<", "y");
 
     // consequence
-    EXPECT_EQ(if_expression->consequence()->statements().size(), 1);
+    EXPECT_EQ(if_expression->consequence()->statements().size(), 1u);
     const auto& consequence = if_expression->consequence()->statements()[0];
     EXPECT_EQ(consequence->type(), Statement::Type::ExpressionStatement);
     const auto& consequence_expression = reinterpret_cast<ExpressionStatement*>(consequence.get())->expression();
@@ -581,7 +581,7 @@ TEST(ParserTest, IfElseExpressionTest) {
 
     // alternative
     ASSERT_TRUE(if_expression->alternative());
-    EXPECT_EQ(if_expression->alternative()->statements().size(), 1);
+    EXPECT_EQ(if_expression->alternative()->statements().size(), 1u);
     const auto& alternative = if_expression->alternative()->statements()[0];
     EXPECT_EQ(alternative->type(), Statement::Type::ExpressionStatement);
     const auto& alternative_expression = reinterpret_cast<ExpressionStatement*>(alternative.get())->expression();
@@ -598,7 +598,7 @@ TEST(ParserTest, FunctionLiteralTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -609,12 +609,12 @@ TEST(ParserTest, FunctionLiteralTest) {
     EXPECT_EQ(function_literal->tokenLiteral(), "fn");
 
     // parameters
-    EXPECT_EQ(function_literal->parameters().size(), 2);
+    EXPECT_EQ(function_literal->parameters().size(), 2u);
     TEST_IDENTIFIER(function_literal->parameters()[0], "x");
     TEST_IDENTIFIER(function_literal->parameters()[1], "y");
 
     // body
-    EXPECT_EQ(function_literal->body()->statements().size(), 1);
+    EXPECT_EQ(function_literal->body()->statements().size(), 1u);
     const auto& body_statement = function_literal->body()->statements()[0];
     EXPECT_EQ(body_statement->type(), Statement::Type::ExpressionStatement);
     const auto& body_expression = reinterpret_cast<ExpressionStatement*>(body_statement.get())->expression();
@@ -630,7 +630,7 @@ TEST(ParserTest, FunctionLiteralWithNameTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::LetStatement);
     const auto& expression = reinterpret_cast<LetStatement*>(statement.get())->value();
@@ -658,7 +658,7 @@ TEST(ParserTest, FunctionParameterTest) {
         auto program = parser->parseProgram();
 
         ASSERT_TRUE(program && parser->errors().empty()) << parser->errorsToString();
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
         const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -680,7 +680,7 @@ TEST(ParserTest, CallExpressionTest) {
     auto program = parser->parseProgram();
 
     ASSERT_TRUE(program && parser->errors().empty());
-    EXPECT_EQ(program->statements().size(), 1);
+    EXPECT_EQ(program->statements().size(), 1u);
     const auto& statement = program->statements()[0];
     EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
     const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();
@@ -696,7 +696,7 @@ TEST(ParserTest, CallExpressionTest) {
     EXPECT_EQ(function->tokenLiteral(), "add");
 
     // arguments
-    EXPECT_EQ(call_expression->arguments().size(), 3);
+    EXPECT_EQ(call_expression->arguments().size(), 3u);
     TEST_INTEGER_LITERAL(call_expression->arguments()[0], "1");
     TEST_INFIX_EXPRESSION(call_expression->arguments()[1], 2, "*", 3);
     TEST_INFIX_EXPRESSION(call_expression->arguments()[2], 4, "+", 5);
@@ -734,7 +734,7 @@ TEST(ParserTest, CallExpressionParameterTest) {
         auto program = parser->parseProgram();
 
         ASSERT_TRUE(program && parser->errors().empty());
-        EXPECT_EQ(program->statements().size(), 1);
+        EXPECT_EQ(program->statements().size(), 1u);
         const auto& statement = program->statements()[0];
         EXPECT_EQ(statement->type(), Statement::Type::ExpressionStatement);
         const auto& expression = reinterpret_cast<ExpressionStatement*>(statement.get())->expression();

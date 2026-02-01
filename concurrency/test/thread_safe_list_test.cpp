@@ -87,7 +87,7 @@ void DoublePushWhileRemove() {
         }
     }
 
-    int cnt = 0;
+    size_t cnt = 0;
     double_push_list.ForEach([&](const MyClass&) { cnt++; });
     EXPECT_EQ(cnt, kDataNum);
 }

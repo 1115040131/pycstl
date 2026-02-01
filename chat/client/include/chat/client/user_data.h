@@ -49,13 +49,13 @@ struct FriendInfo {
 };
 
 struct UserInfo {
-    int uid;
-    int sex;
-    QString name;
-    QString nick;
-    QString icon;
-    QString last_msg;
-    std::vector<std::shared_ptr<TextChatData>> chat_msgs;
+    int uid{};
+    int sex{};
+    QString name{};
+    QString nick{};
+    QString icon{};
+    QString last_msg{};
+    std::vector<std::shared_ptr<TextChatData>> chat_msgs{};
 
     static UserInfo FromSearchInfo(const SearchInfo& search_info) {
         return {search_info.uid, search_info.sex, search_info.name, search_info.nick, search_info.icon};

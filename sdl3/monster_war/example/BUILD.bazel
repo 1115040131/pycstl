@@ -1,4 +1,5 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "entt_example",
@@ -21,7 +22,7 @@ cc_binary(
     srcs = [
         "imgui_example.cpp",
     ],
-    copts = STRICT_COPTS + ["-Wno-old-style-cast"],
+    copts = STRICT_COPTS,
     data = glob(["assets/**"]),
     deps = [
         "//sdl3:sdl3_image",

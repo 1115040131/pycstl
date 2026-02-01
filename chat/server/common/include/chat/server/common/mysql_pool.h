@@ -3,7 +3,10 @@
 #include <chrono>
 #include <thread>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #include <mysqlx/xdevapi.h>
+#pragma GCC diagnostic pop
 
 #include "common/connection_pool.h"
 

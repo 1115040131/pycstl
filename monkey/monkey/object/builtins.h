@@ -8,8 +8,8 @@ namespace pyc {
 namespace monkey {
 
 struct BuiltinWithName {
-    std::string Name;
-    std::shared_ptr<Builtin> Builtin;
+    std::string name;
+    std::shared_ptr<Builtin> builtin;
 };
 
 const std::vector<BuiltinWithName>& GetBuiltinList();

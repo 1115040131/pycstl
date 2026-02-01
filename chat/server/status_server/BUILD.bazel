@@ -1,4 +1,5 @@
 load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,7 +19,7 @@ cc_library(
         "//chat/server/proto:status_cc_grpc_proto",
         "//common",
         "//logger",
-        "@com_github_grpc_grpc//:grpc++",
+        "@grpc//:grpc++",
     ],
 )
 
