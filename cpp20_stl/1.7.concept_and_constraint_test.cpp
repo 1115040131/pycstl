@@ -22,7 +22,7 @@ T arg42(const T& arg) {
 }
 
 template <typename T>
-std::string arg42(const T& arg) {
+std::string arg42(const T&) {
     return "not Numeric<T>";
 }
 

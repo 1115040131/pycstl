@@ -27,7 +27,7 @@ constexpr auto use_vector2() {
 }
 
 TEST(ContexprTest, ContexprTest) {
-    EXPECT_EQ(use_string(), 6);
+    EXPECT_EQ(use_string(), 6u);
     EXPECT_EQ(use_vector(), 15);
 
     // 但是若试图在运行时环境中使用结果, 会得到一个在常量求值期间分配内存的错误

@@ -41,7 +41,7 @@ size_t wordcount(auto& is) {
 TEST(StringTest, WordCountTest) {
     std::ifstream input_file("cpp20_stl/resource/the-raven.txt");
     EXPECT_TRUE(input_file.is_open());
-    EXPECT_EQ(wordcount(input_file), 1068);
+    EXPECT_EQ(wordcount(input_file), 1068u);
 }
 
 #pragma endregion
@@ -175,7 +175,7 @@ using lc_string = std::basic_string<char, lc_traits>;
 TEST(StringTest, CharTraitsTest) {
     ci_string ci_s{"Foo Bar Baz"};
     EXPECT_EQ(fmt::format("{}", ci_s), "Foo Bar Baz");
-    EXPECT_EQ(ci_s.find('b'), 4);
+    EXPECT_EQ(ci_s.find('b'), 4u);
 
     ci_string copmare1{"CoMpArE StRiNg"};
     ci_string compare2{"compare string"};

@@ -211,7 +211,7 @@ TEST(UtilTest, ChronoTest) {
     fmt::println("system_clock::now is {:%F %T}", now);
 
     auto [duration, count] = timer(count_primes);
-    EXPECT_EQ(count, 12252);
+    EXPECT_EQ(count, 12252u);
     fmt::println("find {} primes in range took {:.3f} seconds", count, duration.count());
 
     using milliseconds = std::chrono::duration<double, std::milli>;
