@@ -74,6 +74,9 @@ jobs:
         # Share repository cache between workflows.
         repository-cache: true
 
+    - name: 验证 Bazel 版本
+      run: bazel --version
+
     - name: 构建前检查
       run: |
         echo "===== 磁盘初始状态 ====="
