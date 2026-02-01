@@ -14,12 +14,11 @@ jobs:
       matrix:
         # os: [ubuntu-latest, macos-latest]
         os: [ubuntu-latest]
-        bazel-version: ['8.4.1']
       fail-fast: false
 
     steps:
     - name: 检出代码
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 初始状态检查
       run: |
@@ -29,20 +28,6 @@ jobs:
         echo "===== 主要目录占用 ====="
         du -sh /home/runner/work 2>/dev/null || true
         du -sh ~/.cache 2>/dev/null || true
-
-    # 使用 Action 自动清理
-    # - name: 最大化构建空间
-    #   if: runner.os == 'Linux'
-    #   uses: easimon/maximize-build-space@master
-    #   with:
-    #     root-reserve-mb: 4096      # 为根分区保留 4GB
-    #     temp-reserve-mb: 1024      # 为 /tmp 保留 1GB
-    #     swap-size-mb: 4096         # 创建 4GB swap
-    #     remove-dotnet: 'true'
-    #     remove-android: 'true'
-    #     remove-haskell: 'true'
-    #     remove-codeql: 'true'
-    #     remove-docker-images: 'true'
 
     - name: 手动清理磁盘
       if: runner.os == 'Linux'
@@ -74,36 +59,20 @@ jobs:
         du -sh /home/runner/work 2>/dev/null || true
         du -sh ~/.cache 2>/dev/null || true
 
-    - name: 安装 Bazelisk (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        wget https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64
-        chmod +x bazelisk-linux-amd64
-        sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
-
-    - name: 安装 Bazelisk (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install bazelisk
-        ln -sf $(which bazelisk) /usr/local/bin/bazel
-
-    - name: 验证 Bazel 版本
-      run: bazel --version
-
-    - name: 配置 Bazel 缓存
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/bazel
-          ~/.cache/bazelisk
-        key: ${{ runner.os }}-bazel-${{ hashFiles('WORKSPACE.bazel', 'MODULE.bazel', '.bazelversion') }}
-        restore-keys: |
-          ${{ runner.os }}-bazel-
-
     - name: 替换 CI 专用文件
       run: |
         cp .ci/co_async/test/utils.h co_async/test/utils.h
         cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        # Avoid downloading Bazel every time.
+        bazelisk-cache: true
+        # Store build cache per workflow.
+        disk-cache: ${{ github.workflow }}
+        # Share repository cache between workflows.
+        repository-cache: true
 
     - name: 构建前检查
       run: |
@@ -138,7 +107,7 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: true
 
-    - name: 步骤3 - 构建后状态（缓存保存前）
+    - name: 构建后状态（缓存保存前）
       run: |
         echo "===== 构建后磁盘状态 ====="
         df -h /
@@ -156,7 +125,7 @@ jobs:
 
     steps:
     - name: 检出代码
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 安装 clang-format
       run: sudo apt-get install -y clang-format
