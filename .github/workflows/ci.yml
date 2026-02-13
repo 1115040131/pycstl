@@ -29,40 +29,38 @@ jobs:
         du -sh /home/runner/work 2>/dev/null || true
         du -sh ~/.cache 2>/dev/null || true
 
-    - name: 手动清理磁盘
-      if: runner.os == 'Linux'
-      run: |
-        echo "清理前磁盘状态："
-        df -h
+    # - name: 手动清理磁盘
+    #   if: runner.os == 'Linux'
+    #   run: |
+    #     echo "清理前磁盘状态："
+    #     df -h
 
-        # 删除不需要的软件
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /usr/local/lib/android
-        sudo rm -rf /opt/ghc
-        sudo rm -rf /opt/hostedtoolcache/CodeQL
+    #     # 删除不需要的软件
+    #     sudo rm -rf /usr/share/dotnet
+    #     sudo rm -rf /usr/local/lib/android
+    #     sudo rm -rf /opt/ghc
+    #     sudo rm -rf /opt/hostedtoolcache/CodeQL
 
-        # 清理 Docker
-        sudo docker system prune -af --volumes
+    #     # 清理 Docker
+    #     sudo docker system prune -af --volumes
 
-        # 清理 APT 缓存
-        sudo apt-get clean
+    #     # 清理 APT 缓存
+    #     sudo apt-get clean
 
-        # 清理日志
-        sudo journalctl --vacuum-time=1d
+    #     # 清理日志
+    #     sudo journalctl --vacuum-time=1d
 
-    - name: 清理后检查
-      run: |
-        echo "===== 磁盘初始状态 ====="
-        df -h /
-        echo ""
-        echo "===== 主要目录占用 ====="
-        du -sh /home/runner/work 2>/dev/null || true
-        du -sh ~/.cache 2>/dev/null || true
+    # - name: 清理后检查
+    #   run: |
+    #     echo "===== 磁盘初始状态 ====="
+    #     df -h /
+    #     echo ""
+    #     echo "===== 主要目录占用 ====="
+    #     du -sh /home/runner/work 2>/dev/null || true
+    #     du -sh ~/.cache 2>/dev/null || true
 
     - name: 替换 CI 专用文件
-      run: |
-        cp .ci/co_async/test/utils.h co_async/test/utils.h
-        cp .ci/sdl3/BUILD.bazel sdl3/BUILD.bazel
+      run: python3 .ci/patch_ci_file.py
 
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.18.0

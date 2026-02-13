@@ -15,13 +15,11 @@ cc_library(
     includes = ["include"],
     deps = [
         "//common",
-        "//network/proto:greeter_cc_grpc",
         "//network/proto:msg_cc_proto",
         "@boost.asio",
         "@boost.beast",
         "@boost.uuid",
         "@fmt",
-        "@grpc//:grpc++",
         "@nlohmann_json//:json",
     ],
 )
