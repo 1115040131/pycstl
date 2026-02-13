@@ -28,7 +28,7 @@ cc_library(
     ],
 )
 
-BINARIES = [
+NON_GRPC_BINARIES = [
     # asio client
     "sync_client",
     "test_client_protobuf",
@@ -46,7 +46,10 @@ BINARIES = [
     "http_client",
     "http_server",
     "websocket_server",
+]
 
+# Only these need grpc dependencies
+GRPC_BINARIES = [
     #grpc
     "grpc_server",
     "grpc_client",
@@ -58,4 +61,15 @@ BINARIES = [
     srcs = ["%s.cpp" % binary],
     copts = STRICT_COPTS,
     deps = ["//network"],
-) for binary in BINARIES]
+) for binary in NON_GRPC_BINARIES]
+
+[cc_binary(
+    name = binary,
+    srcs = ["%s.cpp" % binary],
+    copts = STRICT_COPTS,
+    deps = [
+        "//network",
+        "//network/proto:greeter_cc_grpc",
+        "@grpc//:grpc++",
+    ],
+) for binary in GRPC_BINARIES]

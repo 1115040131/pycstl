@@ -1,3 +1,7 @@
+.cache
+.ci
+.github
+.vscode
 bazel-bin
 bazel-out
 bazel-pycstl
