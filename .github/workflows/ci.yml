@@ -2,13 +2,15 @@ name: Bazel CI
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
+  # Job 1: 针对 PR 的快速检查 (无覆盖率)
   build-and-test:
     name: Build and Test
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -67,6 +69,81 @@ jobs:
 
     - name: 构建所有目标
       run: bazel build //...
+
+    - name: 运行所有测试
+      run: bazel test //... --test_output=errors
+
+    - name: 构建后状态（缓存保存前）
+      run: |
+        echo "===== 构建后磁盘状态 ====="
+        df -h /
+        echo ""
+        echo "===== Bazel 相关目录占用 ====="
+        du -sh ~/.cache/bazel* 2>/dev/null || echo "bazel 缓存不存在"
+        du -sh $(bazel info output_base 2>/dev/null) 2>/dev/null || echo "output_base 不存在"
+        echo ""
+        echo "===== 工作目录占用 ====="
+        du -sh /home/runner/work/pycstl 2>/dev/null || true
+
+  # Job 2: 针对合入 Main 后的全面检查 (带覆盖率)
+  main-coverage:
+    # 核心配置: 只有是 Push 事件且在 main 分支时才运行
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 初始状态检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # 这里可以自定义需要删除哪些内容
+        # 默认会删除 Android, .NET, Haskell 等，一般能腾出 10GB+ 空间
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+
+    - name: 清理后检查
+      run: |
+        echo "===== 磁盘初始状态 ====="
+        df -h /
+        echo ""
+        echo "===== 主要目录占用 ====="
+        du -sh /home/runner/work 2>/dev/null || true
+        du -sh ~/.cache 2>/dev/null || true
+
+    - name: 替换 CI 专用文件
+      run: python3 .ci/patch_ci_file.py
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        # Avoid downloading Bazel every time.
+        bazelisk-cache: true
+        # Store build cache per workflow.
+        disk-cache: ${{ github.workflow }}
+        # Share repository cache between workflows.
+        repository-cache: true
+
+    - name: 验证 Bazel 版本
+      run: bazel --version
+
+    - name: 启动 mysql 服务
+      run: tool/build.py chat_prepare
 
     # --combined_report=lcov: 生成单个 lcov 格式报告
     # --test_output=errors: 只显示失败测试的日志，减少噪音
