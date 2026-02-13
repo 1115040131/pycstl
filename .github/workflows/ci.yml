@@ -9,12 +9,7 @@ on:
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        # os: [ubuntu-latest, macos-latest]
-        os: [ubuntu-latest]
-      fail-fast: false
+    runs-on: ubuntu-latest
 
     steps:
     - name: 检出代码
@@ -29,26 +24,18 @@ jobs:
         du -sh /home/runner/work 2>/dev/null || true
         du -sh ~/.cache 2>/dev/null || true
 
-    - name: 手动清理磁盘
-      if: runner.os == 'Linux'
-      run: |
-        echo "清理前磁盘状态："
-        df -h
-
-        # 删除不需要的软件
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /usr/local/lib/android
-        sudo rm -rf /opt/ghc
-        sudo rm -rf /opt/hostedtoolcache/CodeQL
-
-        # 清理 Docker
-        sudo docker system prune -af --volumes
-
-        # 清理 APT 缓存
-        sudo apt-get clean
-
-        # 清理日志
-        sudo journalctl --vacuum-time=1d
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # 这里可以自定义需要删除哪些内容
+        # 默认会删除 Android, .NET, Haskell 等，一般能腾出 10GB+ 空间
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
 
     - name: 清理后检查
       run: |
@@ -75,28 +62,21 @@ jobs:
     - name: 验证 Bazel 版本
       run: bazel --version
 
-    - name: 构建前检查
-      run: |
-        echo "===== 磁盘初始状态 ====="
-        df -h /
-        echo ""
-        echo "===== 主要目录占用 ====="
-        du -sh /home/runner/work 2>/dev/null || true
-        du -sh ~/.cache 2>/dev/null || true
+    - name: 启动 mysql 服务
+      run: tool/build.py chat_prepare
 
     - name: 构建所有目标
       run: bazel build //...
 
-    - name: 启动 mysql 服务
-      run: tool/build.py chat_prepare
-
-    - name: 运行所有测试
-      run: bazel test //... --test_output=errors
-
+    # --combined_report=lcov: 生成单个 lcov 格式报告
+    # --test_output=errors: 只显示失败测试的日志，减少噪音
     - name: 生成测试覆盖率
-      if: runner.os == 'Linux'
       run: |
-        bazel coverage //... --combined_report=lcov
+        bazel coverage //... \
+          --combined_report=lcov \
+          --test_output=errors \
+          --nocache_test_results \
+          --instrumentation_filter="//..."
 
     - name: 上传覆盖率报告
       if: runner.os == 'Linux'
