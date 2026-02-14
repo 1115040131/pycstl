@@ -1,3 +1,9 @@
+graphviz
+ipykernel
+matplotlib
 mysql-connector-python
+numpy
 redis
 requests
+scikit-learn
+torch

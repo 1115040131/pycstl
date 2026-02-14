@@ -345,6 +345,10 @@ def main() -> None:
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
         "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
+        ######################### build for nn #########################
+        "micrograd": lambda args: run_bazel_build('//nn/micrograd/...', args=args),
+        "micrograd_test": lambda args: run_bazel_test('//nn/micrograd:micrograd_test', args=args),
+
         ######################### build for pycstl #########################
         "pycstl": lambda args: run_bazel_build('//pycstl/...', args=args),
         "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', args=args),
