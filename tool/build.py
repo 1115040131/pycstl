@@ -177,6 +177,14 @@ def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) ->
     run_tmux(windows)
 
 
+def venv(args: list[str]):
+    script_path = tool_path / 'setup_venv.sh'
+
+    # 必须使用 open() 打开文件，获得文件对象 f
+    with open(script_path, 'r') as f:
+        subprocess.run(["bash", "-s", "--", root_path], stdin=f)
+
+
 def main() -> None:
     # chat 相关数据
     data_direction = f'{root_path}/chat/server/mysql/data'
@@ -383,6 +391,9 @@ def main() -> None:
         # 测试文件, 单独编译
         ######################### build for hello_world #########################
         "hello_world": lambda args: run_bazel_run('//hello_world', args=args),
+
+        # 进入 venv
+        "venv": venv,
 
         # 更新 compile_commands.json 文件
         "refresh_all": lambda args: run_bazel_run('@hedron_compile_commands//:refresh_all', args=args),

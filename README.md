@@ -53,6 +53,14 @@ sudo usermod -aG docker your_username
 
 确保拥有 python 环境, 执行 ./make 命令
 
+```bash
+# 安装绘图软件
+sudo apt install graphviz
+
+# 进入虚拟环境
+./make venv
+```
+
 ## 使用
 
 ### 编译/运行/测试项目
