@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdlib>
 #include <source_location>
+#include <string>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -11,7 +13,10 @@ enum class LogLevel { kDebug, kInfo, kWarn, kError, kFatal };
 
 class Logger {
 public:
-    constexpr explicit Logger(std::string_view name = "DEFAULT") noexcept : name_(name) {}
+    explicit Logger(std::string_view name = "DEFAULT") : name_(name) {}
+
+    void set_level(LogLevel level) noexcept { min_level_ = level; }
+    LogLevel level() const noexcept { return min_level_; }
 
     template <typename... Args>
     struct FmtWithLocation {
@@ -52,18 +57,18 @@ public:
     }
 
     template <typename... Args>
-    inline void fatal(FormatString<Args...> fmt_with_location, Args&&... args) const {
+    [[noreturn]] inline void fatal(FormatString<Args...> fmt_with_location, Args&&... args) const {
         log<LogLevel::kFatal>(fmt::format(fmt_with_location.fmt, std::forward<Args>(args)...),
                               fmt_with_location.location);
-        exit(EXIT_FAILURE);
+        std::abort();
     }
 
 private:
     template <LogLevel level>
     void log(std::string_view msg, const std::source_location location) const;
 
-private:
-    std::string_view name_;
+    std::string name_;
+    LogLevel min_level_{LogLevel::kDebug};
 };
 
 }  // namespace pyc

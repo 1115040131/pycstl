@@ -70,23 +70,23 @@ TEST(ConfigMgrTest, GetConfig) {
             GET_CONFIG(not_exist, "GateServer", "NotExist");
             DUMMY_CODE(not_exist);
         },
-        ::testing::ExitedWithCode(1), "");
+        ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
             GET_CONFIG(not_exist, "NotExist", "NotExist");
             DUMMY_CODE(not_exist);
         },
-        ::testing::ExitedWithCode(1), "");
+        ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
             GET_CONFIG_INT(not_exist, "NotExist", "NotExist");
             DUMMY_CODE(not_exist);
         },
-        ::testing::ExitedWithCode(1), "");
+        ::testing::KilledBySignal(SIGABRT), "");
 }
 
 TEST(ConfigMgrTest, GetSectionConfig) {
-    EXPECT_EXIT({ GET_SECTION_CONFIG(not_exist, "NotExist"); }, ::testing::ExitedWithCode(1), "");
+    EXPECT_EXIT({ GET_SECTION_CONFIG(not_exist, "NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");
     {
         SET_SECTION("GateServer");
         GET_SECTION_CONFIG(port, "Port");
@@ -150,26 +150,26 @@ TEST(ConfigMgrTest, GetSectionConfig) {
         EXPECT_EQ(port, 6380);
         EXPECT_EQ(password, "123456");
     }
-    EXPECT_EXIT({ SET_SECTION("NotExist"); }, ::testing::ExitedWithCode(1), "");
+    EXPECT_EXIT({ SET_SECTION("NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");
     SET_SECTION("ChatServer1");
     EXPECT_EXIT(
         {
             GET_SECTION_CONFIG(not_exist, "NotExist");
             DUMMY_CODE(not_exist);
         },
-        ::testing::ExitedWithCode(1), "");
+        ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
             GET_SECTION_CONFIG_INT(not_exist, "NotExist");
             DUMMY_CODE(not_exist);
         },
-        ::testing::ExitedWithCode(1), "");
+        ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
             GET_SECTION_CONFIG_INT(cannot_convert, "Name");
             DUMMY_CODE(cannot_convert);
         },
-        ::testing::ExitedWithCode(1), "");
+        ::testing::KilledBySignal(SIGABRT), "");
 }
 
 }  // namespace chat
