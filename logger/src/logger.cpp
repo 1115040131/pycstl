@@ -1,6 +1,7 @@
 #include "logger/logger.h"
 
 #include <chrono>
+#include <mutex>
 
 #include <fmt/chrono.h>
 #include <fmt/color.h>
@@ -60,11 +61,21 @@ constexpr std::string_view ExtractFunctionName(std::string_view full_name) noexc
     return full_name;
 }
 
+static std::mutex g_log_mutex;
+
 template <LogLevel level>
 void Logger::log(std::string_view msg, const std::source_location location) const {
-    fmt::print(ToTextStyle(level), "[{}][{:5}][{:0>5}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
+    if (level < min_level_) {
+        return;
+    }
+
+    std::lock_guard lock(g_log_mutex);
+    fmt::print(stderr, ToTextStyle(level), "[{}][{:5}][{:0>5}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
                ToString(level), ShortThreadId(), std::chrono::system_clock::now(), location.file_name(),
                location.line(), ExtractFunctionName(location.function_name()), msg);
+    if constexpr (level == LogLevel::kFatal) {
+        std::fflush(stderr);
+    }
 }
 
 template void Logger::log<LogLevel::kDebug>(std::string_view msg, const std::source_location location) const;
