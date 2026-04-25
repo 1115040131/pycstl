@@ -15,7 +15,7 @@ int main() {
             io_context.stop();
         });
 
-        std::make_shared<pyc::chat::CServer>(io_context, port)->Start();
+        std::make_shared<pyc::chat::CServer>(static_cast<unsigned short>(port))->Start();
         PYC_LOG_INFO("Gate Server listening on port {}", port);
         io_context.run();
     } catch (const std::exception& e) {

@@ -1,6 +1,7 @@
 .cache
 .ci
 .github
+.venv
 .vscode
 bazel-bin
 bazel-out

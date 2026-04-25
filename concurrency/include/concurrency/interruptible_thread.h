@@ -1,5 +1,12 @@
 #pragma once
 
+// https://clang.llvm.org/docs/ThreadSafetyAnalysis.html#no-thread-safety-analysis
+#ifdef __clang__
+#define NO_THREAD_SAFETY_ANALYSIS __attribute__((no_thread_safety_analysis))
+#else
+#define NO_THREAD_SAFETY_ANALYSIS
+#endif
+
 #include <atomic>
 #include <condition_variable>
 #include <exception>
@@ -54,14 +61,14 @@ public:
                 self->thread_cond_any_ = &cv;
             }
 
-            ~CustomLock() {
+            ~CustomLock() NO_THREAD_SAFETY_ANALYSIS {
                 self->thread_cond_any_ = nullptr;
                 self->set_clear_mutex_.unlock();
             }
 
-            void lock() { std::lock(self->set_clear_mutex_, lk); }
+            void lock() NO_THREAD_SAFETY_ANALYSIS { std::lock(self->set_clear_mutex_, lk); }
 
-            void unlock() {
+            void unlock() NO_THREAD_SAFETY_ANALYSIS {
                 lk.unlock();
                 self->set_clear_mutex_.unlock();
             }

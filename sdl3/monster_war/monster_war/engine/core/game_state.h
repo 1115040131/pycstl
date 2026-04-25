@@ -2,8 +2,8 @@
 
 #include <glm/vec2.hpp>
 
-class SDL_Window;
-class SDL_Renderer;
+struct SDL_Window;
+struct SDL_Renderer;
 
 namespace pyc::monster_war {
 

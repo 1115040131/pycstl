@@ -12,7 +12,7 @@
 #include "common/noncopyable.h"
 #include "common/string_hash.h"
 
-class SDL_Renderer;
+struct SDL_Renderer;
 union SDL_Event;
 
 namespace pyc::sunny_land {

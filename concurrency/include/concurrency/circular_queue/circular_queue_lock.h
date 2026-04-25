@@ -51,12 +51,12 @@ public:
     }
 
 private:
+    [[no_unique_address]] Allocator alloc_;
     std::size_t capacity_;
     T* data_;
     std::size_t head_{0};
     std::size_t tail_{0};
     std::mutex mtx_;
-    [[no_unique_address]] Allocator alloc_;
 };
 
 }  // namespace concurrency

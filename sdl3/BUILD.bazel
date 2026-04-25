@@ -14,7 +14,10 @@ cmake(
 
 cmake(
     name = "sdl3_image",
-    cache_entries = {"SDLIMAGE_VENDORED": "ON"} | select({
+    cache_entries = {
+        "SDLIMAGE_VENDORED": "ON",
+        "CMAKE_C_FLAGS": "-D_POSIX_C_SOURCE=200112L",
+    } | select({
         "//conditions:default": {},
         "//:debug": {"DAV1D_ASM": "OFF"},  # debug not use asm
     }),

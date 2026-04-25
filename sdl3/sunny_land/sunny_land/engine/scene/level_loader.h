@@ -12,7 +12,7 @@
 namespace pyc::sunny_land {
 
 class Scene;
-class TileInfo;
+struct TileInfo;
 enum class TileType;
 class AnimationComponent;
 class AudioComponent;

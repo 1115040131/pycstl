@@ -15,7 +15,7 @@
 namespace pyc::monster_war {
 
 enum class TileType;
-class TileInfo;
+struct TileInfo;
 class Scene;
 
 class LevelLoader final : Noncopyable {

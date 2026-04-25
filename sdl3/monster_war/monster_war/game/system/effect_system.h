@@ -6,15 +6,15 @@
 namespace pyc::monster_war {
 
 class EntityFactory;
-class EnemyDeadEffectEvent;
-class EffectEvent;
+struct EnemyDeadEffectEvent;
+struct EffectEvent;
 
 /**
  * @brief 特效系统，处理所有特效的创建
  */
 class EffectSystem {
 public:
-    EffectSystem(entt::registry& registry, entt::dispatcher& dispatcher, EntityFactory& entity_factory);
+    EffectSystem(entt::dispatcher& dispatcher, EntityFactory& entity_factory);
     ~EffectSystem();
 
 private:
@@ -23,7 +23,6 @@ private:
     void onEffectEvent(const EffectEvent& event);                    ///< @brief (通用)特效事件
 
 private:
-    entt::registry& registry_;
     entt::dispatcher& dispatcher_;
     EntityFactory& entity_factory_;
 };

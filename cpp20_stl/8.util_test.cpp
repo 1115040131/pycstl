@@ -56,7 +56,7 @@ TEST(UtilTest, AnyTest) {
     EXPECT_EQ(dump_any(47), "int: 47");
     EXPECT_EQ(dump_any("abc"s), "string: abc");
     EXPECT_EQ(dump_any(std::list{1, 2, 3}), "list<int>: 1 2 3 ");
-    EXPECT_EQ(dump_any(std::vector{1, 2, 3}), "Something else: St6vectorIiSaIiEE");
+    EXPECT_EQ(dump_any(std::vector{1, 2, 3}), fmt::format("Something else: {}", typeid(std::vector<int>).name()));
 
     // 若用错误的类型强制转换 any 对象，则会抛出一个 bad_any_cast 异常
     EXPECT_THROW(std::any_cast<int>(x), std::bad_any_cast);

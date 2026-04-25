@@ -9,8 +9,7 @@
 namespace network {
 
 Connection::Connection(asio::io_context& io_context)
-    : io_context_(io_context),
-      websocket_(std::make_unique<websocket::stream<beast::tcp_stream>>(asio::make_strand(io_context))) {
+    : websocket_(std::make_unique<websocket::stream<beast::tcp_stream>>(asio::make_strand(io_context))) {
     boost::uuids::uuid uuid = boost::uuids::random_generator()();
     uuid_ = boost::uuids::to_string(uuid);
 }

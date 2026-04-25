@@ -5,7 +5,7 @@
 
 namespace pyc::monster_war {
 
-class AnimationEvent;
+struct AnimationEvent;
 
 /**
  * @brief 动画事件系统，用于处理各种动画事件

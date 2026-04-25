@@ -7,10 +7,10 @@
 
 namespace pyc::monster_war {
 
-class EnemyArriveHomeEvent;
-class LevelClearDelayedEvent;
-class UpgradeUnitEvent;
-class RetreatEvent;
+struct EnemyArriveHomeEvent;
+struct LevelClearDelayedEvent;
+struct UpgradeUnitEvent;
+struct RetreatEvent;
 
 /**
  * @brief 游戏规则系统

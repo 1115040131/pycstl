@@ -5,8 +5,8 @@
 
 namespace pyc::monster_war {
 
-class AttackEvent;
-class HealEvent;
+struct AttackEvent;
+struct HealEvent;
 
 /**
  * @brief 战斗结算系统，用于处理战斗结算

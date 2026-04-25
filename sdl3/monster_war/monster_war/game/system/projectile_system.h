@@ -8,7 +8,7 @@
 namespace pyc::monster_war {
 
 class EntityFactory;
-class EmitProjectileEvent;
+struct EmitProjectileEvent;
 
 /**
  * @brief 投射物系统
