@@ -9,8 +9,8 @@
 
 namespace pyc::monster_war {
 
-EffectSystem::EffectSystem(entt::registry& registry, entt::dispatcher& dispatcher, EntityFactory& entity_factory)
-    : registry_(registry), dispatcher_(dispatcher), entity_factory_(entity_factory) {
+EffectSystem::EffectSystem(entt::dispatcher& dispatcher, EntityFactory& entity_factory)
+    : dispatcher_(dispatcher), entity_factory_(entity_factory) {
     dispatcher_.sink<EnemyDeadEffectEvent>().connect<&EffectSystem::onEnemyDeadEffectEvent>(this);
     dispatcher_.sink<EffectEvent>().connect<&EffectSystem::onEffectEvent>(this);
 }

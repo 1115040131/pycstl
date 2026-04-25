@@ -5,7 +5,7 @@
 
 namespace pyc::monster_war {
 
-class AnimationFinishedEvent;
+struct AnimationFinishedEvent;
 
 /**
  * @brief 动画状态系统，用于处理动画播放事件。

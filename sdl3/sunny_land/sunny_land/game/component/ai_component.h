@@ -28,6 +28,8 @@ class AIComponent final : public Component {
     DECLARE_COMPONENT(AudioComponent, audio_component_);
 
 public:
+    ~AIComponent();
+
     void setBehavior(std::unique_ptr<AIBehavior> behavior);  ///< @brief 设置当前 AI 行为策略
     bool takeDamage(int damage);                             ///< @brief 处理伤害逻辑，返回是否造成伤害
     bool isAlive() const;                                    ///< @brief 检查对象是否存活

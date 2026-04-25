@@ -130,12 +130,6 @@ public:
             return &table_->GetLeafNode(page_index_).cells[cell_index_];
         }
 
-        bool operator!=(const iterator& that) const noexcept {
-            return table_ != that.table_ || page_index_ != that.page_index_ || cell_index_ != that.cell_index_;
-        }
-
-        bool operator==(const const_iterator& that) const noexcept { return !(*this != that); }
-
     private:
         const Table* table_{nullptr};
         uint32_t page_index_{0};

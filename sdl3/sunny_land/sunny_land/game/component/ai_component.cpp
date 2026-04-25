@@ -13,6 +13,8 @@
 
 namespace pyc::sunny_land {
 
+AIComponent::~AIComponent() = default;
+
 void AIComponent::init() {
     if (!owner_) {
         spdlog::error("AIComponent 没有所属游戏对象!");

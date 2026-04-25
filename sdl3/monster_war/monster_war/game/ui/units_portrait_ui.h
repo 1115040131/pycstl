@@ -12,7 +12,7 @@ class Context;
 class UIPanel;
 class UIManager;
 
-class RemoveUIPortraitEvent;
+struct RemoveUIPortraitEvent;
 
 /**
  * @brief 单位肖像UI

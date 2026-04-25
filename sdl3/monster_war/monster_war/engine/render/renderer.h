@@ -15,7 +15,7 @@ namespace pyc::monster_war {
 class Camera;
 class ResourceManager;
 
-class Sprite;
+struct Sprite;
 class Image;
 
 /**

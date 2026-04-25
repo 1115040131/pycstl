@@ -17,6 +17,12 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v4
 
+    # TODO: adapt gcc 14
+    - name: Remove GCC 14
+      run: |
+        sudo apt-get remove -y gcc-14 g++-14 libstdc++-14-dev
+        sudo apt-get autoremove -y
+
     - name: 初始状态检查
       run: |
         echo "===== 磁盘初始状态 ====="

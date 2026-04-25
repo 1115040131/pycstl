@@ -7,10 +7,10 @@ namespace pyc::monster_war {
 
 class EntityFactory;
 
-class SkillReadyEvent;
-class SkillActiveEvent;
-class SkillDurationEndEvent;
-class RemovePlayerUnitEvent;
+struct SkillReadyEvent;
+struct SkillActiveEvent;
+struct SkillDurationEndEvent;
+struct RemovePlayerUnitEvent;
 
 /**
  * @brief 技能系统

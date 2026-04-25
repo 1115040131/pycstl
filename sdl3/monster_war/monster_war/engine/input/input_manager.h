@@ -12,7 +12,7 @@
 
 #include "common/noncopyable.h"
 
-class SDL_Renderer;
+struct SDL_Renderer;
 union SDL_Event;
 
 namespace pyc::monster_war {

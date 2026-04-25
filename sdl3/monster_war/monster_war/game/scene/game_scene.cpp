@@ -292,7 +292,7 @@ bool GameScene::initSystems() {
     animation_event_system_ = std::make_unique<AnimationEventSystem>(registry_, dispatcher);
     combat_resolve_system_ = std::make_unique<CombatResolveSystem>(registry_, dispatcher);
     projectile_system_ = std::make_unique<ProjectileSystem>(registry_, dispatcher, *entity_factory_);
-    effect_system_ = std::make_unique<EffectSystem>(registry_, dispatcher, *entity_factory_);
+    effect_system_ = std::make_unique<EffectSystem>(dispatcher, *entity_factory_);
     health_bar_system_ = std::make_unique<HealthBarSystem>();
     game_rule_system_ = std::make_unique<GameRuleSystem>(registry_, dispatcher);
     place_unit_system_ = std::make_unique<PlaceUnitSystem>(registry_, *entity_factory_, context_);

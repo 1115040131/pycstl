@@ -48,7 +48,6 @@ private:
     glm::vec2 viewport_size_;           ///< @brief 视口大小（屏幕大小）
     glm::vec2 position_;                ///< @brief 相机左上角的世界坐标
     std::optional<Rect> limit_bounds_;  ///< @brief 限制相机的移动范围，空值表示不限制
-    float smooth_speed_ = 5.0f;         ///< @brief 相机移动的平滑速度
 };
 
 }  // namespace pyc::monster_war

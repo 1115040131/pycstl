@@ -40,7 +40,6 @@ private:
     void HandleSend(const beast::error_code& error_code);
 
 private:
-    asio::io_context& io_context_;
     std::unique_ptr<websocket::stream<beast::tcp_stream>> websocket_;
     std::string uuid_{};
     beast::flat_buffer recv_buffer_{};

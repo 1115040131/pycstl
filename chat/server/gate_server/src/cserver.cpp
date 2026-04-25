@@ -6,8 +6,8 @@
 namespace pyc {
 namespace chat {
 
-CServer::CServer(asio::io_context& io_context, unsigned short port)
-    : io_context_(io_context), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {}
+CServer::CServer(unsigned short port)
+    : acceptor_(IOServicePool::GetInstance().GetIOService(), tcp::endpoint(tcp::v4(), port)) {}
 
 void CServer::Start() {
     auto& io_context = IOServicePool::GetInstance().GetIOService();

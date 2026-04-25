@@ -64,12 +64,12 @@ public:
     }
 
 private:
+    [[no_unique_address]] Allocator alloc_;
     std::size_t capacity_;
     T* data_;
     std::atomic<std::size_t> head_{0};
     std::atomic<std::size_t> tail_{0};
     std::atomic<std::size_t> tail_update_{0};  // 正在更新的尾部数据
-    [[no_unique_address]] Allocator alloc_;
 };
 
 }  // namespace concurrency

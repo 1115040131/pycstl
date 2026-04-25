@@ -25,8 +25,25 @@ common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
 build --per_file_copt=external/.*@-w
 build --host_per_file_copt=external/.*@-w
 
+# mysql-connector-cpp headers trigger -Wdelete-non-abstract-non-virtual-dtor
+# via template instantiation in STL (stl_construct.h), pragma guards don't work there.
+# Suppress for all source files that include MySQL headers.
+build --per_file_copt=.*mysql_(pool|mgr).*@-Wno-delete-non-abstract-non-virtual-dtor
+
+# boost.beast/chacha.hpp uses std::size_t without including <cstddef>; force-include it.
+build --per_file_copt=external/boost.beast.*@-include,cstddef
+
+# gtest-printers.h does an implicit char8_t->char32_t cast that triggers
+# -Wcharacter-conversion in LLVM 21+. Suppress it for test TUs only.
+# https://github.com/google/googletest/issues/4762
+build --per_file_copt=.*_test\.cpp@-Wno-character-conversion
+
 build --compilation_mode=dbg
 
 # Minimum c++ standard used.
 build --cxxopt='-std=c++23'
 build --host_cxxopt='-std=c++23'
+
+# build --distdir=/root/bazel-distdir
+
+# build --local_resources=cpu=24

@@ -229,10 +229,14 @@ public:
         if (count <= capacity_) [[likely]] {
             return;
         }
-#ifdef _MSC_VER
-        count = std::max(count, static_cast<std::size_t>(capacity_ * 1.5));
+#if defined(_LIBCPP_VERSION)
+        count = std::max(count, capacity_ * 2);  // libc++:    2x capacity
+#elif defined(__GLIBCXX__)
+        count = std::max(count, size_ * 2);  // libstdc++: 2x size
+#elif defined(_MSC_VER)
+        count = std::max(count, static_cast<std::size_t>(capacity_ * 1.5));  // MSVC:      1.5x capacity
 #else
-        count = std::max(count, size_ * 2);
+        count = std::max(count, capacity_ * 2);
 #endif
         auto old_data = data_;
         auto old_capacity = capacity_;

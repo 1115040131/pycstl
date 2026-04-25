@@ -64,9 +64,25 @@ public:
     virtual ~Expression() override = default;
 };
 
-#pragma region Statement
+#pragma region Identifier
 
-class Identifier;
+class Identifier : public Expression {
+public:
+    TYPE(Identifier)
+
+    Identifier(Token token) : token_(token) {}
+    virtual ~Identifier() override = default;
+
+    virtual std::string_view tokenLiteral() const override { return token_.literal; }
+    virtual std::string toString() const override { return std::string(token_.literal); }
+
+private:
+    Token token_;
+};
+
+#pragma endregion
+
+#pragma region Statement
 
 class LetStatement : public Statement {
 public:
@@ -153,20 +169,6 @@ private:
 #pragma endregion
 
 #pragma region Expression
-
-class Identifier : public Expression {
-public:
-    TYPE(Identifier)
-
-    Identifier(Token token) : token_(token) {}
-    virtual ~Identifier() override = default;
-
-    virtual std::string_view tokenLiteral() const override { return token_.literal; }
-    virtual std::string toString() const override { return std::string(token_.literal); }
-
-private:
-    Token token_;
-};
 
 class Boolean : public Expression {
 public:

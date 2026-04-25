@@ -26,7 +26,7 @@ TEST(LambdaTest, LambdaTest) {
 template <typename T, typename... Ts>
 auto concat(T t, Ts... ts) {
     if constexpr (sizeof...(ts) > 0) {
-        return [&](auto... args) { return t(concat(ts...)(args...)); };
+        return [=](auto... args) { return t(concat(ts...)(args...)); };
     } else {
         return t;
     }

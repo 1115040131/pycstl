@@ -7,7 +7,7 @@ cc_test(
         "*_test.cpp",
         "*.h",
     ]),
-    copts = STRICT_COPTS,
+    copts = STRICT_COPTS + ["-Wno-thread-safety"],
     deps = [
         "//concurrency",
         "@googletest//:gtest_main",

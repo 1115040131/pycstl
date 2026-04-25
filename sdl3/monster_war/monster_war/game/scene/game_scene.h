@@ -24,7 +24,7 @@ class SessionData;
 class UIConfig;
 class UnitsPortraitUI;
 
-class GameEndEvent;
+struct GameEndEvent;
 
 class GameScene final : public Scene {
 public:

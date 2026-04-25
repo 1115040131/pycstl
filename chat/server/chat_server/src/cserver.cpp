@@ -10,7 +10,7 @@ namespace pyc {
 namespace chat {
 
 CServer::CServer(boost::asio::io_context& io_context, const std::string& name, unsigned short port)
-    : io_context_(io_context), name_(name), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
+    : name_(name), acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
     // 初始化 grpc 客户端
     StatusGrpcClient::GetInstance();
     ChatGrpcClient::GetInstance();

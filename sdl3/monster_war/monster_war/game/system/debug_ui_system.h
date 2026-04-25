@@ -11,7 +11,7 @@ class TitleScene;
 class LevelClearScene;
 class EndScene;
 
-class UIPortraitHoverEnterEvent;
+struct UIPortraitHoverEnterEvent;
 
 /**
  * @brief 调试 UI 系统，负责显示调试 UI。

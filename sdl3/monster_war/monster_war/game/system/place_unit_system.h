@@ -12,8 +12,8 @@ namespace pyc::monster_war {
 class Context;
 class EntityFactory;
 
-class PrepUnitEvent;
-class RemovePlayerUnitEvent;
+struct PrepUnitEvent;
+struct RemovePlayerUnitEvent;
 
 /**
  * @brief 放置单位系统

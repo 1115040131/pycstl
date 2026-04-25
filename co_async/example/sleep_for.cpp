@@ -1,5 +1,6 @@
 #include <chrono>
 #include <coroutine>
+#include <exception>
 #include <queue>
 #include <thread>
 
