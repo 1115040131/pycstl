@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Launch",
-            "program": "${workspaceFolder}/bazel-bin/sdl3/ghost_escape/ghost_escape",
+            "program": "${workspaceFolder}/bazel-bin/hello_world/hello_world",
             "args": [],
             "cwd": "${workspaceFolder}",
             "sourceMap": {
