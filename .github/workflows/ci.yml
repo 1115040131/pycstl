@@ -9,7 +9,6 @@ on:
 jobs:
   build-and-test:
     name: ${{ github.event_name == 'push' && 'Build, Test and Coverage' || 'Build and Test' }}
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
