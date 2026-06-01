@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 # asio api
@@ -8,7 +8,7 @@ cc_library(
         "sync_api.cpp",
         "sync_api.h",
     ],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = [
         "//common",
         "@boost.asio",
@@ -21,7 +21,7 @@ cc_library(
         "async_api.cpp",
         "async_api.h",
     ],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = [
         "//common",
         "@boost.asio",
@@ -59,14 +59,14 @@ GRPC_BINARIES = [
 [cc_binary(
     name = binary,
     srcs = ["%s.cpp" % binary],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = ["//network"],
 ) for binary in NON_GRPC_BINARIES]
 
 [cc_binary(
     name = binary,
     srcs = ["%s.cpp" % binary],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = [
         "//network",
         "//network/proto:greeter_cc_grpc",

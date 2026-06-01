@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,7 +11,7 @@ cc_library(
     name = "status_server_lib",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     includes = ["include"],
     deps = [
         "//chat/common",
@@ -26,7 +26,7 @@ cc_library(
 cc_binary(
     name = "status_server",
     srcs = ["status_server.cpp"],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = [
         ":status_server_lib",
     ],

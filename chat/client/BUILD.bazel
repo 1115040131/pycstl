@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("//chat/client/widget:widgets.bzl", "WIDGETS")
 load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 
@@ -12,7 +12,7 @@ qt_cc_library(
     name = "client_lib",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     includes = ["include"],
     deps = [
         "//chat/client/widget:%s_ui" % widget
@@ -28,7 +28,7 @@ qt_cc_library(
 qt_cc_binary(
     name = "client",
     srcs = ["main.cpp"],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     data = glob([
         "config/*",
         "res/*",

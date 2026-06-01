@@ -7,7 +7,7 @@ cc_test(
         "*_test.cpp",
         "*.h",
     ]),
-    copts = COPTS,
+    copts = COPTS + ["-Wno-non-virtual-dtor"],
     deps = [
         "//common",
         "@glm",

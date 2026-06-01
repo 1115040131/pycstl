@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
 cc_test(
@@ -7,7 +7,7 @@ cc_test(
         "*_test.cpp",
         "*.h",
     ]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = [
         "//pycstl",
         "@googletest//:gtest_main",

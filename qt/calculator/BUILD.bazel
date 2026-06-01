@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_qt//:qt.bzl", "qt_cc_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +10,7 @@ exports_files(["LICENSE"])
 qt_cc_binary(
     name = "calculator",
     srcs = ["main.cpp"],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = [
         "@rules_qt//:qt_widgets",
     ],

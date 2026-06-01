@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -11,7 +11,7 @@ cc_library(
     name = "co_async",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/co_async/**/*.h"]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     includes = ["include"],
     deps = [
         "//common",

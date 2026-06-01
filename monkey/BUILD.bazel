@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -16,7 +16,7 @@ cc_library(
     hdrs = glob([
         "monkey/**/*.h",
     ]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     includes = ["."],
     deps = ["@fmt"],
 )
@@ -30,7 +30,7 @@ cc_library(
     hdrs = glob([
         "monkey/**/*.h",
     ]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     defines = ["SORTED_HASH"],
     includes = ["."],
     deps = ["@fmt"],
