@@ -1,49 +1,57 @@
-# Debug configuration
+#-------------------------------------------------------------------------------------
+# Build configurations (use with --config=<name>)
+#-------------------------------------------------------------------------------------
+
 build:debug --compilation_mode=dbg
-
-# Release configuration
 build:release --compilation_mode=opt
-
-# Fastbuild configuration (optional, as it is the default)
 build:fastbuild --compilation_mode=fastbuild
 
-common --enable_bzlmod
-common --incompatible_disallow_empty_glob=false
+#-------------------------------------------------------------------------------------
+# Common settings
+#-------------------------------------------------------------------------------------
+
+# Auto-load build:linux / build:macos / build:windows sections based on current OS
 common --enable_platform_specific_config
+
+# Bazel 9 externalizes cc_library/py_library rules; explicitly load from rules_cc/rules_python
 common --incompatible_autoload_externally=+@rules_cc,+@rules_python
-# Prevent re-fetching Python toolchain caused by __pycache__ written by the interpreter
+
+# Python interpreter writes __pycache__; skip external repo file checks to avoid spurious refetch
 common --noexperimental_check_external_repository_files
 
+# Use prebuilt protoc instead of compiling from source (saves minutes)
 common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
-# common --per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
-# common --host_per_file_copt=external/.*protobuf.*@--PROTOBUF_WAS_NOT_SUPPOSED_TO_BE_BUILT
-# common --per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
-# common --host_per_file_copt=external/.*grpc.*@--GRPC_WAS_NOT_SUPPOSED_TO_BE_BUILT
 
-# For 3rd party code: Disable warnings entirely.
-# They are not actionable and just create noise.
-build --per_file_copt=external/.*@-w
-build --host_per_file_copt=external/.*@-w
+#-------------------------------------------------------------------------------------
+# C++ compilation
+#-------------------------------------------------------------------------------------
 
-# mysql-connector-cpp headers trigger -Wdelete-non-abstract-non-virtual-dtor
-# via template instantiation in STL (stl_construct.h), pragma guards don't work there.
-# Suppress for all source files that include MySQL headers.
-build --per_file_copt=.*mysql_(pool|mgr).*@-Wno-delete-non-abstract-non-virtual-dtor
-
-# boost.beast/chacha.hpp uses std::size_t without including <cstddef>; force-include it.
-build --per_file_copt=external/boost.beast.*@-include,cstddef
-
-# gtest-printers.h does an implicit char8_t->char32_t cast that triggers
-# -Wcharacter-conversion in LLVM 21+. Suppress it for test TUs only.
-# https://github.com/google/googletest/issues/4762
-build --per_file_copt=.*_test\.cpp@-Wno-character-conversion
-
+# Default to debug mode
 build --compilation_mode=dbg
 
-# Minimum c++ standard used.
+# C++23 standard
 build --cxxopt='-std=c++23'
 build --host_cxxopt='-std=c++23'
 
+#-------------------------------------------------------------------------------------
+# Third-party code: suppress warnings
+#-------------------------------------------------------------------------------------
+
+# Disable all warnings for external source files
+build --per_file_copt=external/.*@-w
+build --host_per_file_copt=external/.*@-w
+
+# Use -isystem for external headers so the compiler ignores warnings from them
+build --features=external_include_paths
+
+# Disable Clang module layering check (grpc etc. have incomplete module boundaries)
+build --features=-layering_check
+
+#-------------------------------------------------------------------------------------
+# Environment
+#-------------------------------------------------------------------------------------
+
+# Prefer local distdir for offline/slow-network builds
 # build --distdir=/root/bazel-distdir
 
 # build --local_resources=cpu=24

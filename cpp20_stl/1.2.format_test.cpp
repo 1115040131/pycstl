@@ -76,8 +76,8 @@ struct std::formatter<Frac> {
         return ctx.begin();
     }
     template <typename FormatContext>
-    auto format(const Frac& f, FormatContext& ctx) {
-        return std::format_to(ctx.out(), "{0:d}/{1:d}", f.a, f.b);
+    auto format(const Frac& f, FormatContext& ctx) const {
+        return std::format_to(ctx.out(), "{0:d}/{1:d}", f.n, f.d);
     }
 };
 

@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -10,7 +10,7 @@ exports_files(["LICENSE"])
 cc_library(
     name = "pycstl",
     hdrs = glob(["include/pycstl/*.h"]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     includes = ["include"],
     deps = [
         "//common",

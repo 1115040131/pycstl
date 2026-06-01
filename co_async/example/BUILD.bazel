@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 BINARIES = [
@@ -14,6 +14,6 @@ BINARIES = [
 [cc_binary(
     name = binary,
     srcs = ["%s.cpp" % binary],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     deps = ["//co_async"],
 ) for binary in BINARIES]

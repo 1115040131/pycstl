@@ -54,7 +54,7 @@ struct InternalNode : public Node {
     static constexpr uint32_t kChildNum = sizeof(Child);
     static constexpr uint32_t kMaxChildren = 3;
 
-    std::array<Child, kMaxChildren> children;
+    std::array<Child, kMaxChildren + 1> children;
 
     InternalNode() : Node(Node::Type::kInternal) {}
     InternalNode(Node* node)

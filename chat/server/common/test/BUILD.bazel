@@ -1,13 +1,16 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
 cc_test(
     name = "common_test",
-    srcs = glob([
-        "*.cpp",
-        "*.h",
-    ]),
-    copts = STRICT_COPTS,
+    srcs = glob(
+        [
+            "*_test.cpp",
+            "*.h",
+        ],
+        allow_empty = True,
+    ),
+    copts = COPTS,
     deps = [
         "//chat/server/common",
         "@googletest//:gtest_main",

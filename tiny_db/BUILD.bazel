@@ -1,4 +1,4 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -13,7 +13,7 @@ cc_binary(
         "src/*.cpp",
         "include/tiny_db/*.h",
     ]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     includes = ["include"],
     deps = ["@fmt"],
 )

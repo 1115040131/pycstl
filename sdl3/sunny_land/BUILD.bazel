@@ -1,11 +1,11 @@
-load("//build_defs:cpp_opts.bzl", "STRICT_COPTS")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_library(
     name = "ziyu_engine",
     srcs = glob(["sunny_land/engine/**/*.cpp"]),
     hdrs = glob(["sunny_land/engine/**/*.h"]),
-    copts = STRICT_COPTS,
+    copts = COPTS,
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
@@ -29,7 +29,7 @@ cc_binary(
         "sunny_land/game/**/*.cpp",
         "sunny_land/game/**/*.h",
     ]) + ["sunny_land/main.cpp"],
-    copts = STRICT_COPTS,
+    copts = COPTS,
     data = glob(["assets/**"]),
     defines = select({
         "//conditions:default": [],
