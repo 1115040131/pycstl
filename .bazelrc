@@ -55,3 +55,10 @@ build --features=-layering_check
 # build --distdir=/root/bazel-distdir
 
 # build --local_resources=cpu=24
+
+#-------------------------------------------------------------------------------------
+# Coverage (LLVM toolchain)
+#-------------------------------------------------------------------------------------
+
+coverage --combined_report=lcov
+coverage --experimental_generate_llvm_lcov

@@ -10,6 +10,9 @@ build
 bazel-*
 MODULE.bazel.lock
 
+# coverage
+coverage_report
+
 # python
 __pycache__
 
