@@ -20,6 +20,11 @@ def run_bazel_build(target, check=False, args=[]):
     run_cmd(command, check)
 
 
+def run_bazel_run(target, check=False, args=[]):
+    command = f'bazel run {target} {" ".join(args)}'
+    run_cmd(command, check)
+
+
 def run_bazel_test(target, test_output=True, check=False, args=[]):
     command = f'bazel test {target} {" ".join(args)}'
     if test_output:
@@ -27,9 +32,48 @@ def run_bazel_test(target, test_output=True, check=False, args=[]):
     run_cmd(command, check)
 
 
-def run_bazel_run(target, check=False, args=[]):
-    command = f'bazel run {target} {" ".join(args)}'
+def run_bazel_coverage(target, check=False, args=[]):
+    command = f'bazel coverage {target} --nocache_test_results --instrumentation_filter="//..." {" ".join(args)}'
     run_cmd(command, check)
+
+
+def get_lcov_major_version():
+    try:
+        output = subprocess.check_output(['lcov', '--version'], stderr=subprocess.STDOUT).decode()
+        import re
+        match = re.search(r'(\d+)\.', output)
+        return int(match.group(1)) if match else 1
+    except Exception:
+        return 1
+
+
+def generate_coverage_report(args):
+    report_dat = root_path / 'bazel-out/_coverage/_coverage_report.dat'
+    output_dir = root_path / 'coverage_report'
+
+    if not report_dat.exists():
+        logger.error(f"Coverage data not found: {report_dat}")
+        logger.error("Run a coverage command first (e.g. all_coverage)")
+        return
+
+    if get_lcov_major_version() >= 2:
+        run_cmd(
+            f'genhtml {report_dat} --output-directory {output_dir} '
+            f"--exclude 'external/*' --exclude '/usr/*' "
+            f'--ignore-errors source,unmapped'
+        )
+    else:
+        import tempfile
+        with tempfile.NamedTemporaryFile(suffix='.dat', delete=True) as tmp:
+            filtered_dat = tmp.name
+            run_cmd(
+                f'lcov --remove {report_dat} '
+                f"'external/*' '/usr/*' "
+                f'--output-file {filtered_dat} --ignore-errors source'
+            )
+            run_cmd(f'genhtml {filtered_dat} --output-directory {output_dir} --ignore-errors source')
+
+    logger.info(f"Coverage report generated: {output_dir}/index.html")
 
 
 def run_valgrind(target, args=[]):
@@ -101,10 +145,16 @@ def main():
             logger.error("Please give target name") if len(args) < 1 else
             run_bazel_test(args[0], args=args[1:])
         ),
+        "coverage": lambda args: (
+            logger.error("Please give target name") if len(args) < 1 else
+            run_bazel_coverage(args[0], args=args[1:])
+        ),
 
         ######################### build for all #########################
         "all": lambda args: run_bazel_build('//...', args=args + ['-- -//hello_world']),
         "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args + ['-- -//hello_world']),
+        "all_coverage": lambda args: run_bazel_coverage('//...', args=args + ['-- -//hello_world']),
+        "coverage_report": lambda args: generate_coverage_report(args),
 
         ######################### build for chat #########################
         "chat": lambda args: run_bazel_build('//chat/...', args=args),
@@ -185,15 +235,18 @@ def main():
         ######################### build for common #########################
         "common": lambda args: run_bazel_build('//common', args),
         "common_test": lambda args: run_bazel_test('//common/test:common_all_test', args=args),
+        "common_coverage": lambda args: run_bazel_coverage('//common/test:common_all_test', args=args),
 
         ######################### build for co_async #########################
         "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...',
                                                  args=args),
         "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', args=args),
+        "co_async_coverage": lambda args: run_bazel_coverage('//co_async/test:co_async_all_test', args=args),
 
         ######################### build for concurrency #########################
         "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args=args),
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
+        "concurrency_coverage": lambda args: run_bazel_coverage('//concurrency/test:concurrency_all_test', args=args),
         "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test',
                                                           args=args),
         # '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
@@ -202,19 +255,23 @@ def main():
         ######################### build for cpp20_stl #########################
         "cpp20_stl": lambda args: run_bazel_build('//cpp20_stl:cpp20_stl_all_test', args=args),
         "cpp20_stl_test": lambda args: run_bazel_test('//cpp20_stl:cpp20_stl_all_test', args=args),
+        "cpp20_stl_coverage": lambda args: run_bazel_coverage('//cpp20_stl:cpp20_stl_all_test', args=args),
 
         ######################### build for design_pattern #########################
         "design_pattern": lambda args: run_bazel_build('//design_pattern:design_pattern_test', args=args),
         "design_pattern_test": lambda args: run_bazel_test('//design_pattern:design_pattern_test', args=args),
+        "design_pattern_coverage": lambda args: run_bazel_coverage('//design_pattern:design_pattern_test', args=args),
 
         ######################### build for logger #########################
         "logger": lambda args: run_bazel_build('//logger //logger/test/...', args=args),
         "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
+        "logger_coverage": lambda args: run_bazel_coverage('//logger/test:logger_all_test', args=args),
 
         ######################### build for monkey #########################
         "monkey": lambda args: run_bazel_build('//monkey //monkey/test:monkey_all_test', args=args),
         "monkey_run": lambda args: run_bazel_run('//monkey', args=args),
         "monkey_test": lambda args: run_bazel_test('//monkey/test:monkey_all_test', args=args),
+        "monkey_coverage": lambda args: run_bazel_coverage('//monkey/test:monkey_all_test', args=args),
         "monkey_bench": lambda args: run_bazel_run('//monkey/bench:monkey_bench --config=release', args=args),
 
         ######################### build for network #########################
@@ -224,10 +281,12 @@ def main():
             run_cmd(f'python3 {tool_path / "start_server.py"} {args[0]}')
         ),
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
+        "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
         ######################### build for pycstl #########################
         "pycstl": lambda args: run_bazel_build('//pycstl //pycstl/test/...', args=args),
         "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', args=args),
+        "pycstl_coverage": lambda args: run_bazel_coverage('//pycstl/test:pycstl_all_test', args=args),
 
         ######################### build for qt #########################
         "qt": lambda args: run_bazel_build('//qt/...', args=args),
@@ -238,6 +297,7 @@ def main():
         ######################### build for reaction #########################
         "reaction": lambda args: run_bazel_build('//reaction //reaction/test/...', args=args),
         "reaction_test": lambda args: run_bazel_test('//reaction/test:reaction_all_test', args=args),
+        "reaction_coverage": lambda args: run_bazel_coverage('//reaction/test:reaction_all_test', args=args),
         "reaction_valgrind": lambda args: run_valgrind('./bazel-bin/reaction/test/reaction_all_test', args=args),
 
         ######################### build for sdl2 #########################
