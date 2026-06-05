@@ -8,8 +8,12 @@ on:
 
 jobs:
   build-and-test:
-    name: ${{ github.event_name == 'push' && 'Build, Test and Coverage' || 'Build and Test' }}
-    runs-on: ubuntu-latest
+    name: ${{ github.event_name == 'push' && 'Build, Test and Coverage' || 'Build and Test' }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+      fail-fast: false
 
     steps:
     - name: 检出代码
@@ -30,27 +34,27 @@ jobs:
         du -sh /home/runner/work 2>/dev/null || true
         du -sh ~/.cache 2>/dev/null || true
 
-    - name: Free Disk Space (Ubuntu)
-      uses: jlumbroso/free-disk-space@main
-      with:
-        # 这里可以自定义需要删除哪些内容
-        # 默认会删除 Android, .NET, Haskell 等，一般能腾出 10GB+ 空间
-        tool-cache: true
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
+    # - name: Free Disk Space (Ubuntu)
+    #   uses: jlumbroso/free-disk-space@main
+    #   with:
+    #     # 这里可以自定义需要删除哪些内容
+    #     # 默认会删除 Android, .NET, Haskell 等，一般能腾出 10GB+ 空间
+    #     tool-cache: true
+    #     android: true
+    #     dotnet: true
+    #     haskell: true
+    #     large-packages: true
+    #     docker-images: true
+    #     swap-storage: true
 
-    - name: 清理后检查
-      run: |
-        echo "===== 磁盘清理后状态 ====="
-        df -h /
-        echo ""
-        echo "===== 主要目录占用 ====="
-        du -sh /home/runner/work 2>/dev/null || true
-        du -sh ~/.cache 2>/dev/null || true
+    # - name: 清理后检查
+    #   run: |
+    #     echo "===== 磁盘清理后状态 ====="
+    #     df -h /
+    #     echo ""
+    #     echo "===== 主要目录占用 ====="
+    #     du -sh /home/runner/work 2>/dev/null || true
+    #     du -sh ~/.cache 2>/dev/null || true
 
     - name: 替换 CI 专用文件
       run: python3 .ci/patch_ci_file.py
@@ -61,7 +65,7 @@ jobs:
         # Avoid downloading Bazel every time.
         bazelisk-cache: true
         # Store build cache per workflow.
-        disk-cache: ${{ github.workflow }}
+        disk-cache: ${{ github.workflow }}-${{ matrix.os }}-${{ github.event_name }}
         # Share repository cache between workflows.
         repository-cache: true
 

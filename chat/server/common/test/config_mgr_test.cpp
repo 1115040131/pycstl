@@ -62,7 +62,7 @@ TEST(ConfigMgrTest, GetConfig) {
         GET_CONFIG_INT(port, "Redis", "Port");
         GET_CONFIG(password, "Redis", "Password");
         EXPECT_EQ(host, "127.0.0.1");
-        EXPECT_EQ(port, 6380);
+        EXPECT_EQ(port, 6379);
         EXPECT_EQ(password, "123456");
     }
     EXPECT_EXIT(
@@ -147,7 +147,7 @@ TEST(ConfigMgrTest, GetSectionConfig) {
         GET_SECTION_CONFIG_INT(port, "Port");
         GET_SECTION_CONFIG(password, "Password");
         EXPECT_EQ(host, "127.0.0.1");
-        EXPECT_EQ(port, 6380);
+        EXPECT_EQ(port, 6379);
         EXPECT_EQ(password, "123456");
     }
     EXPECT_EXIT({ SET_SECTION("NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");

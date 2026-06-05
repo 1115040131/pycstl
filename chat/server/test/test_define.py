@@ -173,7 +173,7 @@ class Database:
         try:
             self.connection = mysql.connector.connect(
                 host=config['Mysql']['Host'],
-                port=6306,
+                port=3306,
                 user=config['Mysql']['User'],
                 password=config['Mysql']['Password'],
                 database=config['Mysql']['Schema'])

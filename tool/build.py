@@ -163,7 +163,7 @@ def main():
         "chat_redis_server": lambda args: run_docker(
             image='redis --requirepass "123456"',
             container_name='pyc-redis',
-            args=['-p 6380:6379']
+            args=['-p 6379:6379']
         ),
         "chat_mysql_server": lambda args: (
             # 创建目录并设置访问权限
@@ -178,7 +178,7 @@ def main():
                       f'-v {root_path}/chat/server/mysql/sql/init-script.sql:/docker-entrypoint-initdb.d/init-script.sql',
                       f'-v {data_direction}:/var/lib/mysql',
                       f'-v {log_direction}:/logs',
-                      '--restart=on-failure:3 -p 6306:3306 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456']
+                      '--restart=on-failure:3 -p 3306:3306 -p 33060:33060 -e MYSQL_ROOT_PASSWORD=123456']
             )
         ),
         "chat_gate_server": lambda args: run_bazel_run('//chat/server/gate_server', args=args),
@@ -188,7 +188,7 @@ def main():
         "chat_prepare": lambda args: (
             targets["chat_redis_server"](args=[]),
             targets["chat_mysql_server"](args=[]),
-            wait_until(lambda: mysql_service_is_ready('root', '123456', 'localhost', 6306),
+            wait_until(lambda: mysql_service_is_ready('root', '123456', 'localhost', 3306),
                        'mysql_service_is_ready', interval=1),
         ),
         "chat_clear": lambda args: (
