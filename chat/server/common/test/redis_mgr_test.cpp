@@ -10,7 +10,7 @@ namespace chat {
 TEST(CommonTest, RedisMgrTest) {
     auto& redis_mgr = RedisMgr::GetInstance();
 
-    // EXPECT_TRUE(redis_mgr.Connect("127.0.0.1", 6380));
+    // EXPECT_TRUE(redis_mgr.Connect("127.0.0.1", 6379));
     // EXPECT_TRUE(redis_mgr.Auth("123456"));
 
     EXPECT_TRUE(redis_mgr.Set("blogwebsite", "llfc.club"));
