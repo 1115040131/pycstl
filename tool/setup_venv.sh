@@ -2,6 +2,8 @@
 
 root_path=$1
 echo $root_path
+requirements_file=$2
+echo $requirements_file
 
 # 虚拟环境的路径
 venv_path="$root_path/.venv"
@@ -38,7 +40,7 @@ if [[ "$VIRTUAL_ENV" != "$venv_path" ]]; then
     source "$venv_path/bin/activate"
 
     # 安装依赖
-    pip install -r "$root_path/requirements.in"
+    pip install -r "$requirements_file"
 
     # 检查 pip install 命令是否成功
     if [ $? -eq 0 ]; then

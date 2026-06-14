@@ -1,3 +1,6 @@
+graphviz
+ipykernel
+matplotlib
 mysql-connector-python
 numpy
 redis

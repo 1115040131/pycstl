@@ -182,7 +182,7 @@ def venv(args: list[str]):
 
     # 必须使用 open() 打开文件，获得文件对象 f
     with open(script_path, 'r') as f:
-        subprocess.run(["bash", "-s", "--", root_path], stdin=f)
+        subprocess.run(["bash", "-s", "--", root_path, root_path / 'requirements_venv.in'], stdin=f)
 
 
 def main() -> None:
