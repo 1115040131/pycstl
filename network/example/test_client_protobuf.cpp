@@ -51,7 +51,10 @@ int main() {
                 char msg[kMaxLength];
                 std::size_t msg_length = asio::read(sock, asio::buffer(msg, msg_head.length));
                 MsgData recv_data;
-                recv_data.ParseFromArray(msg, msg_length);
+                if (!recv_data.ParseFromArray(msg, msg_length)) {
+                    fmt::println("Failed to parse reply");
+                    continue;
+                }
                 fmt::println("Reply: {}\nReply len = {}", recv_data, msg_length);
             }
         });

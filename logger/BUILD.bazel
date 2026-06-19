@@ -13,8 +13,6 @@ cc_library(
     hdrs = glob(["include/logger/**/*.h"]),
     copts = COPTS,
     includes = ["include"],
-    deps = [
-        "//common",
-        "@fmt",
-    ],
+    local_defines = ["FMT_USE_LOCAL_TIME=1"],
+    deps = ["@fmt"],
 )

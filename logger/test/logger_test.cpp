@@ -1,4 +1,10 @@
 #include <csignal>
+#include <latch>
+#include <regex>
+#include <set>
+#include <string>
+#include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -132,6 +138,73 @@ TEST(LoggerTest, VisualMultiLogger) {
     client.debug("connecting to {}:{}", "127.0.0.1", 8080);
     db.warn("connection pool at {:.0f}% capacity", 85.0);
     server.error("request timeout after {}ms", 5000);
+}
+
+// --- Thread id tests ---
+
+// Extracts the thread-id field (third bracketed group) from each log line.
+static std::set<std::string> ExtractThreadIds(const std::string& output) {
+    std::set<std::string> ids;
+    const std::regex pattern(R"(\[[^\]]*\]\[[^\]]*\]\[(\d+)\])");
+    for (std::sregex_iterator it(output.begin(), output.end(), pattern), end; it != end; ++it) {
+        ids.insert((*it)[1].str());
+    }
+    return ids;
+}
+
+TEST(LoggerTest, DistinctThreadIdsAcrossThreads) {
+    Logger logger("THREADS");
+    constexpr int kThreadCount = 8;
+
+    testing::internal::CaptureStderr();
+    {
+        std::latch start{kThreadCount};
+        std::vector<std::thread> threads;
+        threads.reserve(kThreadCount);
+        for (int i = 0; i < kThreadCount; ++i) {
+            threads.emplace_back([&logger, &start, i] {
+                start.arrive_and_wait();
+                logger.info("message from worker {}", i);
+            });
+        }
+        for (auto& t : threads) {
+            t.join();
+        }
+    }
+    std::string out = testing::internal::GetCapturedStderr();
+
+    std::set<std::string> ids = ExtractThreadIds(out);
+    EXPECT_EQ(ids.size(), static_cast<std::size_t>(kThreadCount));
+}
+
+TEST(LoggerTest, MainThreadIdIsStable) {
+    Logger logger("THREADS");
+
+    testing::internal::CaptureStderr();
+    logger.info("first");
+    logger.info("second");
+    std::string out = testing::internal::GetCapturedStderr();
+
+    std::set<std::string> ids = ExtractThreadIds(out);
+    EXPECT_EQ(ids.size(), 1u);
+}
+
+TEST(LoggerTest, VisualThreadIds) {
+    Logger logger("WORKER");
+    constexpr int kThreadCount = 4;
+
+    std::latch start{kThreadCount};
+    std::vector<std::thread> threads;
+    threads.reserve(kThreadCount);
+    for (int i = 0; i < kThreadCount; ++i) {
+        threads.emplace_back([&logger, &start, i] {
+            start.arrive_and_wait();
+            logger.info("hello from thread #{}", i);
+        });
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
 }
 
 }  // namespace pyc

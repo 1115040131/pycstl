@@ -21,18 +21,9 @@ cmake(
 
 cmake(
     name = "sdl2_image",
-    cache_entries = {"SDL2IMAGE_VENDORED": "ON"} | select({
-        "//conditions:default": {},
-        "//:debug": {"DAV1D_ASM": "OFF"},  # debug not use asm
-    }),
-    data = select({
-        "//conditions:default": ["@nasm"],
-        "//:debug": [],
-    }),
-    env = select({
-        "//conditions:default": {"ASM_NASM": "$(execpath @nasm)"},
-        "//:debug": {},
-    }),
+    build_data = ["@nasm"],
+    cache_entries = {"SDL2IMAGE_VENDORED": "ON"},
+    env = {"ASM_NASM": "$(execpath @nasm)"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl2_image//:all_srcs",
     out_shared_libs = select({

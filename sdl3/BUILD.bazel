@@ -14,14 +14,15 @@ cmake(
 
 cmake(
     name = "sdl3_image",
+    # build_data (not data) puts nasm in the exec config, which builds it in opt.
+    # The dbg (-O0) build segfaults assembling aom asm; opt is safe.
+    build_data = ["@nasm"],
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
-        "CMAKE_C_FLAGS": "-D_POSIX_C_SOURCE=200112L",
-    } | select({
-        "//conditions:default": {},
-        "//:debug": {"DAV1D_ASM": "OFF"},  # debug not use asm
-    }),
-    data = ["@nasm"],
+        # dav1d's mem.h uses posix_memalign; its meson build defines _GNU_SOURCE on
+        # linux, but the vendored CMake port omits it. Match meson here.
+        "CMAKE_C_FLAGS": "-D_GNU_SOURCE",
+    },
     env = {
         "ASM_NASM": "$(execpath @nasm)",
         "NASM_PATH": "$(execpath @nasm)/..",

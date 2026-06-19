@@ -9,9 +9,9 @@ COPTS = select({
         "-Wnon-virtual-dtor",
     ],
 }) + select({
-    "@bazel_tools//tools/cpp:gcc": [
+    "@rules_cc//cc/compiler:gcc": [
     ],
-    "@bazel_tools//tools/cpp:clang": [
+    "@rules_cc//cc/compiler:clang": [
         "-fexperimental-library",
     ],
     "//conditions:default": [],
