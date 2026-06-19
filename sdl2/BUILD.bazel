@@ -2,6 +2,7 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 cmake(
     name = "sdl2",
+    build_args = ["-j8"],
     cache_entries = {"SDL_STATIC_ENABLED_BY_DEFAULT": "OFF"},
     generate_args = ["-GNinja"],
     includes = ["SDL2"],
@@ -21,6 +22,7 @@ cmake(
 
 cmake(
     name = "sdl2_image",
+    build_args = ["-j8"],
     build_data = ["@nasm"],
     cache_entries = {"SDL2IMAGE_VENDORED": "ON"},
     env = {"ASM_NASM": "$(execpath @nasm)"},
@@ -42,6 +44,7 @@ cmake(
 
 cmake(
     name = "sdl2_mixer",
+    build_args = ["-j8"],
     cache_entries = {"SDL2MIXER_VENDORED": "ON"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl2_mixer//:all_srcs",
@@ -61,6 +64,7 @@ cmake(
 
 cmake(
     name = "sdl2_ttf",
+    build_args = ["-j8"],
     cache_entries = {"SDL2TTF_VENDORED": "ON"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl2_ttf//:all_srcs",

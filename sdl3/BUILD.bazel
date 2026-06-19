@@ -3,6 +3,7 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 # sdl3
 cmake(
     name = "sdl3",
+    build_args = ["-j8"],
     generate_args = ["-GNinja"],
     lib_source = "@sdl3//:all_srcs",
     out_shared_libs = [
@@ -14,6 +15,7 @@ cmake(
 
 cmake(
     name = "sdl3_image",
+    build_args = ["-j8"],
     # build_data (not data) puts nasm in the exec config, which builds it in opt.
     # The dbg (-O0) build segfaults assembling aom asm; opt is safe.
     build_data = ["@nasm"],
@@ -39,6 +41,7 @@ cmake(
 
 cmake(
     name = "sdl3_mixer",
+    build_args = ["-j8"],
     cache_entries = {
         "SDLMIXER_VENDORED": "ON",
         "SDLMIXER_MIDI_NATIVE": "OFF",
@@ -55,6 +58,7 @@ cmake(
 
 cmake(
     name = "sdl3_ttf",
+    build_args = ["-j8"],
     cache_entries = {"SDLTTF_VENDORED": "ON"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl3_ttf//:all_srcs",
