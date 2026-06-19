@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    name: ${{ github.event_name == 'push' && 'Build, Test and Coverage' || 'Build and Test' }} (${{ matrix.os }})
+    name: Build and Test (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -60,14 +60,14 @@ jobs:
       run: python3 .ci/patch_ci_file.py
 
     - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.18.0
+      uses: bazel-contrib/setup-bazel@0.19.0
       with:
         # Avoid downloading Bazel every time.
         bazelisk-cache: true
         # Store build cache per workflow.
-        disk-cache: ${{ github.workflow }}-${{ matrix.os }}-${{ github.event_name }}
+        disk-cache: ${{ github.workflow }}-${{ matrix.os }}-build
         # Share repository cache between workflows.
-        repository-cache: true
+        repository-cache: false
 
     - name: 验证 Bazel 版本
       run: bazel --version
@@ -75,20 +75,65 @@ jobs:
     - name: 启动 mysql 服务
       run: tool/build.py chat_prepare
 
-    # 以下步骤仅在 pull_request 时运行（不生成覆盖率）
     - name: 构建所有目标
-      if: github.event_name == 'pull_request'
       run: bazel build //...
 
     - name: 运行所有测试
-      if: github.event_name == 'pull_request'
       run: bazel test //... --test_output=errors
 
-    # 以下步骤仅在 push 时运行（生成覆盖率）
+    - name: 构建后状态（缓存保存前）
+      run: |
+        echo "===== 构建后磁盘状态 ====="
+        df -h /
+        echo ""
+        echo "===== Bazel 相关目录占用 ====="
+        du -sh ~/.cache/bazel* 2>/dev/null || echo "bazel 缓存不存在"
+        du -sh $(bazel info output_base 2>/dev/null) 2>/dev/null || echo "output_base 不存在"
+        echo ""
+        echo "===== 工作目录占用 ====="
+        du -sh /home/runner/work/pycstl 2>/dev/null || true
+
+  coverage:
+    name: Coverage (${{ matrix.os }})
+    if: github.event_name == 'push'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+      fail-fast: false
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    # TODO: adapt gcc 14
+    - name: Remove GCC 14
+      run: |
+        sudo apt-get remove -y gcc-14 g++-14 libstdc++-14-dev
+        sudo apt-get autoremove -y
+
+    - name: 替换 CI 专用文件
+      run: python3 .ci/patch_ci_file.py
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.19.0
+      with:
+        # Avoid downloading Bazel every time.
+        bazelisk-cache: true
+        # Store build cache per workflow.
+        disk-cache: ${{ github.workflow }}-${{ matrix.os }}-coverage
+        # Share repository cache between workflows.
+        repository-cache: false
+
+    - name: 验证 Bazel 版本
+      run: bazel --version
+
+    - name: 启动 mysql 服务
+      run: tool/build.py chat_prepare
+
     # --combined_report=lcov: 生成单个 lcov 格式报告
     # --test_output=errors: 只显示失败测试的日志，减少噪音
     - name: 生成测试覆盖率
-      if: github.event_name == 'push'
       run: |
         bazel coverage //... \
           --combined_report=lcov \
@@ -97,7 +142,7 @@ jobs:
           --instrumentation_filter="//..."
 
     - name: 上传覆盖率报告
-      if: github.event_name == 'push' && runner.os == 'Linux'
+      if: runner.os == 'Linux'
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
