@@ -3,6 +3,7 @@ import os
 import subprocess
 import shlex
 import shutil
+import sys
 import time
 
 from logger import Logger
@@ -16,6 +17,8 @@ def run_cmd(cmd, check=True):
         subprocess.run(shlex.split(cmd), check=check)
     except subprocess.CalledProcessError as e:
         logger.warn(f"Command '{e.cmd}' returned non-zero exit status {e.returncode}.")
+        if check:
+            sys.exit(e.returncode)
     except KeyboardInterrupt:
         logger.warn("Keyboard interrupt received, stopping.")
     except Exception as e:

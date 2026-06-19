@@ -42,6 +42,9 @@ if __name__ == '__main__':
     db.connection.commit()  # 确认更改
     print("Db Clear success")
 
+    connect_redis(config).flushdb()
+    print("Redis Clear success")
+
     try:
         # 利用剩余的 argv 运行 unittest
         unittest.main(argv=sys.argv[:1] + remaining_argv)

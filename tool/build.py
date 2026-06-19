@@ -2,10 +2,10 @@
 
 import subprocess
 import os
-import shlex
 import sys
 
 from pathlib import Path
+from typing import Any, Callable
 from cmd_utils import *
 from logger import Logger, LogStyle
 
@@ -15,29 +15,29 @@ logger = Logger(LogStyle.NO_DEBUG_INFO)
 os.environ['PATH'] = '/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 
 
-def run_bazel_build(target, check=False, args=[]):
+def run_bazel_build(target: str, check: bool = False, args: list[str] = []) -> None:
     command = f'bazel build {target} {" ".join(args)}'
     run_cmd(command, check)
 
 
-def run_bazel_run(target, check=False, args=[]):
+def run_bazel_run(target: str, check: bool = False, args: list[str] = []) -> None:
     command = f'bazel run {target} {" ".join(args)}'
     run_cmd(command, check)
 
 
-def run_bazel_test(target, test_output=True, check=False, args=[]):
+def run_bazel_test(target: str, test_output: bool = True, check: bool = False, args: list[str] = []) -> None:
     command = f'bazel test {target} {" ".join(args)}'
     if test_output:
         command += ' --test_output=all'
     run_cmd(command, check)
 
 
-def run_bazel_coverage(target, check=False, args=[]):
+def run_bazel_coverage(target: str, check: bool = False, args: list[str] = []) -> None:
     command = f'bazel coverage {target} --nocache_test_results --instrumentation_filter="//..." {" ".join(args)}'
     run_cmd(command, check)
 
 
-def get_lcov_major_version():
+def get_lcov_major_version() -> int:
     try:
         output = subprocess.check_output(['lcov', '--version'], stderr=subprocess.STDOUT).decode()
         import re
@@ -47,7 +47,7 @@ def get_lcov_major_version():
         return 1
 
 
-def generate_coverage_report(args):
+def generate_coverage_report(args: list[str]) -> None:
     report_dat = root_path / 'bazel-out/_coverage/_coverage_report.dat'
     output_dir = root_path / 'coverage_report'
 
@@ -76,7 +76,7 @@ def generate_coverage_report(args):
     logger.info(f"Coverage report generated: {output_dir}/index.html")
 
 
-def run_valgrind(target, args=[]):
+def run_valgrind(target: str, args: list[str] = []) -> None:
     command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args)}'
     run_cmd(command)
 
@@ -86,8 +86,8 @@ root_path = Path(__file__).resolve().parent.parent
 tool_path = root_path / 'tool'  # tool 目录
 
 
-def chat_run(targets, args):
-    run_bazel_build('//chat/...', args)
+def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) -> None:
+    run_bazel_build('//chat/...', args=args)
     targets["chat_prepare"](args=[])
     if len(args) > 0 and int(args[0]) > 1:
         client_num = int(args[0])
@@ -118,7 +118,7 @@ def chat_run(targets, args):
         })
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         logger.error("Usage: ./make [target] [...args]")
         return
@@ -131,7 +131,7 @@ def main():
     data_direction = f'{root_path}/chat/server/mysql/data'
     log_direction = f'{root_path}/chat/server/mysql/logs'
 
-    targets = {
+    targets: dict[str, Callable[[list[str]], Any]] = {
         ######################### basic command #########################
         "build": lambda args: (
             logger.error("Please give target name") if len(args) < 1 else
@@ -233,7 +233,7 @@ def main():
         "chat_run": lambda args: chat_run(targets, args),
 
         ######################### build for common #########################
-        "common": lambda args: run_bazel_build('//common', args),
+        "common": lambda args: run_bazel_build('//common', args=args),
         "common_test": lambda args: run_bazel_test('//common/test:common_all_test', args=args),
         "common_coverage": lambda args: run_bazel_coverage('//common/test:common_all_test', args=args),
 

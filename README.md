@@ -87,6 +87,28 @@ bazel run -- @pnpm --dir $PWD install --lockfile-only
 
 ## Optional
 
+### WSL
+
+配置与宿主机镜像网络模式
+
+```bash
+.wslconfig
+
+[wsl2]
+networkingMode=mirrored
+dnsTunneling=true
+firewall=true
+autoProxy=true
+```
+
+预分配端口避开后端组件常用端口
+
+```bash
+netsh interface ipv4 show excludedportrange protocol=tcp
+netsh int ipv4 set dynamicport tcp start=49152 num=16384
+netsh int ipv6 set dynamicport tcp start=49152 num=16384
+```
+
 ### mysql-connector-python
 
 安装 mysql-connector-python 包, 用以检测 mysql 容器是否已经 ready

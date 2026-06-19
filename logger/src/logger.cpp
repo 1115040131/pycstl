@@ -1,16 +1,45 @@
 #include "logger/logger.h"
 
 #include <chrono>
+#include <cstdint>
 #include <mutex>
 
 #include <fmt/chrono.h>
 #include <fmt/color.h>
 
-#include "common/thread_id.h"
+#if defined(__linux__)
+#include <sys/syscall.h>
+#include <unistd.h>
+#elif defined(__APPLE__)
+#include <pthread.h>
+#elif defined(_WIN32)
+#include <windows.h>
+#else
+#include <functional>
+#include <thread>
+#endif
 
 namespace pyc {
 
-consteval inline std::string_view ToString(LogLevel level) noexcept {
+// Returns the OS-level thread id, matching what top/htop/gdb report.
+static std::uint64_t OsThreadId() {
+    thread_local const std::uint64_t os_thread_id = [] -> std::uint64_t {
+#if defined(__linux__)
+        return static_cast<std::uint64_t>(::syscall(SYS_gettid));
+#elif defined(__APPLE__)
+        std::uint64_t tid = 0;
+        pthread_threadid_np(nullptr, &tid);
+        return tid;
+#elif defined(_WIN32)
+        return static_cast<std::uint64_t>(::GetCurrentThreadId());
+#else
+        return std::hash<std::thread::id>{}(std::this_thread::get_id());
+#endif
+    }();
+    return os_thread_id;
+}
+
+static consteval std::string_view ToString(LogLevel level) noexcept {
     switch (level) {
         case LogLevel::kDebug:
             return "DEBUG";
@@ -26,7 +55,7 @@ consteval inline std::string_view ToString(LogLevel level) noexcept {
     return "UNKNOWN";
 }
 
-consteval inline fmt::text_style ToTextStyle(LogLevel level) noexcept {
+static consteval fmt::text_style ToTextStyle(LogLevel level) noexcept {
     switch (level) {
         case LogLevel::kDebug:
             return fg(fmt::color::cyan);
@@ -42,7 +71,7 @@ consteval inline fmt::text_style ToTextStyle(LogLevel level) noexcept {
     return {};
 }
 
-constexpr std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
+static constexpr std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
     auto end_pos = full_name.find_last_of('(');
     if (end_pos != std::string::npos) {
         auto start_pos = full_name.rfind("::", end_pos);
@@ -70,9 +99,11 @@ void Logger::log(std::string_view msg, const std::source_location location) cons
     }
 
     std::lock_guard lock(g_log_mutex);
-    fmt::print(stderr, ToTextStyle(level), "[{}][{:5}][{:0>5}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
-               ToString(level), ShortThreadId(), std::chrono::system_clock::now(), location.file_name(),
-               location.line(), ExtractFunctionName(location.function_name()), msg);
+    fmt::print(
+        stderr, ToTextStyle(level), "[{}][{:5}][{:0>7}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
+        ToString(level), OsThreadId(),
+        std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::system_clock::now()}.get_local_time(),
+        location.file_name(), location.line(), ExtractFunctionName(location.function_name()), msg);
     if constexpr (level == LogLevel::kFatal) {
         std::fflush(stderr);
     }
