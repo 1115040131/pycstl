@@ -19,9 +19,11 @@ py_test(
     imports = ["."],
     deps = [
         requirement("mysql-connector-python"),
-        requirement("protobuf"),
         requirement("redis"),
         requirement("requests"),
+        # status_py_grpc (grpc's rule) does not forward the protobuf python runtime
+        # from its proto dep, so depend on status_py_proto directly to pull it in.
+        "//chat/server/proto:status_py_proto",
         "//chat/server/proto:status_py_grpc",
     ],
 )

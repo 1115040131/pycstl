@@ -27,11 +27,11 @@ TEST(ProtobufTest, BookTest) {
     book.set_price(200);
 
     std::string book_str;
-    book.SerializeToString(&book_str);
+    EXPECT_TRUE(book.SerializeToString(&book_str));
     fmt::println("Serialize str is {}", book_str);
 
     network::Book book2;
-    book2.ParseFromString(book_str);
+    EXPECT_TRUE(book2.ParseFromString(book_str));
     fmt::println("Book: {}", book2);
 
     EXPECT_EQ(book, book2);

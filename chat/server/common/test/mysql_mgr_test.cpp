@@ -1,10 +1,6 @@
 #include <fmt/chrono.h>
 #include <gtest/gtest.h>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #include <mysqlx/xdevapi.h>
-#pragma GCC diagnostic pop
 
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/mysql_mgr.h"
