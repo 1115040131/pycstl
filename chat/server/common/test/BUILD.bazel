@@ -2,17 +2,54 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
 cc_test(
-    name = "common_test",
-    srcs = glob(
-        [
-            "*_test.cpp",
-            "*.h",
-        ],
-        allow_empty = True,
-    ),
+    name = "config_mgr_test",
+    srcs = ["config_mgr_test.cpp"],
     copts = COPTS,
     deps = [
-        "//chat/server/common",
+        "//chat/server/common:config_mgr",
         "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "data_test",
+    srcs = ["data_test.cpp"],
+    copts = COPTS,
+    deps = [
+        "//chat/server/common:data",
+        "@fmt",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "mysql_mgr_test",
+    srcs = ["mysql_mgr_test.cpp"],
+    copts = COPTS,
+    deps = [
+        "//chat/server/common:mysql_mgr",
+        "@fmt",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "redis_mgr_test",
+    srcs = ["redis_mgr_test.cpp"],
+    copts = COPTS,
+    deps = [
+        "//chat/server/common:redis_mgr",
+        "@googletest//:gtest_main",
+    ],
+)
+
+# Aggregate suite — `bazel test //chat/server/common/test:common_test` runs all.
+test_suite(
+    name = "common_test",
+    tests = [
+        ":config_mgr_test",
+        ":data_test",
+        ":mysql_mgr_test",
+        ":redis_mgr_test",
     ],
 )

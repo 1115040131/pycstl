@@ -68,6 +68,10 @@ sudo usermod -aG docker your_username
 ### 清除 bazel 缓存
 
 ```bash
+# 查看 repository cache 路径
+bazel info repository_cache
+
+# 彻底清除
 bazel clean --expunge
 ```
 

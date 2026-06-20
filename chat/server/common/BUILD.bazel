@@ -7,25 +7,156 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+# Header-only utilities ---------------------------------------------------------
+
 cc_library(
-    name = "common",
-    srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/**/*.h"]),
+    name = "defer",
+    hdrs = ["include/chat/server/common/defer.h"],
+    copts = COPTS,
+    includes = ["include"],
+)
+
+cc_library(
+    name = "data",
+    hdrs = ["include/chat/server/common/data.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = ["@nlohmann_json//:json"],
+)
+
+cc_library(
+    name = "utils",
+    srcs = ["src/utils.cpp"],
+    hdrs = ["include/chat/server/common/utils.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = ["@boost.uuid"],
+)
+
+# Config ------------------------------------------------------------------------
+
+cc_library(
+    name = "config_mgr",
+    srcs = ["src/config_mgr.cpp"],
+    hdrs = ["include/chat/server/common/config_mgr.h"],
     copts = COPTS,
     data = glob(["config/*"]),
     includes = ["include"],
     deps = [
-        "//chat/common",
-        "//chat/server/proto:status_cc_grpc_proto",
+        "//common",
+        "//logger",
+        "@boost.property_tree",
+        "@fmt",
+    ],
+)
+
+# Networking --------------------------------------------------------------------
+
+cc_library(
+    name = "io_service_pool",
+    srcs = ["src/io_service_pool.cpp"],
+    hdrs = ["include/chat/server/common/io_service_pool.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = [
         "//common",
         "//logger",
         "@boost.asio",
-        "@boost.property_tree",
-        "@boost.uuid",
+    ],
+)
+
+# MySQL -------------------------------------------------------------------------
+
+cc_library(
+    name = "mysql_pool",
+    srcs = ["src/mysql_pool.cpp"],
+    hdrs = ["include/chat/server/common/mysql_pool.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = [
+        ":defer",
+        "//common",
+        "//logger",
         "@fmt",
-        "@grpc//:grpc++",
-        "@hiredis",
         "@mysql-connector-cpp",
-        "@nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "mysql_mgr",
+    srcs = ["src/mysql_mgr.cpp"],
+    hdrs = ["include/chat/server/common/mysql_mgr.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = [
+        ":config_mgr",
+        ":data",
+        ":defer",
+        ":mysql_pool",
+        "//common",
+    ],
+)
+
+# Redis -------------------------------------------------------------------------
+
+cc_library(
+    name = "redis_connection_pool",
+    srcs = ["src/redis_connection_pool.cpp"],
+    hdrs = ["include/chat/server/common/redis_connection_pool.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = [
+        "//logger",
+        "@hiredis",
+    ],
+)
+
+cc_library(
+    name = "redis_mgr",
+    srcs = ["src/redis_mgr.cpp"],
+    hdrs = ["include/chat/server/common/redis_mgr.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = [
+        ":config_mgr",
+        ":redis_connection_pool",
+        "//common",
+    ],
+)
+
+# gRPC client -------------------------------------------------------------------
+
+cc_library(
+    name = "status_grpc_client",
+    srcs = ["src/status_grpc_client.cpp"],
+    hdrs = ["include/chat/server/common/status_grpc_client.h"],
+    copts = COPTS,
+    includes = ["include"],
+    deps = [
+        ":config_mgr",
+        ":defer",
+        "//chat/common",
+        "//chat/server/proto:status_cc_grpc_proto",
+        "//common",
+        "@grpc//:grpc++",
+    ],
+)
+
+# Umbrella target — keeps existing consumers (servers) working unchanged. --------
+
+cc_library(
+    name = "common",
+    copts = COPTS,
+    deps = [
+        ":config_mgr",
+        ":data",
+        ":defer",
+        ":io_service_pool",
+        ":mysql_mgr",
+        ":mysql_pool",
+        ":redis_connection_pool",
+        ":redis_mgr",
+        ":status_grpc_client",
+        ":utils",
     ],
 )
