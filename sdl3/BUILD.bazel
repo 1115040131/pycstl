@@ -4,6 +4,11 @@ load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 cmake(
     name = "sdl3",
     build_args = ["-j8"],
+    # Point the hermetic pkg-config at the system pkgconfig dir so SDL's
+    # CheckPulseAudio (pkg_check_modules libpulse) finds the host libpulse-dev.
+    # Without this only dummy/disk audio backends are compiled in and
+    # SDL_Init(SDL_INIT_AUDIO) fails with "No available audio device".
+    env = {"PKG_CONFIG_PATH": "/usr/lib/x86_64-linux-gnu/pkgconfig"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl3//:all_srcs",
     out_shared_libs = [
@@ -16,18 +21,13 @@ cmake(
 cmake(
     name = "sdl3_image",
     build_args = ["-j8"],
-    # build_data (not data) puts nasm in the exec config, which builds it in opt.
-    # The dbg (-O0) build segfaults assembling aom asm; opt is safe.
-    build_data = ["@nasm"],
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
-        # dav1d's mem.h uses posix_memalign; its meson build defines _GNU_SOURCE on
-        # linux, but the vendored CMake port omits it. Match meson here.
-        "CMAKE_C_FLAGS": "-D_GNU_SOURCE",
-    },
-    env = {
-        "ASM_NASM": "$(execpath @nasm)",
-        "NASM_PATH": "$(execpath @nasm)/..",
+        # Only PNG is used (decoded by the built-in stb backend). Disable the
+        # heavy vendored codecs we don't need: AVIF pulls in aom/dav1d, plus TIF/WEBP.
+        "SDLIMAGE_AVIF": "OFF",
+        "SDLIMAGE_TIF": "OFF",
+        "SDLIMAGE_WEBP": "OFF",
     },
     generate_args = ["-GNinja"],
     lib_source = "@sdl3_image//:all_srcs",
