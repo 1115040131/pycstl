@@ -4,6 +4,11 @@ cmake(
     name = "sdl2",
     build_args = ["-j8"],
     cache_entries = {"SDL_STATIC_ENABLED_BY_DEFAULT": "OFF"},
+    # Point the hermetic pkg-config at the system pkgconfig dir so SDL's
+    # pulse detection finds the host libpulse-dev. Without this only
+    # dummy/disk audio backends are compiled in and SDL_Init(SDL_INIT_AUDIO)
+    # fails with "No available audio device".
+    env = {"PKG_CONFIG_PATH": "/usr/lib/x86_64-linux-gnu/pkgconfig"},
     generate_args = ["-GNinja"],
     includes = ["SDL2"],
     lib_source = "@sdl2//:all_srcs",
@@ -23,9 +28,14 @@ cmake(
 cmake(
     name = "sdl2_image",
     build_args = ["-j8"],
-    build_data = ["@nasm"],
-    cache_entries = {"SDL2IMAGE_VENDORED": "ON"},
-    env = {"ASM_NASM": "$(execpath @nasm)"},
+    cache_entries = {
+        "SDL2IMAGE_VENDORED": "ON",
+        # Only PNG is used (decoded by the built-in stb backend). Disable the
+        # heavy vendored codecs we don't need: AVIF pulls in aom/dav1d, plus TIF/WEBP.
+        "SDL2IMAGE_AVIF": "OFF",
+        "SDL2IMAGE_TIF": "OFF",
+        "SDL2IMAGE_WEBP": "OFF",
+    },
     generate_args = ["-GNinja"],
     lib_source = "@sdl2_image//:all_srcs",
     out_shared_libs = select({
