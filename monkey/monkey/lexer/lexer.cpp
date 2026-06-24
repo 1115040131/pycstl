@@ -1,7 +1,5 @@
 #include "monkey/lexer/lexer.h"
 
-#include <fmt/base.h>
-
 namespace pyc {
 namespace monkey {
 

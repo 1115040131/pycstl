@@ -114,9 +114,10 @@ std::optional<UserInfo> LogicSystem::GetBaseInfo(int uid) {
 
     // 将数据写入 redis 缓存中
     nlohmann::json j = user_info.value();
-    auto result = RedisMgr::GetInstance().Set(key, j.dump());
+    auto dump = j.dump();
+    auto result = RedisMgr::GetInstance().Set(key, dump);
     if (!result) {
-        PYC_LOG_ERROR("Redis set {} {} error", key, j.dump());
+        PYC_LOG_ERROR("Redis set {} {} error", key, dump);
     }
 
     return user_info.value();
@@ -145,9 +146,10 @@ std::optional<UserInfo> LogicSystem::GetBaseInfo(const std::string& name) {
 
     // 将数据写入 redis 缓存中
     nlohmann::json j = user_info.value();
-    auto result = RedisMgr::GetInstance().Set(key, j.dump());
+    auto dump = j.dump();
+    auto result = RedisMgr::GetInstance().Set(key, dump);
     if (!result) {
-        PYC_LOG_ERROR("Redis set {} {} error", key, j.dump());
+        PYC_LOG_ERROR("Redis set {} {} error", key, dump);
     }
 
     return user_info.value();

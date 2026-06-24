@@ -16,7 +16,7 @@ struct HazardPointer {
 };
 
 constexpr std::size_t kMaxHazardPointer = 100;
-HazardPointer hazard_pointers[kMaxHazardPointer];
+inline HazardPointer hazard_pointers[kMaxHazardPointer];
 
 class HpOwner : public Noncopyable {
 public:
@@ -162,7 +162,7 @@ private:
 
 private:
     std::atomic<Node*> head_{nullptr};
-    std::atomic<DataToReclaim*> nodes_to_reclaim;
+    std::atomic<DataToReclaim*> nodes_to_reclaim{nullptr};
     [[no_unique_address]] AllocatorWrapper<Node, Allocator> alloc_;
     [[no_unique_address]] AllocatorWrapper<DataToReclaim, Allocator> reclaim_alloc_;
 };

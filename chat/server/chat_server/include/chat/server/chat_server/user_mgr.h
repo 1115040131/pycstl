@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 #include "chat/server/chat_server/csession.h"
@@ -24,7 +24,7 @@ public:
     void RemoveUserSeesion(int uid);
 
 private:
-    std::mutex mtx_;
+    std::shared_mutex mtx_;
     std::unordered_map<int, std::shared_ptr<CSession>> sessions_;
 };
 

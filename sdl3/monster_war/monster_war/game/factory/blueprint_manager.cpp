@@ -112,7 +112,8 @@ bool BlueprintManager::loadEffectBlueprints(std::string_view effect_json_path) {
             entt::id_type id = entt::hashed_string(name.c_str());
             // 组合蓝图并插入容器
             effect_blueprints_.emplace(id, EffectBlueprint{
-                                               id, name,
+                                               id,
+                                               name,
                                                parseSprite(data_json),        // 解析 Sprite
                                                parseOneAnimation(data_json),  // 解析 Animation (单个动画)
                                            });
@@ -138,7 +139,9 @@ bool BlueprintManager::loadSkillBlueprints(std::string_view skill_json_path) {
 
             // 解析完毕，组合蓝图并插入容器
             skill_blueprints_.emplace(id, SkillBlueprint{
-                                              id, data_json.value("name", ""), data_json.value("description", ""),
+                                              id,
+                                              data_json.value("name", ""),
+                                              data_json.value("description", ""),
                                               data_json.value("passive", false),
                                               std::chrono::duration<float>(data_json.value("cooldown", 0.0f)),
                                               std::chrono::duration<float>(data_json.value("duration", 0.0f)),

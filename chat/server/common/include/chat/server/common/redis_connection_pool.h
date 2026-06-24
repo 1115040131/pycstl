@@ -2,10 +2,14 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <cstddef>
+#include <initializer_list>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <queue>
+#include <string_view>
+#include <vector>
 
 #include <hiredis/hiredis.h>
 
@@ -18,8 +22,19 @@ namespace chat {
 struct RedisReplyGuard {
     explicit RedisReplyGuard(redisReply* reply) : reply_(reply) {}
 
-    RedisReplyGuard(redisContext* context, std::string_view command)
-        : reply_(static_cast<redisReply*>(redisCommand(context, command.data()))) {}
+    /// @brief 参数化执行, 用 redisCommandArgv 避免命令拼接导致的分词/转义/注入问题
+    RedisReplyGuard(redisContext* context, std::initializer_list<std::string_view> args) {
+        std::vector<const char*> argv;
+        std::vector<std::size_t> argvlen;
+        argv.reserve(args.size());
+        argvlen.reserve(args.size());
+        for (const auto& arg : args) {
+            argv.push_back(arg.data());
+            argvlen.push_back(arg.size());
+        }
+        reply_ = static_cast<redisReply*>(
+            redisCommandArgv(context, static_cast<int>(argv.size()), argv.data(), argvlen.data()));
+    }
 
     ~RedisReplyGuard() { freeReplyObject(reply_); }
 

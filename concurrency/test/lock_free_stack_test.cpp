@@ -1,4 +1,3 @@
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "concurrency/lock_free_stack/hazard_pointer_stack.h"

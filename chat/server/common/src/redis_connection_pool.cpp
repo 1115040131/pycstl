@@ -17,7 +17,7 @@ RedisConnectionPool::RedisConnectionPool(size_t size, std::string_view host, int
 
         if (!password.empty()) {
             auto command = fmt::format("AUTH {}", password);
-            auto guard = RedisReplyGuard(context.get(), command);
+            auto guard = RedisReplyGuard(context.get(), {"AUTH", password});
 
             // 认证失败
             if (!RedisReplyOk(guard.reply_)) {

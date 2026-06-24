@@ -72,7 +72,7 @@ std::shared_ptr<Object> VM::run() {
             case OpcodeType::OpSub:
             case OpcodeType::OpMul:
             case OpcodeType::OpDiv: {
-                auto result = excuteBinaryOperation(op);
+                auto result = executeBinaryOperation(op);
                 if (IsError(result)) {
                     return result;
                 }
@@ -100,21 +100,21 @@ std::shared_ptr<Object> VM::run() {
             case OpcodeType::OpEqual:
             case OpcodeType::OpNotEqual:
             case OpcodeType::OpGreaterThan: {
-                auto result = excuteComparison(op);
+                auto result = executeComparison(op);
                 if (IsError(result)) {
                     return result;
                 }
             } break;
 
             case OpcodeType::OpBang: {
-                auto result = excuteBangOperation();
+                auto result = executeBangOperation();
                 if (IsError(result)) {
                     return result;
                 }
             } break;
 
             case OpcodeType::OpMinus: {
-                auto result = excuteMinusOperation();
+                auto result = executeMinusOperation();
                 if (IsError(result)) {
                     return result;
                 }
@@ -269,23 +269,23 @@ std::shared_ptr<Object> VM::run() {
     return nullptr;
 }
 
-std::shared_ptr<Object> VM::excuteBinaryOperation(OpcodeType op) {
+std::shared_ptr<Object> VM::executeBinaryOperation(OpcodeType op) {
     auto right = pop();
     auto left = pop();
 
     if (left->type() == Object::Type::INTEGER && right->type() == Object::Type::INTEGER) {
-        return excuteBinaryIntegerOperation(op, std::dynamic_pointer_cast<Integer>(left),
-                                            std::dynamic_pointer_cast<Integer>(right));
+        return executeBinaryIntegerOperation(op, std::dynamic_pointer_cast<Integer>(left),
+                                             std::dynamic_pointer_cast<Integer>(right));
     } else if (left->type() == Object::Type::STRING && right->type() == Object::Type::STRING) {
-        return excuteBinaryStringOperation(op, std::dynamic_pointer_cast<String>(left),
-                                           std::dynamic_pointer_cast<String>(right));
+        return executeBinaryStringOperation(op, std::dynamic_pointer_cast<String>(left),
+                                            std::dynamic_pointer_cast<String>(right));
     }
     return std::make_shared<Error>(fmt::format("unsupported types for binary operaction: {} {} {}",
                                                left->typeStr(), toString(op), right->typeStr()));
 }
 
-std::shared_ptr<Object> VM::excuteBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
-                                                         std::shared_ptr<Integer> right) {
+std::shared_ptr<Object> VM::executeBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
+                                                          std::shared_ptr<Integer> right) {
     switch (op) {
         case OpcodeType::OpAdd:
             return push(std::make_shared<Integer>(left->value() + right->value()));
@@ -304,8 +304,8 @@ std::shared_ptr<Object> VM::excuteBinaryIntegerOperation(OpcodeType op, std::sha
     return std::make_shared<Error>(fmt::format("unknown integer operator: {}", toString(op)));
 }
 
-std::shared_ptr<Object> VM::excuteBinaryStringOperation(OpcodeType op, std::shared_ptr<String> left,
-                                                        std::shared_ptr<String> right) {
+std::shared_ptr<Object> VM::executeBinaryStringOperation(OpcodeType op, std::shared_ptr<String> left,
+                                                         std::shared_ptr<String> right) {
     switch (op) {
         case OpcodeType::OpAdd:
             return push(std::make_shared<String>(left->value() + right->value()));
@@ -315,13 +315,13 @@ std::shared_ptr<Object> VM::excuteBinaryStringOperation(OpcodeType op, std::shar
     return std::make_shared<Error>(fmt::format("unknown string operator: {}", toString(op)));
 }
 
-std::shared_ptr<Object> VM::excuteComparison(OpcodeType op) {
+std::shared_ptr<Object> VM::executeComparison(OpcodeType op) {
     auto right = pop();
     auto left = pop();
 
     if (left->type() == Object::Type::INTEGER && right->type() == Object::Type::INTEGER) {
-        return excuteIntegerComparison(op, std::dynamic_pointer_cast<Integer>(left),
-                                       std::dynamic_pointer_cast<Integer>(right));
+        return executeIntegerComparison(op, std::dynamic_pointer_cast<Integer>(left),
+                                        std::dynamic_pointer_cast<Integer>(right));
     }
     switch (op) {
         case OpcodeType::OpEqual:
@@ -335,8 +335,8 @@ std::shared_ptr<Object> VM::excuteComparison(OpcodeType op) {
                                                left->typeStr(), toString(op), right->typeStr()));
 }
 
-std::shared_ptr<Object> VM::excuteIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,
-                                                    std::shared_ptr<Integer> right) {
+std::shared_ptr<Object> VM::executeIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,
+                                                     std::shared_ptr<Integer> right) {
     switch (op) {
         case OpcodeType::OpGreaterThan:
             return push(EvalBool(left->value() > right->value()));
@@ -350,7 +350,7 @@ std::shared_ptr<Object> VM::excuteIntegerComparison(OpcodeType op, std::shared_p
     return std::make_shared<Error>(fmt::format("unknown integer operator: {}", toString(op)));
 }
 
-std::shared_ptr<Object> VM::excuteBangOperation() {
+std::shared_ptr<Object> VM::executeBangOperation() {
     auto operand = pop();
     if (operand == kTrueObj) {
         return push(kFalseObj);
@@ -360,7 +360,7 @@ std::shared_ptr<Object> VM::excuteBangOperation() {
     return push(kFalseObj);
 }
 
-std::shared_ptr<Object> VM::excuteMinusOperation() {
+std::shared_ptr<Object> VM::executeMinusOperation() {
     auto operand = pop();
     if (operand->type() != Object::Type::INTEGER) {
         return std::make_shared<Error>(fmt::format("unsupported type for negation: {}", operand->typeStr()));

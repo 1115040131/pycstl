@@ -23,7 +23,7 @@ std::optional<std::string> RedisMgr::Get(std::string_view key) {
     }
 
     auto command = fmt::format("GET {}", key);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"GET", key});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -47,7 +47,7 @@ bool RedisMgr::Set(std::string_view key, std::string_view value) {
     }
 
     auto command = fmt::format("SET {} {}", key, value);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"SET", key, value});
 
     if (!RedisReplyOk(guard.reply_)) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -66,7 +66,7 @@ bool RedisMgr::LPush(std::string_view key, std::string_view value) {
     }
 
     auto command = fmt::format("LPush {} {}", key, value);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"LPush", key, value});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -89,7 +89,7 @@ std::optional<std::string> RedisMgr::LPop(std::string_view key) {
     }
 
     auto command = fmt::format("LPop {}", key);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"LPop", key});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -113,7 +113,7 @@ bool RedisMgr::RPush(std::string_view key, std::string_view value) {
     }
 
     auto command = fmt::format("RPush {} {}", key, value);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"RPush", key, value});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -136,7 +136,7 @@ std::optional<std::string> RedisMgr::RPop(std::string_view key) {
     }
 
     auto command = fmt::format("RPop {}", key);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"RPop", key});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -160,7 +160,7 @@ bool RedisMgr::HDel(std::string_view key, std::string_view field) {
     }
 
     auto command = fmt::format("HDEL {} {}", key, field);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"HDEL", key, field});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -184,7 +184,7 @@ bool RedisMgr::HSet(std::string_view key, std::string_view field, std::string_vi
     }
 
     auto command = fmt::format("HSET {} {} {}", key, field, value);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"HSET", key, field, value});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -207,7 +207,7 @@ std::optional<std::string> RedisMgr::HGet(std::string_view key, std::string_view
     }
 
     auto command = fmt::format("HGET {} {}", key, field);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"HGET", key, field});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -231,7 +231,8 @@ std::optional<int64_t> RedisMgr::HIncrBy(std::string_view key, std::string_view 
     }
 
     auto command = fmt::format("HINCRBY {} {} {}", key, field, increment);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto increment_str = std::to_string(increment);
+    auto guard = RedisReplyGuard(connection->Get(), {"HINCRBY", key, field, increment_str});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -255,7 +256,7 @@ bool RedisMgr::Del(std::string_view key) {
     }
 
     auto command = fmt::format("DEL {}", key);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"DEL", key});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
@@ -279,7 +280,7 @@ bool RedisMgr::Exists(std::string_view key) {
     }
 
     auto command = fmt::format("EXISTS {}", key);
-    auto guard = RedisReplyGuard(connection->Get(), command);
+    auto guard = RedisReplyGuard(connection->Get(), {"EXISTS", key});
 
     if (!guard.reply_) {
         _g_redis_mgr_logger.error("[{}] failed", command);
