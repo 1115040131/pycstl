@@ -1,7 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <functional>
 #include <list>
+#include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
 #include <vector>
@@ -79,7 +81,7 @@ public:
     void RemoveMapping(const Key& key) { GetBucket(key).RemoveMapping(key); }
 
     std::unordered_map<Key, Value> GetMap() const {
-        std::vector<std::unique_lock<std::shared_mutex>> locks;
+        std::vector<std::shared_lock<std::shared_mutex>> locks;
         for (std::size_t i = 0; i < buckets_.size(); i++) {
             locks.emplace_back(buckets_[i].mutex_);
         }
@@ -88,9 +90,6 @@ public:
         for (std::size_t i = 0; i < buckets_.size(); i++) {
             for (const auto& item : buckets_[i].data_) {
                 result.insert(item);
-            }
-            for (auto it = buckets_[i].data_.begin(); it != buckets_[i].data_.end(); ++it) {
-                result.insert(*it);
             }
         }
 

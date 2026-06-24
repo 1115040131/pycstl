@@ -169,6 +169,9 @@ repos:
 3. 安装 pre-commit hooks
 
 ```bash
+# 把配置里所有 hook 的 rev 自动改写成各仓库的最新 tag
+pre-commit autoupdate
+
 # 在项目根目录下执行
 pre-commit install
 
@@ -187,6 +190,9 @@ pre-commit run
 
 # 运行特定的hook
 pre-commit run clang-format --all-files
+
+# stages: [manual] 的 hook 必须带 --hook-stage manual 才会跑
+pre-commit run clang-tidy --hook-stage manual --all-files
 ```
 
 ### QT

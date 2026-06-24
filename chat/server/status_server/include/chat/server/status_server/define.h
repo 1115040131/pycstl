@@ -1,3 +1,5 @@
+#pragma once
+
 #include "chat/common/error_code.h"
 #include "logger/logger.h"
 

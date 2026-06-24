@@ -93,7 +93,7 @@ public:
 
     void Push(const T& data) { Emplace(data); }
 
-    void Push(T&& data) { Emplace(data); }
+    void Push(T&& data) { Emplace(std::move(data)); }
 
     std::unique_ptr<T> Pop() {
         CountedNodePtr old_head = head_.load(MemoryOrder::memory_order_relaxed);

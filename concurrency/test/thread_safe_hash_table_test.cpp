@@ -1,6 +1,3 @@
-#include <chrono>
-
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 #include "concurrency/test/utils.h"

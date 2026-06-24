@@ -4,7 +4,7 @@ namespace pyc {
 namespace chat {
 
 std::shared_ptr<CSession> UserMgr::GetSession(int uid) {
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::shared_lock<std::shared_mutex> lock(mtx_);
     auto iter = sessions_.find(uid);
     if (iter == sessions_.end()) {
         return nullptr;
@@ -13,12 +13,12 @@ std::shared_ptr<CSession> UserMgr::GetSession(int uid) {
 }
 
 void UserMgr::SetUserSession(int uid, const std::shared_ptr<CSession>& session) {
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::shared_mutex> lock(mtx_);
     sessions_[uid] = session;
 }
 
 void UserMgr::RemoveUserSeesion(int uid) {
-    std::lock_guard<std::mutex> lock(mtx_);
+    std::unique_lock<std::shared_mutex> lock(mtx_);
     sessions_.erase(uid);
 }
 

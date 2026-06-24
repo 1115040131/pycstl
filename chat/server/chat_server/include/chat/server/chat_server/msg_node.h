@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <memory>
 
 #include "chat/common/method.h"
 #include "common/noncopyable.h"
@@ -21,32 +22,27 @@ inline constexpr size_t kMaxLength = 2ul * 1024;        // 消息体最大长度
 
 class MsgNode : public Noncopyable {
 public:
-    MsgNode(uint16_t max_len) : total_len_(max_len) {
-        data_ = new char[total_len_ + 1];
-        data_[total_len_] = '\0';
-    }
-
-    ~MsgNode() { delete[] data_; }
+    MsgNode(uint16_t max_len) : total_len_(max_len), data_(new char[total_len_ + 1]) { data_[total_len_] = '\0'; }
 
     size_t Remain() const { return total_len_ - cur_len_; }
 
     size_t Size() const { return total_len_; }
 
-    char* Data() { return data_; }
+    char* Data() { return data_.get(); }
 
-    const char* Data() const { return data_; }
+    const char* Data() const { return data_.get(); }
 
     size_t Copy(const char* src, size_t len);
 
     void Clear() {
-        ::memset(data_, 0, total_len_);
+        ::memset(data_.get(), 0, total_len_);
         cur_len_ = 0;
     }
 
 protected:
-    size_t cur_len_ = 0;    // 已经接收/发送的数据长度
-    size_t total_len_ = 0;  // 数据总长度
-    char* data_ = nullptr;  // 数据缓冲区
+    size_t cur_len_ = 0;            // 已经接收/发送的数据长度
+    size_t total_len_ = 0;          // 数据总长度
+    std::unique_ptr<char[]> data_;  // 数据缓冲区
 };
 
 class RecvNode : public MsgNode {

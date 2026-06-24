@@ -38,22 +38,22 @@ public:
     std::shared_ptr<Object> run();
 
 private:
-    std::shared_ptr<Object> excuteBinaryOperation(OpcodeType op);
+    std::shared_ptr<Object> executeBinaryOperation(OpcodeType op);
 
-    std::shared_ptr<Object> excuteBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
-                                                         std::shared_ptr<Integer> right);
+    std::shared_ptr<Object> executeBinaryIntegerOperation(OpcodeType op, std::shared_ptr<Integer> left,
+                                                          std::shared_ptr<Integer> right);
 
-    std::shared_ptr<Object> excuteBinaryStringOperation(OpcodeType op, std::shared_ptr<String> left,
-                                                        std::shared_ptr<String> right);
+    std::shared_ptr<Object> executeBinaryStringOperation(OpcodeType op, std::shared_ptr<String> left,
+                                                         std::shared_ptr<String> right);
 
-    std::shared_ptr<Object> excuteComparison(OpcodeType op);
+    std::shared_ptr<Object> executeComparison(OpcodeType op);
 
-    std::shared_ptr<Object> excuteIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,
-                                                    std::shared_ptr<Integer> right);
+    std::shared_ptr<Object> executeIntegerComparison(OpcodeType op, std::shared_ptr<Integer> left,
+                                                     std::shared_ptr<Integer> right);
 
-    std::shared_ptr<Object> excuteBangOperation();
+    std::shared_ptr<Object> executeBangOperation();
 
-    std::shared_ptr<Object> excuteMinusOperation();
+    std::shared_ptr<Object> executeMinusOperation();
 
     std::shared_ptr<Object> executeIndexExpression();
 
