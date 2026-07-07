@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "chat/server/proto/chat.grpc.pb.h"
+#include "chat/server/proto/chat.pb.h"
 #include "common/singleton.h"
 
 namespace pyc {

@@ -5,6 +5,7 @@
 #include "chat/common/error_code.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
+#include "chat/server/proto/status.grpc.pb.h"
 #include "common/connection_pool.h"
 
 namespace pyc {

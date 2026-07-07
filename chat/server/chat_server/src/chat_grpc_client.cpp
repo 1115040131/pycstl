@@ -6,6 +6,7 @@
 #include "chat/server/chat_server/define.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/defer.h"
+#include "chat/server/proto/chat.grpc.pb.h"
 #include "common/connection_pool.h"
 
 namespace pyc {
