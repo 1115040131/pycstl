@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chat/server/proto/status.grpc.pb.h"
+#include "chat/server/proto/status.pb.h"
 #include "common/singleton.h"
 
 namespace pyc {
