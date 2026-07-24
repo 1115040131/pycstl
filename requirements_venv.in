@@ -1,5 +1,5 @@
 graphviz
-ipykernel
+ipykernel<7
 matplotlib
 mysql-connector-python
 numpy
