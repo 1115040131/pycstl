@@ -175,14 +175,18 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v7
 
-    - name: 安装 clang-format
-      run: sudo apt-get install -y clang-format
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
 
+    - name: 缓存 pre-commit 环境
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+    # 工具与版本全部由 .pre-commit-config.yaml 声明,与本地 pre-commit 完全一致
     - name: 检查代码格式
       run: |
-        find . \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
-          -not -path './bazel-*' \
-          -not -path './third_party/*' \
-          -not -path './.venv/*' \
-          -print0 \
-          | xargs -0 clang-format --dry-run --Werror
+        pipx install pre-commit
+        pre-commit run --all-files --show-diff-on-failure

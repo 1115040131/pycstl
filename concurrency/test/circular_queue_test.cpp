@@ -21,7 +21,8 @@ void PushWhilePop() {
     // 注意实际线程数是 2 * kThreadNum(生产者 + 消费者)，即 kThreadNum == 核数时已是 2 倍超订，
     // 实测这一档仍然稳定，所以阈值取 kThreadNum 而非 2 * kThreadNum。
     if (!HasEnoughCoresFor(kThreadNum)) {
-        GTEST_SKIP() << "kThreadNum=" << kThreadNum << " 超过本机 " << std::thread::hardware_concurrency() << " 核";
+        GTEST_SKIP() << "kThreadNum=" << kThreadNum << " 超过本机 " << std::thread::hardware_concurrency()
+                     << " 核";
     }
 
     QueueType<MyClass, 1000, std::allocator<MyClass>> queue;
