@@ -6,6 +6,10 @@ build:debug --compilation_mode=dbg
 build:release --compilation_mode=opt
 build:fastbuild --compilation_mode=fastbuild
 
+# CI 专用配置
+build:ci --test_env=CO_ASYNC_TIMER_TOLERANCE_MS=20
+build:ci --define=sdl3_console=true
+
 #-------------------------------------------------------------------------------------
 # Common settings
 #-------------------------------------------------------------------------------------

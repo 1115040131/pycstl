@@ -1,9 +1,19 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
+# CI 无显示器,需要 console 构建(--define=sdl3_console=true,见 .bazelrc 的 build:ci)。
+config_setting(
+    name = "console_build",
+    define_values = {"sdl3_console": "true"},
+)
+
 # sdl3
 cmake(
     name = "sdl3",
     build_args = ["-j8"],
+    cache_entries = select({
+        ":console_build": {"SDL_UNIX_CONSOLE_BUILD": "ON"},
+        "//conditions:default": {},
+    }),
     # Point the hermetic pkg-config at the system pkgconfig dir so SDL's
     # CheckPulseAudio (pkg_check_modules libpulse) finds the host libpulse-dev.
     # Without this only dummy/disk audio backends are compiled in and
