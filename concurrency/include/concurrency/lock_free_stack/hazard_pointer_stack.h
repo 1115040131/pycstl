@@ -82,7 +82,7 @@ public:
         // 1. 从风险列表中获取一个节点给当前线程
         std::atomic<void*>& hp = GetHazardPointerForCurrentThread();
         Node* old_head = head_.load();
-        while (old_head) {
+        do {
             Node* temp;
             do {
                 temp = old_head;
@@ -90,24 +90,27 @@ public:
                 old_head = head_.load();
             }  // 2. 如果 old_head 和 temp 不等说明 head 被其他线程更新了，需重试
             while (old_head != temp);
+            // 3. 将当前 head 更新为 old_head->next, 如不满足则重试。
+            //    old_head 判空必须在这里: 上面的内层循环可能把它刷成 nullptr(其他线程刚
+            //    弹走最后一个节点)，此时 old_head->next 会解引用空指针
+        } while (old_head && !head_.compare_exchange_weak(old_head, old_head->next));
 
-            // 3. 将当前 head 更新为 old_head->next, 如不满足则重试
-            if (head_.compare_exchange_weak(old_head, old_head->next)) {
-                // 4一旦更新了 head_ 指针，便将风险指针清零
-                hp.store(nullptr);
-                auto result = std::move(old_head->data);
-                // 5 删除旧有的头节点之前，先核查它是否正被风险指针所指涉
-                if (OutstandingHazardPointersFor(old_head)) {
-                    // 6 延迟删除
-                    ReclaimLater(old_head);
-                } else {
-                    // 7 删除头部节点
-                    alloc_.Deallocate(old_head);
-                }
-                // 8 删除没有风险的节点
-                DeleteNodesWithNoHazards();
-                return result;
+        // 4 一旦更新了 head_ 指针，便将风险指针清零(栈空退出时同样要清，否则会残留悬垂标记)
+        hp.store(nullptr);
+
+        if (old_head) {
+            std::optional<T> result = std::move(old_head->data);
+            // 5 删除旧有的头节点之前，先核查它是否正被风险指针所指涉
+            if (OutstandingHazardPointersFor(old_head)) {
+                // 6 延迟删除
+                ReclaimLater(old_head);
+            } else {
+                // 7 删除头部节点
+                alloc_.Deallocate(old_head);
             }
+            // 8 删除没有风险的节点
+            DeleteNodesWithNoHazards();
+            return result;
         }
         return {};
     }

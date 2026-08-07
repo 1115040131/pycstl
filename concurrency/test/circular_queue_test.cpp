@@ -14,6 +14,16 @@ template <template <typename, std::size_t, typename> class QueueType, std::size_
 void PushWhilePop() {
     static_assert(kDataNum >= kThreadNum && (kDataNum % kThreadNum == 0), "kDataNum 要能被 kThreadNum 均分");
 
+    // 这些队列的生产者要按预约顺序发布槽位(等待 tail_update_ 推进到自己)，等待方式是忙等。
+    // 线程数超过核数时，被等待的那个生产者一旦被抢占下核，其余线程就会持续空转烧完整个时间片，
+    // 反过来拖慢它重新被调度，形成 convoy —— 实测 16 生产者 + 16 消费者在 8 核机器上会从
+    // 13ms 劣化到 69s。此时测的是调度器行为而非队列本身，直接跳过。
+    // 注意实际线程数是 2 * kThreadNum(生产者 + 消费者)，即 kThreadNum == 核数时已是 2 倍超订，
+    // 实测这一档仍然稳定，所以阈值取 kThreadNum 而非 2 * kThreadNum。
+    if (!HasEnoughCoresFor(kThreadNum)) {
+        GTEST_SKIP() << "kThreadNum=" << kThreadNum << " 超过本机 " << std::thread::hardware_concurrency() << " 核";
+    }
+
     QueueType<MyClass, 1000, std::allocator<MyClass>> queue;
     bool check[kDataNum] = {false};
 
