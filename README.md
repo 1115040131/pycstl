@@ -26,10 +26,14 @@ chmod +x bazelisk-linux-amd64
 sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
 ```
 
-### 编译器
+### 必备库
 
 ```bash
-sudo apt update && sudo apt install gcc
+sudo apt update
+sudo apt install gcc g++ # 编译器
+sudo apt install libx11-dev  # 窗口
+sudo apt install libpulse-dev libxext-dev # 音频驱动
+sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xkb1 # qt
 ```
 
 ### docker
@@ -195,13 +199,6 @@ pre-commit run clang-format --all-files
 pre-commit run clang-tidy --hook-stage manual --all-files
 ```
 
-### QT
-
-```bash
-# for 6.5+
-sudo apt install libxcb-cursor0
-```
-
 ### QT Designer
 
 ```bash
@@ -218,9 +215,6 @@ export QT_QPA_PLATFORM=xcb
 ### SDL
 
 ```bash
-# 安装驱动
-sudo apt install libpulse-dev libxext-dev
-
 # 强制使用无声驱动（dummy驱动）
 export SDL_AUDIODRIVER=dummy
 export AUDIODEV=null

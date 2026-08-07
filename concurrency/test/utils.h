@@ -65,6 +65,13 @@ private:
     int* data_;
 };
 
+/// @brief 本机核数是否够跑 thread_num 个并发线程。hardware_concurrency 返回 0 表示无法探测，
+///        此时不做限制
+inline bool HasEnoughCoresFor(std::size_t thread_num) {
+    const unsigned kCores = std::thread::hardware_concurrency();
+    return kCores == 0 || thread_num <= kCores;
+}
+
 /// @brief 对于 actions 中的每个函数, 启动 kThreadNum 个线程执行
 inline void MultiThreadExecute(const std::size_t kThreadNum,
                                const std::vector<std::function<void(std::size_t)>>& actions) {
