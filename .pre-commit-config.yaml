@@ -1,7 +1,8 @@
 # .pre-commit-config.yaml
 repos:
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v22.1.5  # 使用最新版本
+    # 本地与 CI 共用此版本(CI 直接跑 pre-commit),升级走 pre-commit autoupdate
+    rev: v22.1.8
     hooks:
       - id: clang-format
         types: [c++]

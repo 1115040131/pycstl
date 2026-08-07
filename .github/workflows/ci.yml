@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ main ]
 
+# 同一分支/PR 有新推送时取消进行中的旧 run,避免堆积浪费额度。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# 最小权限:仅需读取代码。
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     name: Build and Test (${{ matrix.os }})
@@ -17,7 +26,7 @@ jobs:
 
     steps:
     - name: 检出代码
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     # TODO: adapt gcc 14
     - name: Remove GCC 14
@@ -56,9 +65,6 @@ jobs:
     #     du -sh /home/runner/work 2>/dev/null || true
     #     du -sh ~/.cache 2>/dev/null || true
 
-    - name: 替换 CI 专用文件
-      run: python3 .ci/patch_ci_file.py
-
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.19.0
       with:
@@ -76,10 +82,10 @@ jobs:
       run: tool/build.py chat_prepare
 
     - name: 构建所有目标
-      run: bazel build //...
+      run: bazel build //... --config=ci
 
     - name: 运行所有测试
-      run: bazel test //... --test_output=errors
+      run: bazel test //... --config=ci --test_output=errors
 
     - name: 构建后状态（缓存保存前）
       run: |
@@ -104,16 +110,13 @@ jobs:
 
     steps:
     - name: 检出代码
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     # TODO: adapt gcc 14
     - name: Remove GCC 14
       run: |
         sudo apt-get remove -y gcc-14 g++-14 libstdc++-14-dev
         sudo apt-get autoremove -y
-
-    - name: 替换 CI 专用文件
-      run: python3 .ci/patch_ci_file.py
 
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.19.0
@@ -136,6 +139,7 @@ jobs:
     - name: 生成测试覆盖率
       run: |
         bazel coverage //... \
+          --config=ci \
           --combined_report=lcov \
           --test_output=errors \
           --nocache_test_results \
@@ -143,7 +147,7 @@ jobs:
 
     - name: 上传覆盖率报告
       if: runner.os == 'Linux'
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v7
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./bazel-out/_coverage/_coverage_report.dat
@@ -169,12 +173,20 @@ jobs:
 
     steps:
     - name: 检出代码
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
-    - name: 安装 clang-format
-      run: sudo apt-get install -y clang-format
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
 
+    - name: 缓存 pre-commit 环境
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+    # 工具与版本全部由 .pre-commit-config.yaml 声明,与本地 pre-commit 完全一致
     - name: 检查代码格式
       run: |
-        find src test -name '*.cc' -o -name '*.h' | xargs clang-format -i -style=Google
-        git diff --exit-code
+        pipx install pre-commit
+        pre-commit run --all-files --show-diff-on-failure
