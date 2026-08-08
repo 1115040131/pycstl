@@ -1,5 +1,7 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 mysql-connector-python
 numpy
 redis
 requests
-torch
+torch==2.12.1+cpu
