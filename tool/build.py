@@ -182,7 +182,11 @@ def venv(args: list[str]):
 
     # 必须使用 open() 打开文件，获得文件对象 f
     with open(script_path, 'r') as f:
-        subprocess.run(["bash", "-s", "--", root_path, root_path / 'requirements_venv.in'], stdin=f)
+        result = subprocess.run(["bash", "-s", "--", root_path, root_path / 'requirements_venv.in'], stdin=f)
+
+    # 子进程无法激活父 shell 的虚拟环境，成功后提示用户手动 source
+    if result.returncode == 0:
+        logger.info(f'虚拟环境已就绪，请在当前 shell 运行以进入：source {root_path / ".venv" / "bin" / "activate"}')
 
 
 def main() -> None:
