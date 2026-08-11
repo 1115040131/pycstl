@@ -1,4 +1,5 @@
 #include <csignal>
+#include <cstdio>
 #include <latch>
 #include <regex>
 #include <set>
@@ -64,9 +65,17 @@ TEST(LoggerTest, LevelFiltering) {
     EXPECT_TRUE(out.contains("visible"));
 }
 
-TEST(LoggerTest, FatalAborts) {
-    Logger logger;
-    EXPECT_EXIT(logger.fatal("Hello, World!"), ::testing::KilledBySignal(SIGABRT), "");
+// stderr is unbuffered by default, which would hide a missing flush; make it
+// buffered so the record only survives if fatal() flushes before aborting, since
+// abort() itself does not flush stdio streams.
+TEST(LoggerTest, FatalAbortsAndFlushesMessage) {
+    EXPECT_EXIT(
+        {
+            std::setvbuf(stderr, nullptr, _IOFBF, 8192);
+            Logger logger;
+            logger.fatal("fatal must survive {}", 42);
+        },
+        ::testing::KilledBySignal(SIGABRT), "fatal must survive 42");
 }
 
 // --- Format string tests ---

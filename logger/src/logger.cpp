@@ -39,6 +39,14 @@ static std::uint64_t OsThreadId() {
     return os_thread_id;
 }
 
+// current_zone() re-reads the tz database on every call, which costs more than
+// rendering the whole record, so resolve it once. A TZ change after startup is
+// therefore not picked up.
+static const std::chrono::time_zone* LocalZone() {
+    static const std::chrono::time_zone* const zone = std::chrono::current_zone();
+    return zone;
+}
+
 static consteval std::string_view ToString(LogLevel level) noexcept {
     switch (level) {
         case LogLevel::kDebug:
@@ -94,19 +102,11 @@ static std::mutex g_log_mutex;
 
 template <LogLevel level>
 void Logger::log(std::string_view msg, const std::source_location location) const {
-    if (level < min_level_) {
-        return;
-    }
-
     std::lock_guard lock(g_log_mutex);
-    fmt::print(
-        stderr, ToTextStyle(level), "[{}][{:5}][{:0>7}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
-        ToString(level), OsThreadId(),
-        std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::system_clock::now()}.get_local_time(),
-        location.file_name(), location.line(), ExtractFunctionName(location.function_name()), msg);
-    if constexpr (level == LogLevel::kFatal) {
-        std::fflush(stderr);
-    }
+    fmt::print(stderr, ToTextStyle(level), "[{}][{:5}][{:0>7}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
+               ToString(level), OsThreadId(),
+               std::chrono::zoned_time{LocalZone(), std::chrono::system_clock::now()}.get_local_time(),
+               location.file_name(), location.line(), ExtractFunctionName(location.function_name()), msg);
 }
 
 template void Logger::log<LogLevel::kDebug>(std::string_view msg, const std::source_location location) const;
