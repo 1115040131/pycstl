@@ -2,10 +2,12 @@
 
 #include <chrono>
 #include <cstdint>
+#include <iterator>
 #include <mutex>
+#include <string_view>
 
 #include <fmt/chrono.h>
-#include <fmt/color.h>
+#include <fmt/format.h>
 
 #if defined(__linux__)
 #include <sys/syscall.h>
@@ -39,12 +41,24 @@ static std::uint64_t OsThreadId() {
     return os_thread_id;
 }
 
-// current_zone() re-reads the tz database on every call, which costs more than
-// rendering the whole record, so resolve it once. A TZ change after startup is
-// therefore not picked up.
-static const std::chrono::time_zone* LocalZone() {
-    static const std::chrono::time_zone* const zone = std::chrono::current_zone();
-    return zone;
+static std::mutex g_timestamp_mutex;
+
+static std::string_view LocalSecondText(std::chrono::sys_seconds second) {
+    struct Cache {
+        std::chrono::sys_seconds second{std::chrono::sys_seconds::min()};
+        std::string text;
+    };
+    thread_local Cache cache;
+
+    if (cache.second != second) {
+        static const std::chrono::time_zone* const zone = std::chrono::current_zone();
+        std::lock_guard lock(g_timestamp_mutex);
+        cache.text.clear();
+        fmt::format_to(std::back_inserter(cache.text), "{:%Y-%m-%d %H:%M:%S}",
+                       std::chrono::zoned_time{zone, second}.get_local_time());
+        cache.second = second;
+    }
+    return cache.text;
 }
 
 static consteval std::string_view ToString(LogLevel level) noexcept {
@@ -61,22 +75,6 @@ static consteval std::string_view ToString(LogLevel level) noexcept {
             return "FATAL";
     }
     return "UNKNOWN";
-}
-
-static consteval fmt::text_style ToTextStyle(LogLevel level) noexcept {
-    switch (level) {
-        case LogLevel::kDebug:
-            return fg(fmt::color::cyan);
-        case LogLevel::kInfo:
-            return fg(fmt::color::green);
-        case LogLevel::kWarn:
-            return fg(fmt::color::yellow);
-        case LogLevel::kError:
-            return fg(fmt::color::red);
-        case LogLevel::kFatal:
-            return fg(fmt::color::dark_orange) | fmt::emphasis::reverse | fmt::emphasis::bold;
-    }
-    return {};
 }
 
 static constexpr std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
@@ -98,15 +96,24 @@ static constexpr std::string_view ExtractFunctionName(std::string_view full_name
     return full_name;
 }
 
-static std::mutex g_log_mutex;
-
+// The record is rendered without holding the output path's locks, then handed to each
+// sink, which serialises writes on its own mutex. It carries no colour escapes: a sink
+// that targets a terminal adds them, which keeps files and pipes clean.
 template <LogLevel level>
 void Logger::log(std::string_view msg, const std::source_location location) const {
-    std::lock_guard lock(g_log_mutex);
-    fmt::print(stderr, ToTextStyle(level), "[{}][{:5}][{:0>7}][{:%Y-%m-%d %H:%M:%S}] <{}:{}> [{}] {}\n", name_,
-               ToString(level), OsThreadId(),
-               std::chrono::zoned_time{LocalZone(), std::chrono::system_clock::now()}.get_local_time(),
-               location.file_name(), location.line(), ExtractFunctionName(location.function_name()), msg);
+    const auto now = std::chrono::system_clock::now();
+    const auto second = std::chrono::floor<std::chrono::seconds>(now);
+    const auto fraction = std::chrono::duration_cast<std::chrono::nanoseconds>(now - second).count();
+
+    fmt::memory_buffer buf;
+    fmt::format_to(std::back_inserter(buf), "[{}][{:5}][{:0>7}][{}.{:09}] <{}:{}> [{}] {}\n", name_,
+                   ToString(level), OsThreadId(), LocalSecondText(second), fraction, location.file_name(),
+                   location.line(), ExtractFunctionName(location.function_name()), msg);
+    const std::string_view record(buf.data(), buf.size());
+
+    for (const auto& sink : sinks_) {
+        sink->Write(level, record);
+    }
 }
 
 template void Logger::log<LogLevel::kDebug>(std::string_view msg, const std::source_location location) const;
