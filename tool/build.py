@@ -263,9 +263,10 @@ def main() -> None:
         "design_pattern_coverage": lambda args: run_bazel_coverage('//design_pattern:design_pattern_test', args=args),
 
         ######################### build for logger #########################
-        "logger": lambda args: run_bazel_build('//logger //logger/test/...', args=args),
+        "logger": lambda args: run_bazel_build('//logger //logger/test/... //logger/bench/...', args=args),
         "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
         "logger_coverage": lambda args: run_bazel_coverage('//logger/test:logger_all_test', args=args),
+        "logger_bench": lambda args: run_bazel_run('//logger/bench:logger_bench --config=release', args=args),
 
         ######################### build for monkey #########################
         "monkey": lambda args: run_bazel_build('//monkey //monkey/test:monkey_all_test', args=args),
