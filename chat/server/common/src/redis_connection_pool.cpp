@@ -1,5 +1,7 @@
 #include "chat/server/common/redis_connection_pool.h"
 
+#include <fmt/format.h>
+
 namespace pyc {
 namespace chat {
 

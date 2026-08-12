@@ -1,5 +1,6 @@
 #include <thread>
 
+#include <fmt/format.h>
 #include <grpcpp/grpcpp.h>
 
 #include "chat/server/chat_server/chat_service_impl.h"

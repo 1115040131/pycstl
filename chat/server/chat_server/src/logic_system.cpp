@@ -2,6 +2,7 @@
 
 #include <ranges>
 
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include "chat/common/error_code.h"

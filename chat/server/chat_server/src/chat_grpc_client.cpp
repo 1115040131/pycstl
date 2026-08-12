@@ -1,5 +1,6 @@
 #include "chat/server/chat_server/chat_grpc_client.h"
 
+#include <fmt/format.h>
 #include <grpcpp/create_channel.h>
 
 #include "chat/common/error_code.h"

@@ -1,5 +1,7 @@
 #include "chat/server/common/redis_mgr.h"
 
+#include <fmt/format.h>
+
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/redis_connection_pool.h"
 

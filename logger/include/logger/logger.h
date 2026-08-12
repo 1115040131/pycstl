@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/base.h>
 
 #include "logger/sink.h"
 
@@ -34,11 +34,12 @@ public:
     struct FmtWithLocation {
         fmt::format_string<Args...> fmt;
         std::source_location location;
+        std::string_view function;
 
         template <typename S>
         consteval inline FmtWithLocation(const S& fmt_,
                                          const std::source_location location_ = std::source_location::current())
-            : fmt(fmt_), location(location_) {}
+            : fmt(fmt_), location(location_), function(ExtractFunctionName(location_.function_name())) {}
     };
 
     template <typename... Args>
@@ -66,8 +67,8 @@ public:
 
     template <typename... Args>
     [[noreturn]] inline void fatal(FormatString<Args...> fmt_with_location, Args&&... args) const {
-        log<LogLevel::kFatal>(fmt::format(fmt_with_location.fmt, std::forward<Args>(args)...),
-                              fmt_with_location.location);
+        log(LogLevel::kFatal, fmt_with_location.fmt, fmt::make_format_args(args...), fmt_with_location.location,
+            fmt_with_location.function);
         // abort() does not flush stdio streams, so the record would be lost for any
         // sink that buffers.
         for (const auto& sink : sinks_) {
@@ -77,6 +78,27 @@ public:
     }
 
 private:
+    // Trims a __PRETTY_FUNCTION__-style signature down to the bare function name. Runs in
+    // FmtWithLocation's consteval constructor, so no record pays for the scan.
+    static consteval std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
+        auto end_pos = full_name.find_last_of('(');
+        if (end_pos != std::string_view::npos) {
+            auto start_pos = full_name.rfind("::", end_pos);
+            if (start_pos != std::string_view::npos) {
+                start_pos += 2;
+            } else {
+                start_pos = full_name.rfind(' ', end_pos);
+                if (start_pos != std::string_view::npos) {
+                    start_pos++;
+                } else {
+                    return full_name.substr(0, end_pos);
+                }
+            }
+            return full_name.substr(start_pos, end_pos - start_pos);
+        }
+        return full_name;
+    }
+
     // Checks the level before formatting, so filtered-out records cost neither the
     // conversion work nor the std::string allocation.
     template <LogLevel level, typename... Args>
@@ -84,11 +106,12 @@ private:
         if (level < min_level_) {
             return;
         }
-        log<level>(fmt::format(fmt_with_location.fmt, std::forward<Args>(args)...), fmt_with_location.location);
+        log(level, fmt_with_location.fmt, fmt::make_format_args(args...), fmt_with_location.location,
+            fmt_with_location.function);
     }
 
-    template <LogLevel level>
-    void log(std::string_view msg, const std::source_location location) const;
+    void log(LogLevel level, fmt::string_view format_str, fmt::format_args args,
+             const std::source_location location, std::string_view function) const;
 
     std::string name_;
     std::vector<std::shared_ptr<LogSink>> sinks_;

@@ -1,5 +1,6 @@
 #include "chat/server/gate_server/verify_grpc_client.h"
 
+#include <fmt/format.h>
 #include <grpcpp/create_channel.h>
 
 #include "chat/server/common/config_mgr.h"
