@@ -4,11 +4,8 @@
 #include <exception>
 
 #include "co_async/awaiter/previous_awaiter.h"
+#include "co_async/utils/debug.h"
 #include "co_async/utils/uninitialized.h"
-
-#ifdef CO_ASYNC_DEBUG
-#include "co_async/utils/logger.h"
-#endif
 
 namespace pyc {
 namespace co_async {
@@ -24,9 +21,7 @@ struct Promise {
     auto final_suspend() noexcept { return PreviousAwaiter(previous_); }
 
     void unhandled_exception() noexcept {
-#ifdef CO_ASYNC_DEBUG
-        logger.error("unhandled_exception");
-#endif
+        CO_ASYNC_LOG_ERROR("unhandled_exception");
         exception_ = std::current_exception();
     }
 
@@ -70,7 +65,7 @@ struct Promise<void> {
     auto final_suspend() noexcept { return PreviousAwaiter(previous_); }
 
     void unhandled_exception() noexcept {
-        // logger.error("unhandled_exception");
+        CO_ASYNC_LOG_ERROR("unhandled_exception");
         result_ = std::current_exception();
     }
 

@@ -2,11 +2,7 @@
 
 #include <thread>
 
-#ifdef CO_ASYNC_DEBUG
-#include <fmt/chrono.h>
-
-#include "co_async/utils/logger.h"
-#endif
+#include "co_async/utils/debug.h"
 
 namespace pyc {
 namespace co_async {
@@ -32,9 +28,7 @@ void TimerLoop::runAll() {
             deleteTask(task);
             task.resume();
         } else {
-#ifdef CO_ASYNC_DEBUG
-            logger.debug("No task Loop waiting for {:%S}s", expire_time - now_time);
-#endif
+            CO_ASYNC_LOG_DEBUG("No task Loop waiting for {:%S}s", expire_time - now_time);
             std::this_thread::sleep_until(expire_time);
         }
     }

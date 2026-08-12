@@ -241,6 +241,8 @@ def main() -> None:
         "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...',
                                                  args=args),
         "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', args=args),
+        "co_async_debug_test": lambda args: run_bazel_test(
+            '//co_async/test:co_async_all_test --define=co_async_debug=true', args=args),
         "co_async_coverage": lambda args: run_bazel_coverage('//co_async/test:co_async_all_test', args=args),
 
         ######################### build for concurrency #########################
