@@ -35,8 +35,7 @@ class StandardFormatter(logging.Formatter):
             logging.INFO: LogColors.GREEN + fmt + LogColors.RESET,
             logging.WARNING: LogColors.YELLOW + fmt + LogColors.RESET,
             logging.ERROR: LogColors.RED + fmt + LogColors.RESET,
-            logging.CRITICAL: LogColors.BACKGROUND_RED +
-            LogColors.WHITE + fmt + LogColors.RESET
+            logging.CRITICAL: LogColors.RED + fmt + LogColors.RESET
         }
 
     # 重写 format 方法来添加颜色和自定义字段
@@ -65,7 +64,7 @@ class NoDebugInfoFormatter(logging.Formatter):
         logging.INFO: LogColors.GREEN,
         logging.WARNING: LogColors.YELLOW,
         logging.ERROR: LogColors.RED,
-        logging.CRITICAL: LogColors.BACKGROUND_RED + LogColors.WHITE
+        logging.CRITICAL: LogColors.RED
     }
 
     def __init__(self, *args, **kwargs):
@@ -125,8 +124,9 @@ class Logger:
     def error(self, message, *args, **kwargs):
         self._log(logging.ERROR, message, *args, **kwargs)
 
-    def fatal(self, message, *args, **kwargs):
+    def fatal(self, message, *args, code=1, **kwargs):
         self._log(logging.CRITICAL, message, *args, **kwargs)
+        sys.exit(code)
 
 
 # 测试日志函数
@@ -136,14 +136,20 @@ def test_logging():
     logger.info('This is an info message.')
     logger.warn('This is a warning message.')
     logger.error('This is an error message.')
-    logger.fatal('This is a fatal message.')
+    try:
+        logger.fatal('This is a fatal message.')
+    except SystemExit:
+        pass
 
     logger = Logger(LogStyle.NO_DEBUG_INFO)
     logger.debug('This is a debug message.')
     logger.info('This is an info message.')
     logger.warn('This is a warning message.')
     logger.error('This is an error message.')
-    logger.fatal('This is a fatal message.')
+    try:
+        logger.fatal('This is a fatal message.')
+    except SystemExit:
+        pass
 
 
 if __name__ == "__main__":

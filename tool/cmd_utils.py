@@ -3,7 +3,6 @@ import os
 import subprocess
 import shlex
 import shutil
-import sys
 import time
 
 from logger import Logger
@@ -16,13 +15,23 @@ def run_cmd(cmd, check=True):
     try:
         subprocess.run(shlex.split(cmd), check=check)
     except subprocess.CalledProcessError as e:
-        logger.warn(f"Command '{e.cmd}' returned non-zero exit status {e.returncode}.")
+        msg = f"Command '{e.cmd}' returned non-zero exit status {e.returncode}."
         if check:
-            sys.exit(e.returncode)
+            logger.fatal(msg, code=e.returncode)
+        logger.warn(msg)
+    except FileNotFoundError:
+        # 命令不存在, 沿用 shell 的 127 退出码
+        msg = f"Command not found: {shlex.split(cmd)[0]}"
+        if check:
+            logger.fatal(msg, code=127)
+        logger.warn(msg)
     except KeyboardInterrupt:
         logger.warn("Keyboard interrupt received, stopping.")
     except Exception as e:
-        logger.warn(f"An unexpected error occurred: {e}")
+        msg = f"An unexpected error occurred: {e}"
+        if check:
+            logger.fatal(msg)
+        logger.warn(msg)
 
 
 # 创建目录并设置权限的函数
@@ -121,7 +130,7 @@ def run_tmux(windows_commands_dict: dict):
         run_cmd(f"tmux kill-session -t {session_name}")
 
 
-def run_docker(image, container_name, args=[]):
+def run_docker(image: str, container_name: str, args: list[str] | None = None):
     try:
         # 列出所有容器（包括未运行的）
         output = subprocess.check_output(shlex.split('docker ps -a --format {{.Names}}'))
@@ -130,7 +139,7 @@ def run_docker(image, container_name, args=[]):
         command = ''
         if container_name not in containers:
             # 容器不存在，根据提供的参数运行新的容器
-            command = f'docker run -d --name {container_name} {" ".join(args)} {image}'
+            command = f'docker run -d --name {container_name} {" ".join(args or [])} {image}'
             logger.info(f"Creating and starting container '{container_name}'")
 
         else:
