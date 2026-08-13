@@ -21,6 +21,7 @@ cc_library(
         "//logger",
         "@boost.asio",
         "@boost.uuid",
+        "@fmt",
         "@grpc//:grpc++",
         "@nlohmann_json//:json",
     ],

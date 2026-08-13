@@ -1,6 +1,5 @@
 #include "chat/server/common/status_grpc_client.h"
 
-#include <fmt/format.h>
 #include <grpcpp/create_channel.h>
 
 #include "chat/common/error_code.h"
@@ -8,6 +7,7 @@
 #include "chat/server/common/defer.h"
 #include "chat/server/proto/status.grpc.pb.h"
 #include "common/connection_pool.h"
+#include "common/utils.h"
 
 namespace pyc {
 namespace chat {
@@ -15,7 +15,7 @@ namespace chat {
 class StatusConnectionPool : public ConnectionPool<std::unique_ptr<StatusService::Stub>> {
 public:
     StatusConnectionPool(std::string_view host, std::string_view port, size_t size) {
-        auto target = fmt::format("{}:{}", host, port);
+        auto target = JoinHostPort(host, port);
         for (std::size_t i = 0; i < size; ++i) {
             connections_.push(
                 StatusService::NewStub(grpc::CreateChannel(target, grpc::InsecureChannelCredentials())));

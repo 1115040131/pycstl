@@ -1,7 +1,5 @@
 #include "chat/server/common/redis_connection_pool.h"
 
-#include <fmt/format.h>
-
 namespace pyc {
 namespace chat {
 
@@ -18,15 +16,14 @@ RedisConnectionPool::RedisConnectionPool(size_t size, std::string_view host, int
         }
 
         if (!password.empty()) {
-            auto command = fmt::format("AUTH {}", password);
             auto guard = RedisReplyGuard(context.get(), {"AUTH", password});
 
             // 认证失败
             if (!RedisReplyOk(guard.reply_)) {
-                _g_redis_mgr_logger.error("[{}] failed", command);
+                _g_redis_mgr_logger.error("[AUTH ***] failed");
                 continue;
             }
-            _g_redis_mgr_logger.info("[{}] success", command);
+            _g_redis_mgr_logger.info("[AUTH ***] success");
         }
 
         connections_.push(std::move(context));
