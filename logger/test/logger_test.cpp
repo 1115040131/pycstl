@@ -1,5 +1,8 @@
+#include <algorithm>
 #include <csignal>
+#include <cstdio>
 #include <latch>
+#include <memory>
 #include <regex>
 #include <set>
 #include <string>
@@ -12,108 +15,109 @@
 
 namespace pyc {
 
+// Records are captured through a StringSink rather than by redirecting stderr, so
+// the assertions do not depend on gtest internals.
+static std::shared_ptr<StringSink> MakeSink() { return std::make_shared<StringSink>(); }
+
 TEST(LoggerTest, OutputContainsLevelAndMessage) {
-    Logger logger;
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
 
-    testing::internal::CaptureStderr();
     logger.debug("Hello, World!");
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("DEBUG"));
-    EXPECT_TRUE(out.contains("Hello, World!"));
+    EXPECT_TRUE(sink->str().contains("DEBUG"));
+    EXPECT_TRUE(sink->str().contains("Hello, World!"));
 
-    testing::internal::CaptureStderr();
+    sink->clear();
     logger.info("Hello, World!");
-    out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("INFO"));
-    EXPECT_TRUE(out.contains("Hello, World!"));
+    EXPECT_TRUE(sink->str().contains("INFO"));
+    EXPECT_TRUE(sink->str().contains("Hello, World!"));
 
-    testing::internal::CaptureStderr();
+    sink->clear();
     logger.warn("Hello, World!");
-    out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("WARN"));
-    EXPECT_TRUE(out.contains("Hello, World!"));
+    EXPECT_TRUE(sink->str().contains("WARN"));
+    EXPECT_TRUE(sink->str().contains("Hello, World!"));
 
-    testing::internal::CaptureStderr();
+    sink->clear();
     logger.error("Hello, World!");
-    out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("ERROR"));
-    EXPECT_TRUE(out.contains("Hello, World!"));
+    EXPECT_TRUE(sink->str().contains("ERROR"));
+    EXPECT_TRUE(sink->str().contains("Hello, World!"));
 }
 
 TEST(LoggerTest, LoggerNameInOutput) {
-    Logger logger("MY_LOGGER");
-    testing::internal::CaptureStderr();
+    auto sink = MakeSink();
+    Logger logger("MY_LOGGER", sink);
     logger.info("test message");
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("MY_LOGGER"));
+    EXPECT_TRUE(sink->str().contains("MY_LOGGER"));
 }
 
 TEST(LoggerTest, LevelFiltering) {
-    Logger logger;
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
     logger.set_level(LogLevel::kWarn);
 
-    testing::internal::CaptureStderr();
     logger.debug("suppressed");
     logger.info("suppressed");
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_FALSE(out.contains("suppressed"));
+    EXPECT_FALSE(sink->str().contains("suppressed"));
 
-    testing::internal::CaptureStderr();
     logger.warn("visible");
-    out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("visible"));
+    EXPECT_TRUE(sink->str().contains("visible"));
 }
 
-TEST(LoggerTest, FatalAborts) {
-    Logger logger;
-    EXPECT_EXIT(logger.fatal("Hello, World!"), ::testing::KilledBySignal(SIGABRT), "");
+// stderr is unbuffered by default, which would hide a missing flush; make it
+// buffered so the record only survives if fatal() flushes before aborting, since
+// abort() itself does not flush stdio streams.
+TEST(LoggerTest, FatalAbortsAndFlushesMessage) {
+    EXPECT_EXIT(
+        {
+            std::setvbuf(stderr, nullptr, _IOFBF, 8192);
+            Logger logger;
+            logger.fatal("fatal must survive {}", 42);
+        },
+        ::testing::KilledBySignal(SIGABRT), "fatal must survive 42");
 }
 
 // --- Format string tests ---
 
 TEST(LoggerTest, FormatIntegers) {
-    Logger logger;
-    testing::internal::CaptureStderr();
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
     logger.info("{} + {} = {}", 1, 2, 3);
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("1 + 2 = 3"));
+    EXPECT_TRUE(sink->str().contains("1 + 2 = 3"));
 }
 
 TEST(LoggerTest, FormatFloat) {
-    Logger logger;
-    testing::internal::CaptureStderr();
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
     logger.debug("pi = {:.4f}", 3.14159265);
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("pi = 3.1416"));
+    EXPECT_TRUE(sink->str().contains("pi = 3.1416"));
 }
 
 TEST(LoggerTest, FormatMixedTypes) {
-    Logger logger;
-    testing::internal::CaptureStderr();
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
     logger.warn("user={}, age={}, score={:.1f}", "Alice", 30, 98.6);
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("user=Alice, age=30, score=98.6"));
+    EXPECT_TRUE(sink->str().contains("user=Alice, age=30, score=98.6"));
 }
 
 TEST(LoggerTest, FormatPadding) {
-    Logger logger;
-    testing::internal::CaptureStderr();
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
     logger.info("[{:>10}][{:<10}][{:^10}]", "right", "left", "center");
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("[     right]"));
-    EXPECT_TRUE(out.contains("[left      ]"));
-    EXPECT_TRUE(out.contains("[  center  ]"));
+    EXPECT_TRUE(sink->str().contains("[     right]"));
+    EXPECT_TRUE(sink->str().contains("[left      ]"));
+    EXPECT_TRUE(sink->str().contains("[  center  ]"));
 }
 
 TEST(LoggerTest, FormatHex) {
-    Logger logger;
-    testing::internal::CaptureStderr();
+    auto sink = MakeSink();
+    Logger logger("DEFAULT", sink);
     logger.error("errno=0x{:08X}", 0xDEADBEEF);
-    std::string out = testing::internal::GetCapturedStderr();
-    EXPECT_TRUE(out.contains("errno=0xDEADBEEF"));
+    EXPECT_TRUE(sink->str().contains("errno=0xDEADBEEF"));
 }
 
 // --- Visual / terminal display tests (no assertions, for manual inspection) ---
+// These keep the default stderr sink so the output can be eyeballed, including its
+// colouring when the test is run from a terminal.
 
 TEST(LoggerTest, VisualAllLevels) {
     Logger logger("DEMO");
@@ -153,10 +157,10 @@ static std::set<std::string> ExtractThreadIds(const std::string& output) {
 }
 
 TEST(LoggerTest, DistinctThreadIdsAcrossThreads) {
-    Logger logger("THREADS");
+    auto sink = MakeSink();
+    Logger logger("THREADS", sink);
     constexpr int kThreadCount = 8;
 
-    testing::internal::CaptureStderr();
     {
         std::latch start{kThreadCount};
         std::vector<std::thread> threads;
@@ -171,21 +175,19 @@ TEST(LoggerTest, DistinctThreadIdsAcrossThreads) {
             t.join();
         }
     }
-    std::string out = testing::internal::GetCapturedStderr();
 
-    std::set<std::string> ids = ExtractThreadIds(out);
+    std::set<std::string> ids = ExtractThreadIds(sink->str());
     EXPECT_EQ(ids.size(), static_cast<std::size_t>(kThreadCount));
 }
 
 TEST(LoggerTest, MainThreadIdIsStable) {
-    Logger logger("THREADS");
+    auto sink = MakeSink();
+    Logger logger("THREADS", sink);
 
-    testing::internal::CaptureStderr();
     logger.info("first");
     logger.info("second");
-    std::string out = testing::internal::GetCapturedStderr();
 
-    std::set<std::string> ids = ExtractThreadIds(out);
+    std::set<std::string> ids = ExtractThreadIds(sink->str());
     EXPECT_EQ(ids.size(), 1u);
 }
 
@@ -205,6 +207,108 @@ TEST(LoggerTest, VisualThreadIds) {
     for (auto& t : threads) {
         t.join();
     }
+}
+
+// --- Sink tests ---
+
+TEST(SinkTest, RecordsCarryNoColorEscapes) {
+    auto sink = MakeSink();
+    Logger logger("PLAIN", sink);
+    logger.error("no escapes here");
+    // Colouring belongs to a terminal-backed sink, so a captured record must be
+    // free of escape sequences; otherwise log files and pipes get polluted.
+    EXPECT_EQ(sink->str().find('\033'), std::string::npos);
+}
+
+TEST(SinkTest, FanOutDeliversToEverySink) {
+    auto first = MakeSink();
+    auto second = MakeSink();
+    Logger logger("FANOUT", {first, second});
+
+    logger.info("delivered {}", 1);
+    EXPECT_TRUE(first->str().contains("delivered 1"));
+    EXPECT_TRUE(second->str().contains("delivered 1"));
+    EXPECT_EQ(first->str(), second->str());
+}
+
+TEST(SinkTest, OneSinkSharedBySeveralLoggers) {
+    auto sink = MakeSink();
+    Logger first("SVC1", sink);
+    Logger second("SVC2", sink);
+
+    first.info("from first");
+    second.info("from second");
+    EXPECT_TRUE(sink->str().contains("SVC1"));
+    EXPECT_TRUE(sink->str().contains("SVC2"));
+    // str() returns a copy, so the range has to be taken from a single call.
+    EXPECT_EQ(std::ranges::count(sink->str(), '\n'), 2);
+}
+
+TEST(SinkTest, NullSinkDiscardsAndFilteringStillApplies) {
+    Logger logger("NUL", std::make_shared<NullSink>());
+    logger.info("goes nowhere");  // must not crash
+    EXPECT_EQ(logger.level(), LogLevel::kDebug);
+}
+
+TEST(SinkTest, SinkOutlivesTheLoggerThatNamedIt) {
+    auto sink = MakeSink();
+    {
+        Logger logger("TEMP", sink);
+        logger.info("written before the logger went away");
+    }
+    EXPECT_TRUE(sink->str().contains("written before the logger went away"));
+}
+
+TEST(SinkTest, IteratorRangeConstructor) {
+    std::vector<std::shared_ptr<LogSink>> sinks{MakeSink(), MakeSink()};
+    Logger logger("RANGE", sinks.begin(), sinks.end());
+
+    logger.warn("range built");
+    for (const auto& sink : sinks) {
+        EXPECT_TRUE(static_cast<StringSink*>(sink.get())->str().contains("range built"));
+    }
+}
+
+TEST(SinkTest, SinkLevelFiltersIndependently) {
+    auto sink = MakeSink();
+    sink->set_level(LogLevel::kWarn);
+    Logger logger("LEVELS", sink);
+
+    logger.debug("below");
+    logger.info("below");
+    EXPECT_FALSE(sink->str().contains("below"));
+
+    logger.warn("at");
+    logger.error("above");
+    EXPECT_TRUE(sink->str().contains("at"));
+    EXPECT_TRUE(sink->str().contains("above"));
+}
+
+TEST(SinkTest, FanOutSinksFilterAtDifferentLevels) {
+    auto verbose = MakeSink();
+    auto quiet = MakeSink();
+    quiet->set_level(LogLevel::kError);
+    Logger logger("SPLIT", {verbose, quiet});
+
+    logger.info("chatter");
+    logger.error("trouble");
+
+    EXPECT_TRUE(verbose->str().contains("chatter"));
+    EXPECT_TRUE(verbose->str().contains("trouble"));
+    EXPECT_FALSE(quiet->str().contains("chatter"));
+    EXPECT_TRUE(quiet->str().contains("trouble"));
+}
+
+// The logger's level runs first and decides whether a record is rendered at all, so a
+// sink cannot widen what its logger already dropped.
+TEST(SinkTest, SinkCannotWidenTheLoggersLevel) {
+    auto sink = MakeSink();
+    sink->set_level(LogLevel::kDebug);
+    Logger logger("NARROW", sink);
+    logger.set_level(LogLevel::kError);
+
+    logger.debug("dropped by the logger");
+    EXPECT_FALSE(sink->str().contains("dropped by the logger"));
 }
 
 }  // namespace pyc

@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <fmt/format.h>
+
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/redis_mgr.h"
 #include "chat/server/common/utils.h"

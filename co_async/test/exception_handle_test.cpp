@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#define CO_ASYNC_DEBUG
 #include "co_async/task.h"
 
 namespace pyc {

@@ -7,6 +7,7 @@
 #include "chat/server/chat_server/define.h"
 #include "chat/server/common/config_mgr.h"
 #include "chat/server/common/redis_mgr.h"
+#include "common/utils.h"
 
 using namespace pyc::chat;
 
@@ -27,7 +28,7 @@ int main(int argc, char const* argv[]) {
         // 定义一个 GrpcServer
         GET_SECTION_CONFIG(host, "Host");
         GET_SECTION_CONFIG(rpc_port, "RpcPort");
-        auto server_address = fmt::format("{}:{}", host, rpc_port);
+        auto server_address = pyc::JoinHostPort(host, rpc_port);
         ChatServiceImpl service;
         // 监听端口和添加服务
         grpc::ServerBuilder builder;

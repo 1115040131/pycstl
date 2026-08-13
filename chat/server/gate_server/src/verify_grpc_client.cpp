@@ -7,6 +7,7 @@
 #include "chat/server/gate_server/define.h"
 #include "chat/server/proto/verify.grpc.pb.h"
 #include "common/connection_pool.h"
+#include "common/utils.h"
 
 namespace pyc {
 namespace chat {
@@ -14,7 +15,7 @@ namespace chat {
 class VerifyConnectionPool : public ConnectionPool<std::unique_ptr<VerifyService::Stub>> {
 public:
     VerifyConnectionPool(std::string_view host, std::string_view port, size_t size) {
-        auto target = fmt::format("{}:{}", host, port);
+        auto target = JoinHostPort(host, port);
         for (std::size_t i = 0; i < size; ++i) {
             connections_.push(
                 VerifyService::NewStub(grpc::CreateChannel(target, grpc::InsecureChannelCredentials())));

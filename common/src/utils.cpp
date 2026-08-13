@@ -24,4 +24,11 @@ std::string_view GetSimpleName(std::string_view functionName) {
     return functionName;  // 如果没有找到 "(", 则返回原始字符串
 }
 
+std::string JoinHostPort(std::string_view host, std::string_view port) {
+    std::string target;
+    target.reserve(host.size() + 1 + port.size());
+    target.append(host).append(1, ':').append(port);
+    return target;
+}
+
 }  // namespace pyc

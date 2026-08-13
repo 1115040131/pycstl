@@ -1,0 +1,24 @@
+load("//build_defs:cpp_opts.bzl", "COPTS")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_binary(
+    name = "logger_bench",
+    srcs = glob(
+        [
+            "*_bench.cpp",
+            "*.h",
+        ],
+        allow_empty = True,
+    ),
+    copts = COPTS,
+    deps = [
+        "//logger",
+        "@google_benchmark//:benchmark",
+    ],
+)

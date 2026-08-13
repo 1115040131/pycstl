@@ -241,6 +241,8 @@ def main() -> None:
         "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...',
                                                  args=args),
         "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', args=args),
+        "co_async_debug_test": lambda args: run_bazel_test(
+            '//co_async/test:co_async_all_test --define=co_async_debug=true', args=args),
         "co_async_coverage": lambda args: run_bazel_coverage('//co_async/test:co_async_all_test', args=args),
 
         ######################### build for concurrency #########################
@@ -263,9 +265,10 @@ def main() -> None:
         "design_pattern_coverage": lambda args: run_bazel_coverage('//design_pattern:design_pattern_test', args=args),
 
         ######################### build for logger #########################
-        "logger": lambda args: run_bazel_build('//logger //logger/test/...', args=args),
+        "logger": lambda args: run_bazel_build('//logger //logger/test/... //logger/bench/...', args=args),
         "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
         "logger_coverage": lambda args: run_bazel_coverage('//logger/test:logger_all_test', args=args),
+        "logger_bench": lambda args: run_bazel_run('//logger/bench:logger_bench --config=release', args=args),
 
         ######################### build for monkey #########################
         "monkey": lambda args: run_bazel_build('//monkey //monkey/test:monkey_all_test', args=args),

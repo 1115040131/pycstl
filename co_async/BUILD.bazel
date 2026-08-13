@@ -7,14 +7,23 @@ licenses(["notice"])
 
 exports_files(["LICENSE"])
 
+config_setting(
+    name = "debug_build",
+    define_values = {"co_async_debug": "true"},
+)
+
 cc_library(
     name = "co_async",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/co_async/**/*.h"]),
     copts = COPTS,
+    defines = select({
+        ":debug_build": ["CO_ASYNC_DEBUG"],
+        "//conditions:default": [],
+    }),
     includes = ["include"],
-    deps = [
-        "//common",
-        "//logger",
-    ],
+    deps = ["//common"] + select({
+        ":debug_build": ["//logger"],
+        "//conditions:default": [],
+    }),
 )
