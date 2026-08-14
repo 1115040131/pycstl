@@ -1,69 +1,77 @@
 #!/usr/bin/env python3
 
+import re
+import shutil
 import subprocess
-import os
 import sys
+import tempfile
 
 from pathlib import Path
 from typing import Any, Callable
-from cmd_utils import *
+from cmd_utils import mysql_service_is_ready, run_cmd, run_docker, run_tmux, setup_directory, wait_until
 from logger import Logger, LogStyle
 
 logger = Logger(LogStyle.NO_DEBUG_INFO)
 
-# 设置PATH环境变量以防止bazel重复编译
-os.environ['PATH'] = '/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+# 路径定义
+root_path = Path(__file__).resolve().parent.parent
+tool_path = root_path / 'tool'  # tool 目录
 
 
-def run_bazel_build(target: str, check: bool = False, args: list[str] = []) -> None:
-    command = f'bazel build {target} {" ".join(args)}'
+def run_bazel_build(target: str, check: bool = True, args: list[str] | None = None) -> None:
+    command = f'bazel build {target} {" ".join(args or [])}'
     run_cmd(command, check)
 
 
-def run_bazel_run(target: str, check: bool = False, args: list[str] = []) -> None:
-    command = f'bazel run {target} {" ".join(args)}'
+def run_bazel_run(target: str, check: bool = False, args: list[str] | None = None) -> None:
+    # 交互式运行, Ctrl+C 退出时返回非零码属正常情况, 因此不做 check
+    command = f'bazel run {target} {" ".join(args or [])}'
     run_cmd(command, check)
 
 
-def run_bazel_test(target: str, test_output: bool = True, check: bool = False, args: list[str] = []) -> None:
-    command = f'bazel test {target} {" ".join(args)}'
+def run_bazel_test(target: str, test_output: bool = True, check: bool = True,
+                   args: list[str] | None = None) -> None:
+    command = f'bazel test {target} {" ".join(args or [])}'
     if test_output:
         command += ' --test_output=all'
     run_cmd(command, check)
 
 
-def run_bazel_coverage(target: str, check: bool = False, args: list[str] = []) -> None:
-    command = f'bazel coverage {target} --nocache_test_results --instrumentation_filter="//..." {" ".join(args)}'
+def run_bazel_coverage(target: str, check: bool = True, args: list[str] | None = None) -> None:
+    command = (f'bazel coverage {target} --nocache_test_results '
+               f'--instrumentation_filter="//..." {" ".join(args or [])}')
     run_cmd(command, check)
 
 
 def get_lcov_major_version() -> int:
     try:
         output = subprocess.check_output(['lcov', '--version'], stderr=subprocess.STDOUT).decode()
-        import re
         match = re.search(r'(\d+)\.', output)
         return int(match.group(1)) if match else 1
     except Exception:
         return 1
 
 
-def generate_coverage_report(args: list[str]) -> None:
+def generate_coverage_report() -> None:
     report_dat = root_path / 'bazel-out/_coverage/_coverage_report.dat'
     output_dir = root_path / 'coverage_report'
 
     if not report_dat.exists():
         logger.error(f"Coverage data not found: {report_dat}")
-        logger.error("Run a coverage command first (e.g. all_coverage)")
-        return
+        logger.fatal("Run a coverage command first (e.g. all_coverage)")
+
+    if shutil.which('genhtml') is None:
+        logger.fatal("genhtml not found, install it first (e.g. sudo apt install lcov)")
 
     if get_lcov_major_version() >= 2:
         run_cmd(
             f'genhtml {report_dat} --output-directory {output_dir} '
             f"--exclude 'external/*' --exclude '/usr/*' "
-            f'--ignore-errors source,unmapped'
+            f'--ignore-errors source,unmapped,unused'
         )
     else:
-        import tempfile
+        if shutil.which('lcov') is None:
+            logger.fatal("lcov not found, install it first (e.g. sudo apt install lcov)")
         with tempfile.NamedTemporaryFile(suffix='.dat', delete=True) as tmp:
             filtered_dat = tmp.name
             run_cmd(
@@ -76,52 +84,46 @@ def generate_coverage_report(args: list[str]) -> None:
     logger.info(f"Coverage report generated: {output_dir}/index.html")
 
 
-def run_valgrind(target: str, args: list[str] = []) -> None:
-    command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args)}'
+def run_valgrind(target: str, args: list[str] | None = None) -> None:
+    command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args or [])}'
     run_cmd(command)
 
 
-# 路径定义
-root_path = Path(__file__).resolve().parent.parent
-tool_path = root_path / 'tool'  # tool 目录
-
-
 def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) -> None:
-    run_bazel_build('//chat/...', args=args)
-    targets["chat_prepare"](args=[])
-    if len(args) > 0 and int(args[0]) > 1:
+    # 首个参数若为数字则表示客户端个数, 不能透传给 bazel
+    client_num = 1
+    bazel_args = args
+    if len(args) > 0 and args[0].isdigit():
         client_num = int(args[0])
-        run_tmux({
-            "GateServer": [
-                f"python3 {tool_path / 'build.py'} chat_gate_server",
-                f"python3 {tool_path / 'build.py'} chat_verify_server",
-                f"python3 {tool_path / 'build.py'} chat_status_server",
-            ],
-            "ChatServer": [
-                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer1",
-                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer2"
-            ],
-            "Client": [f"python3 {tool_path / 'build.py'} chat_client"] * client_num
-        })
+        bazel_args = args[1:]
+
+    run_bazel_build('//chat/...', args=bazel_args)
+    targets["chat_prepare"](args=[])
+
+    make = f"python3 {tool_path / 'build.py'}"
+    windows = {
+        "GateServer": [
+            f"{make} chat_gate_server",
+            f"{make} chat_verify_server",
+            f"{make} chat_status_server",
+        ],
+        "ChatServer": [
+            f"{make} chat_chat_server ChatServer1",
+            f"{make} chat_chat_server ChatServer2",
+        ],
+    }
+    if client_num > 1:
+        # 多个客户端时单独开一个窗口, 否则与 ChatServer 共用
+        windows["Client"] = [f"{make} chat_client"] * client_num
     else:
-        run_tmux({
-            "GateServer": [
-                f"python3 {tool_path / 'build.py'} chat_gate_server",
-                f"python3 {tool_path / 'build.py'} chat_verify_server",
-                f"python3 {tool_path / 'build.py'} chat_status_server",
-            ],
-            "ChatServer": [
-                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer1",
-                f"python3 {tool_path / 'build.py'} chat_chat_server ChatServer2",
-                f"python3 {tool_path / 'build.py'} chat_client"
-            ]
-        })
+        windows["ChatServer"].append(f"{make} chat_client")
+
+    run_tmux(windows)
 
 
 def main() -> None:
     if len(sys.argv) < 2:
-        logger.error("Usage: ./make [target] [...args]")
-        return
+        logger.fatal("Usage: ./make [target] [...args]")
 
     # 第一个参数是目标名称，其余的是传递给bazel命令的参数
     target = sys.argv[1]
@@ -134,19 +136,19 @@ def main() -> None:
     targets: dict[str, Callable[[list[str]], Any]] = {
         ######################### basic command #########################
         "build": lambda args: (
-            logger.error("Please give target name") if len(args) < 1 else
+            logger.fatal("Please give target name") if len(args) < 1 else
             run_bazel_build(args[0], args=args[1:])
         ),
         "run": lambda args: (
-            logger.error("Please give target name") if len(args) < 1 else
+            logger.fatal("Please give target name") if len(args) < 1 else
             run_bazel_run(args[0], args=args[1:])
         ),
         "test": lambda args: (
-            logger.error("Please give target name") if len(args) < 1 else
+            logger.fatal("Please give target name") if len(args) < 1 else
             run_bazel_test(args[0], args=args[1:])
         ),
         "coverage": lambda args: (
-            logger.error("Please give target name") if len(args) < 1 else
+            logger.fatal("Please give target name") if len(args) < 1 else
             run_bazel_coverage(args[0], args=args[1:])
         ),
 
@@ -154,7 +156,7 @@ def main() -> None:
         "all": lambda args: run_bazel_build('//...', args=args + ['-- -//hello_world']),
         "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args + ['-- -//hello_world']),
         "all_coverage": lambda args: run_bazel_coverage('//...', args=args + ['-- -//hello_world']),
-        "coverage_report": lambda args: generate_coverage_report(args),
+        "coverage_report": lambda args: generate_coverage_report(),
 
         ######################### build for chat #########################
         "chat": lambda args: run_bazel_build('//chat/...', args=args),
@@ -233,24 +235,23 @@ def main() -> None:
         "chat_run": lambda args: chat_run(targets, args),
 
         ######################### build for common #########################
-        "common": lambda args: run_bazel_build('//common', args=args),
+        "common": lambda args: run_bazel_build('//common/...', args=args),
         "common_test": lambda args: run_bazel_test('//common/test:common_all_test', args=args),
         "common_coverage": lambda args: run_bazel_coverage('//common/test:common_all_test', args=args),
 
         ######################### build for co_async #########################
-        "co_async": lambda args: run_bazel_build('//co_async //co_async/example/... //co_async/test/...',
-                                                 args=args),
+        "co_async": lambda args: run_bazel_build('//co_async/...', args=args),
         "co_async_test": lambda args: run_bazel_test('//co_async/test:co_async_all_test', args=args),
         "co_async_debug_test": lambda args: run_bazel_test(
             '//co_async/test:co_async_all_test --define=co_async_debug=true', args=args),
         "co_async_coverage": lambda args: run_bazel_coverage('//co_async/test:co_async_all_test', args=args),
 
         ######################### build for concurrency #########################
-        "concurrency": lambda args: run_bazel_build('//concurrency //concurrency/test/...', args=args),
+        "concurrency": lambda args: run_bazel_build('//concurrency/...', args=args),
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
         "concurrency_coverage": lambda args: run_bazel_coverage('//concurrency/test:concurrency_all_test', args=args),
-        "concurrency_valgrind": lambda args: run_valgrind('./bazel-bin/concurrency/test/concurrency_all_test',
-                                                          args=args),
+        "concurrency_valgrind": lambda args: run_valgrind(
+            str(root_path / 'bazel-bin/concurrency/test/concurrency_all_test'), args=args),
         # '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
 
 
@@ -265,29 +266,29 @@ def main() -> None:
         "design_pattern_coverage": lambda args: run_bazel_coverage('//design_pattern:design_pattern_test', args=args),
 
         ######################### build for logger #########################
-        "logger": lambda args: run_bazel_build('//logger //logger/test/... //logger/bench/...', args=args),
+        "logger": lambda args: run_bazel_build('//logger/...', args=args),
         "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
         "logger_coverage": lambda args: run_bazel_coverage('//logger/test:logger_all_test', args=args),
         "logger_bench": lambda args: run_bazel_run('//logger/bench:logger_bench --config=release', args=args),
 
         ######################### build for monkey #########################
-        "monkey": lambda args: run_bazel_build('//monkey //monkey/test:monkey_all_test', args=args),
+        "monkey": lambda args: run_bazel_build('//monkey/...', args=args),
         "monkey_run": lambda args: run_bazel_run('//monkey', args=args),
         "monkey_test": lambda args: run_bazel_test('//monkey/test:monkey_all_test', args=args),
         "monkey_coverage": lambda args: run_bazel_coverage('//monkey/test:monkey_all_test', args=args),
         "monkey_bench": lambda args: run_bazel_run('//monkey/bench:monkey_bench --config=release', args=args),
 
         ######################### build for network #########################
-        "network": lambda args: run_bazel_build('//network //network/example/... //network/test/...', args=args),
+        "network": lambda args: run_bazel_build('//network/...', args=args),
         "network_run": lambda args: (
-            logger.error("Please give config name") if len(args) < 1 else
+            logger.fatal("Please give config name") if len(args) < 1 else
             run_cmd(f'python3 {tool_path / "start_server.py"} {args[0]}')
         ),
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
         "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
         ######################### build for pycstl #########################
-        "pycstl": lambda args: run_bazel_build('//pycstl //pycstl/test/...', args=args),
+        "pycstl": lambda args: run_bazel_build('//pycstl/...', args=args),
         "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', args=args),
         "pycstl_coverage": lambda args: run_bazel_coverage('//pycstl/test:pycstl_all_test', args=args),
 
@@ -298,10 +299,11 @@ def main() -> None:
         "notepad": lambda args: run_bazel_run('//qt/notepad', args=args),
 
         ######################### build for reaction #########################
-        "reaction": lambda args: run_bazel_build('//reaction //reaction/test/...', args=args),
+        "reaction": lambda args: run_bazel_build('//reaction/...', args=args),
         "reaction_test": lambda args: run_bazel_test('//reaction/test:reaction_all_test', args=args),
         "reaction_coverage": lambda args: run_bazel_coverage('//reaction/test:reaction_all_test', args=args),
-        "reaction_valgrind": lambda args: run_valgrind('./bazel-bin/reaction/test/reaction_all_test', args=args),
+        "reaction_valgrind": lambda args: run_valgrind(
+            str(root_path / 'bazel-bin/reaction/test/reaction_all_test'), args=args),
 
         ######################### build for sdl2 #########################
         "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),
@@ -336,10 +338,15 @@ def main() -> None:
         "refresh": lambda args: run_bazel_run('//:refresh_compile_commands', args=args),
     }
 
+    if target in ('help', '-h', '--help'):
+        print("Usage: ./make [target] [...args]")
+        print("Available targets: [", ', '.join(targets.keys()), "]")
+        return
+
     if target not in targets:
         print(f"Unknown target: {target}")
         print("Available targets: [", ', '.join(targets.keys()), "]")
-        return
+        sys.exit(1)
 
     # 执行对应目标的函数
     targets[target](additional_args)
