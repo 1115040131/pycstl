@@ -1,8 +1,6 @@
 graphviz
 ipykernel<7
 matplotlib
-mysql-connector-python
 numpy
-redis
-requests
+regex
 torch
