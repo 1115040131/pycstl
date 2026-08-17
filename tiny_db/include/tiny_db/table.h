@@ -40,7 +40,7 @@ public:
     inline uint32_t GetPageNum() const noexcept { return pager_.page_num_; }
 
     struct iterator {
-        using value_type = Row;
+        using value_type = LeafNodeType::Cell;
         using difference_type = ptrdiff_t;
 
     private:
@@ -74,11 +74,7 @@ public:
 
         LeafNodeType::Cell* operator->() const { return &table_->GetLeafNode(page_index_).cells[cell_index_]; }
 
-        bool operator!=(const iterator& that) const noexcept {
-            return table_ != that.table_ || page_index_ != that.page_index_ || cell_index_ != that.cell_index_;
-        }
-
-        bool operator==(const iterator& that) const noexcept { return !(*this != that); }
+        bool operator==(const iterator& that) const noexcept = default;
 
     private:
         Table* table_{nullptr};
@@ -87,7 +83,7 @@ public:
     };
 
     struct const_iterator {
-        using value_type = Row;
+        using value_type = LeafNodeType::Cell;
         using difference_type = ptrdiff_t;
 
     private:
@@ -129,6 +125,8 @@ public:
         const LeafNodeType::Cell* operator->() const {
             return &table_->GetLeafNode(page_index_).cells[cell_index_];
         }
+
+        bool operator==(const const_iterator& that) const noexcept = default;
 
     private:
         const Table* table_{nullptr};

@@ -3,10 +3,6 @@ load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-licenses(["notice"])
-
-exports_files(["LICENSE"])
-
 qt_cc_library(
     name = "notepad_lib",
     srcs = glob(["src/**/*.cpp"]),
