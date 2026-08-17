@@ -3,10 +3,6 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-licenses(["notice"])
-
-exports_files(["LICENSE"])
-
 cc_library(
     name = "gate_server_lib",
     srcs = glob(["src/**/*.cpp"]),

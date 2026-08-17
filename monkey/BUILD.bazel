@@ -3,33 +3,28 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-licenses(["notice"])
+_LIB_SRCS = glob(
+    ["monkey/**/*.cpp"],
+    exclude = ["monkey/monkey.cpp"],
+)
 
-exports_files(["LICENSE"])
+_LIB_HDRS = glob(["monkey/**/*.h"])
 
 cc_library(
     name = "monkey_lib",
-    srcs = glob(
-        ["monkey/**/*.cpp"],
-        exclude = ["monkey/monkey.cpp"],
-    ),
-    hdrs = glob([
-        "monkey/**/*.h",
-    ]),
+    srcs = _LIB_SRCS,
+    hdrs = _LIB_HDRS,
     copts = COPTS,
     includes = ["."],
     deps = ["@fmt"],
 )
 
+# SORTED_HASH 让 HashLiteral 的键排序后编译，字节码输出确定，供测试断言；
+# 默认变体不排序，供 bench 测量真实性能。两者需同时构建，故不能用 select() 合并。
 cc_library(
     name = "monkey_lib_with_sorted_hash",
-    srcs = glob(
-        ["monkey/**/*.cpp"],
-        exclude = ["monkey/monkey.cpp"],
-    ),
-    hdrs = glob([
-        "monkey/**/*.h",
-    ]),
+    srcs = _LIB_SRCS,
+    hdrs = _LIB_HDRS,
     copts = COPTS,
     defines = ["SORTED_HASH"],
     includes = ["."],
@@ -39,5 +34,6 @@ cc_library(
 cc_binary(
     name = "monkey",
     srcs = ["monkey/monkey.cpp"],
+    copts = COPTS,
     deps = [":monkey_lib"],
 )
