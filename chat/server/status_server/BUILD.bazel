@@ -13,8 +13,8 @@ cc_library(
         "//chat/common",
         "//chat/server/common",
         "//chat/server/proto:status_cc_grpc_proto",
-        "//common",
         "//logger",
+        "@fmt",
         "@grpc//:grpc++",
     ],
 )
@@ -25,5 +25,7 @@ cc_binary(
     copts = COPTS,
     deps = [
         ":status_server_lib",
+        "//chat/server/common",
+        "@boost.asio",
     ],
 )

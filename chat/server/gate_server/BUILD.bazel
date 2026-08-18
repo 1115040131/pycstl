@@ -10,11 +10,15 @@ cc_library(
     copts = COPTS,
     includes = ["include"],
     deps = [
+        "//chat/common",
         "//chat/server/common",
         "//chat/server/proto:verify_cc_grpc_proto",
+        "//chat/server/proto:verify_cc_proto",
         "//common",
         "//logger",
+        "@boost.asio",
         "@boost.beast",
+        "@grpc//:grpc++",
         "@nlohmann_json//:json",
     ],
 )
@@ -25,5 +29,6 @@ cc_binary(
     copts = COPTS,
     deps = [
         ":gate_server_lib",
+        "//chat/server/common",
     ],
 )

@@ -7,8 +7,6 @@
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "common/noncopyable.h"
-
 namespace pyc {
 namespace concurrency {
 

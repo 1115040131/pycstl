@@ -14,6 +14,9 @@ cc_test(
     deps = [
         "//network",
         "//network/test/proto:book_cc_proto",
+        "@fmt",
+        "@googletest//:gtest",
+        "@nlohmann_json//:json",
         "@googletest//:gtest_main",
     ],
 )

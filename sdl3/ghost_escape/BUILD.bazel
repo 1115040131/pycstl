@@ -1,6 +1,8 @@
 load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
+package(features = ["-layering_check"])
+
 cc_binary(
     name = "ghost_escape",
     srcs = glob([

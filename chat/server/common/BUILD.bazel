@@ -42,7 +42,6 @@ cc_library(
         "//common",
         "//logger",
         "@boost.property_tree",
-        "@fmt",
     ],
 )
 
@@ -132,6 +131,7 @@ cc_library(
         ":config_mgr",
         ":defer",
         "//chat/common",
+        "//chat/server/proto:status_cc_proto",
         "//chat/server/proto:status_cc_grpc_proto",
         "//common",
         "@grpc//:grpc++",
@@ -142,7 +142,9 @@ cc_library(
 
 cc_library(
     name = "common",
+    hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
+    includes = ["include"],
     deps = [
         ":config_mgr",
         ":data",

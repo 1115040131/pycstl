@@ -2,6 +2,8 @@
 
 #include <coroutine>
 
+#include "co_async/utils/non_void_helper.h"
+
 namespace pyc {
 namespace co_async {
 

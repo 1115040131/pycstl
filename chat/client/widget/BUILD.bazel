@@ -1,7 +1,10 @@
 load("widgets.bzl", "WIDGETS")
 load("@rules_qt//:qt.bzl", "qt_ui_library")
 
-package(default_visibility = ["//visibility:public"])
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["-layering_check"],
+)
 
 [qt_ui_library(
     name = "%s_ui" % widget,

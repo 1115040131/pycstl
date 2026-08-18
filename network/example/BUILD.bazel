@@ -10,8 +10,8 @@ cc_library(
     ],
     copts = COPTS,
     deps = [
-        "//common",
         "@boost.asio",
+        "@fmt",
     ],
 )
 
@@ -23,53 +23,84 @@ cc_library(
     ],
     copts = COPTS,
     deps = [
-        "//common",
         "@boost.asio",
+        "@fmt",
     ],
 )
 
-NON_GRPC_BINARIES = [
+# layering_check 要求每个 #include 都由直接 deps 提供,所以逐个 example 列自己实际用到的。
+BINARIES = {
     # asio client
-    "sync_client",
-    "test_client_protobuf",
-    "test_client_json",
-    "concurrency_client",
+    "sync_client": [
+        "//network",
+        "@boost.asio",
+        "@fmt",
+        "@nlohmann_json//:json",
+    ],
+    "test_client_protobuf": [
+        "//network",
+        "//network/proto:msg_cc_proto",
+        "@boost.asio",
+        "@fmt",
+    ],
+    "test_client_json": [
+        "//network",
+        "@boost.asio",
+        "@fmt",
+        "@nlohmann_json//:json",
+    ],
+    "concurrency_client": [
+        "//common",
+        "//network",
+        "@boost.asio",
+        "@nlohmann_json//:json",
+    ],
 
     # asio server
-    "sync_server",
-    "async_io_service_pool_server",
-    "async_thread_pool_server",
-    "simple_coroutine_server",
-    "coroutine_server",
+    "sync_server": [
+        "@boost.asio",
+        "@fmt",
+    ],
+    "async_io_service_pool_server": ["//network"],
+    "async_thread_pool_server": ["//network"],
+    "simple_coroutine_server": ["@boost.asio"],
+    "coroutine_server": ["//network"],
 
     # beast http
-    "http_client",
-    "http_server",
-    "websocket_server",
-]
+    "http_client": [
+        "@boost.asio",
+        "@fmt",
+    ],
+    "http_server": [
+        "@boost.asio",
+        "@boost.beast",
+        "@fmt",
+        "@nlohmann_json//:json",
+    ],
+    "websocket_server": ["//network"],
 
-# Only these need grpc dependencies
-GRPC_BINARIES = [
-    #grpc
-    "grpc_server",
-    "grpc_client",
-    "grpc_concurrency_client",
-]
-
-[cc_binary(
-    name = binary,
-    srcs = ["%s.cpp" % binary],
-    copts = COPTS,
-    deps = ["//network"],
-) for binary in NON_GRPC_BINARIES]
-
-[cc_binary(
-    name = binary,
-    srcs = ["%s.cpp" % binary],
-    copts = COPTS,
-    deps = [
-        "//network",
+    # grpc
+    "grpc_server": [
         "//network/proto:greeter_cc_grpc",
+        "@fmt",
         "@grpc//:grpc++",
     ],
-) for binary in GRPC_BINARIES]
+    "grpc_client": [
+        "//network/proto:greeter_cc_grpc",
+        "@fmt",
+        "@grpc//:grpc++",
+    ],
+    "grpc_concurrency_client": [
+        "//common",
+        "//network/proto:greeter_cc_grpc",
+        "@fmt",
+        "@grpc//:grpc++",
+    ],
+}
+
+[cc_binary(
+    name = binary,
+    srcs = ["%s.cpp" % binary],
+    copts = COPTS,
+    deps = deps,
+) for binary, deps in BINARIES.items()]

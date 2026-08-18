@@ -10,6 +10,7 @@ cc_test(
     copts = COPTS,
     deps = [
         "//co_async",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )

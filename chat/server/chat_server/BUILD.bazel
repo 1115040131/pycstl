@@ -13,10 +13,10 @@ cc_library(
         "//chat/common",
         "//chat/server/common",
         "//chat/server/proto:chat_cc_grpc_proto",
+        "//chat/server/proto:chat_cc_proto",
         "//common",
         "//logger",
         "@boost.asio",
-        "@boost.uuid",
         "@fmt",
         "@grpc//:grpc++",
         "@nlohmann_json//:json",
@@ -29,5 +29,8 @@ cc_binary(
     copts = COPTS,
     deps = [
         ":chat_server_lib",
+        "//chat/server/common",
+        "//common",
+        "@grpc//:grpc++",
     ],
 )
