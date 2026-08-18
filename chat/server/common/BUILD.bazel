@@ -1,5 +1,5 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -131,8 +131,8 @@ cc_library(
         ":config_mgr",
         ":defer",
         "//chat/common",
-        "//chat/server/proto:status_cc_proto",
         "//chat/server/proto:status_cc_grpc_proto",
+        "//chat/server/proto:status_cc_proto",
         "//common",
         "@grpc//:grpc++",
     ],

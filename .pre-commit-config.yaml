@@ -8,3 +8,10 @@ repos:
         types: [c++]
         args: [--style=file]  # 使用项目中的 .clang-format 文件
         exclude: ^third_party/.*$  # 排除第三方代码
+
+  - repo: https://github.com/keith/pre-commit-buildifier
+    # 对应 buildtools 8.5.1(与 bazel 9.1.1 兼容),升级走 pre-commit autoupdate
+    rev: 8.5.1.3
+    hooks:
+      # 覆盖 BUILD.bazel / MODULE.bazel / REPO.bazel / *.bzl
+      - id: buildifier

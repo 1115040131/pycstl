@@ -1,5 +1,5 @@
-load("widgets.bzl", "WIDGETS")
 load("@rules_qt//:qt.bzl", "qt_ui_library")
+load("widgets.bzl", "WIDGETS")
 
 package(
     default_visibility = ["//visibility:public"],

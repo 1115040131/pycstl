@@ -3,5 +3,6 @@ module(
     version = "0.0.1",
 )
 
+bazel_dep(name = "rules_cc", version = "0.2.19")
 bazel_dep(name = "imgui", version = "1.92.2")
 bazel_dep(name = "pycstl", version = "0.0.1")

@@ -1,5 +1,5 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
