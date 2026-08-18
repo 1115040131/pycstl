@@ -2,3 +2,5 @@ module(
     name = "sdl2_gfx",
     version = "1.0.4",
 )
+
+bazel_dep(name = "rules_cc", version = "0.2.19")

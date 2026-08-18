@@ -1,5 +1,5 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_test")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 
 cc_test(
     name = "network_all_test",
@@ -16,7 +16,7 @@ cc_test(
         "//network/test/proto:book_cc_proto",
         "@fmt",
         "@googletest//:gtest",
-        "@nlohmann_json//:json",
         "@googletest//:gtest_main",
+        "@nlohmann_json//:json",
     ],
 )

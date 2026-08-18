@@ -1,5 +1,5 @@
-load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("//build_defs:cpp_opts.bzl", "COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,5 +35,8 @@ cc_binary(
     name = "monkey",
     srcs = ["monkey/monkey.cpp"],
     copts = COPTS,
-    deps = [":monkey_lib","@fmt",],
+    deps = [
+        ":monkey_lib",
+        "@fmt",
+    ],
 )

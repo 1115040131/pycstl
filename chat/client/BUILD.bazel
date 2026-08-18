@@ -1,6 +1,6 @@
+load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 load("//chat/client/widget:widgets.bzl", "WIDGETS")
-load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 
 package(
     default_visibility = ["//visibility:public"],
