@@ -45,11 +45,11 @@ build --host_cxxopt='-std=c++23'
 build --per_file_copt=external/.*@-w
 build --host_per_file_copt=external/.*@-w
 
+build --per_file_copt=external/.*@-Wno-private-header
+build --host_per_file_copt=external/.*@-Wno-private-header
+
 # Use -isystem for external headers so the compiler ignores warnings from them
 build --features=external_include_paths
-
-# Disable Clang module layering check (grpc etc. have incomplete module boundaries)
-build --features=-layering_check
 
 #-------------------------------------------------------------------------------------
 # Environment

@@ -10,5 +10,6 @@ cc_binary(
     deps = [
         "//monkey:monkey_lib",
         "@gflags",
+        "@fmt",
     ],
 )

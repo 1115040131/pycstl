@@ -1,6 +1,8 @@
 load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
+package(features = ["-layering_check"])
+
 cc_binary(
     name = "shooter",
     srcs = glob([
@@ -12,6 +14,9 @@ cc_binary(
     includes = ["include"],
     deps = [
         "//common",
-        "//sdl2/common",
+        "//sdl2",
+        "//sdl2:sdl2_image",
+        "//sdl2:sdl2_mixer",
+        "//sdl2:sdl2_ttf",
     ],
 )

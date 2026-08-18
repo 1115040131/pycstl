@@ -1,7 +1,12 @@
 load("//build_defs:cpp_opts.bzl", "COPTS")
 load("@rules_qt//:qt.bzl", "qt_cc_binary")
 
-package(default_visibility = ["//visibility:public"])
+# @rules_qt//:qt_* 是纯转发 target（自身无 hdrs，头文件在 @qt_<os>_<cpu>//:qt_*_<os>），
+# 而 layering_check 只认直接 deps 的 cppmap，故整包关闭；moc/uic 生成的代码同样无法满足检查。
+package(
+    default_visibility = ["//visibility:public"],
+    features = ["-layering_check"],
+)
 
 qt_cc_binary(
     name = "99table",

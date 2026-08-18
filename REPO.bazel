@@ -1,0 +1,11 @@
+"""Repo-wide defaults for the main repository (does not apply to external repos)."""
+
+repo(
+    # Compile every hdrs entry as its own TU (-xc++-header -fsyntax-only), so a header
+    # that only works because the includer pulled something in first fails the build.
+    # Clang 模块分层检查：include 了哪个库的头，就必须在 deps 里声明。
+    features = [
+        "layering_check",
+        "parse_headers",
+    ],
+)

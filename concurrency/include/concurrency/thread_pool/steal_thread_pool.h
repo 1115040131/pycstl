@@ -3,6 +3,7 @@
 #include <atomic>
 #include <future>
 #include <thread>
+#include <vector>
 
 #include "common/singleton.h"
 #include "concurrency/thread_safe_queue/thread_safe_queue.h"

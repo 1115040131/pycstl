@@ -10,8 +10,5 @@ cc_library(
     copts = COPTS,
     includes = ["include"],
     linkopts = ["-latomic"],
-    deps = [
-        "//common",
-        "@fmt",
-    ],
+    deps = ["//common"],
 )

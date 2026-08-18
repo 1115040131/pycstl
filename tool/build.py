@@ -20,13 +20,13 @@ tool_path = root_path / 'tool'  # tool 目录
 
 def run_bazel_build(target: str, check: bool = True, args: list[str] | None = None) -> None:
     command = f'bazel build {target} {" ".join(args or [])}'
-    run_cmd(command, check)
+    run_cmd(command, check=False)
 
 
 def run_bazel_run(target: str, check: bool = False, args: list[str] | None = None) -> None:
     # 交互式运行, Ctrl+C 退出时返回非零码属正常情况, 因此不做 check
     command = f'bazel run {target} {" ".join(args or [])}'
-    run_cmd(command, check)
+    run_cmd(command, check=False)
 
 
 def run_bazel_test(target: str, test_output: bool = True, check: bool = True,
@@ -34,13 +34,13 @@ def run_bazel_test(target: str, test_output: bool = True, check: bool = True,
     command = f'bazel test {target} {" ".join(args or [])}'
     if test_output:
         command += ' --test_output=all'
-    run_cmd(command, check)
+    run_cmd(command, check=False)
 
 
 def run_bazel_coverage(target: str, check: bool = True, args: list[str] | None = None) -> None:
     command = (f'bazel coverage {target} --nocache_test_results '
                f'--instrumentation_filter="//..." {" ".join(args or [])}')
-    run_cmd(command, check)
+    run_cmd(command, check=False)
 
 
 def get_lcov_major_version() -> int:

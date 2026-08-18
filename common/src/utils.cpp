@@ -1,8 +1,5 @@
 #include "common/utils.h"
 
-#include <sstream>
-#include <thread>
-
 namespace pyc {
 
 std::string_view GetSimpleName(std::string_view functionName) {

@@ -13,6 +13,8 @@ cc_test(
     copts = COPTS,
     deps = [
         "//common",
+        "@fmt",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )

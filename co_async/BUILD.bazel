@@ -19,7 +19,10 @@ cc_library(
     }),
     includes = ["include"],
     deps = ["//common"] + select({
-        ":debug_build": ["//logger"],
+        ":debug_build": [
+            "//logger",
+            "@fmt",
+        ],
         "//conditions:default": [],
     }),
 )
