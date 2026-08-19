@@ -23,22 +23,21 @@ git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "g
 # 2. The `repo_name` attribute allows users to reference this dependency via the `gtest` repo name.
 BOOST_VERSION = "1.90.0"
 
-bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "boost.asio", version = BOOST_VERSION + ".bcr.1")
 bazel_dep(name = "boost.beast", version = BOOST_VERSION + ".bcr.1")
 bazel_dep(name = "boost.property_tree", version = BOOST_VERSION + ".bcr.1")
 bazel_dep(name = "boost.uuid", version = BOOST_VERSION + ".bcr.1")
-bazel_dep(name = "eigen", version = "5.0.1.bcr.1")
-bazel_dep(name = "fmt", version = "12.1.0")
-bazel_dep(name = "gflags", version = "2.2.2.bcr.1")
+bazel_dep(name = "eigen", version = "5.0.1.bcr.2")
+bazel_dep(name = "fmt", version = "12.2.0")
+bazel_dep(name = "gflags", version = "2.3.1")
 bazel_dep(name = "glm", version = "1.0.3")
-bazel_dep(name = "grpc", version = "1.81.1")
+bazel_dep(name = "grpc", version = "1.83.0")
 bazel_dep(name = "hiredis", version = "1.3.0")
 bazel_dep(name = "imgui", version = "1.92.2")
 bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.1")
 bazel_dep(name = "platforms", version = "1.1.0")  # rules_qt need it
 bazel_dep(name = "protobuf", version = "35.1")
-bazel_dep(name = "rules_cc", version = "0.2.19")
+bazel_dep(name = "rules_cc", version = "0.2.22")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
 bazel_dep(name = "spdlog", version = "1.17.0")
 
@@ -142,23 +141,24 @@ local_path_override(
     path = "third_party/sdl2_gfx",
 )
 
-git_repository(
-    name = "entt",
+bazel_dep(name = "entt")
+git_override(
+    module_name = "entt",
+    commit = "85c6bba014049b5de8fad49d25424df2f1f6a8c1",  # v4.0.0
     remote = "https://github.com/skypjack/entt",
-    tag = "v3.16.0",
 )
 
 #-------------------------------------------------------------------------------------
 # Qt6
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "rules_qt", version = "0.0.5")
+bazel_dep(name = "rules_qt", version = "0.0.7")
 
 qt = use_extension("@rules_qt//extension:qt.bzl", "fetch")
 qt.install(
     name = "qt_linux_x86_64",
     build_file = "@rules_qt//extension:qt/6.8.3/linux_x86_64.BUILD",
-    os = "linux",
+    os = "linux_x86_64",
     version = "6.8.3",
 )
 use_repo(qt, "qt_linux_x86_64")
@@ -171,7 +171,7 @@ register_toolchains(
 # Node.js
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "aspect_rules_js", version = "2.9.2")
+bazel_dep(name = "aspect_rules_js", version = "3.4.0")
 
 ####### Node.js version #########
 # By default you get the node version from DEFAULT_NODE_VERSION in @rules_nodejs//nodejs:repositories.bzl
@@ -199,7 +199,7 @@ use_repo(pnpm, "pnpm")
 # Python
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "rules_python", version = "2.0.3")
+bazel_dep(name = "rules_python", version = "2.3.1")
 
 PYTHON_VERSION = "3.12"
 
@@ -222,8 +222,8 @@ use_repo(pip, "pycstl_deps")
 # Test only
 #-------------------------------------------------------------------------------------
 
-bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
-bazel_dep(name = "google_benchmark", version = "1.9.5")
+bazel_dep(name = "googletest", version = "1.18.0", dev_dependency = True)
+bazel_dep(name = "google_benchmark", version = "1.9.5", dev_dependency = True)
 
 # 导出 compile_commands.json
 # Hedron's Compile Commands Extractor for Bazel

@@ -60,7 +60,7 @@ bool setup_working_directory(int, char** argv) {
 void setupInitialScene(Context& context) {
     // GameApp在调用run方法之前，先创建并设置初始场景
     auto title_scene = std::make_unique<TitleScene>(context);
-    context.getDispatcher().trigger<PushSceneEvent>(PushSceneEvent{std::move(title_scene)});
+    context.getDispatcher().enqueue(PushSceneEvent{std::move(title_scene)});
 }
 
 int main(int argc, char** argv) {

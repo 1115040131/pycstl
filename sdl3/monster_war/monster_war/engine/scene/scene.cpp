@@ -49,16 +49,16 @@ void Scene::clean() {
     spdlog::trace("场景 '{}' 清理完成。", scene_name_);
 }
 
-void Scene::requestPopScene() { context_.getDispatcher().trigger<PopSceneEvent>(); }
+void Scene::requestPopScene() { context_.getDispatcher().trigger(PopSceneEvent{}); }
 
 void Scene::requestPushScene(std::unique_ptr<Scene> scene) {
-    context_.getDispatcher().trigger<PushSceneEvent>(PushSceneEvent{std::move(scene)});
+    context_.getDispatcher().enqueue(PushSceneEvent{std::move(scene)});
 }
 
 void Scene::requestReplaceScene(std::unique_ptr<Scene> scene) {
-    context_.getDispatcher().trigger<ReplaceSceneEvent>(ReplaceSceneEvent{std::move(scene)});
+    context_.getDispatcher().enqueue(ReplaceSceneEvent{std::move(scene)});
 }
 
-void Scene::quit() { context_.getDispatcher().trigger<QuitEvent>(); }
+void Scene::quit() { context_.getDispatcher().trigger(QuitEvent{}); }
 
 }  // namespace pyc::monster_war

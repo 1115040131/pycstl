@@ -8,6 +8,9 @@
     },
     "author": "",
     "license": "ISC",
+    "pnpm": {
+        "onlyBuiltDependencies": []
+    },
     "dependencies": {
         "@grpc/grpc-js": "latest",
         "@grpc/proto-loader": "latest",

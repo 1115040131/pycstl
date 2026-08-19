@@ -67,8 +67,8 @@ public:
 
     template <typename... Args>
     [[noreturn]] inline void fatal(FormatString<Args...> fmt_with_location, Args&&... args) const {
-        log(LogLevel::kFatal, fmt_with_location.fmt, fmt::make_format_args(args...), fmt_with_location.location,
-            fmt_with_location.function);
+        log(LogLevel::kFatal, fmt_with_location.fmt.get(), fmt::make_format_args(args...),
+            fmt_with_location.location, fmt_with_location.function);
         // abort() does not flush stdio streams, so the record would be lost for any
         // sink that buffers.
         for (const auto& sink : sinks_) {
@@ -106,7 +106,7 @@ private:
         if (level < min_level_) {
             return;
         }
-        log(level, fmt_with_location.fmt, fmt::make_format_args(args...), fmt_with_location.location,
+        log(level, fmt_with_location.fmt.get(), fmt::make_format_args(args...), fmt_with_location.location,
             fmt_with_location.function);
     }
 
