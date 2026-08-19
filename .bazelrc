@@ -26,6 +26,9 @@ common --noexperimental_check_external_repository_files
 # Use prebuilt protoc instead of compiling from source (saves minutes)
 common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
 
+# Disable implicit __init__.py files creation
+common --incompatible_default_to_explicit_init_py
+
 #-------------------------------------------------------------------------------------
 # C++ compilation
 #-------------------------------------------------------------------------------------

@@ -64,7 +64,7 @@ void InputManager::update() {
     }
 }
 
-void InputManager::quit() { dispatcher_->trigger<QuitEvent>(); }
+void InputManager::quit() { dispatcher_->trigger(QuitEvent{}); }
 
 bool InputManager::isActionDown(entt::id_type action_name_id) const {
     auto it = action_states_.find(action_name_id);

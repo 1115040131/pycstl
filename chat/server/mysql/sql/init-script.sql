@@ -147,9 +147,9 @@ BEGIN
             COMMIT;
         ELSE
             -- email也不存在，更新user_id表
-            UPDATE `user_id` SET `id` = `id` + 1;
+            UPDATE `user_id` SET `id` = LAST_INSERT_ID(`id` + 1);
             -- 获取更新后的id
-            SELECT `id` INTO @new_id FROM `user_id`;
+            SET @new_id = LAST_INSERT_ID();
             -- 在user表中插入新记录
             INSERT INTO `user` (`uid`, `name`, `email`, `pwd`) VALUES (@new_id, new_name, new_email, new_pwd);
             -- 设置result为新插入的uid

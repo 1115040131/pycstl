@@ -336,6 +336,13 @@ def main() -> None:
         # 更新 compile_commands.json 文件
         "refresh_all": lambda args: run_bazel_run('@hedron_compile_commands//:refresh_all', args=args),
         "refresh": lambda args: run_bazel_run('//:refresh_compile_commands', args=args),
+
+        ######################### 更新依赖锁文件 #########################
+        # 从 requirements.in 重新生成 requirements_lock.txt
+        "update_pip": lambda args: run_bazel_run('//:requirements.update', args=args),
+        # 从 package.json 重新生成 pnpm-lock.yaml
+        "update_pnpm": lambda args: run_cmd(
+            f'bazel run -- @pnpm --dir {root_path} install --lockfile-only'),
     }
 
     if target in ('help', '-h', '--help'):
