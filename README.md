@@ -117,14 +117,6 @@ netsh int ipv4 set dynamicport tcp start=49152 num=16384
 netsh int ipv6 set dynamicport tcp start=49152 num=16384
 ```
 
-### mysql-connector-python
-
-安装 mysql-connector-python 包, 用以检测 mysql 容器是否已经 ready
-
-```bash
-pip install mysql-connector-python --break-system-packages
-```
-
 ### acl 工具
 
 安装 acl 工具, 用户管理让 mysql 创建的所有文件当前用户都有读写权限
