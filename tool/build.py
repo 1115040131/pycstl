@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import re
 import shutil
 import subprocess
@@ -7,7 +8,7 @@ import sys
 import tempfile
 
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, NoReturn
 from cmd_utils import mysql_service_is_ready, run_cmd, run_docker, run_tmux, setup_directory, wait_until
 from logger import Logger, LogStyle
 
@@ -16,6 +17,46 @@ logger = Logger(LogStyle.NO_DEBUG_INFO)
 # 路径定义
 root_path = Path(__file__).resolve().parent.parent
 tool_path = root_path / 'tool'  # tool 目录
+
+
+class BuildArgumentParser(argparse.ArgumentParser):
+    """用法出错时给出完整帮助, 与 help 目标的提示样式保持一致"""
+
+    def error(self, message: str) -> NoReturn:
+        self.print_help(sys.stderr)
+        self.exit(1, f'\n{self.prog}: error: {message}\n')
+
+
+def parse_args(target_names: list[str]) -> tuple[str, list[str]]:
+    """校验目标名与编译模式, 未识别的参数原样透传给 bazel"""
+    parser = BuildArgumentParser(
+        description='Project build entry, unrecognized args are passed through to bazel',
+        epilog=f"available targets: {', '.join(target_names)}",
+        # bazel 的长选项 (如 --define) 不应被缩写匹配到本脚本的选项上
+        allow_abbrev=False,
+    )
+    # 目标名不用 choices 校验, 否则报错时会重复列出 epilog 里已有的目标清单
+    parser.add_argument('target', metavar='target',
+                        help="build target, or 'help' to list all targets")
+
+    # 编译模式互斥, 展开为 bazel 的 --config
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('-d', dest='config', action='store_const', const='--config=dbg',
+                      help='dbg mode (-O0 -g), for debugging')
+    mode.add_argument('-o', dest='config', action='store_const', const='--config=opt',
+                      help='opt mode (-O2), for benchmarks and releases')
+
+    args, passthrough = parser.parse_known_args()
+
+    if args.target == 'help':
+        parser.print_help()
+        parser.exit()
+
+    if args.target not in target_names:
+        parser.error(f'unknown target: {args.target}')
+
+    # --config 追加在末尾, 避免占用 build/run/test 等入口的 args[0] (目标名)
+    return args.target, passthrough + ([args.config] if args.config else [])
 
 
 def run_bazel_build(target: str, check: bool = True, args: list[str] | None = None) -> None:
@@ -84,9 +125,24 @@ def generate_coverage_report() -> None:
     logger.info(f"Coverage report generated: {output_dir}/index.html")
 
 
-def run_valgrind(target: str, args: list[str] | None = None) -> None:
-    command = f'valgrind --leak-check=full --track-origins=yes {target} {" ".join(args or [])}'
-    run_cmd(command)
+def run_valgrind(bazel_target: str, binary: str, args: list[str] | None = None) -> None:
+    """valgrind 需要调试信息才能定位到源码行, 因此固定以 dbg 构建, 并取该配置下的产物"""
+    run_bazel_build(bazel_target, args=['--config=dbg'])
+
+    # 产物目录问 bazel 要, 不要硬编码 bazel-out/k8-dbg (k8 只是 x86_64 的平台名),
+    # 也不能用 bazel-bin 软链 (它指向最后一次构建的配置, 未必是 dbg)
+    info = subprocess.run(['bazel', 'info', 'bazel-bin', '--config=dbg'],
+                          capture_output=True, text=True)
+    if info.returncode != 0:
+        logger.fatal("Failed to resolve bazel-bin for the dbg configuration")
+
+    binary_path = Path(info.stdout.strip()) / binary
+    if not binary_path.exists():
+        logger.fatal(f"Binary not found: {binary_path} (dbg build may have failed)")
+
+    # -d/-o 展开出的 --config 属于 bazel 选项, 不能传给测试二进制
+    bin_args = [arg for arg in args or [] if not arg.startswith('--config=')]
+    run_cmd(f'valgrind --leak-check=full --track-origins=yes {binary_path} {" ".join(bin_args)}')
 
 
 def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) -> None:
@@ -122,13 +178,6 @@ def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) ->
 
 
 def main() -> None:
-    if len(sys.argv) < 2:
-        logger.fatal("Usage: ./make [target] [...args]")
-
-    # 第一个参数是目标名称，其余的是传递给bazel命令的参数
-    target = sys.argv[1]
-    additional_args = sys.argv[2:]
-
     # chat 相关数据
     data_direction = f'{root_path}/chat/server/mysql/data'
     log_direction = f'{root_path}/chat/server/mysql/logs'
@@ -190,7 +239,7 @@ def main() -> None:
         "chat_prepare": lambda args: (
             targets["chat_redis_server"](args=[]),
             targets["chat_mysql_server"](args=[]),
-            wait_until(lambda: mysql_service_is_ready('root', '123456', 'localhost', 3306),
+            wait_until(lambda: mysql_service_is_ready('localhost', 3306),
                        'mysql_service_is_ready', interval=1),
         ),
         "chat_clear": lambda args: (
@@ -251,7 +300,8 @@ def main() -> None:
         "concurrency_test": lambda args: run_bazel_test('//concurrency/test:concurrency_all_test', args=args),
         "concurrency_coverage": lambda args: run_bazel_coverage('//concurrency/test:concurrency_all_test', args=args),
         "concurrency_valgrind": lambda args: run_valgrind(
-            str(root_path / 'bazel-bin/concurrency/test/concurrency_all_test'), args=args),
+            '//concurrency/test:concurrency_all_test',
+            'concurrency/test/concurrency_all_test', args=args),
         # '--gtest_filter=ThreadSafeAdaptorTest.*:ThreadSafeHashTableTest.*:ThreadSafeListTest.*'
 
 
@@ -269,14 +319,14 @@ def main() -> None:
         "logger": lambda args: run_bazel_build('//logger/...', args=args),
         "logger_test": lambda args: run_bazel_test('//logger/test:logger_all_test', args=args),
         "logger_coverage": lambda args: run_bazel_coverage('//logger/test:logger_all_test', args=args),
-        "logger_bench": lambda args: run_bazel_run('//logger/bench:logger_bench --config=release', args=args),
+        "logger_bench": lambda args: run_bazel_run('//logger/bench:logger_bench --config=opt', args=args),
 
         ######################### build for monkey #########################
         "monkey": lambda args: run_bazel_build('//monkey/...', args=args),
         "monkey_run": lambda args: run_bazel_run('//monkey', args=args),
         "monkey_test": lambda args: run_bazel_test('//monkey/test:monkey_all_test', args=args),
         "monkey_coverage": lambda args: run_bazel_coverage('//monkey/test:monkey_all_test', args=args),
-        "monkey_bench": lambda args: run_bazel_run('//monkey/bench:monkey_bench --config=release', args=args),
+        "monkey_bench": lambda args: run_bazel_run('//monkey/bench:monkey_bench --config=opt', args=args),
 
         ######################### build for network #########################
         "network": lambda args: run_bazel_build('//network/...', args=args),
@@ -303,7 +353,8 @@ def main() -> None:
         "reaction_test": lambda args: run_bazel_test('//reaction/test:reaction_all_test', args=args),
         "reaction_coverage": lambda args: run_bazel_coverage('//reaction/test:reaction_all_test', args=args),
         "reaction_valgrind": lambda args: run_valgrind(
-            str(root_path / 'bazel-bin/reaction/test/reaction_all_test'), args=args),
+            '//reaction/test:reaction_all_test',
+            'reaction/test/reaction_all_test', args=args),
 
         ######################### build for sdl2 #########################
         "sdl2_demo": lambda args: run_bazel_run('//sdl2/demo', args=args),
@@ -312,13 +363,13 @@ def main() -> None:
 
         ######################### build for sdl3 #########################
         "sdl3_demo": lambda args: run_bazel_run('//sdl3/demo', args=args),
-        "sdl3_demo_release": lambda args: run_bazel_run('//sdl3/demo --config=release', args=args),
+        "sdl3_demo_release": lambda args: run_bazel_run('//sdl3/demo --config=opt', args=args),
         "ghost_escape": lambda args: run_bazel_run('//sdl3/ghost_escape', args=args),
-        "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=release', args=args),
+        "ghost_escape_release": lambda args: run_bazel_run('//sdl3/ghost_escape --config=opt', args=args),
         "monster_war": lambda args: run_bazel_run('//sdl3/monster_war', args=args),
-        "monster_war_release": lambda args: run_bazel_run('//sdl3/monster_war --config=release', args=args),
+        "monster_war_release": lambda args: run_bazel_run('//sdl3/monster_war --config=opt', args=args),
         "sunny_land": lambda args: run_bazel_run('//sdl3/sunny_land', args=args),
-        "sunny_land_release": lambda args: run_bazel_run('//sdl3/sunny_land --config=release', args=args),
+        "sunny_land_release": lambda args: run_bazel_run('//sdl3/sunny_land --config=opt', args=args),
 
         ######################### build for tetris #########################
         "tetris": lambda args: run_bazel_build('//tetris', args=args),
@@ -345,15 +396,7 @@ def main() -> None:
             f'bazel run -- @pnpm --dir {root_path} install --lockfile-only'),
     }
 
-    if target in ('help', '-h', '--help'):
-        print("Usage: ./make [target] [...args]")
-        print("Available targets: [", ', '.join(targets.keys()), "]")
-        return
-
-    if target not in targets:
-        print(f"Unknown target: {target}")
-        print("Available targets: [", ', '.join(targets.keys()), "]")
-        sys.exit(1)
+    target, additional_args = parse_args(list(targets.keys()))
 
     # 执行对应目标的函数
     targets[target](additional_args)

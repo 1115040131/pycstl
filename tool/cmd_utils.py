@@ -3,6 +3,7 @@ import os
 import subprocess
 import shlex
 import shutil
+import socket
 import time
 
 from logger import Logger
@@ -178,52 +179,25 @@ def wait_until(condition_func, msg, interval=0.5):
     logger.info(f"{msg} satisfied!")
 
 
-def mysql_service_is_ready(user, password, host, port):
-    """尝试连接到MySQL服务器并执行一个基本查询，以验证服务是否就绪。
+def mysql_service_is_ready(host, port, timeout=2):
+    """探测MySQL服务是否已经就绪, 仅依赖标准库。
+
+    MySQL 协议由服务端先发送 handshake 包, 因此连接建立且收到数据即说明 mysqld
+    已经开始接受网络连接。官方 mysql 镜像在执行初始化脚本期间, 临时 mysqld 是带
+    --skip-networking 启动的, 所以端口可连通也意味着初始化已完成。
 
     Args:
-        user (str): 数据库用户名称。
-        password (str): 数据库用户密码。
         host (str): MySQL服务器主机名或IP地址。
         port (int): MySQL服务器端口号。
+        timeout (float): 单次探测的超时时间, 单位为秒。
 
     Returns:
-        bool: 如果成功执行查询，则表示MySQL服务就绪，返回True。
+        bool: MySQL服务就绪返回True, 否则返回False。
     """
 
     try:
-        import mysql.connector
-        from mysql.connector import Error
-
-        conn = None  # 初始化conn为None，确保即使数据库连接失败也能进入finally块
-        try:
-            # 尝试创建数据库连接
-            conn = mysql.connector.connect(
-                user=user,
-                password=password,
-                host=host,
-                port=port
-            )
-
-            # 创建一个cursor对象
-            cursor = conn.cursor()
-            cursor.execute("SHOW VARIABLES LIKE 'version';")
-
-            # 确认我们得到了响应
-            if cursor.fetchone():
-                return True
-            else:
-                return False
-
-        except Error as e:
-            logger.warn(f"Error connecting to MySQL: {e}")
-            return False
-        finally:
-            if conn is not None and conn.is_connected():  # 在尝试关闭前检查conn是否已创建并连接
-                cursor.close()
-                conn.close()
-
-    except ImportError:
-        logger.warn("mysql-connector-python not installed, check MySQL by sleep 10s...")
-        time.sleep(10)
-        return True
+        with socket.create_connection((host, port), timeout=timeout) as sock:
+            return bool(sock.recv(1))
+    except OSError as e:
+        logger.warn(f"Error connecting to MySQL {host}:{port}: {e}")
+        return False

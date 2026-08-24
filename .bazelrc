@@ -2,9 +2,9 @@
 # Build configurations (use with --config=<name>)
 #-------------------------------------------------------------------------------------
 
-build:debug --compilation_mode=dbg
-build:release --compilation_mode=opt
-build:fastbuild --compilation_mode=fastbuild
+# Default compilation_mode is fastbuild; switch explicitly when you need -g or -O2
+build:dbg --compilation_mode=dbg
+build:opt --compilation_mode=opt
 
 # CI 专用配置
 build:ci --test_env=CO_ASYNC_TIMER_TOLERANCE_MS=20
@@ -24,7 +24,7 @@ common --incompatible_autoload_externally=+@rules_cc,+@rules_python
 common --noexperimental_check_external_repository_files
 
 # Use prebuilt protoc instead of compiling from source (saves minutes)
-common --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
+common --@protobuf//bazel/flags:prefer_prebuilt_protoc
 
 # Disable implicit __init__.py files creation
 common --incompatible_default_to_explicit_init_py
@@ -32,9 +32,6 @@ common --incompatible_default_to_explicit_init_py
 #-------------------------------------------------------------------------------------
 # C++ compilation
 #-------------------------------------------------------------------------------------
-
-# Default to debug mode
-build --compilation_mode=dbg
 
 # C++23 standard
 build --cxxopt='-std=c++23'
