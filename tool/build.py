@@ -177,6 +177,23 @@ def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) ->
     run_tmux(windows)
 
 
+def check_venv() -> None:
+    python = root_path / '.venv' / 'bin' / 'python'
+    if not python.exists():
+        logger.fatal('虚拟环境不存在，请先运行: make venv')
+
+    req = root_path / 'requirements_venv.in'
+    site_packages = list((root_path / '.venv' / 'lib').glob('python*/site-packages'))
+    if site_packages and req.stat().st_mtime > site_packages[0].stat().st_mtime:
+        logger.warn('requirements_venv.in 已更新，虚拟环境可能过期，建议运行: make venv')
+
+
+def run_venv(command: str, args: list[str] | None = None) -> None:
+    check_venv()
+    python = root_path / '.venv' / 'bin' / 'python'
+    run_cmd(f'{python} {command} {" ".join(args or [])}')
+
+
 def venv(args: list[str]):
     script_path = tool_path / 'setup_venv.sh'
 
@@ -350,8 +367,11 @@ def main() -> None:
         "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
         ######################### build for nn #########################
-        "micrograd": lambda args: run_bazel_build('//nn/micrograd/...', args=args),
-        "micrograd_test": lambda args: run_bazel_test('//nn/micrograd:micrograd_test', args=args),
+        "bigram": lambda args: run_venv(root_path / 'nn/nanoGPT/bigram.py', args),
+        "gpt": lambda args: run_venv(root_path / 'nn/nanoGPT/gpt.py', args),
+        "micrograd_test": lambda args: run_venv(
+            f'-m unittest discover -s {root_path / "nn/micrograd/test"} -t {root_path / "nn/micrograd"}', args
+        ),
 
         ######################### build for pycstl #########################
         "pycstl": lambda args: run_bazel_build('//pycstl/...', args=args),

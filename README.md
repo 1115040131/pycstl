@@ -26,6 +26,32 @@ chmod +x bazelisk-linux-amd64
 sudo mv bazelisk-linux-amd64 /usr/local/bin/bazel
 ```
 
+### buildifier
+
+BUILD.bazel / MODULE.bazel / *.bzl 的格式化与 lint 工具
+
+提交时由 pre-commit 自动下载并运行 (见 .pre-commit-config.yaml)，本机安装是为了让编辑器保存时能格式化 \
+版本与 .pre-commit-config.yaml 中的 rev 保持一致，避免本地与 CI 格式化结果不同
+
+```bash
+wget https://github.com/bazelbuild/buildtools/releases/download/v8.5.1/buildifier-linux-amd64
+chmod +x buildifier-linux-amd64
+sudo mv buildifier-linux-amd64 /usr/local/bin/buildifier
+```
+
+### starpls
+
+Starlark 语言服务器，为 BUILD.bazel / *.bzl 提供跳转定义、补全、hover 与类型诊断
+
+.vscode/settings.json 中已配置 `bazel.lsp.command: starpls`，未安装时 VSCode 会提示语言服务器启动失败 \
+它不做格式化，格式化仍由 buildifier 负责
+
+```bash
+wget https://github.com/withered-magic/starpls/releases/download/v0.1.22/starpls-linux-amd64
+chmod +x starpls-linux-amd64
+sudo mv starpls-linux-amd64 /usr/local/bin/starpls
+```
+
 ### 必备库
 
 ```bash
