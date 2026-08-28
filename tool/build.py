@@ -190,8 +190,8 @@ def check_venv() -> None:
 
 def run_venv(command: str, args: list[str] | None = None) -> None:
     check_venv()
-    python = root_path / '.venv' / 'bin' / 'python'
-    run_cmd(f'{python} {command} {" ".join(args or [])}')
+    bin_path = root_path / '.venv' / 'bin'
+    run_cmd(f'{bin_path}/{command} {" ".join(args or [])}')
 
 
 def venv(args: list[str]):
@@ -367,10 +367,12 @@ def main() -> None:
         "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
         ######################### build for nn #########################
-        "bigram": lambda args: run_venv(root_path / 'nn/nanoGPT/bigram.py', args),
-        "gpt": lambda args: run_venv(root_path / 'nn/nanoGPT/gpt.py', args),
+        "bigram": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/bigram.py"}', args),
+        "gpt": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/gpt.py"}', args),
+        "train_gpt2": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
+        "train_gpt2_dist": lambda args: run_venv(f'torchrun --standalone --nproc_per_node=8 {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
         "micrograd_test": lambda args: run_venv(
-            f'-m unittest discover -s {root_path / "nn/micrograd/test"} -t {root_path / "nn/micrograd"}', args
+            f'python -m unittest discover -s {root_path / "nn/micrograd/test"} -t {root_path / "nn/micrograd"}', args
         ),
 
         ######################### build for pycstl #########################
