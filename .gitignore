@@ -19,3 +19,6 @@ __pycache__
 # chat
 chat/server/mysql/data
 chat/server/mysql/logs
+
+# nn
+nn/nanoGPT/edu_fineweb10B
