@@ -1,0 +1,10 @@
+datasets
+graphviz
+ipykernel<7
+ipywidgets
+matplotlib
+numpy
+regex
+tiktoken
+torch
+transformers

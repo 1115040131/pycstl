@@ -177,6 +177,35 @@ def chat_run(targets: dict[str, Callable[[list[str]], Any]], args: list[str]) ->
     run_tmux(windows)
 
 
+def check_venv() -> None:
+    python = root_path / '.venv' / 'bin' / 'python'
+    if not python.exists():
+        logger.fatal('虚拟环境不存在，请先运行: make venv')
+
+    req = root_path / 'requirements_venv.in'
+    marker = root_path / '.venv' / '.deps_installed'
+    if not marker.exists() or req.stat().st_mtime > marker.stat().st_mtime:
+        logger.warn('requirements_venv.in 已更新，虚拟环境可能过期，建议运行: make venv')
+
+
+def run_venv(command: str, args: list[str] | None = None) -> None:
+    check_venv()
+    bin_path = root_path / '.venv' / 'bin'
+    run_cmd(f'{bin_path}/{command} {" ".join(args or [])}')
+
+
+def venv(args: list[str]):
+    script_path = tool_path / 'setup_venv.sh'
+
+    # 必须使用 open() 打开文件，获得文件对象 f
+    with open(script_path, 'r') as f:
+        result = subprocess.run(["bash", "-s", "--", root_path, root_path / 'requirements_venv.in'], stdin=f)
+
+    # 子进程无法激活父 shell 的虚拟环境，成功后提示用户手动 source
+    if result.returncode == 0:
+        logger.info(f'虚拟环境已就绪，请在当前 shell 运行以进入：source {root_path / ".venv" / "bin" / "activate"}')
+
+
 def main() -> None:
     # chat 相关数据
     data_direction = f'{root_path}/chat/server/mysql/data'
@@ -337,6 +366,21 @@ def main() -> None:
         "network_test": lambda args: run_bazel_test('//network/test:network_all_test', args=args),
         "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
+        ######################### build for nn #########################
+        # download dataset
+        "fineweb": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/fineweb.py"}', args),
+        "hellaswag": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/hellaswag.py"}', args),
+        # train_gpt
+        "bigram": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/bigram.py"}', args),
+        "gpt": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/gpt.py"}', args),
+        # train_gpt2
+        "train_gpt2": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
+        "train_gpt2_ddp": lambda args: run_venv(f'torchrun --standalone --nproc_per_node=8 {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
+        # micrograd
+        "micrograd_test": lambda args: run_venv(
+            f'python -m unittest discover -s {root_path / "nn/micrograd/test"} -t {root_path / "nn/micrograd"}', args
+        ),
+
         ######################### build for pycstl #########################
         "pycstl": lambda args: run_bazel_build('//pycstl/...', args=args),
         "pycstl_test": lambda args: run_bazel_test('//pycstl/test:pycstl_all_test', args=args),
@@ -383,6 +427,9 @@ def main() -> None:
         # 测试文件, 单独编译
         ######################### build for hello_world #########################
         "hello_world": lambda args: run_bazel_run('//hello_world', args=args),
+
+        # 进入 venv
+        "venv": venv,
 
         # 更新 compile_commands.json 文件
         "refresh_all": lambda args: run_bazel_run('@hedron_compile_commands//:refresh_all', args=args),

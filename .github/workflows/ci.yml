@@ -167,6 +167,23 @@ jobs:
         echo "===== 工作目录占用 ====="
         du -sh /home/runner/work/pycstl 2>/dev/null || true
 
+  nn-test:
+    name: NN Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v7
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: 运行 micrograd 测试
+      run: |
+        pip install -r requirements_venv.in
+        python -m unittest discover -s nn/micrograd/test/ -t nn/micrograd/
+
   code-quality:
     name: Code Quality Check
     runs-on: ubuntu-latest
