@@ -367,11 +367,16 @@ def main() -> None:
         "network_coverage": lambda args: run_bazel_coverage('//network/test:network_all_test', args=args),
 
         ######################### build for nn #########################
-        "bigram": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/bigram.py"}', args),
+        # download dataset
         "fineweb": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/fineweb.py"}', args),
+        "hellaswag": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/hellaswag.py"}', args),
+        # train_gpt
+        "bigram": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/bigram.py"}', args),
         "gpt": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/gpt.py"}', args),
+        # train_gpt2
         "train_gpt2": lambda args: run_venv(f'python {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
-        "train_gpt2_dist": lambda args: run_venv(f'torchrun --standalone --nproc_per_node=8 {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
+        "train_gpt2_ddp": lambda args: run_venv(f'torchrun --standalone --nproc_per_node=8 {root_path / "nn/nanoGPT/train_gpt2.py"}', args),
+        # micrograd
         "micrograd_test": lambda args: run_venv(
             f'python -m unittest discover -s {root_path / "nn/micrograd/test"} -t {root_path / "nn/micrograd"}', args
         ),

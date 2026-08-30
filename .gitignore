@@ -22,3 +22,4 @@ chat/server/mysql/logs
 
 # nn
 nn/nanoGPT/edu_fineweb10B
+nn/nanoGPT/hellaswag
