@@ -14,7 +14,10 @@ cc_library(
         "//chat/server/common",
         "//chat/server/proto:chat_cc_grpc_proto",
         "//chat/server/proto:chat_cc_proto",
-        "//common",
+        "//common:connection_pool",
+        "//common:noncopyable",
+        "//common:singleton",
+        "//common:utils",
         "//logger",
         "@boost.asio",
         "@fmt",
@@ -30,7 +33,10 @@ cc_binary(
     deps = [
         ":chat_server_lib",
         "//chat/server/common",
-        "//common",
+        "//common:connection_pool",
+        "//common:noncopyable",
+        "//common:singleton",
+        "//common:utils",
         "@grpc//:grpc++",
     ],
 )

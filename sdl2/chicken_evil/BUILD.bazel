@@ -13,7 +13,8 @@ cc_binary(
     data = glob(["assets/**"]),
     includes = ["include"],
     deps = [
-        "//common",
+        "//common:singleton",
         "//sdl2/common",
+        "@fmt",
     ],
 )

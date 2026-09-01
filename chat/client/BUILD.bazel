@@ -18,7 +18,7 @@ qt_cc_library(
         for widget in WIDGETS
     ] + [
         "//chat/common",
-        "//common",
+        "//common:singleton",
         "@rules_qt//:qt_network",
         "@rules_qt//:qt_widgets",
     ],

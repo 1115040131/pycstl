@@ -49,8 +49,8 @@ T fromJson(const nlohmann::json& root) {
     return object;
 }
 
-std::string toString(const nlohmann::json& root) { return root.dump(); }
-nlohmann::json fromString(const std::string& json) { return nlohmann::json::parse(json); }
+inline std::string toString(const nlohmann::json& root) { return root.dump(); }
+inline nlohmann::json fromString(const std::string& json) { return nlohmann::json::parse(json); }
 
 template <typename T>
 std::string serialize(const T& object) {

@@ -8,5 +8,8 @@ cc_library(
     hdrs = glob(["reaction/**/*.h"]),
     copts = COPTS,
     includes = [""],
-    deps = ["//common"],
+    deps = [
+        "//common:noncopyable",
+        "//common:singleton",
+    ],
 )

@@ -14,7 +14,8 @@ cc_library(
     }),
     includes = [""],
     deps = [
-        "//common",
+        "//common:noncopyable",
+        "//common:string_hash",
         "//sdl3",
         "//sdl3:sdl3_image",
         "//sdl3:sdl3_mixer",

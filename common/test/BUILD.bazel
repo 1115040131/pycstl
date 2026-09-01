@@ -12,7 +12,7 @@ cc_test(
     ),
     copts = COPTS,
     deps = [
-        "//common",
+        "//common:json",
         "@fmt",
         "@googletest//:gtest",
         "@googletest//:gtest_main",

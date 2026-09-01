@@ -13,7 +13,7 @@ cc_binary(
     data = glob(["resource/**"]),
     includes = ["include"],
     deps = [
-        "//common",
+        "//common:singleton",
         "@fmt",
     ],
 )

@@ -10,7 +10,7 @@ cc_test(
     copts = COPTS,
     data = glob(["resource/**"]),
     deps = [
-        "//common",
+        "//common:cin_redirect",
         "@fmt",
         "@googletest//:gtest",
         "@googletest//:gtest_main",

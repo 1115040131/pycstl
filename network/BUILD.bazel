@@ -10,7 +10,8 @@ cc_library(
     copts = COPTS,
     includes = ["include"],
     deps = [
-        "//common",
+        "//common:noncopyable",
+        "//common:singleton",
         "//network/proto:msg_cc_proto",
         "@boost.asio",
         "@boost.beast",
