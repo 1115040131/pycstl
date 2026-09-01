@@ -3,7 +3,7 @@
 // co_async 的日志只为调试服务。未定义 CO_ASYNC_DEBUG 时,下面的宏展开成空语句,
 // logger/ 既不被 include 也不被链接,参数也不会求值。
 //
-// 开关由构建时的 --define=co_async_debug=true 决定(见 co_async/BUILD.bazel),不要在
+// 开关由构建时的 --config=dbg 决定(见 co_async/BUILD.bazel),不要在
 // 某个 .cpp 里单独 #define:协程设施(Promise 等)都定义在头文件里,取值不一致会违反
 // ODR,而且已编译进库的 timer_loop.cpp 根本不会跟着变。
 #ifdef CO_ASYNC_DEBUG

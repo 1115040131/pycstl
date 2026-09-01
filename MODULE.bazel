@@ -145,6 +145,9 @@ bazel_dep(name = "entt")
 git_override(
     module_name = "entt",
     commit = "85c6bba014049b5de8fad49d25424df2f1f6a8c1",  # v4.0.0
+    # src/BUILD.bazel 用裸 cc_library, Bazel 9 已移除该 native 规则
+    patch_strip = 1,
+    patches = ["//build_defs/patches:entt.patch"],
     remote = "https://github.com/skypjack/entt",
 )
 
@@ -232,6 +235,10 @@ bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
     commit = "f5fbd4cee671d8d908f37c83abaf70fba5928fc7",
+    # 上游仍在用 native.py_binary / 裸 cc_binary, Bazel 9 已移除这些 native 规则,
+    # 打 patch 改为显式 load, 以免整个仓库靠 --incompatible_autoload_externally 兜底
+    patch_strip = 1,
+    patches = ["//build_defs/patches:hedron_compile_commands.patch"],
     remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
     # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
