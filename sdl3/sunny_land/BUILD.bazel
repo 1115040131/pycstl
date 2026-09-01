@@ -1,8 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(features = ["-layering_check"])
-
 cc_library(
     name = "ziyu_engine",
     srcs = glob(["sunny_land/engine/**/*.cpp"]),
@@ -12,6 +10,7 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
+    features = ["-layering_check"],
     includes = [""],
     deps = [
         "//common:noncopyable",
@@ -41,6 +40,11 @@ cc_binary(
     }),
     deps = [
         "ziyu_engine",
+        "//common:noncopyable",
         "@bazel_tools//tools/cpp/runfiles",
+        "@fmt",
+        "@glm",
+        "@nlohmann_json//:json",
+        "@spdlog",
     ],
 )

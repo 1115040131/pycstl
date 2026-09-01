@@ -4,7 +4,6 @@ load("@protobuf//bazel:proto_library.bzl", "proto_library")
 
 package(
     default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
 )
 
 # msg.pb
@@ -33,5 +32,8 @@ cc_grpc_library(
     name = "greeter_cc_grpc",
     srcs = ["greeter_proto"],
     grpc_only = True,
-    deps = ["greeter_cc_proto"],
+    deps = [
+        "greeter_cc_proto",
+        "@grpc//:grpc++",
+    ],
 )

@@ -7,7 +7,6 @@ load("@protobuf//bazel:py_proto_library.bzl", "py_proto_library")
 
 package(
     default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
 )
 
 # verify.grpc
@@ -25,7 +24,10 @@ cc_grpc_library(
     name = "verify_cc_grpc_proto",
     srcs = ["verify_proto"],
     grpc_only = True,
-    deps = ["verify_cc_proto"],
+    deps = [
+        "verify_cc_proto",
+        "@grpc//:grpc++",
+    ],
 )
 
 js_library(
@@ -48,7 +50,10 @@ cc_grpc_library(
     name = "status_cc_grpc_proto",
     srcs = ["status_proto"],
     grpc_only = True,
-    deps = ["status_cc_proto"],
+    deps = [
+        "status_cc_proto",
+        "@grpc//:grpc++",
+    ],
 )
 
 py_proto_library(
@@ -77,5 +82,8 @@ cc_grpc_library(
     name = "chat_cc_grpc_proto",
     srcs = ["chat_proto"],
     grpc_only = True,
-    deps = ["chat_cc_proto"],
+    deps = [
+        "chat_cc_proto",
+        "@grpc//:grpc++",
+    ],
 )

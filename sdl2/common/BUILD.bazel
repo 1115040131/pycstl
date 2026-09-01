@@ -3,7 +3,6 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 package(
     default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
 )
 
 cc_library(
@@ -11,6 +10,7 @@ cc_library(
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
+    features = ["-layering_check"],
     includes = ["include"],
     deps = [
         "//sdl2",
