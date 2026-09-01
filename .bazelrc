@@ -17,9 +17,6 @@ build:ci --define=sdl3_console=true
 # Auto-load build:linux / build:macos / build:windows sections based on current OS
 common --enable_platform_specific_config
 
-# Bazel 9 externalizes cc_library/py_library rules; explicitly load from rules_cc/rules_python
-common --incompatible_autoload_externally=+@rules_cc,+@rules_python
-
 # Python interpreter writes __pycache__; skip external repo file checks to avoid spurious refetch
 common --noexperimental_check_external_repository_files
 

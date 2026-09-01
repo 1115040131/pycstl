@@ -3,26 +3,21 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 package(default_visibility = ["//visibility:public"])
 
-config_setting(
-    name = "debug_build",
-    define_values = {"co_async_debug": "true"},
-)
-
 cc_library(
     name = "co_async",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/co_async/**/*.h"]),
     copts = COPTS,
     defines = select({
-        ":debug_build": ["CO_ASYNC_DEBUG"],
         "//conditions:default": [],
+        "//:debug": ["CO_ASYNC_DEBUG"],
     }),
     includes = ["include"],
     deps = ["//common:singleton"] + select({
-        ":debug_build": [
+        "//conditions:default": [],
+        "//:debug": [
             "//logger",
             "@fmt",
         ],
-        "//conditions:default": [],
     }),
 )
