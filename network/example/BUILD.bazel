@@ -50,7 +50,7 @@ BINARIES = {
         "@nlohmann_json//:json",
     ],
     "concurrency_client": [
-        "//common",
+        "//common:timer",
         "//network",
         "@boost.asio",
         "@nlohmann_json//:json",
@@ -91,7 +91,7 @@ BINARIES = {
         "@grpc//:grpc++",
     ],
     "grpc_concurrency_client": [
-        "//common",
+        "//common:timer",
         "//network/proto:greeter_cc_grpc",
         "@fmt",
         "@grpc//:grpc++",

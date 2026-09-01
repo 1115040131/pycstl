@@ -1,16 +1,94 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
+cc_library(
+    name = "noncopyable",
+    hdrs = ["include/common/noncopyable.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
-    name = "common",
-    srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/common/**/*.h"]),
+    name = "allocator_wrapper",
+    hdrs = ["include/common/allocator_wrapper.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "connection_pool",
+    hdrs = ["include/common/connection_pool.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "string_hash",
+    hdrs = ["include/common/string_hash.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "cin_redirect",
+    hdrs = ["include/common/cin_redirect.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [":noncopyable"],
+)
+
+cc_library(
+    name = "singleton",
+    hdrs = ["include/common/singleton.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [":noncopyable"],
+)
+
+cc_library(
+    name = "utils",
+    srcs = ["src/utils.cpp"],
+    hdrs = ["include/common/utils.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "timer",
+    srcs = ["src/timer.cpp"],
+    hdrs = ["include/common/timer.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
     deps = [
+        ":utils",
         "@fmt",
+    ],
+)
+
+cc_library(
+    name = "reflect",
+    hdrs = ["include/common/reflect.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "json",
+    hdrs = ["include/common/json.h"],
+    copts = COPTS,
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":reflect",
         "@nlohmann_json//:json",
     ],
 )

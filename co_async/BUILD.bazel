@@ -18,7 +18,7 @@ cc_library(
         "//conditions:default": [],
     }),
     includes = ["include"],
-    deps = ["//common"] + select({
+    deps = ["//common:singleton"] + select({
         ":debug_build": [
             "//logger",
             "@fmt",

@@ -39,7 +39,9 @@ cc_library(
     data = glob(["config/*"]),
     includes = ["include"],
     deps = [
-        "//common",
+        "//common:connection_pool",
+        "//common:singleton",
+        "//common:utils",
         "//logger",
         "@boost.property_tree",
     ],
@@ -54,7 +56,9 @@ cc_library(
     copts = COPTS,
     includes = ["include"],
     deps = [
-        "//common",
+        "//common:connection_pool",
+        "//common:singleton",
+        "//common:utils",
         "//logger",
         "@boost.asio",
     ],
@@ -70,7 +74,9 @@ cc_library(
     includes = ["include"],
     deps = [
         ":defer",
-        "//common",
+        "//common:connection_pool",
+        "//common:singleton",
+        "//common:utils",
         "//logger",
         "@fmt",
         "@mysql-connector-cpp",
@@ -88,7 +94,9 @@ cc_library(
         ":data",
         ":defer",
         ":mysql_pool",
-        "//common",
+        "//common:connection_pool",
+        "//common:singleton",
+        "//common:utils",
     ],
 )
 
@@ -115,7 +123,9 @@ cc_library(
     deps = [
         ":config_mgr",
         ":redis_connection_pool",
-        "//common",
+        "//common:connection_pool",
+        "//common:singleton",
+        "//common:utils",
     ],
 )
 
@@ -133,7 +143,9 @@ cc_library(
         "//chat/common",
         "//chat/server/proto:status_cc_grpc_proto",
         "//chat/server/proto:status_cc_proto",
-        "//common",
+        "//common:connection_pool",
+        "//common:singleton",
+        "//common:utils",
         "@grpc//:grpc++",
     ],
 )

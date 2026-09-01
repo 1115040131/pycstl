@@ -17,7 +17,7 @@ cc_binary(
     }),
     includes = ["."],
     deps = [
-        "//common",
+        "//common:singleton",
         "//sdl3",
         "//sdl3:sdl3_image",
         "//sdl3:sdl3_mixer",

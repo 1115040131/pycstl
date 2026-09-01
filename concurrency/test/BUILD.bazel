@@ -9,7 +9,7 @@ cc_test(
     ]),
     copts = COPTS + ["-Wno-thread-safety"],
     deps = [
-        "//common",
+        "//common:noncopyable",
         "//concurrency",
         "@fmt",
         "@googletest//:gtest",

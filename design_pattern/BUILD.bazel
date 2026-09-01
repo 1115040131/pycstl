@@ -9,7 +9,7 @@ cc_test(
     ]),
     copts = COPTS + ["-Wno-non-virtual-dtor"],
     deps = [
-        "//common",
+        "//common:cin_redirect",
         "@glm",
         "@googletest//:gtest",
         "@googletest//:gtest_main",
