@@ -1,8 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(features = ["-layering_check"])
-
 cc_binary(
     name = "demo",
     srcs = glob([
@@ -10,6 +8,7 @@ cc_binary(
     ]),
     copts = COPTS,
     data = glob(["assets/**"]),
+    features = ["-layering_check"],
     deps = [
         "//sdl2",
         "//sdl2:sdl2_image",

@@ -1,8 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(features = ["-layering_check"])
-
 cc_library(
     name = "ziyu_engine",
     srcs = glob(["monster_war/engine/**/*.cpp"]),
@@ -12,6 +10,7 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
+    features = ["-layering_check"],
     includes = [""],
     deps = [
         "//common:noncopyable",
@@ -22,6 +21,7 @@ cc_library(
         "//sdl3:sdl3_ttf",
         "@entt",
         "@glm",
+        "@imgui",
         "@imgui_backends//:platform-sdl3",
         "@imgui_backends//:renderer-sdlrenderer3",
         "@nlohmann_json//:json",
@@ -41,8 +41,16 @@ cc_binary(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
+    features = ["-layering_check"],
     deps = [
         "ziyu_engine",
         "@bazel_tools//tools/cpp/runfiles",
+        "@entt",
+        "@glm",
+        "@imgui",
+        "@imgui_backends//:platform-sdl3",
+        "@imgui_backends//:renderer-sdlrenderer3",
+        "@nlohmann_json//:json",
+        "@spdlog",
     ],
 )

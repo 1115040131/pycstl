@@ -1,8 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(features = ["-layering_check"])
-
 cc_binary(
     name = "ghost_escape",
     srcs = glob([
@@ -15,6 +13,7 @@ cc_binary(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
+    features = ["-layering_check"],
     includes = ["."],
     deps = [
         "//common:singleton",

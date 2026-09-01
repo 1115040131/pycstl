@@ -1,8 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(features = ["-layering_check"])
-
 cc_binary(
     name = "entt_example",
     srcs = [
@@ -26,10 +24,12 @@ cc_binary(
     ],
     copts = COPTS,
     data = glob(["assets/**"]),
+    features = ["-layering_check"],
     deps = [
         "//sdl3:sdl3_image",
         "@bazel_tools//tools/cpp/runfiles",
         "@glm",
+        "@imgui",
         "@imgui_backends//:platform-sdl3",
         "@imgui_backends//:renderer-sdlrenderer3",
         "@spdlog",
