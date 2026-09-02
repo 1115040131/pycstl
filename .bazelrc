@@ -63,3 +63,5 @@ build --features=external_include_paths
 
 coverage --combined_report=lcov
 coverage --experimental_generate_llvm_lcov
+coverage --copt=-fprofile-continuous
+coverage --test_env=LLVM_PROFILE_CONTINUOUS_MODE=1

@@ -65,12 +65,13 @@ protected:
     mutable Mutex mutex_;
 };
 
-// Writes to a C stream, colouring records only when that stream is a terminal so
-// that redirected output and log files stay free of escape sequences. Whether the
-// stream is a terminal is decided once, on construction.
+enum class ColorMode { kAuto, kAlways, kNever };
+
+// Writes to a C stream. Whether to colour is settled once, on construction, so no record
+// pays for the decision.
 class FileSink final : public BaseSink<std::mutex> {
 public:
-    explicit FileSink(std::FILE* file);
+    explicit FileSink(std::FILE* file, ColorMode mode = ColorMode::kAuto);
 
 protected:
     void WriteImpl(LogLevel level, std::string_view record) override;

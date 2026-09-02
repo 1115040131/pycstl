@@ -1,11 +1,13 @@
 #include <algorithm>
 #include <csignal>
 #include <cstdio>
+#include <fstream>
 #include <latch>
 #include <memory>
 #include <regex>
 #include <set>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -18,6 +20,16 @@ namespace pyc {
 // Records are captured through a StringSink rather than by redirecting stderr, so
 // the assertions do not depend on gtest internals.
 static std::shared_ptr<StringSink> MakeSink() { return std::make_shared<StringSink>(); }
+
+static std::string TempPath(std::string_view stem) {
+    const char* dir = std::getenv("TEST_TMPDIR");
+    return std::string(dir != nullptr ? dir : "/tmp") + "/" + std::string(stem);
+}
+
+static std::string ReadFile(const std::string& path) {
+    std::ifstream in(path, std::ios::binary);
+    return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+}
 
 TEST(LoggerTest, OutputContainsLevelAndMessage) {
     auto sink = MakeSink();
@@ -76,6 +88,26 @@ TEST(LoggerTest, FatalAbortsAndFlushesMessage) {
         ::testing::KilledBySignal(SIGABRT), "fatal must survive 42");
 }
 
+// Same contract for a sink the logger was given explicitly, and this time the record is
+// read back from outside the process that aborted, so nothing about stderr's buffering
+// mode can mask a missing flush.
+TEST(LoggerTest, FatalFlushesEveryNamedSink) {
+    const std::string path = TempPath("fatal_flush.log");
+    EXPECT_EXIT(
+        {
+            std::FILE* out = std::fopen(path.c_str(), "w");
+            std::setvbuf(out, nullptr, _IOFBF, 8192);
+            Logger logger("DYING", std::make_shared<FileSink>(out));
+            logger.fatal("aborting with {}", 7);
+        },
+        ::testing::KilledBySignal(SIGABRT), "");
+
+    const std::string written = ReadFile(path);
+    EXPECT_TRUE(written.contains("aborting with 7"));
+    EXPECT_TRUE(written.contains("FATAL"));
+    EXPECT_TRUE(written.contains("DYING"));
+}
+
 // --- Format string tests ---
 
 TEST(LoggerTest, FormatIntegers) {
@@ -115,16 +147,83 @@ TEST(LoggerTest, FormatHex) {
     EXPECT_TRUE(sink->str().contains("errno=0xDEADBEEF"));
 }
 
-// --- Visual / terminal display tests (no assertions, for manual inspection) ---
-// These keep the default stderr sink so the output can be eyeballed, including its
-// colouring when the test is run from a terminal.
+// --- Call-site metadata tests ---
 
-TEST(LoggerTest, VisualAllLevels) {
-    Logger logger("DEMO");
-    logger.debug("this is a debug message");
-    logger.info("this is an info message");
-    logger.warn("this is a warning message");
-    logger.error("this is an error message");
+// Reached directly thanks to -fno-access-control on this target. Going through info() only
+// ever evaluates the trimming at compile time, which leaves these rules unverified.
+TEST(LoggerTest, ExtractFunctionNameTrimsQualifiersAndParameters) {
+    // Qualified: everything up to the last "::" goes, along with the parameter list.
+    EXPECT_EQ(Logger::ExtractFunctionName("void pyc::Server::Run(int, char**)"), "Run");
+    EXPECT_EQ(Logger::ExtractFunctionName("static std::string_view pyc::Logger::Name()"), "Name");
+
+    // Unqualified: the return type is cut at the last space instead.
+    EXPECT_EQ(Logger::ExtractFunctionName("void Run(int)"), "Run");
+
+    // Neither "::" nor a space, so only the parameter list goes.
+    EXPECT_EQ(Logger::ExtractFunctionName("Run(int)"), "Run");
+
+    // No parameter list at all: nothing to trim.
+    EXPECT_EQ(Logger::ExtractFunctionName("Run"), "Run");
+    EXPECT_EQ(Logger::ExtractFunctionName(""), "");
+}
+
+static void FreeFunctionLogs(const Logger& logger) { logger.info("from a free function"); }
+
+struct MemberLogger {
+    void Emit(const Logger& logger) const { logger.info("from a member function"); }
+};
+
+TEST(LoggerTest, RecordCarriesCallSiteFileAndLine) {
+    auto sink = MakeSink();
+    Logger logger("LOC", sink);
+
+    const int line = __LINE__ + 1;
+    logger.info("located");
+
+    EXPECT_TRUE(sink->str().contains("logger_test.cpp:" + std::to_string(line)));
+}
+
+// The signature is trimmed in FmtWithLocation's consteval constructor, so what lands in
+// the record is the bare name rather than the whole __PRETTY_FUNCTION__ string.
+TEST(LoggerTest, FunctionNameIsTrimmedToTheBareName) {
+    auto sink = MakeSink();
+    Logger logger("LOC", sink);
+
+    logger.info("from a test body");
+    EXPECT_TRUE(sink->str().contains("[TestBody]"));
+
+    sink->clear();
+    FreeFunctionLogs(logger);
+    EXPECT_TRUE(sink->str().contains("[FreeFunctionLogs]"));
+
+    sink->clear();
+    MemberLogger{}.Emit(logger);
+    EXPECT_TRUE(sink->str().contains("[Emit]"));
+}
+
+// --- Visual / terminal display tests (no assertions, for manual inspection) ---
+// These write to stderr so the output can be eyeballed, including its colouring when the
+// test is run from a terminal.
+TEST(LoggerTest, VisualAllLevel) {
+    auto sink = std::make_shared<FileSink>(stderr, ColorMode::kAlways);
+    Logger logger("COLOR", sink);
+
+    logger.debug("cyan: this is a debug message");
+    logger.info("green: this is an info message");
+    logger.warn("yellow: this is a warning message");
+    logger.error("red: this is an error message");
+
+    const std::string path = TempPath("visual_fatal.log");
+    EXPECT_EXIT(
+        {
+            std::FILE* out = std::fopen(path.c_str(), "w");
+            Logger dying("COLOR", std::make_shared<FileSink>(out, ColorMode::kAlways));
+            dying.fatal("dark orange, reversed and bold: this is a fatal message");
+        },
+        ::testing::KilledBySignal(SIGABRT), "");
+
+    const std::string record = ReadFile(path);
+    std::fwrite(record.data(), 1, record.size(), stderr);
 }
 
 TEST(LoggerTest, VisualFormatting) {
@@ -309,6 +408,157 @@ TEST(SinkTest, SinkCannotWidenTheLoggersLevel) {
 
     logger.debug("dropped by the logger");
     EXPECT_FALSE(sink->str().contains("dropped by the logger"));
+}
+
+// A sink that derives straight from LogSink instead of going through BaseSink: it gets
+// no lock and the base class's do-nothing Flush, and level filtering is its own
+// business, since ShouldWrite is the caller's to consult.
+class CountingSink final : public LogSink {
+public:
+    void Write(LogLevel level, std::string_view) override {
+        ++count_;
+        last_ = level;
+    }
+
+    int count() const noexcept { return count_; }
+    LogLevel last() const noexcept { return last_; }
+
+private:
+    int count_{0};
+    LogLevel last_{LogLevel::kDebug};
+};
+
+TEST(SinkTest, DerivingStraightFromLogSinkWorks) {
+    auto sink = std::make_shared<CountingSink>();
+    Logger logger("DIRECT", sink);
+
+    logger.info("one");
+    logger.error("two");
+    sink->Flush();  // LogSink's default Flush: nothing to do, must not crash.
+
+    EXPECT_EQ(sink->count(), 2);
+    EXPECT_EQ(sink->last(), LogLevel::kError);
+}
+
+TEST(SinkTest, SinkLevelDefaultsToDebugAndGatesShouldWrite) {
+    CountingSink sink;
+    EXPECT_EQ(sink.level(), LogLevel::kDebug);
+    EXPECT_TRUE(sink.ShouldWrite(LogLevel::kDebug));
+
+    sink.set_level(LogLevel::kError);
+    EXPECT_EQ(sink.level(), LogLevel::kError);
+    EXPECT_FALSE(sink.ShouldWrite(LogLevel::kWarn));
+    EXPECT_TRUE(sink.ShouldWrite(LogLevel::kError));
+    EXPECT_TRUE(sink.ShouldWrite(LogLevel::kFatal));
+}
+
+TEST(SinkTest, FlushOnMemorySinksKeepsRecords) {
+    auto sink = MakeSink();
+    Logger logger("FLUSH", sink);
+
+    logger.info("kept");
+    sink->Flush();  // BaseSink's default FlushImpl: nothing is buffered.
+    EXPECT_TRUE(sink->str().contains("kept"));
+
+    NullSink discarded;
+    discarded.Flush();
+}
+
+// --- FileSink tests ---
+
+// Reads back through a second handle, so what is asserted is what actually reached the
+// file rather than what is still sitting in the stream's buffer.
+TEST(SinkTest, FileSinkFlushPushesRecordsOutOfTheStreamBuffer) {
+    const std::string path = TempPath("file_sink.log");
+    std::FILE* out = std::fopen(path.c_str(), "w");
+    ASSERT_NE(out, nullptr);
+    std::setvbuf(out, nullptr, _IOFBF, 8192);
+
+    auto sink = std::make_shared<FileSink>(out);
+    Logger logger("FILE", sink);
+    logger.info("buffered {}", 7);
+    EXPECT_EQ(ReadFile(path), "");
+
+    sink->Flush();
+    const std::string written = ReadFile(path);
+    EXPECT_TRUE(written.contains("buffered 7"));
+    // Not a terminal, so the record must stay free of escape sequences.
+    EXPECT_EQ(written.find('\033'), std::string::npos);
+
+    sink.reset();
+    std::fclose(out);
+}
+
+static std::vector<std::string> ExtractSgrSequences(const std::string& text) {
+    std::vector<std::string> sequences;
+    const std::regex pattern("\033\\[[0-9;]*m");
+    for (std::sregex_iterator it(text.begin(), text.end(), pattern), end; it != end; ++it) {
+        sequences.push_back(it->str());
+    }
+    return sequences;
+}
+
+// kAlways is what makes this testable without a terminal to hand. kFatal is written straight
+// to the sink because Logger::fatal aborts, so its style cannot be observed from inside the
+// process that logs it.
+TEST(SinkTest, ColorModeAlwaysGivesEachLevelItsOwnStyle) {
+    const std::string path = TempPath("colored.log");
+    std::FILE* out = std::fopen(path.c_str(), "w");
+    ASSERT_NE(out, nullptr);
+
+    auto sink = std::make_shared<FileSink>(out, ColorMode::kAlways);
+    Logger logger("COLOR", sink);
+    logger.debug("d");
+    logger.info("i");
+    logger.warn("w");
+    logger.error("e");
+    sink->Write(LogLevel::kFatal, "boom\n");
+    sink->Flush();
+
+    const std::string written = ReadFile(path);
+    EXPECT_TRUE(written.contains("DEBUG"));
+    EXPECT_TRUE(written.contains("boom"));
+
+    // A colour sequence plus a reset for each of the four levels above, then three for
+    // kFatal, whose emphasis is a sequence of its own ahead of the colour.
+    constexpr std::size_t kPlainLevels = 4;
+    const std::vector<std::string> sequences = ExtractSgrSequences(written);
+    ASSERT_EQ(sequences.size(), kPlainLevels * 2 + 3);
+
+    std::set<std::string> colors;
+    for (std::size_t i = 0; i < kPlainLevels * 2; i += 2) {
+        colors.insert(sequences[i]);
+        // Without the reset, the style would bleed into whatever the terminal prints next.
+        EXPECT_EQ(sequences[i + 1], "\033[0m");
+    }
+    EXPECT_EQ(colors.size(), kPlainLevels);
+
+    EXPECT_EQ(sequences[8], "\033[1;7m");  // bold + reverse
+    EXPECT_FALSE(colors.contains(sequences[9]));
+    EXPECT_EQ(sequences[10], "\033[0m");
+
+    sink.reset();
+    std::fclose(out);
+}
+
+// The stream here is a file, so this cannot tell kNever apart from kAuto — what it pins down
+// is that kNever never colours, which is what would break if the mode test were inverted.
+TEST(SinkTest, ColorModeNeverSuppressesColor) {
+    const std::string path = TempPath("plain.log");
+    std::FILE* out = std::fopen(path.c_str(), "w");
+    ASSERT_NE(out, nullptr);
+
+    auto sink = std::make_shared<FileSink>(out, ColorMode::kNever);
+    Logger logger("PLAIN", sink);
+    logger.error("no escapes here");
+    sink->Flush();
+
+    const std::string written = ReadFile(path);
+    EXPECT_TRUE(written.contains("no escapes here"));
+    EXPECT_EQ(written.find('\033'), std::string::npos);
+
+    sink.reset();
+    std::fclose(out);
 }
 
 }  // namespace pyc
