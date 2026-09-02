@@ -1,13 +1,9 @@
 load("@rules_qt//:qt.bzl", "qt_ui_library")
 load("widgets.bzl", "WIDGETS")
 
-package(
-    default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
-)
-
 [qt_ui_library(
     name = "%s_ui" % widget,
     ui = "%s.ui" % widget,
+    visibility = ["//chat/client:__pkg__"],
     deps = ["@rules_qt//:qt_widgets"],
 ) for widget in WIDGETS]

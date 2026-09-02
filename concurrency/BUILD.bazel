@@ -1,15 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
-
 cc_library(
     name = "concurrency",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/concurrency/**/*.h"]),
     copts = COPTS,
-    includes = ["include"],
     linkopts = ["-latomic"],
+    strip_include_prefix = "include",
+    visibility = ["//concurrency:__subpackages__"],
     deps = [
         "//common:allocator_wrapper",
         "//common:noncopyable",

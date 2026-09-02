@@ -3,7 +3,7 @@
 #include <string_view>
 #include <vector>
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <fmt/format.h>
 
 namespace pyc {

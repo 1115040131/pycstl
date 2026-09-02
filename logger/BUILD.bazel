@@ -1,14 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
-
 cc_library(
     name = "logger",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/logger/**/*.h"]),
     copts = COPTS,
-    includes = ["include"],
     local_defines = ["FMT_USE_LOCAL_TIME=1"],
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
     deps = ["@fmt"],
 )

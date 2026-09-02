@@ -1,19 +1,22 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
-
-cc_binary(
-    name = "tetris",
-    srcs = glob([
-        "src/*.cpp",
-        "include/tetris/*.h",
-    ]),
+cc_library(
+    name = "tetris_lib",
+    srcs = glob(["tetris/*.cpp"]),
+    hdrs = glob(["tetris/*.h"]),
     copts = COPTS,
-    data = glob(["resource/**"]),
-    includes = ["include"],
+    strip_include_prefix = "/tetris",
     deps = [
         "//common:singleton",
         "@fmt",
     ],
+)
+
+cc_binary(
+    name = "tetris",
+    srcs = ["tetris.cpp"],
+    copts = COPTS,
+    data = glob(["resource/**"]),
+    deps = [":tetris_lib"],
 )

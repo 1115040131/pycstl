@@ -1,7 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library")
 
-package(default_visibility = ["//visibility:public"])
-
 js_library(
     name = "verify_server_lib",
     srcs = glob(["src/*.js"]),

@@ -4,6 +4,6 @@ cc_library(
     name = "mysql-connector-cpp",
     srcs = glob(["lib/*"]),
     hdrs = glob(["include/**/*.h"]),
-    includes = ["include"],
+    strip_include_prefix = "include",
     visibility = ["//visibility:public"],
 )

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "sdl2/common/position.h"
 #include "sdl2/common/timer.h"

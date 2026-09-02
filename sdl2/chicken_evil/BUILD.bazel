@@ -1,20 +1,25 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-cc_binary(
-    name = "chicken_evil",
-    srcs = glob([
-        "src/**/*.cpp",
-        "include/**/*.h",
-    ]),
+cc_library(
+    name = "chicken_evil_lib",
+    srcs = glob(["chicken_evil/*.cpp"]),
+    hdrs = glob(["chicken_evil/*.h"]),
     copts = COPTS,
-    data = glob(["assets/**"]),
     features = ["-layering_check"],
-    includes = ["include"],
+    strip_include_prefix = "/sdl2/chicken_evil",
     deps = [
         "//common:singleton",
         "//sdl2/common",
         "@eigen",
         "@fmt",
     ],
+)
+
+cc_binary(
+    name = "chicken_evil",
+    srcs = ["main.cpp"],
+    copts = COPTS,
+    data = glob(["assets/**"]),
+    deps = [":chicken_evil_lib"],
 )

@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//chat/server:__subpackages__"])
 
 # Header-only utilities ---------------------------------------------------------
 
@@ -9,14 +9,14 @@ cc_library(
     name = "defer",
     hdrs = ["include/chat/server/common/defer.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
 )
 
 cc_library(
     name = "data",
     hdrs = ["include/chat/server/common/data.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = ["@nlohmann_json//:json"],
 )
 
@@ -25,7 +25,7 @@ cc_library(
     srcs = ["src/utils.cpp"],
     hdrs = ["include/chat/server/common/utils.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = ["@boost.uuid"],
 )
 
@@ -37,7 +37,7 @@ cc_library(
     hdrs = ["include/chat/server/common/config_mgr.h"],
     copts = COPTS,
     data = glob(["config/*"]),
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         "//common:connection_pool",
         "//common:singleton",
@@ -54,7 +54,7 @@ cc_library(
     srcs = ["src/io_service_pool.cpp"],
     hdrs = ["include/chat/server/common/io_service_pool.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         "//common:connection_pool",
         "//common:singleton",
@@ -71,7 +71,7 @@ cc_library(
     srcs = ["src/mysql_pool.cpp"],
     hdrs = ["include/chat/server/common/mysql_pool.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         ":defer",
         "//common:connection_pool",
@@ -88,7 +88,7 @@ cc_library(
     srcs = ["src/mysql_mgr.cpp"],
     hdrs = ["include/chat/server/common/mysql_mgr.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         ":config_mgr",
         ":data",
@@ -107,7 +107,7 @@ cc_library(
     srcs = ["src/redis_connection_pool.cpp"],
     hdrs = ["include/chat/server/common/redis_connection_pool.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         "//logger",
         "@hiredis",
@@ -119,7 +119,7 @@ cc_library(
     srcs = ["src/redis_mgr.cpp"],
     hdrs = ["include/chat/server/common/redis_mgr.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         ":config_mgr",
         ":redis_connection_pool",
@@ -136,7 +136,7 @@ cc_library(
     srcs = ["src/status_grpc_client.cpp"],
     hdrs = ["include/chat/server/common/status_grpc_client.h"],
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         ":config_mgr",
         ":defer",
@@ -156,7 +156,7 @@ cc_library(
     name = "common",
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         ":config_mgr",
         ":data",

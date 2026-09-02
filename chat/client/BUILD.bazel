@@ -2,17 +2,13 @@ load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 load("//chat/client/widget:widgets.bzl", "WIDGETS")
 
-package(
-    default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
-)
-
 qt_cc_library(
     name = "client_lib",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    includes = ["include"],
+    features = ["-layering_check"],
+    strip_include_prefix = "include",
     deps = [
         "//chat/client/widget:%s_ui" % widget
         for widget in WIDGETS
@@ -33,6 +29,7 @@ qt_cc_binary(
         "res/*",
         "style/*",
     ]),
+    features = ["-layering_check"],
     deps = [
         ":client_lib",
     ],

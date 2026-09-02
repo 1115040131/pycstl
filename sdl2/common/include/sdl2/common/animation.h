@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <Eigen/Core>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "sdl2/common/atlas.h"
 #include "sdl2/common/camera.h"

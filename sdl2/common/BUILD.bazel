@@ -1,17 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(
-    default_visibility = ["//visibility:public"],
-)
-
 cc_library(
     name = "common",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
     features = ["-layering_check"],
-    includes = ["include"],
+    strip_include_prefix = "include",
+    visibility = ["//sdl2:__subpackages__"],
     deps = [
         "//sdl2",
         "//sdl2:sdl2_image",

@@ -1,14 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
-
 cc_library(
     name = "chat_server_lib",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    includes = ["include"],
+    strip_include_prefix = "include",
     deps = [
         "//chat/common",
         "//chat/server/common",
@@ -30,6 +28,7 @@ cc_binary(
     name = "chat_server",
     srcs = ["chat_server.cpp"],
     copts = COPTS,
+    visibility = ["//chat/server:__subpackages__"],
     deps = [
         ":chat_server_lib",
         "//chat/server/common",
