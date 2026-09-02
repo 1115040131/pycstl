@@ -80,7 +80,7 @@ public:
 private:
     // Trims a __PRETTY_FUNCTION__-style signature down to the bare function name. Runs in
     // FmtWithLocation's consteval constructor, so no record pays for the scan.
-    static consteval std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
+    static constexpr std::string_view ExtractFunctionName(std::string_view full_name) noexcept {
         auto end_pos = full_name.find_last_of('(');
         if (end_pos != std::string_view::npos) {
             auto start_pos = full_name.rfind("::", end_pos);

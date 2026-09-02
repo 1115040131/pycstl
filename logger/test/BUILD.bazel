@@ -10,7 +10,7 @@ cc_test(
         ],
         allow_empty = True,
     ),
-    copts = COPTS,
+    copts = COPTS + ["-fno-access-control"],
     deps = [
         "//logger",
         "@googletest//:gtest",

@@ -32,10 +32,10 @@ static constexpr fmt::text_style ToTextStyle(LogLevel level) noexcept {
         case LogLevel::kFatal:
             return fg(fmt::color::dark_orange) | fmt::emphasis::reverse | fmt::emphasis::bold;
     }
-    return {};
 }
 
-FileSink::FileSink(std::FILE* file) : file_(file), colorize_(IsTerminal(file)) {}
+FileSink::FileSink(std::FILE* file, ColorMode mode)
+    : file_(file), colorize_(mode == ColorMode::kAlways || (mode == ColorMode::kAuto && IsTerminal(file))) {}
 
 void FileSink::WriteImpl(LogLevel level, std::string_view record) {
     if (colorize_) {

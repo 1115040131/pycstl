@@ -79,7 +79,6 @@ static constexpr std::string_view ToString(LogLevel level) noexcept {
         case LogLevel::kFatal:
             return "FATAL";
     }
-    return "UNKWN";
 }
 
 void Logger::log(LogLevel level, fmt::string_view format_str, fmt::format_args args,
