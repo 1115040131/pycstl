@@ -1,13 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
-
 cc_library(
     name = "reaction",
     hdrs = glob(["reaction/**/*.h"]),
     copts = COPTS,
-    includes = [""],
+    strip_include_prefix = "/reaction",
+    visibility = ["//reaction:__subpackages__"],
     deps = [
         "//common:noncopyable",
         "//common:singleton",

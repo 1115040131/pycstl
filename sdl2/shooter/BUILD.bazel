@@ -1,16 +1,13 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-cc_binary(
-    name = "shooter",
-    srcs = glob([
-        "src/**/*.cpp",
-        "include/**/*.h",
-    ]),
+cc_library(
+    name = "shooter_lib",
+    srcs = glob(["shooter/*.cpp"]),
+    hdrs = glob(["shooter/*.h"]),
     copts = COPTS,
-    data = glob(["assets/**"]),
     features = ["-layering_check"],
-    includes = ["include"],
+    strip_include_prefix = "/sdl2/shooter",
     deps = [
         "//common:singleton",
         "//sdl2",
@@ -19,4 +16,12 @@ cc_binary(
         "//sdl2:sdl2_ttf",
         "@fmt",
     ],
+)
+
+cc_binary(
+    name = "shooter",
+    srcs = ["main.cpp"],
+    copts = COPTS,
+    data = glob(["assets/**"]),
+    deps = [":shooter_lib"],
 )

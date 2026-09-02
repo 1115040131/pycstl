@@ -1,15 +1,11 @@
 load("@rules_qt//:qt.bzl", "qt_cc_binary")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(
-    default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
-)
-
 qt_cc_binary(
     name = "calculator",
     srcs = ["main.cpp"],
     copts = COPTS,
+    features = ["-layering_check"],
     deps = [
         "@rules_qt//:qt_widgets",
     ],

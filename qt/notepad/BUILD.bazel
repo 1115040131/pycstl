@@ -1,17 +1,13 @@
 load("@rules_qt//:qt.bzl", "qt_cc_binary", "qt_cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(
-    default_visibility = ["//visibility:public"],
-    features = ["-layering_check"],
-)
-
 qt_cc_library(
     name = "notepad_lib",
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    includes = ["include"],
+    features = ["-layering_check"],
+    strip_include_prefix = "include",
     deps = [
         "@rules_qt//:qt_widgets",
     ],
@@ -24,6 +20,7 @@ qt_cc_binary(
     data = glob([
         "res/*",
     ]),
+    features = ["-layering_check"],
     deps = [
         ":notepad_lib",
     ],

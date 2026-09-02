@@ -1,15 +1,22 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
+cc_library(
+    name = "tiny_db_lib",
+    srcs = glob(["tiny_db/*.cpp"]),
+    hdrs = glob(["tiny_db/*.h"]),
+    copts = COPTS,
+    strip_include_prefix = "/tiny_db",
+    deps = ["@fmt"],
+)
 
 cc_binary(
     name = "tiny_db",
-    srcs = glob([
-        "src/*.cpp",
-        "include/tiny_db/*.h",
-    ]),
+    srcs = ["tiny_db.cpp"],
     copts = COPTS,
-    includes = ["include"],
-    deps = ["@fmt"],
+    visibility = ["//tiny_db:__subpackages__"],
+    deps = [
+        ":tiny_db_lib",
+        "@fmt",
+    ],
 )

@@ -10,6 +10,9 @@ cmake(
     # fails with "No available audio device".
     env = {"PKG_CONFIG_PATH": "/usr/lib/x86_64-linux-gnu/pkgconfig"},
     generate_args = ["-GNinja"],
+    # vendored 的 SDL2_image/SDL2_ttf 等上游头内部用引号引 "SDL.h",而 SDL.h 在
+    # 另一个 cmake 输出目录下,必须把 include/SDL2 直接放进搜索路径。foreign_cc 的
+    # cmake() 没有 strip_include_prefix,所以这里只能保留 includes。
     includes = ["SDL2"],
     lib_source = "@sdl2//:all_srcs",
     out_shared_libs = select({
@@ -22,7 +25,7 @@ cmake(
             "libSDL2-2.0d.so.0",
         ],
     }),
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl2:__subpackages__"],
 )
 
 cmake(
@@ -48,7 +51,7 @@ cmake(
             "libSDL2_image-2.0d.so.0",
         ],
     }),
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl2:__subpackages__"],
     deps = ["sdl2"],
 )
 
@@ -68,7 +71,7 @@ cmake(
             "libSDL2_mixer-2.0d.so.0",
         ],
     }),
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl2:__subpackages__"],
     deps = ["sdl2"],
 )
 
@@ -88,6 +91,6 @@ cmake(
             "libSDL2_ttf-2.0d.so.0",
         ],
     }),
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl2:__subpackages__"],
     deps = ["sdl2"],
 )

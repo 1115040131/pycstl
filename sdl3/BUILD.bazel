@@ -25,7 +25,10 @@ cmake(
         "libSDL3.so",
         "libSDL3.so.0",
     ],
-    visibility = ["//visibility:public"],
+    visibility = [
+        "//sdl3:__subpackages__",
+        "@imgui_backends//:__pkg__",
+    ],
 )
 
 cmake(
@@ -45,7 +48,7 @@ cmake(
         "libSDL3_image.so",
         "libSDL3_image.so.0",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl3:__subpackages__"],
     deps = ["sdl3"],
 )
 
@@ -62,7 +65,7 @@ cmake(
         "libSDL3_mixer.so",
         "libSDL3_mixer.so.0",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl3:__subpackages__"],
     deps = ["sdl3"],
 )
 
@@ -76,6 +79,6 @@ cmake(
         "libSDL3_ttf.so",
         "libSDL3_ttf.so.0",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//sdl3:__subpackages__"],
     deps = ["sdl3"],
 )

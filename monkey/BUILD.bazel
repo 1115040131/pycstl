@@ -1,8 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-package(default_visibility = ["//visibility:public"])
-
 _LIB_SRCS = glob(
     ["monkey/**/*.cpp"],
     exclude = ["monkey/monkey.cpp"],
@@ -15,7 +13,8 @@ cc_library(
     srcs = _LIB_SRCS,
     hdrs = _LIB_HDRS,
     copts = COPTS,
-    includes = ["."],
+    strip_include_prefix = "/monkey",
+    visibility = ["//monkey:__subpackages__"],
     deps = ["@fmt"],
 )
 
@@ -27,7 +26,8 @@ cc_library(
     hdrs = _LIB_HDRS,
     copts = COPTS,
     defines = ["SORTED_HASH"],
-    includes = ["."],
+    strip_include_prefix = "/monkey",
+    visibility = ["//monkey:__subpackages__"],
     deps = ["@fmt"],
 )
 

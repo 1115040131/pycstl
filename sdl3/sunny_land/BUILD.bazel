@@ -11,7 +11,7 @@ cc_library(
         "//:debug": ["DEBUG_MODE"],
     }),
     features = ["-layering_check"],
-    includes = [""],
+    strip_include_prefix = "/sdl3/sunny_land",
     deps = [
         "//common:noncopyable",
         "//common:string_hash",
@@ -26,12 +26,30 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "sunny_land_game",
+    srcs = glob(["sunny_land/game/**/*.cpp"]),
+    hdrs = glob(["sunny_land/game/**/*.h"]),
+    copts = COPTS,
+    defines = select({
+        "//conditions:default": [],
+        "//:debug": ["DEBUG_MODE"],
+    }),
+    features = ["-layering_check"],
+    strip_include_prefix = "/sdl3/sunny_land",
+    deps = [
+        ":ziyu_engine",
+        "//common:noncopyable",
+        "@fmt",
+        "@glm",
+        "@nlohmann_json//:json",
+        "@spdlog",
+    ],
+)
+
 cc_binary(
     name = "sunny_land",
-    srcs = glob([
-        "sunny_land/game/**/*.cpp",
-        "sunny_land/game/**/*.h",
-    ]) + ["sunny_land/main.cpp"],
+    srcs = ["main.cpp"],
     copts = COPTS,
     data = glob(["assets/**"]),
     defines = select({
@@ -39,12 +57,9 @@ cc_binary(
         "//:debug": ["DEBUG_MODE"],
     }),
     deps = [
-        "ziyu_engine",
-        "//common:noncopyable",
+        ":sunny_land_game",
+        ":ziyu_engine",
         "@bazel_tools//tools/cpp/runfiles",
-        "@fmt",
-        "@glm",
-        "@nlohmann_json//:json",
         "@spdlog",
     ],
 )
