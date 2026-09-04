@@ -85,7 +85,7 @@ jobs:
       run: bazel build //... --config=ci
 
     - name: 运行所有测试
-      run: bazel test //... --config=ci --test_output=errors
+      run: bazel test //... --config=ci
 
     - name: 构建后状态（缓存保存前）
       run: |
@@ -134,16 +134,9 @@ jobs:
     - name: 启动 mysql 服务
       run: tool/build.py chat_prepare
 
-    # --combined_report=lcov: 生成单个 lcov 格式报告
-    # --test_output=errors: 只显示失败测试的日志，减少噪音
+    # 覆盖率相关 flag 全部在 .bazelrc 的 coverage / coverage:ci 段
     - name: 生成测试覆盖率
-      run: |
-        bazel coverage //... \
-          --config=ci \
-          --combined_report=lcov \
-          --test_output=errors \
-          --nocache_test_results \
-          --instrumentation_filter="//..."
+      run: bazel coverage //... --config=ci
 
     - name: 上传覆盖率报告
       if: runner.os == 'Linux'

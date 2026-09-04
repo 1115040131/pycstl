@@ -7,8 +7,18 @@ build:dbg --compilation_mode=dbg
 build:opt --compilation_mode=opt
 
 # CI 专用配置
+common:ci --announce_rc
+common:ci --color=yes
+common:ci --lockfile_mode=error
+
 build:ci --test_env=CO_ASYNC_TIMER_TOLERANCE_MS=20
 build:ci --define=sdl3_console=true
+build:ci --keep_going
+
+test:ci --test_output=errors
+
+coverage:ci --build_tests_only
+coverage:ci --nocache_test_results
 
 #-------------------------------------------------------------------------------------
 # Common settings
@@ -16,9 +26,6 @@ build:ci --define=sdl3_console=true
 
 # Auto-load build:linux / build:macos / build:windows sections based on current OS
 common --enable_platform_specific_config
-
-# Python interpreter writes __pycache__; skip external repo file checks to avoid spurious refetch
-common --noexperimental_check_external_repository_files
 
 # Use prebuilt protoc instead of compiling from source (saves minutes)
 common --@protobuf//bazel/flags:prefer_prebuilt_protoc
