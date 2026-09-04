@@ -9,7 +9,9 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         "//chat/common",
-        "//chat/server/common",
+        "//chat/server/common:config_mgr",
+        "//chat/server/common:redis_mgr",
+        "//chat/server/common:utils",
         "//chat/server/proto:status_cc_grpc_proto",
         "//logger",
         "@fmt",
@@ -24,7 +26,7 @@ cc_binary(
     visibility = ["//chat/server:__subpackages__"],
     deps = [
         ":status_server_lib",
-        "//chat/server/common",
+        "//chat/server/common:config_mgr",
         "@boost.asio",
     ],
 )

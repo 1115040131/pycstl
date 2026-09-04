@@ -8,6 +8,7 @@ cc_test(
         "*.h",
     ]),
     copts = COPTS + ["-Wno-non-virtual-dtor"],
+    features = ["-parse_headers"],
     deps = [
         "//common:cin_redirect",
         "@glm",

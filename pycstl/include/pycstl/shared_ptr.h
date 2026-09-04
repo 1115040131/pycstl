@@ -1,10 +1,19 @@
 #pragma once
 
 #include <atomic>
+#include <exception>
 
 #include "pycstl/unique_ptr.h"
 
 namespace pycstl {
+
+class BadWeakPtr : public std::exception {
+public:
+    BadWeakPtr() = default;
+    virtual ~BadWeakPtr() = default;
+
+    virtual const char* what() const noexcept override { return "BadWeakPtr"; }
+};
 
 struct _SpCounter {
     explicit _SpCounter() noexcept : ref_count_(1) {}
@@ -276,7 +285,7 @@ protected:
         static_assert(std::is_base_of_v<EnableSharedFromThis, Derived>,
                       "Derived must inherit from EnableSharedFromThis");
         if (!owner_) {
-            throw std::bad_weak_ptr();
+            throw BadWeakPtr();
         }
         owner_->_M_incref();
         return _S_makeSharedFused(static_cast<Derived*>(this), owner_);
@@ -286,7 +295,7 @@ protected:
         static_assert(std::is_base_of_v<EnableSharedFromThis, Derived>,
                       "Derived must inherit from EnableSharedFromThis");
         if (!owner_) {
-            throw std::bad_weak_ptr();
+            throw BadWeakPtr();
         }
         owner_->_M_incref();
         return _S_makeSharedFused(static_cast<std::add_const_t<Derived>*>(this), owner_);

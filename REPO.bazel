@@ -1,24 +1,22 @@
 """Repo-wide defaults for the main repository (does not apply to external repos).
 
-layering_check 的豁免（features = ["-layering_check"]）：
+layering_check 的豁免(features = ["-layering_check"]) —— 拿不到 module map 的场景:
+- qt/*、chat/client*: @rules_qt//:qt_* 是无 hdrs 的转发 cc_library, 生成空 module 又不
+  re-export deps(alias 能穿透, cc_library(deps = ...) 不行), 改造需上游配合;
+  moc/uic 生成的代码同理。
+- sdl2/*、sdl3/*: 经 rules_foreign_cc 的 cmake() 构建, 上游 disable 了 module_maps,
+  而建 module map 的 Starlark API 是 private 的, alias 也救不了, 故只豁免直接
+  include SDL 头的 target(非整包)。
 
-无 hdrs 的转发 cc_library 会生成一个空 module,且不 re-export deps 的 module,
-而 layering_check 只认直接 deps 导出的头,于是「头在间接 deps 里」一律报错。
-alias 不生成新 module,可以穿透;cc_library(deps = ...) 不行。据此分两类:
-
-1. rules_qt 的 @rules_qt//:qt_* 正是这种转发 target(真头在 @qt_<os>_<cpu>//:qt_*_<os>),
-   alias 化需上游配合(模块间依赖只在主 repo 表达),故 qt/*、chat/client* 整包豁免;
-   moc/uic 生成的代码同样无法满足检查。
-2. SDL2/SDL3 经 rules_foreign_cc 的 cmake() 构建。上游在 FOREIGN_CC_DISABLED_FEATURES
-   里 disable 了 module_maps(理由:这些 flag 传给第三方构建系统不安全),而创建 module map
-   的 Starlark API 是 private 的,所以 foreign_cc 规则自己生不出 module,alias 也救不了。
-   故 sdl2/*、sdl3/* 中直接 include SDL 头的 target 逐个豁免(非整包)。
+parse_headers 的豁免(features = ["-parse_headers"]) —— 无法独立成 TU 的头:
+- chat/client/widget: uic 生成的 ui_*.h, include 路径与 Qt module 依赖都由使用者提供。
+- design_pattern/*: 示例头, state_pattern.h 的状态互转天然成环(Idle→Chase→Attack→Idle),
+  拆开的可读性代价大于收益。
 """
 
 repo(
-    # Compile every hdrs entry as its own TU (-xc++-header -fsyntax-only), so a header
-    # that only works because the includer pulled something in first fails the build.
-    # Clang 模块分层检查：include 了哪个库的头，就必须在 deps 里声明。
+    # layering_check: include 了哪个库的头, 就必须在 deps 里声明
+    # parse_headers: 每个 hdrs 单独编成一个 TU, 靠包含顺序才成立的头会构建失败
     features = [
         "layering_check",
         "parse_headers",

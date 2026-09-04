@@ -128,7 +128,7 @@ TEST(SharedPtrTest, EnableSharedFromThisTest) {
 
         student1->func();
 
-        EXPECT_THROW(student2->func(), std::bad_weak_ptr);
+        EXPECT_THROW(student2->func(), BadWeakPtr);
     }
     EXPECT_EQ(g_student_count, 0);
 }

@@ -41,6 +41,10 @@ bazel_dep(name = "rules_cc", version = "0.2.22")
 bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
 bazel_dep(name = "spdlog", version = "1.17.0")
 
+# 第三方自己声明的 layering_check / parse_headers 会被 --process_headers_in_dependencies 一起
+# 激活, 在这里统一关掉(原因、边界与维护方式写在被 include 的文件里)
+include("//build_defs:third_party_hdr_check.MODULE.bazel")
+
 # mysql-connector-cpp
 bazel_dep(name = "mysql-connector-cpp")
 local_path_override(
