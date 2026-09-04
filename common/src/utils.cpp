@@ -1,5 +1,7 @@
 #include "common/utils.h"
 
+#include <format>
+
 namespace pyc {
 
 std::string_view GetSimpleName(std::string_view functionName) {
@@ -22,10 +24,11 @@ std::string_view GetSimpleName(std::string_view functionName) {
 }
 
 std::string JoinHostPort(std::string_view host, std::string_view port) {
-    std::string target;
-    target.reserve(host.size() + 1 + port.size());
-    target.append(host).append(1, ':').append(port);
-    return target;
+    // IPv6 字面量自身含冒号，必须加方括号才能和 port 的分隔符区分开；已带括号则原样保留
+    if (host.find(':') != std::string_view::npos && !(host.starts_with('[') && host.ends_with(']'))) {
+        return std::format("[{}]:{}", host, port);
+    }
+    return std::format("{}:{}", host, port);
 }
 
 }  // namespace pyc

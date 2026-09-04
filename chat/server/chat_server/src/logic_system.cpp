@@ -1,7 +1,5 @@
 #include "chat/server/chat_server/logic_system.h"
 
-#include <ranges>
-
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
