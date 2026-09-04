@@ -149,24 +149,3 @@ cc_library(
         "@grpc//:grpc++",
     ],
 )
-
-# Umbrella target — keeps existing consumers (servers) working unchanged. --------
-
-cc_library(
-    name = "common",
-    hdrs = glob(["include/**/*.h"]),
-    copts = COPTS,
-    strip_include_prefix = "include",
-    deps = [
-        ":config_mgr",
-        ":data",
-        ":defer",
-        ":io_service_pool",
-        ":mysql_mgr",
-        ":mysql_pool",
-        ":redis_connection_pool",
-        ":redis_mgr",
-        ":status_grpc_client",
-        ":utils",
-    ],
-)

@@ -3,6 +3,7 @@ load("widgets.bzl", "WIDGETS")
 
 [qt_ui_library(
     name = "%s_ui" % widget,
+    features = ["-parse_headers"],
     ui = "%s.ui" % widget,
     visibility = ["//chat/client:__pkg__"],
     deps = ["@rules_qt//:qt_widgets"],

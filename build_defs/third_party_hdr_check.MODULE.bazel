@@ -1,0 +1,130 @@
+# 关掉第三方自己声明的 layering_check / parse_headers。
+#
+# 脚本的边界(逐形式实测过): 只动 features = [...] 里的这两个字符串项, 不碰 name = "layering_check"
+# 这类赋值, 也不碰 implies 之类的别的列表; 不动上游自己的 "-layering_check" 豁免与注释掉的声明;
+# 只处理 BUILD/BUILD.bazel, 不碰 .bzl(grpc 自带的 RBE toolchain 在 .bzl 里定义了同名 feature)。
+# 一个正向声明都没匹配到时以非 0 退出, 让 fetch 失败, 以免上游改写法后静默失效。
+#
+# 刻意不在列表里的三个: rules_cc(那里的 "layering_check" 是 cc_feature(name = ...) 的定义,
+# 删了 toolchain 就坏)、boringssl(上游自己写了 "-parse_headers")、apple_support(只在 test/ 下)。
+#
+# 维护: 依赖升级后在 bazel 的 external 目录里重跑下面这条核对列表; 若 Bazel 报
+# "overrides on nonexistent module", 说明该 module 已不在依赖图里, 从列表删掉即可。
+#   grep -rlE '^ *"(layering_check|parse_headers)",?$' --include=BUILD --include=BUILD.bazel .
+_STRIP_HDR_CHECK_FEATURES = r"""python3 - <<'PY'
+import pathlib
+import re
+import sys
+
+_NAMES = "layering_check|parse_headers"
+_OPEN = re.compile(r"features\s*=\s*\[")
+_ITEM = re.compile(r'^\s*"(?:%s)",?\s*$' % _NAMES)
+_INLINE = re.compile(r'"(?:%s)"\s*,?\s*' % _NAMES)
+
+
+def strip(path):
+    # 逐行走, 只在 features = [ 块内部删项; 返回该文件是否有改动
+    changed = False
+    out = []
+    in_features = False
+    for line in path.read_text(encoding="utf-8").splitlines(keepends=True):
+        if in_features:
+            if _ITEM.match(line):
+                changed = True
+                continue
+            if "]" in line:
+                in_features = False
+        elif _OPEN.search(line) and not line.lstrip().startswith("#"):
+            if "]" in line[line.index("["):]:
+                new = _INLINE.sub("", line)
+                if new != line:
+                    changed = True
+                    line = re.sub(r",\s*\]", "]", new)
+            else:
+                in_features = True
+        out.append(line)
+    if changed:
+        path.write_text("".join(out), encoding="utf-8")
+    return changed
+
+
+n = 0
+for name in ("BUILD", "BUILD.bazel"):
+    for path in pathlib.Path(".").rglob(name):
+        n += strip(path)
+if n == 0:
+    sys.exit("no layering_check/parse_headers declaration found: upstream layout changed?")
+print("stripped %d BUILD file(s)" % n)
+PY
+"""
+
+_MODULES_WITH_HDR_CHECK = [
+    "abseil-cpp",
+    "grpc",
+    "boost.algorithm",
+    "boost.align",
+    "boost.any",
+    "boost.array",
+    "boost.assert",
+    "boost.atomic",
+    "boost.beast",
+    "boost.bind",
+    "boost.concept_check",
+    "boost.config",
+    "boost.container",
+    "boost.container_hash",
+    "boost.context",
+    "boost.conversion",
+    "boost.core",
+    "boost.date_time",
+    "boost.describe",
+    "boost.detail",
+    "boost.endian",
+    "boost.exception",
+    "boost.function",
+    "boost.function_types",
+    "boost.functional",
+    "boost.fusion",
+    "boost.integer",
+    "boost.intrusive",
+    "boost.io",
+    "boost.iterator",
+    "boost.lexical_cast",
+    "boost.logic",
+    "boost.move",
+    "boost.mp11",
+    "boost.mpl",
+    "boost.multi_index",
+    "boost.optional",
+    "boost.phoenix",
+    "boost.pool",
+    "boost.predef",
+    "boost.preprocessor",
+    "boost.property_tree",
+    "boost.proto",
+    "boost.range",
+    "boost.ratio",
+    "boost.regex",
+    "boost.smart_ptr",
+    "boost.spirit",
+    "boost.static_assert",
+    "boost.static_string",
+    "boost.system",
+    "boost.throw_exception",
+    "boost.tokenizer",
+    "boost.tuple",
+    "boost.type_index",
+    "boost.type_traits",
+    "boost.typeof",
+    "boost.unordered",
+    "boost.utility",
+    "boost.uuid",
+    "boost.variant",
+    "boost.variant2",
+    "boost.winapi",
+]
+
+[single_version_override(
+    module_name = m,
+    patch_cmds = [_STRIP_HDR_CHECK_FEATURES],
+) for m in _MODULES_WITH_HDR_CHECK]

@@ -9,7 +9,12 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         "//chat/common",
-        "//chat/server/common",
+        "//chat/server/common:config_mgr",
+        "//chat/server/common:defer",
+        "//chat/server/common:io_service_pool",
+        "//chat/server/common:mysql_mgr",
+        "//chat/server/common:redis_mgr",
+        "//chat/server/common:status_grpc_client",
         "//chat/server/proto:verify_cc_grpc_proto",
         "//chat/server/proto:verify_cc_proto",
         "//common:connection_pool",
@@ -30,6 +35,6 @@ cc_binary(
     visibility = ["//chat/server:__subpackages__"],
     deps = [
         ":gate_server_lib",
-        "//chat/server/common",
+        "//chat/server/common:config_mgr",
     ],
 )
