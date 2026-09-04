@@ -79,8 +79,7 @@ def run_bazel_test(target: str, test_output: bool = True, check: bool = True,
 
 
 def run_bazel_coverage(target: str, check: bool = True, args: list[str] | None = None) -> None:
-    command = (f'bazel coverage {target} --nocache_test_results '
-               f'--instrumentation_filter="//..." {" ".join(args or [])}')
+    command = f'bazel coverage {target} {" ".join(args or [])}'
     run_cmd(command, check=False)
 
 
