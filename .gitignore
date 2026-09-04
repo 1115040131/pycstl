@@ -8,7 +8,7 @@ build
 
 # bazel
 bazel-*
-MODULE.bazel.lock
+third_party/*/MODULE.bazel.lock
 
 # coverage
 coverage_report
