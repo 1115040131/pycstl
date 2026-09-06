@@ -17,9 +17,6 @@ build:ci --keep_going
 
 test:ci --test_output=errors
 
-coverage:ci --build_tests_only
-coverage:ci --nocache_test_results
-
 #-------------------------------------------------------------------------------------
 # Common settings
 #-------------------------------------------------------------------------------------
@@ -68,7 +65,10 @@ build --features=external_include_paths
 # Coverage (LLVM toolchain)
 #-------------------------------------------------------------------------------------
 
+coverage --build_tests_only
 coverage --combined_report=lcov
 coverage --experimental_generate_llvm_lcov
+coverage --instrumentation_filter=^//
+coverage --nocache_test_results
 coverage --per_file_copt=.*@-fprofile-continuous
 coverage --test_env=LLVM_PROFILE_CONTINUOUS_MODE=1
