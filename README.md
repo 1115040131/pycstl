@@ -57,8 +57,8 @@ sudo mv starpls-linux-amd64 /usr/local/bin/starpls
 ```bash
 sudo apt update
 sudo apt install gcc g++ # 编译器
-sudo apt install libx11-dev  # 窗口
-sudo apt install libpulse-dev libxext-dev # 音频驱动
+sudo apt install libx11-dev libxext-dev libxcursor-dev libxi-dev libxrandr-dev libxfixes-dev libxss-dev libxtst-dev # x11
+sudo apt install libpulse-dev libgl-dev # 驱动
 sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 libxcb-xkb1 # qt
 ```
 
