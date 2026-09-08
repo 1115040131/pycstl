@@ -1,4 +1,5 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("//build_defs:foreign_cc_opts.bzl", "BUILD_ARGS")
 
 # CI 无显示器,需要 console 构建(--define=sdl3_console=true,见 .bazelrc 的 build:ci)。
 config_setting(
@@ -9,9 +10,16 @@ config_setting(
 # sdl3
 cmake(
     name = "sdl3",
-    build_args = ["-j8"],
+    build_args = BUILD_ARGS,
+    # SDL_UNIX_CONSOLE_BUILD 只压制"X11/Wayland 全无"那个最终报错(macros.cmake:414),
+    # 压不住 3.4 新增的 SDL_missing_dependency —— 只要宿主机有 libx11-dev+libxext-dev,
+    # 9 个 X11 子特性就会逐个要求对应的扩展 dev 包, 缺一个就 FATAL。console 构建本来
+    # 就不开窗, 直接把 X11 整个关掉, 与 runner 镜像装了什么彻底解耦。
     cache_entries = select({
-        ":console_build": {"SDL_UNIX_CONSOLE_BUILD": "ON"},
+        ":console_build": {
+            "SDL_UNIX_CONSOLE_BUILD": "ON",
+            "SDL_X11": "OFF",
+        },
         "//conditions:default": {},
     }),
     # Point the hermetic pkg-config at the system pkgconfig dir so SDL's
@@ -33,11 +41,12 @@ cmake(
 
 cmake(
     name = "sdl3_image",
-    build_args = ["-j8"],
+    build_args = BUILD_ARGS,
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
-        # Only PNG is used (decoded by the built-in stb backend). Disable the
-        # heavy vendored codecs we don't need: AVIF pulls in aom/dav1d, plus TIF/WEBP.
+        "SDLIMAGE_DEPS_SHARED": "OFF",
+        # 3.4 起基础 PNG 解码搬进了 SDL3 本体(SDL_LoadPNG_IO), libpng 只剩 APNG 用途
+        "SDLIMAGE_PNG_LIBPNG": "OFF",
         "SDLIMAGE_AVIF": "OFF",
         "SDLIMAGE_TIF": "OFF",
         "SDLIMAGE_WEBP": "OFF",
@@ -54,10 +63,16 @@ cmake(
 
 cmake(
     name = "sdl3_mixer",
-    build_args = ["-j8"],
+    build_args = BUILD_ARGS,
     cache_entries = {
         "SDLMIXER_VENDORED": "ON",
         "SDLMIXER_MIDI_NATIVE": "OFF",
+        "SDLMIXER_DEPS_SHARED": "OFF",
+        # 项目音频只有 wav/mp3/ogg
+        "SDLMIXER_GME": "OFF",
+        "SDLMIXER_MOD": "OFF",
+        "SDLMIXER_OPUS": "OFF",
+        "SDLMIXER_WAVPACK": "OFF",
     },
     generate_args = ["-GNinja"],
     lib_source = "@sdl3_mixer//:all_srcs",
@@ -71,7 +86,7 @@ cmake(
 
 cmake(
     name = "sdl3_ttf",
-    build_args = ["-j8"],
+    build_args = BUILD_ARGS,
     cache_entries = {"SDLTTF_VENDORED": "ON"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl3_ttf//:all_srcs",

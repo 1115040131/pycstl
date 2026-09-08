@@ -15,6 +15,8 @@ filegroup(
 
 git_repository = use_repo_rule("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 #-------------------------------------------------------------------------------------
 # C++
 #-------------------------------------------------------------------------------------
@@ -76,66 +78,67 @@ register_toolchains("@llvm_toolchain//:all")
 # SDL2/SDL3
 #-------------------------------------------------------------------------------------
 
-git_repository(
+http_archive(
     name = "sdl2",
     build_file_content = _ALL_CONTENT,
-    remote = "https://github.com/libsdl-org/SDL.git",
-    tag = "release-2.32.10",
+    sha256 = "5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165",
+    strip_prefix = "SDL2-2.32.10",
+    urls = ["https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10.tar.gz"],
 )
 
-git_repository(
+http_archive(
     name = "sdl2_image",
     build_file_content = _ALL_CONTENT,
-    init_submodules = True,
-    remote = "https://github.com/libsdl-org/SDL_image.git",
-    tag = "release-2.8.8",
+    sha256 = "393f5efb50536ec13ca4f4affb69cc9966d3c3f969e6c5e701faddf9f9785381",
+    strip_prefix = "SDL2_image-2.8.12",
+    urls = ["https://github.com/libsdl-org/SDL_image/releases/download/release-2.8.12/SDL2_image-2.8.12.tar.gz"],
 )
 
-git_repository(
+http_archive(
     name = "sdl2_mixer",
     build_file_content = _ALL_CONTENT,
-    init_submodules = True,
-    remote = "https://github.com/libsdl-org/SDL_mixer.git",
-    tag = "release-2.8.1",
+    sha256 = "938dff531d00ace2296557a6599abe6f34599e2f34f0a4a08a397e2ccac8b8f7",
+    strip_prefix = "SDL2_mixer-2.8.2",
+    urls = ["https://github.com/libsdl-org/SDL_mixer/releases/download/release-2.8.2/SDL2_mixer-2.8.2.tar.gz"],
 )
 
-git_repository(
+http_archive(
     name = "sdl2_ttf",
     build_file_content = _ALL_CONTENT,
-    init_submodules = True,
-    remote = "https://github.com/libsdl-org/SDL_ttf.git",
-    tag = "release-2.24.0",
+    sha256 = "0b2bf1e7b6568adbdbc9bb924643f79d9dedafe061fa1ed687d1d9ac4e453bfd",
+    strip_prefix = "SDL2_ttf-2.24.0",
+    urls = ["https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.24.0/SDL2_ttf-2.24.0.tar.gz"],
 )
 
-git_repository(
+http_archive(
     name = "sdl3",
     build_file_content = _ALL_CONTENT,
-    remote = "https://github.com/libsdl-org/SDL.git",
-    tag = "release-3.2.28",
+    sha256 = "7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68",
+    strip_prefix = "SDL3-3.4.16",
+    urls = ["https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz"],
 )
 
-git_repository(
+http_archive(
     name = "sdl3_image",
     build_file_content = _ALL_CONTENT,
-    init_submodules = True,
-    remote = "https://github.com/libsdl-org/SDL_image.git",
-    tag = "release-3.2.4",
+    sha256 = "d2e4637ae700f72e5196b8fbd749850ed2e5e1e09c5a5be8d06ff55aaccf3b01",
+    strip_prefix = "SDL3_image-3.4.6",
+    urls = ["https://github.com/libsdl-org/SDL_image/releases/download/release-3.4.6/SDL3_image-3.4.6.tar.gz"],
 )
 
 git_repository(
     name = "sdl3_mixer",
     build_file_content = _ALL_CONTENT,
     commit = "e777b524e8f854c6c6590e2b5766bb1cee52e016",
-    init_submodules = True,
     remote = "https://github.com/libsdl-org/SDL_mixer.git",
 )
 
 git_repository(
     name = "sdl3_ttf",
     build_file_content = _ALL_CONTENT,
+    commit = "a1ce3670aec736ecbf0936c43f2f0cc53aa61e5b",  # release-3.2.2
     init_submodules = True,
     remote = "https://github.com/libsdl-org/SDL_ttf.git",
-    tag = "release-3.2.2",
 )
 
 # SDL2
