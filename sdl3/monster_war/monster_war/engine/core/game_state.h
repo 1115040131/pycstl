@@ -58,6 +58,14 @@ private:
     SDL_Window* window_ = nullptr;        ///< @brief SDL窗口，用于获取窗口大小
     SDL_Renderer* renderer_ = nullptr;    ///< @brief SDL渲染器，用于获取逻辑分辨率
     State current_state_ = State::Title;  ///< @brief 当前游戏状态
+    /**
+     * @brief 逻辑分辨率，自己缓存而不是每次向 SDL 查询。
+     * @note SDL 3.4 起，以 SDL_LOGICAL_PRESENTATION_DISABLED 调用
+     *       SDL_SetRenderLogicalPresentation 会把渲染器内部的 logical_w/h 清零
+     *       (3.2 是无条件保留传入值)，因此关闭期间 SDL_GetRenderLogicalPresentation
+     *       只能读回 0x0，无法再用它来恢复原尺寸。
+     */
+    glm::ivec2 logical_size_{0};
 };
 
 }  // namespace pyc::monster_war

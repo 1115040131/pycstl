@@ -11,6 +11,8 @@ GameState::GameState(SDL_Window* window, SDL_Renderer* renderer, State initial_s
         spdlog::error("窗口或渲染器为空");
         throw std::runtime_error("窗口或渲染器不能为空");
     }
+    // 记录初始逻辑分辨率(由 GameApp::initSDL 在构造本类之前设置好)
+    SDL_GetRenderLogicalPresentation(renderer_, &logical_size_.x, &logical_size_.y, NULL);
     spdlog::trace("游戏状态初始化完成");
 }
 
@@ -36,31 +38,26 @@ void GameState::setWindowSize(const glm::vec2& window_size) {
 }
 
 glm::vec2 GameState::getLogicalSize() const {
-    int width{};
-    int height{};
-    // SDL3获取逻辑分辨率的方法
-    SDL_GetRenderLogicalPresentation(renderer_, &width, &height, NULL);
-    return glm::vec2(width, height);
+    // 返回缓存值：逻辑分辨率被临时关闭期间(见 disableLogicalPresentation)，
+    // SDL_GetRenderLogicalPresentation 会读回 0x0
+    return glm::vec2(logical_size_);
 }
 
 void GameState::setLogicalSize(const glm::vec2& logical_size) {
-    SDL_SetRenderLogicalPresentation(renderer_, static_cast<int>(logical_size.x), static_cast<int>(logical_size.y),
+    logical_size_ = glm::ivec2(logical_size);
+    SDL_SetRenderLogicalPresentation(renderer_, logical_size_.x, logical_size_.y,
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
-    spdlog::trace("逻辑分辨率设置为: {}x{}", logical_size.x, logical_size.y);
+    spdlog::trace("逻辑分辨率设置为: {}x{}", logical_size_.x, logical_size_.y);
 }
 
 bool GameState::disableLogicalPresentation() {
-    int width{};
-    int height{};
-    SDL_GetRenderLogicalPresentation(renderer_, &width, &height, NULL);
-    return SDL_SetRenderLogicalPresentation(renderer_, width, height, SDL_LOGICAL_PRESENTATION_DISABLED);
+    return SDL_SetRenderLogicalPresentation(renderer_, logical_size_.x, logical_size_.y,
+                                            SDL_LOGICAL_PRESENTATION_DISABLED);
 }
 
 bool GameState::enableLogicalPresentation() {
-    int width{};
-    int height{};
-    SDL_GetRenderLogicalPresentation(renderer_, &width, &height, NULL);
-    return SDL_SetRenderLogicalPresentation(renderer_, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    return SDL_SetRenderLogicalPresentation(renderer_, logical_size_.x, logical_size_.y,
+                                            SDL_LOGICAL_PRESENTATION_LETTERBOX);
 }
 
 }  // namespace pyc::monster_war
