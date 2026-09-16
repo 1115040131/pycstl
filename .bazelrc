@@ -72,3 +72,9 @@ coverage --instrumentation_filter=^//
 coverage --nocache_test_results
 coverage --per_file_copt=.*@-fprofile-continuous
 coverage --test_env=LLVM_PROFILE_CONTINUOUS_MODE=1
+
+#-------------------------------------------------------------------------------------
+# Local overrides (not tracked by git)
+#-------------------------------------------------------------------------------------
+
+try-import %workspace%/.bazelrc.local
