@@ -18,6 +18,20 @@ logger = Logger(LogStyle.NO_DEBUG_INFO)
 root_path = Path(__file__).resolve().parent.parent
 tool_path = root_path / 'tool'  # tool 目录
 
+# docker 镜像仓库前缀, 默认为空即直接拉取官方镜像
+DOCKER_REGISTRY = ''
+
+# 本地配置, 不纳入 git, 文件不存在时保持上面的默认值
+try:
+    from build_local import *  # noqa: F401,F403
+except ImportError:
+    pass
+
+
+def docker_image(name: str) -> str:
+    """按 DOCKER_REGISTRY 拼接完整镜像名"""
+    return f'{DOCKER_REGISTRY.rstrip("/")}/{name}' if DOCKER_REGISTRY else name
+
 
 class BuildArgumentParser(argparse.ArgumentParser):
     """用法出错时给出完整帮助, 与 help 目标的提示样式保持一致"""
@@ -240,7 +254,7 @@ def main() -> None:
 
         # chat server
         "chat_redis_server": lambda args: run_docker(
-            image='redis --requirepass "123456"',
+            image=f'{docker_image("redis")} --requirepass "123456"',
             container_name='pyc-redis',
             args=['-p 6379:6379']
         ),
@@ -251,7 +265,7 @@ def main() -> None:
 
             # 运行容器
             run_docker(
-                image='mysql:8.0',
+                image=docker_image('mysql:8.0'),
                 container_name='pyc-mysql',
                 args=[f'-v {root_path}/chat/server/mysql/config/my.cnf:/etc/my.cnf',
                       f'-v {root_path}/chat/server/mysql/sql/init-script.sql:/docker-entrypoint-initdb.d/init-script.sql',
