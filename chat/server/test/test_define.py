@@ -154,6 +154,15 @@ def get_chat_servers(config: configparser.ConfigParser):
     return chat_servers
 
 
+def decode_redis(value: bytes | str | None) -> str:
+    """
+    redis 返回值统一解码为 str, 值不存在时直接失败
+    """
+
+    assert value is not None, 'redis 返回空值'
+    return value.decode('utf-8') if isinstance(value, bytes) else value
+
+
 def connect_redis(config: configparser.ConfigParser) -> redis.Redis:
     """
     连接 redis 服务器
@@ -161,7 +170,7 @@ def connect_redis(config: configparser.ConfigParser) -> redis.Redis:
 
     return redis.Redis(
         host=config['Redis']['Host'],
-        port=config['Redis']['Port'],
+        port=int(config['Redis']['Port']),
         password=config['Redis']['Password'],
     )
 
@@ -169,7 +178,6 @@ def connect_redis(config: configparser.ConfigParser) -> redis.Redis:
 class Database:
     def __init__(self, config: configparser.ConfigParser):
         # 初始化数据库连接
-        self.connection = None
         try:
             self.connection = mysql.connector.connect(
                 host=config['Mysql']['Host'],
@@ -178,7 +186,9 @@ class Database:
                 password=config['Mysql']['Password'],
                 database=config['Mysql']['Schema'])
         except Error as e:
+            # 连接失败时直接抛出, 否则后续操作会崩在 NoneType 上, 错误信息难以定位
             print(f"Error connecting to MySQL: {e}")
+            raise
 
     def query(self, sql):
         # 执行SQL查询并返回结果
@@ -197,5 +207,6 @@ class Database:
             self.connection.close()
 
     def __del__(self):
-        # 确保在对象被销毁时关闭连接
-        self.close()
+        # 确保在对象被销毁时关闭连接; 连接失败时 connection 未赋值, 需先判断
+        if hasattr(self, 'connection'):
+            self.close()

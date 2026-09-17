@@ -11,9 +11,9 @@ logger = Logger()
 
 
 def read_config(config_name):
+    file_name = f"{Path(__file__).resolve().parent}/server_client_config.json"
     try:
         # 打开并读取 JSON 文件
-        file_name = f"{Path(__file__).resolve().parent}/server_client_config.json"
         with open(file_name, 'r') as file:
             data = json.load(file)
 

@@ -177,7 +177,7 @@ class ChatServerTest(unittest.TestCase):
         assert json_response['token'] == token
         assert json_response['base_info']['uid'] == user_info.uid
         assert json_response['base_info']['name'] == user_info.name
-        server_name = cls.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info.uid}').decode('utf-8')
+        server_name = decode_redis(cls.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info.uid}'))
         assert server_name in cls.chat_servers.keys()
 
         return client_socket
@@ -283,11 +283,11 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(json_response['token'], token)
             self.assertEqual(json_response['base_info']['uid'], user_info.uid)
             self.assertEqual(json_response['base_info']['name'], user_info.name)
-            server_name = self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info.uid}').decode('utf-8')
+            server_name = decode_redis(self.redis.get(f'{RedisKey.kUserIpPrefix.value}{user_info.uid}'))
             self.assertIn(server_name, self.chat_servers.keys())
 
             # 登录后有缓存
-            cache = json.loads(self.redis.get(f'{RedisKey.kUserBaseInfo.value}{user_info.uid}').decode('utf-8'))
+            cache = json.loads(decode_redis(self.redis.get(f'{RedisKey.kUserBaseInfo.value}{user_info.uid}')))
             self.assertEqual(cache['uid'], user_info.uid)
             self.assertEqual(cache['name'], user_info.name)
             self.assertEqual(cache['email'], user_info.email)
@@ -306,8 +306,8 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
             json_response = json.loads(response.message_body)
             self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
-            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1").decode('utf-8')), 1)
-            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2").decode('utf-8')), 0)
+            self.assertEqual(int(decode_redis(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1"))), 1)
+            self.assertEqual(int(decode_redis(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2"))), 0)
 
             # 重复登录
             response = Message.send_and_receive(client_socket, Message(
@@ -316,8 +316,8 @@ class ChatServerTest(unittest.TestCase):
             self.assertEqual(response.message_id, ReqId.kChatLoginRes)
             json_response = json.loads(response.message_body)
             self.assertEqual(json_response['error'], ErrorCode.kSuccess.value)
-            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1").decode('utf-8')), 2)
-            self.assertEqual(int(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2").decode('utf-8')), 0)
+            self.assertEqual(int(decode_redis(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer1"))), 2)
+            self.assertEqual(int(decode_redis(self.redis.hget(RedisKey.kLoginCount.value, "ChatServer2"))), 0)
 
     def test_search_info(self):
         """
@@ -435,7 +435,7 @@ class ChatServerTest(unittest.TestCase):
 
         # 测试登录后的好友申请列表
         with self.connect_server(user_info_2) as client_2:
-            token = self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user_info_2.uid}').decode('utf-8')
+            token = decode_redis(self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user_info_2.uid}'))
             response = Message.send_and_receive(client_2, Message(
                 ReqId.kChatLogin, json.dumps({'uid': user_info_2.uid,
                                                 "token": token})))
@@ -546,7 +546,7 @@ class ChatServerTest(unittest.TestCase):
 
         # 测试登录后的好友列表
         with self.connect_server(user_info_1) as client_1:
-            token = self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user_info_1.uid}').decode('utf-8')
+            token = decode_redis(self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user_info_1.uid}'))
             response = Message.send_and_receive(client_1, Message(
                 ReqId.kChatLogin, json.dumps({'uid': user_info_1.uid,
                                                 "token": token})))

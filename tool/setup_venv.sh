@@ -8,22 +8,12 @@ echo $requirements_file
 # 虚拟环境的路径
 venv_path="$root_path/.venv"
 
-# 检查 python3-venv 包是否已安装
-if ! dpkg -s python3-venv &>/dev/null; then
-    echo "python3-venv 未安装。"
-
-    # 询问用户是否自动安装
-    read -p "是否尝试自动安装 python3-venv? (y/N) " answer
-    if [[ $answer = [Yy]* ]]; then
-        sudo apt update && sudo apt install -y python3-venv
-        if [ $? -ne 0 ]; then
-            echo "自动安装失败，请手动安装 python3-venv 后再次运行此脚本。"
-            exit 1
-        fi
-    else
-        echo "请手动安装 python3-venv 后再次运行此脚本。"
-        exit 1
-    fi
+# 包名各发行版不一致 (python3-venv / python3.10-venv), 直接检测模块是否可用
+# 本脚本经 bash -s 由 stdin 传入, read 会读走脚本自身内容, 因此不能交互询问
+if ! python3 -c "import ensurepip, venv" &>/dev/null; then
+    echo "python3 的 venv 模块不可用，请先安装后再次运行此脚本。"
+    echo "Debian/Ubuntu: sudo apt install -y python3-venv"
+    exit 1
 fi
 
 # 如果虚拟环境不存在，则创建它

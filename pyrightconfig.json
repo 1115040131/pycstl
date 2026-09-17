@@ -1,0 +1,16 @@
+{
+    "exclude": [
+        "**/.*",
+        "**/__editable__.*",
+        "**/__pycache__",
+        "**/bazel-*",
+        "**/external",
+        "**/node_modules"
+    ],
+    "extraPaths": [
+        "tool",
+        "bazel-bin"
+    ],
+    "venvPath": ".",
+    "venv": ".venv"
+}
