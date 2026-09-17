@@ -78,14 +78,26 @@ jobs:
     - name: 验证 Bazel 版本
       run: bazel --version
 
+    # fork 过来的 PR 拿不到 secret, 这时自动降级为不走远程缓存
+    - name: 配置远程缓存
+      env:
+        BB_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+      run: |
+        if [ -n "$BB_KEY" ]; then
+          echo "BAZEL_REMOTE=--config=remote --remote_header=x-buildbuddy-api-key=$BB_KEY" >> "$GITHUB_ENV"
+        else
+          echo "BAZEL_REMOTE=" >> "$GITHUB_ENV"
+          echo "::notice::未配置 BUILDBUDDY_API_KEY, 本次构建不使用远程缓存"
+        fi
+
     - name: 启动 mysql 服务
       run: tool/build.py chat_prepare
 
     - name: 构建所有目标
-      run: bazel build //... --config=ci
+      run: bazel build //... --config=ci $BAZEL_REMOTE
 
     - name: 运行所有测试
-      run: bazel test //... --config=ci
+      run: bazel test //... --config=ci $BAZEL_REMOTE
 
     - name: 构建后状态（缓存保存前）
       run: |
@@ -131,12 +143,24 @@ jobs:
     - name: 验证 Bazel 版本
       run: bazel --version
 
+    # fork 过来的 PR 拿不到 secret, 这时自动降级为不走远程缓存
+    - name: 配置远程缓存
+      env:
+        BB_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+      run: |
+        if [ -n "$BB_KEY" ]; then
+          echo "BAZEL_REMOTE=--config=remote --remote_header=x-buildbuddy-api-key=$BB_KEY" >> "$GITHUB_ENV"
+        else
+          echo "BAZEL_REMOTE=" >> "$GITHUB_ENV"
+          echo "::notice::未配置 BUILDBUDDY_API_KEY, 本次构建不使用远程缓存"
+        fi
+
     - name: 启动 mysql 服务
       run: tool/build.py chat_prepare
 
     # 覆盖率相关 flag 全部在 .bazelrc 的 coverage / coverage:ci 段
     - name: 生成测试覆盖率
-      run: bazel coverage //... --config=ci
+      run: bazel coverage //... --config=ci $BAZEL_REMOTE
 
     - name: 上传覆盖率报告
       if: runner.os == 'Linux'

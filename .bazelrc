@@ -74,6 +74,26 @@ coverage --per_file_copt=.*@-fprofile-continuous
 coverage --test_env=LLVM_PROFILE_CONTINUOUS_MODE=1
 
 #-------------------------------------------------------------------------------------
+# Remote cache (BuildBuddy) — 用 --config=remote 启用, 本地默认不走
+#
+# endpoint 用 remote.buildbuddy.io(公共入口)。API key 不写进本文件: CI 从 secret 经
+# 命令行传入, 本地要用就写在 .bazelrc.local:
+#   common --remote_header=x-buildbuddy-api-key=<key>
+#   common --noremote_upload_local_results   # 本地只读, 不把本机产物写回共享缓存
+#-------------------------------------------------------------------------------------
+
+# 构建事件上传, 可在 app.buildbuddy.io 上看缓存命中率与关键路径
+common:remote --bes_results_url=https://app.buildbuddy.io/invocation/
+common:remote --bes_backend=grpcs://remote.buildbuddy.io
+
+common:remote --remote_cache=grpcs://remote.buildbuddy.io
+common:remote --remote_timeout=10m
+
+# 传输层优化, 取自 BuildBuddy 官方 shared.bazelrc 的 cache-shared 段
+common:remote --remote_cache_compression
+common:remote --experimental_remote_cache_chunking
+
+#-------------------------------------------------------------------------------------
 # Local overrides (not tracked by git)
 #-------------------------------------------------------------------------------------
 
