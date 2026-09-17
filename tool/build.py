@@ -278,11 +278,16 @@ def main() -> None:
         "chat_verify_server": lambda args: run_bazel_run('//chat/server/verify_server', args=args),
         "chat_status_server": lambda args: run_bazel_run('//chat/server/status_server', args=args),
         "chat_chat_server": lambda args: run_bazel_run('//chat/server/chat_server', args=args),
-        "chat_prepare": lambda args: (
+        "chat_prepare_start": lambda args: (
             targets["chat_redis_server"](args=[]),
             targets["chat_mysql_server"](args=[]),
-            wait_until(lambda: mysql_service_is_ready('localhost', 3306),
-                       'mysql_service_is_ready', interval=1),
+        ),
+        "chat_prepare_wait": lambda args: wait_until(
+            lambda: mysql_service_is_ready('localhost', 3306),
+            'mysql_service_is_ready', interval=1),
+        "chat_prepare": lambda args: (
+            targets["chat_prepare_start"](args=[]),
+            targets["chat_prepare_wait"](args=[]),
         ),
         "chat_clear": lambda args: (
             run_cmd('docker stop pyc-redis', check=False),

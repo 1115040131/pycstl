@@ -1,0 +1,61 @@
+name: Setup build environment
+description: 拉起 chat 依赖服务、安装 Bazel、配置 BuildBuddy 远程缓存
+
+inputs:
+  os:
+    description: runner 标签,用于区分 disk-cache(与调用方的 matrix.os 保持一致)
+    required: true
+  cache-kind:
+    description: 缓存区分名(build / coverage),同时决定 disk-cache key 与 remote instance
+    required: true
+  bb-key:
+    description: BuildBuddy API key,为空时自动降级为不走远程缓存
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    # 先把容器起起来,让 mysql 的初始化与后面几步重叠;就绪等待放到最后
+    - name: 启动依赖服务
+      shell: bash
+      run: tool/build.py chat_prepare_start
+
+    # TODO: adapt gcc 14
+    - name: Remove GCC 14
+      shell: bash
+      run: |
+        sudo apt-get remove -y gcc-14 g++-14 libstdc++-14-dev
+        sudo apt-get autoremove -y
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.19.0
+      with:
+        # Avoid downloading Bazel every time.
+        bazelisk-cache: true
+        # Store build cache per workflow.
+        disk-cache: ${{ github.workflow }}-${{ inputs.os }}-${{ inputs.cache-kind }}
+        # Share repository cache between workflows.
+        repository-cache: false
+
+    - name: 验证 Bazel 版本
+      shell: bash
+      run: bazel --version
+
+    # fork 过来的 PR 拿不到 secret, 这时自动降级为不走远程缓存
+    - name: 配置远程缓存
+      shell: bash
+      env:
+        BB_KEY: ${{ inputs.bb-key }}
+        CACHE_KIND: ${{ inputs.cache-kind }}
+      run: |
+        if [ -n "$BB_KEY" ]; then
+          echo "BAZEL_REMOTE=--config=remote-$CACHE_KIND --remote_header=x-buildbuddy-api-key=$BB_KEY" >> "$GITHUB_ENV"
+        else
+          echo "BAZEL_REMOTE=" >> "$GITHUB_ENV"
+          echo "::notice::未配置 BUILDBUDDY_API_KEY, 本次构建不使用远程缓存"
+        fi
+
+    - name: 等待 mysql 就绪
+      shell: bash
+      run: tool/build.py chat_prepare_wait

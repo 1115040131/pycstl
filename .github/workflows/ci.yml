@@ -28,92 +28,18 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v7
 
-    # TODO: adapt gcc 14
-    - name: Remove GCC 14
-      run: |
-        sudo apt-get remove -y gcc-14 g++-14 libstdc++-14-dev
-        sudo apt-get autoremove -y
-
-    - name: 初始状态检查
-      run: |
-        echo "===== 磁盘初始状态 ====="
-        df -h /
-        echo ""
-        echo "===== 主要目录占用 ====="
-        du -sh /home/runner/work 2>/dev/null || true
-        du -sh ~/.cache 2>/dev/null || true
-
-    # - name: Free Disk Space (Ubuntu)
-    #   uses: jlumbroso/free-disk-space@main
-    #   with:
-    #     # 这里可以自定义需要删除哪些内容
-    #     # 默认会删除 Android, .NET, Haskell 等，一般能腾出 10GB+ 空间
-    #     tool-cache: true
-    #     android: true
-    #     dotnet: true
-    #     haskell: true
-    #     large-packages: true
-    #     docker-images: true
-    #     swap-storage: true
-
-    # - name: 清理后检查
-    #   run: |
-    #     echo "===== 磁盘清理后状态 ====="
-    #     df -h /
-    #     echo ""
-    #     echo "===== 主要目录占用 ====="
-    #     du -sh /home/runner/work 2>/dev/null || true
-    #     du -sh ~/.cache 2>/dev/null || true
-
-    - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.19.0
+    - name: 准备构建环境
+      uses: ./.github/actions/setup-env
       with:
-        # Avoid downloading Bazel every time.
-        bazelisk-cache: true
-        # Store build cache per workflow.
-        disk-cache: ${{ github.workflow }}-${{ matrix.os }}-build
-        # Share repository cache between workflows.
-        repository-cache: false
+        os: ${{ matrix.os }}
+        cache-kind: build
+        bb-key: ${{ secrets.BUILDBUDDY_API_KEY }}
 
-    - name: 验证 Bazel 版本
-      run: bazel --version
-
-    # fork 过来的 PR 拿不到 secret, 这时自动降级为不走远程缓存
-    - name: 配置远程缓存
-      env:
-        BB_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
-      run: |
-        if [ -n "$BB_KEY" ]; then
-          echo "BAZEL_REMOTE=--config=remote --remote_header=x-buildbuddy-api-key=$BB_KEY" >> "$GITHUB_ENV"
-        else
-          echo "BAZEL_REMOTE=" >> "$GITHUB_ENV"
-          echo "::notice::未配置 BUILDBUDDY_API_KEY, 本次构建不使用远程缓存"
-        fi
-
-    - name: 启动 mysql 服务
-      run: tool/build.py chat_prepare
-
-    - name: 构建所有目标
-      run: bazel build //... --config=ci $BAZEL_REMOTE
-
-    - name: 运行所有测试
+    - name: 构建并测试
       run: bazel test //... --config=ci $BAZEL_REMOTE
-
-    - name: 构建后状态（缓存保存前）
-      run: |
-        echo "===== 构建后磁盘状态 ====="
-        df -h /
-        echo ""
-        echo "===== Bazel 相关目录占用 ====="
-        du -sh ~/.cache/bazel* 2>/dev/null || echo "bazel 缓存不存在"
-        du -sh $(bazel info output_base 2>/dev/null) 2>/dev/null || echo "output_base 不存在"
-        echo ""
-        echo "===== 工作目录占用 ====="
-        du -sh /home/runner/work/pycstl 2>/dev/null || true
 
   coverage:
     name: Coverage (${{ matrix.os }})
-    if: github.event_name == 'push'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -124,39 +50,12 @@ jobs:
     - name: 检出代码
       uses: actions/checkout@v7
 
-    # TODO: adapt gcc 14
-    - name: Remove GCC 14
-      run: |
-        sudo apt-get remove -y gcc-14 g++-14 libstdc++-14-dev
-        sudo apt-get autoremove -y
-
-    - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.19.0
+    - name: 准备构建环境
+      uses: ./.github/actions/setup-env
       with:
-        # Avoid downloading Bazel every time.
-        bazelisk-cache: true
-        # Store build cache per workflow.
-        disk-cache: ${{ github.workflow }}-${{ matrix.os }}-coverage
-        # Share repository cache between workflows.
-        repository-cache: false
-
-    - name: 验证 Bazel 版本
-      run: bazel --version
-
-    # fork 过来的 PR 拿不到 secret, 这时自动降级为不走远程缓存
-    - name: 配置远程缓存
-      env:
-        BB_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
-      run: |
-        if [ -n "$BB_KEY" ]; then
-          echo "BAZEL_REMOTE=--config=remote --remote_header=x-buildbuddy-api-key=$BB_KEY" >> "$GITHUB_ENV"
-        else
-          echo "BAZEL_REMOTE=" >> "$GITHUB_ENV"
-          echo "::notice::未配置 BUILDBUDDY_API_KEY, 本次构建不使用远程缓存"
-        fi
-
-    - name: 启动 mysql 服务
-      run: tool/build.py chat_prepare
+        os: ${{ matrix.os }}
+        cache-kind: coverage
+        bb-key: ${{ secrets.BUILDBUDDY_API_KEY }}
 
     # 覆盖率相关 flag 全部在 .bazelrc 的 coverage / coverage:ci 段
     - name: 生成测试覆盖率
@@ -172,18 +71,6 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: true
 
-    - name: 构建后状态（缓存保存前）
-      run: |
-        echo "===== 构建后磁盘状态 ====="
-        df -h /
-        echo ""
-        echo "===== Bazel 相关目录占用 ====="
-        du -sh ~/.cache/bazel* 2>/dev/null || echo "bazel 缓存不存在"
-        du -sh $(bazel info output_base 2>/dev/null) 2>/dev/null || echo "output_base 不存在"
-        echo ""
-        echo "===== 工作目录占用 ====="
-        du -sh /home/runner/work/pycstl 2>/dev/null || true
-
   nn-test:
     name: NN Test
     runs-on: ubuntu-latest
@@ -195,9 +82,14 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.x'
+        cache: 'pip'
+        cache-dependency-path: requirements_venv.in
 
     - name: 运行 micrograd 测试
       run: |
+        # runner 没有 GPU, 先装 CPU 版 torch, 免得 pip 默认拉 2~3GB 的 CUDA 依赖。
+        # 后一条会发现 torch 已满足而跳过, 其余依赖照常从 requirements_venv.in 装。
+        pip install torch --index-url https://download.pytorch.org/whl/cpu
         pip install -r requirements_venv.in
         python -m unittest discover -s nn/micrograd/test/ -t nn/micrograd/
 

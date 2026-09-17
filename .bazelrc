@@ -93,6 +93,14 @@ common:remote --remote_timeout=10m
 common:remote --remote_cache_compression
 common:remote --experimental_remote_cache_chunking
 
+# build 与 coverage 的产物基本无法互用(覆盖率给所有文件都加了插桩 flag), 用 instance
+# name 在服务端分成两个互不可见的命名空间, 与 disk-cache 分两套的理由一致
+common:remote-build --config=remote
+common:remote-build --remote_instance_name=build
+
+common:remote-coverage --config=remote
+common:remote-coverage --remote_instance_name=coverage
+
 #-------------------------------------------------------------------------------------
 # Local overrides (not tracked by git)
 #-------------------------------------------------------------------------------------
