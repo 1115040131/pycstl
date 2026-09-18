@@ -8,4 +8,5 @@ cc_binary(
         "hello_world.cpp",
     ],
     copts = COPTS,
+    tags = ["manual"],
 )
