@@ -1,0 +1,23 @@
+--- a/cc/common/cc_helper.bzl
++++ b/cc/common/cc_helper.bzl
+@@ -1140,13 +1140,19 @@
+                         extensions.CC_HEADER + \
+                         extensions.ASSEMBLER_WITH_C_PREPROCESSOR + \
+                         extensions.ASSEMBLER
++    source_attributes = ["srcs", "hdrs"]
++    if hasattr(ctx.attr, "module_interfaces"):
++        # C++20 模块接口(.cppm)既不在 srcs 也不在 hdrs 中, 不登记进覆盖率清单的话,
++        # 模块代码虽然已插桩也会被报告的文件过滤丢掉
++        source_attributes.append("module_interfaces")
++        source_extensions = source_extensions + [".cppm"]
+     coverage_environment = {}
+     if ctx.configuration.coverage_enabled:
+         coverage_environment = _get_coverage_environment(ctx, cc_config, cc_toolchain, feature_configuration)
+     coverage_support_files = cc_toolchain._coverage_files if ctx.configuration.coverage_enabled else depset([])
+     info = coverage_common.instrumented_files_info(
+         ctx = ctx,
+-        source_attributes = ["srcs", "hdrs"],
++        source_attributes = source_attributes,
+         dependency_attributes = ["implementation_deps", "deps", "data"],
+         extensions = source_extensions,
+         metadata_files = metadata_files,
