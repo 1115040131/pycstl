@@ -1,6 +1,5 @@
 # status_server_test.py
 
-import time
 import unittest
 
 import grpc
@@ -46,21 +45,21 @@ class StatusServerTest(unittest.TestCase):
         response = self.client.GetChatServer(request)
         self.assertEqual(response.error, ErrorCode.kSuccess.value)
         self.assertIn([response.host, response.port], self.chat_servers.values())
-        self.assertEqual(response.token, self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}').decode('utf-8'))
+        self.assertEqual(response.token, decode_redis(self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}')))
 
         self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 0)
         self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 1)
         response = self.client.GetChatServer(request)
         self.assertEqual(response.error, ErrorCode.kSuccess.value)
         self.assertEqual([response.host, response.port], self.chat_servers["ChatServer1"])
-        self.assertEqual(response.token, self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}').decode('utf-8'))
+        self.assertEqual(response.token, decode_redis(self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}')))
 
         self.redis.hset(RedisKey.kLoginCount.value, "ChatServer1", 1)
         self.redis.hset(RedisKey.kLoginCount.value, "ChatServer2", 0)
         response = self.client.GetChatServer(request)
         self.assertEqual(response.error, ErrorCode.kSuccess.value)
         self.assertEqual([response.host, response.port], self.chat_servers["ChatServer2"])
-        self.assertEqual(response.token, self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}').decode('utf-8'))
+        self.assertEqual(response.token, decode_redis(self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{uid}')))
 
     def test_Login(self):
         uid = 1234567

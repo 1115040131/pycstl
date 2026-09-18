@@ -26,6 +26,7 @@ class EngineTest(unittest.TestCase):
         # forward pass went well
         self.assertEqual(ymg.data, ypt.data.item())
         # backward pass went well
+        assert xpt.grad is not None
         self.assertEqual(xmg.grad, xpt.grad.item())
 
     def test_more_ops(self):
@@ -64,6 +65,7 @@ class EngineTest(unittest.TestCase):
         # forward pass went well
         self.assertAlmostEqual(gmg.data, gpt.data.item())
         # backward pass went well
+        assert apt.grad is not None and bpt.grad is not None
         self.assertAlmostEqual(amg.grad, apt.grad.item())
         self.assertAlmostEqual(bmg.grad, bpt.grad.item())
 

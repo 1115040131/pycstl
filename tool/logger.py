@@ -30,6 +30,8 @@ class StandardFormatter(logging.Formatter):
         # 默认日志格式，此处使用提供的log_fmt格式
         fmt = "[%(asctime)s] [%(levelname)s] <%(custom_filename)s:%(custom_lineno)d> [%(custom_funcName)s]: %(message)s"
         super().__init__(fmt, datefmt, *args, **kwargs)
+        # 单独保存原始格式, 父类的 _fmt 可能为 None, 不便于还原
+        self._base_fmt = fmt
         self.FORMATS = {
             logging.DEBUG: LogColors.BLUE + fmt + LogColors.RESET,
             logging.INFO: LogColors.GREEN + fmt + LogColors.RESET,
@@ -46,13 +48,13 @@ class StandardFormatter(logging.Formatter):
             record.levelname = record.levelname.ljust(5)  # 确保宽度为5字符
 
         # 动态设置消息格式
-        self._style._fmt = self.FORMATS.get(record.levelno, self._fmt)
+        self._style._fmt = self.FORMATS.get(record.levelno, self._base_fmt)
 
         # 使用父类的format方法来完成格式化
         formatted_message = super().format(record)
 
         # 恢复原始格式以避免影响其他处理器/格式化器
-        self._style._fmt = self._fmt
+        self._style._fmt = self._base_fmt
 
         return formatted_message
 

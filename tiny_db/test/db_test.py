@@ -11,9 +11,8 @@ MAX_CELLS = MAX_CELLS_PER_PAGE * MAX_PAGES
 
 
 class TestDatabase(unittest.TestCase):
-    @classmethod
     def setUp(self):
-        # 确保每次运行测试类前，测试数据库文件不在
+        # 确保每个测试用例运行前，测试数据库文件不在
         if os.path.exists('test.db'):
             os.remove('test.db')
 

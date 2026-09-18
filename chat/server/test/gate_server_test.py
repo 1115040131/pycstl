@@ -352,7 +352,7 @@ class GateServerTest(unittest.TestCase):
         self.assertEqual(json_response['uid'], user1_uid)
         self.assertEqual(json_response['user'], user1)
         self.assertIn([json_response['host'], json_response['port']], self.chat_servers.values())
-        self.assertEqual(json_response['token'], self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user1_uid}').decode('utf-8'))
+        self.assertEqual(json_response['token'], decode_redis(self.redis.get(f'{RedisKey.kUserTokenPrefix.value}{user1_uid}')))
 
 
 if __name__ == '__main__':
