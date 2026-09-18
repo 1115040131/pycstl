@@ -221,9 +221,9 @@ TARGETS: dict[str, Callable[[list[str]], Any]] = {
     ),
 
     ######################### build for all #########################
-    "all": lambda args: run_bazel_build('//...', args=args + ['-- -//hello_world']),
-    "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args + ['-- -//hello_world']),
-    "all_coverage": lambda args: run_bazel_coverage('//...', args=args + ['-- -//hello_world']),
+    "all": lambda args: run_bazel_build('//...', args=args),
+    "all_test": lambda args: run_bazel_test('//...', test_output=False, args=args),
+    "all_coverage": lambda args: run_bazel_coverage('//...', args=args),
     "coverage_report": lambda args: generate_coverage_report(),
 
     ######################### build for chat #########################
