@@ -83,14 +83,14 @@ jobs:
       with:
         python-version: '3.x'
         cache: 'pip'
-        cache-dependency-path: requirements_venv.in
+        cache-dependency-path: nn/requirements.in
 
     - name: 运行 micrograd 测试
       run: |
         # runner 没有 GPU, 先装 CPU 版 torch, 免得 pip 默认拉 2~3GB 的 CUDA 依赖。
-        # 后一条会发现 torch 已满足而跳过, 其余依赖照常从 requirements_venv.in 装。
+        # 后一条会发现 torch 已满足而跳过, 其余依赖照常从 nn/requirements.in 装。
         pip install torch --index-url https://download.pytorch.org/whl/cpu
-        pip install -r requirements_venv.in
+        pip install -r nn/requirements.in
         python -m unittest discover -s nn/micrograd/test/ -t nn/micrograd/
 
   code-quality:

@@ -10,7 +10,5 @@
     "extraPaths": [
         "tool",
         "bazel-bin"
-    ],
-    "venvPath": ".",
-    "venv": ".venv"
+    ]
 }

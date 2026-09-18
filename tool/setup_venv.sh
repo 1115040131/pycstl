@@ -1,12 +1,10 @@
 #!/bin/bash
 
-root_path=$1
-echo $root_path
+# 参数: $1 虚拟环境目录, $2 依赖文件, 均为绝对路径, 由调用方决定用哪一套
+venv_path=$1
 requirements_file=$2
-echo $requirements_file
-
-# 虚拟环境的路径
-venv_path="$root_path/.venv"
+echo "虚拟环境: $venv_path"
+echo "依赖文件: $requirements_file"
 
 # 包名各发行版不一致 (python3-venv / python3.10-venv), 直接检测模块是否可用
 # 本脚本经 bash -s 由 stdin 传入, read 会读走脚本自身内容, 因此不能交互询问
