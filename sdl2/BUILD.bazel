@@ -1,15 +1,8 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
-load("//build_defs:foreign_cc_opts.bzl", "BUILD_ARGS")
 
 cmake(
     name = "sdl2",
-    build_args = BUILD_ARGS,
     cache_entries = {"SDL_STATIC_ENABLED_BY_DEFAULT": "OFF"},
-    # Point the hermetic pkg-config at the system pkgconfig dir so SDL's
-    # pulse detection finds the host libpulse-dev. Without this only
-    # dummy/disk audio backends are compiled in and SDL_Init(SDL_INIT_AUDIO)
-    # fails with "No available audio device".
-    env = {"PKG_CONFIG_PATH": "/usr/lib/x86_64-linux-gnu/pkgconfig"},
     generate_args = ["-GNinja"],
     # vendored 的 SDL2_image/SDL2_ttf 等上游头内部用引号引 "SDL.h",而 SDL.h 在
     # 另一个 cmake 输出目录下,必须把 include/SDL2 直接放进搜索路径。foreign_cc 的
@@ -26,12 +19,12 @@ cmake(
             "libSDL2-2.0d.so.0",
         ],
     }),
+    resource_size = "medium",
     visibility = ["//sdl2:__subpackages__"],
 )
 
 cmake(
     name = "sdl2_image",
-    build_args = BUILD_ARGS,
     cache_entries = {
         "SDL2IMAGE_VENDORED": "ON",
         # Only PNG is used (decoded by the built-in stb backend). Disable the
@@ -52,13 +45,13 @@ cmake(
             "libSDL2_image-2.0d.so.0",
         ],
     }),
+    resource_size = "medium",
     visibility = ["//sdl2:__subpackages__"],
     deps = ["sdl2"],
 )
 
 cmake(
     name = "sdl2_mixer",
-    build_args = BUILD_ARGS,
     cache_entries = {
         "SDL2MIXER_VENDORED": "ON",
         "SDL2MIXER_DEPS_SHARED": "OFF",
@@ -79,13 +72,13 @@ cmake(
             "libSDL2_mixer-2.0d.so.0",
         ],
     }),
+    resource_size = "medium",
     visibility = ["//sdl2:__subpackages__"],
     deps = ["sdl2"],
 )
 
 cmake(
     name = "sdl2_ttf",
-    build_args = BUILD_ARGS,
     cache_entries = {"SDL2TTF_VENDORED": "ON"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl2_ttf//:all_srcs",
@@ -99,6 +92,7 @@ cmake(
             "libSDL2_ttf-2.0d.so.0",
         ],
     }),
+    resource_size = "medium",
     visibility = ["//sdl2:__subpackages__"],
     deps = ["sdl2"],
 )

@@ -40,12 +40,16 @@ bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.1")
 bazel_dep(name = "platforms", version = "1.1.0")  # rules_qt need it
 bazel_dep(name = "protobuf", version = "35.1")
 bazel_dep(name = "rules_cc", version = "0.2.22")
-bazel_dep(name = "rules_foreign_cc", version = "0.15.1")
+bazel_dep(name = "rules_foreign_cc", version = "0.16.0")
 bazel_dep(name = "spdlog", version = "1.17.0")
 
 # 第三方自己声明的 layering_check / parse_headers 会被 --process_headers_in_dependencies 一起
 # 激活, 在这里统一关掉(原因、边界与维护方式写在被 include 的文件里)
 include("//build_defs:third_party_hdr_check.MODULE.bazel")
+
+tools = use_extension("@rules_foreign_cc//foreign_cc:extensions.bzl", "tools")
+tools.m4(mode = "system")
+tools.pkgconfig(mode = "system")
 
 # mysql-connector-cpp
 bazel_dep(name = "mysql-connector-cpp")
