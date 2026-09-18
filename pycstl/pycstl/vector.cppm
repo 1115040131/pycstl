@@ -1,11 +1,11 @@
-#pragma once
+module;
 
-#include <memory>
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
+export module pycstl.vector;
 
-namespace pycstl {
+export namespace pycstl {
 
 template <typename T, typename Allocator = std::allocator<T>>
 class Vector {
@@ -418,7 +418,7 @@ public:
 private:
     void _throw_out_of_range(std::size_t pos) {
         throw std::out_of_range(
-            fmt::format("out of range! vector<{}> size={} visit ", typeid(T).name(), size_, pos));
+            std::format("out of range! vector<{}> size={} visit {} ", typeid(T).name(), size_, pos));
     }
 
 private:

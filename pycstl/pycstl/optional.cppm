@@ -1,9 +1,12 @@
-#pragma once
+module;
 
+#include <compare>
 #include <exception>
 #include <initializer_list>
 
-namespace pycstl {
+export module pycstl.optional;
+
+export namespace pycstl {
 
 class BadOptionalAccess : public std::exception {
 public:

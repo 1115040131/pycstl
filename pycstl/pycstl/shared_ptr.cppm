@@ -1,11 +1,13 @@
-#pragma once
+module;
 
 #include <atomic>
 #include <exception>
 
-#include "pycstl/unique_ptr.h"
+export module pycstl.shared_ptr;
 
-namespace pycstl {
+import pycstl.unique_ptr;
+
+export namespace pycstl {
 
 class BadWeakPtr : public std::exception {
 public:
@@ -116,7 +118,7 @@ public:
     explicit SharedPtr(UniquePtr<Y, Deleter>&& ptr) : SharedPtr(ptr.release(), Deleter{}) {}
 
     template <class Y>
-    inline friend SharedPtr<Y> _S_makeSharedFused(Y* ptr, _SpCounter* owner) noexcept;
+    friend SharedPtr<Y> _S_makeSharedFused(Y* ptr, _SpCounter* owner) noexcept;
 
     template <typename Y, std::enable_if_t<std::is_convertible_v<Y*, T*>, int> = 0>
     SharedPtr& operator=(const SharedPtr<Y>& that) noexcept {
@@ -302,7 +304,7 @@ protected:
     }
 
     template <class U>
-    inline friend void _S_setEnableSharedFromThisOwner(EnableSharedFromThis<U>*, _SpCounter*);
+    friend void _S_setEnableSharedFromThisOwner(EnableSharedFromThis<U>*, _SpCounter*);
 
 private:
     _SpCounter* owner_;

@@ -1,11 +1,10 @@
-#include <optional>
 #include <string>
 #include <vector>
 
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "pycstl/optional.h"
+import pycstl.optional;
 
 namespace pycstl {
 

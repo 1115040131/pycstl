@@ -1,8 +1,6 @@
-#include <array>
-
 #include <gtest/gtest.h>
 
-#include "pycstl/array.h"
+import pycstl.array;
 
 using namespace pycstl;
 

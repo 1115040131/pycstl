@@ -3,7 +3,8 @@
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "pycstl/shared_ptr.h"
+import pycstl.shared_ptr;
+import pycstl.unique_ptr;
 
 namespace pycstl {
 

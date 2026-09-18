@@ -41,6 +41,9 @@ build --host_cxxopt='-std=c++23'
 # Verify parse_headers works as the toolchain changes
 build --process_headers_in_dependencies
 
+# Enable cpp_modules
+build --experimental_cpp_modules
+
 #-------------------------------------------------------------------------------------
 # Third-party code: suppress warnings
 #-------------------------------------------------------------------------------------

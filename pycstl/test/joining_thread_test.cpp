@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "pycstl/joining_thread.h"
+import pycstl.joining_thread;
 
 namespace pycstl {
 

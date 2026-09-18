@@ -1,8 +1,10 @@
-#pragma once
+module;
 
-#include <fmt/format.h>
+#include <format>
 
-namespace pycstl {
+export module pycstl.array;
+
+export namespace pycstl {
 
 template <typename _Tp, std::size_t _N>
 class Array {
@@ -96,7 +98,7 @@ public:
 
 private:
     void throwOutOfRange(std::size_t _Pos) {
-        throw std::out_of_range(fmt::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), _N, _Pos));
+        throw std::out_of_range(std::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), _N, _Pos));
     }
 };
 
@@ -183,7 +185,7 @@ public:
 
 private:
     void throwOutOfRange(std::size_t _Pos) {
-        throw std::out_of_range(fmt::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), 0, _Pos));
+        throw std::out_of_range(std::format("out of range! array<{}, {}>.at({}) ", typeid(_Tp).name(), 0, _Pos));
     }
 };
 

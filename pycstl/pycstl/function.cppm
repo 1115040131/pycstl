@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <functional>
 #include <memory>
 #include <type_traits>
 
-namespace pycstl {
+export module pycstl.function;
+
+export namespace pycstl {
 
 template <typename FnSig>
 struct Function {

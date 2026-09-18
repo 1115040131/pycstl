@@ -39,7 +39,7 @@ bazel_dep(name = "imgui", version = "1.92.2")
 bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.1")
 bazel_dep(name = "platforms", version = "1.1.0")  # rules_qt need it
 bazel_dep(name = "protobuf", version = "35.1")
-bazel_dep(name = "rules_cc", version = "0.2.22")
+bazel_dep(name = "rules_cc", version = "0.2.25")
 bazel_dep(name = "rules_foreign_cc", version = "0.16.0")
 bazel_dep(name = "spdlog", version = "1.17.0")
 
@@ -65,12 +65,12 @@ local_path_override(
     path = "third_party/imgui/backends",
 )
 
-bazel_dep(name = "toolchains_llvm", version = "1.8.0")
+bazel_dep(name = "toolchains_llvm", version = "1.9.1")
 
 # Configure and register the toolchain.
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
 llvm.toolchain(
-    llvm_version = "21.1.8",
+    llvm_version = "22.1.8",
     stdlib = {"linux-x86_64": "stdc++"},
 )
 use_repo(llvm, "llvm_toolchain")
@@ -240,17 +240,14 @@ bazel_dep(name = "googletest", version = "1.18.0", dev_dependency = True)
 bazel_dep(name = "google_benchmark", version = "1.9.5", dev_dependency = True)
 
 # 导出 compile_commands.json
-# Hedron's Compile Commands Extractor for Bazel
-# https://github.com/hedronvision/bazel-compile-commands-extractor
+# Hedron's Compile Commands Extractor for Bazel, 用 helly25 的 fork:
+# 上游(hedronvision)自 2024-06 起事实停摆
+# https://github.com/helly25/bazel-compile-commands-extractor
 bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
 git_override(
     module_name = "hedron_compile_commands",
-    commit = "f5fbd4cee671d8d908f37c83abaf70fba5928fc7",
-    # 上游仍在用 native.py_binary / 裸 cc_binary, Bazel 9 已移除这些 native 规则,
-    # 打 patch 改为显式 load, 以免整个仓库靠 --incompatible_autoload_externally 兜底
-    patch_strip = 1,
-    patches = ["//build_defs/patches:hedron_compile_commands.patch"],
-    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
-    # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
+    commit = "078ba7675c05bea2666c92d9a8abe200d8547655",
+    remote = "https://github.com/helly25/bazel-compile-commands-extractor.git",
+    # Replace the commit hash (above) with the latest (https://github.com/helly25/bazel-compile-commands-extractor/commits/main).
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
 )

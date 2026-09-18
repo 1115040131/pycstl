@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <thread>
 
 #include "common/noncopyable.h"
 
-namespace pycstl {
+export module pycstl.joining_thread;
+
+export namespace pycstl {
 
 class JoiningThread : pyc::Noncopyable {
 public:
