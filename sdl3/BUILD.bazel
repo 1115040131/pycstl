@@ -1,5 +1,4 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
-load("//build_defs:foreign_cc_opts.bzl", "BUILD_ARGS")
 
 # CI 无显示器,需要 console 构建(--define=sdl3_console=true,见 .bazelrc 的 build:ci)。
 config_setting(
@@ -10,7 +9,6 @@ config_setting(
 # sdl3
 cmake(
     name = "sdl3",
-    build_args = BUILD_ARGS,
     # SDL_UNIX_CONSOLE_BUILD 只压制"X11/Wayland 全无"那个最终报错(macros.cmake:414),
     # 压不住 3.4 新增的 SDL_missing_dependency —— 只要宿主机有 libx11-dev+libxext-dev,
     # 9 个 X11 子特性就会逐个要求对应的扩展 dev 包, 缺一个就 FATAL。console 构建本来
@@ -22,17 +20,13 @@ cmake(
         },
         "//conditions:default": {},
     }),
-    # Point the hermetic pkg-config at the system pkgconfig dir so SDL's
-    # CheckPulseAudio (pkg_check_modules libpulse) finds the host libpulse-dev.
-    # Without this only dummy/disk audio backends are compiled in and
-    # SDL_Init(SDL_INIT_AUDIO) fails with "No available audio device".
-    env = {"PKG_CONFIG_PATH": "/usr/lib/x86_64-linux-gnu/pkgconfig"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl3//:all_srcs",
     out_shared_libs = [
         "libSDL3.so",
         "libSDL3.so.0",
     ],
+    resource_size = "medium",
     visibility = [
         "//sdl3:__subpackages__",
         "@imgui_backends//:__pkg__",
@@ -41,7 +35,6 @@ cmake(
 
 cmake(
     name = "sdl3_image",
-    build_args = BUILD_ARGS,
     cache_entries = {
         "SDLIMAGE_VENDORED": "ON",
         "SDLIMAGE_DEPS_SHARED": "OFF",
@@ -57,13 +50,13 @@ cmake(
         "libSDL3_image.so",
         "libSDL3_image.so.0",
     ],
+    resource_size = "medium",
     visibility = ["//sdl3:__subpackages__"],
     deps = ["sdl3"],
 )
 
 cmake(
     name = "sdl3_mixer",
-    build_args = BUILD_ARGS,
     cache_entries = {
         "SDLMIXER_VENDORED": "ON",
         "SDLMIXER_MIDI_NATIVE": "OFF",
@@ -80,13 +73,13 @@ cmake(
         "libSDL3_mixer.so",
         "libSDL3_mixer.so.0",
     ],
+    resource_size = "medium",
     visibility = ["//sdl3:__subpackages__"],
     deps = ["sdl3"],
 )
 
 cmake(
     name = "sdl3_ttf",
-    build_args = BUILD_ARGS,
     cache_entries = {"SDLTTF_VENDORED": "ON"},
     generate_args = ["-GNinja"],
     lib_source = "@sdl3_ttf//:all_srcs",
@@ -94,6 +87,7 @@ cmake(
         "libSDL3_ttf.so",
         "libSDL3_ttf.so.0",
     ],
+    resource_size = "medium",
     visibility = ["//sdl3:__subpackages__"],
     deps = ["sdl3"],
 )
