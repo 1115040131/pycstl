@@ -5,7 +5,8 @@
 #include <gtest/gtest.h>
 
 #include "pycstl/test/utils.h"
-#include "pycstl/vector.h"
+
+import pycstl.vector;
 
 TEST(VectorTest, test_construction) {
     pycstl::Vector<int> vec1;

@@ -2,8 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "pycstl/list.h"
 #include "pycstl/test/utils.h"
+
+import pycstl.list;
 
 static std::initializer_list<int> init_list{1, 2, 5, 7, 9, 392, 213, 1, -321, 12};
 

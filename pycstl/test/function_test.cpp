@@ -1,7 +1,7 @@
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "pycstl/function.h"
+import pycstl.function;
 
 void repeatTwice(pycstl::Function<void(int)> const& func) {
     func(1);

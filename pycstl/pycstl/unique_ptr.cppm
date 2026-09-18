@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <utility>
 
-namespace pycstl {
+export module pycstl.unique_ptr;
+
+export namespace pycstl {
 
 template <typename T, typename U = T>
 T exchange(T& val, U&& new_val) {

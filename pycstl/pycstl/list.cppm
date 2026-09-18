@@ -1,9 +1,11 @@
-#pragma once
+module;
 
 #include <limits>
 #include <memory>
 
-namespace pycstl {
+export module pycstl.list;
+
+export namespace pycstl {
 
 template <typename T, typename Allocator = std::allocator<T>>
 class List {

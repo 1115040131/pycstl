@@ -41,6 +41,9 @@ build --host_cxxopt='-std=c++23'
 # Verify parse_headers works as the toolchain changes
 build --process_headers_in_dependencies
 
+# Enable cpp_modules
+build --experimental_cpp_modules
+
 #-------------------------------------------------------------------------------------
 # Third-party code: suppress warnings
 #-------------------------------------------------------------------------------------
@@ -68,8 +71,12 @@ build --features=external_include_paths
 coverage --build_tests_only
 coverage --combined_report=lcov
 coverage --experimental_generate_llvm_lcov
-coverage --instrumentation_filter=^//
+coverage --instrumentation_filter=^//,-//.*[/:]test[/:]
 coverage --nocache_test_results
+# -fprofile-continuous 必须与 -fprofile-instr-generate 同时出现(clang 的硬性要求)。正常编译
+# action 的伴随项来自 coverage feature, 但模块依赖扫描 action 只拿到 per_file_copt, 拿不到
+# feature, 于是扫描时只剩 -fprofile-continuous 而被 clang 拒绝 —— 这里显式把伴随项也补上
+coverage --per_file_copt=.*@-fprofile-instr-generate
 coverage --per_file_copt=.*@-fprofile-continuous
 coverage --test_env=LLVM_PROFILE_CONTINUOUS_MODE=1
 

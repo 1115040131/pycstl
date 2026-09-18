@@ -1,9 +1,11 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <exception>
 
-namespace pycstl {
+export module pycstl.variant;
+
+export namespace pycstl {
 
 template <size_t I>
 struct InPlaceIndex {

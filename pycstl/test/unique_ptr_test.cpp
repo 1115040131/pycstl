@@ -3,7 +3,7 @@
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "pycstl/unique_ptr.h"
+import pycstl.unique_ptr;
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4996)

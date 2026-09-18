@@ -4,7 +4,7 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "pycstl/variant.h"
+import pycstl.variant;
 
 namespace pycstl {
 
