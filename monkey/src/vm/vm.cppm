@@ -8,6 +8,8 @@ export module monkey.vm;
 
 export import monkey.compiler;
 export import monkey.vm.frame;
+export import monkey.object;
+import monkey.code;
 
 export namespace pyc::monkey {
 

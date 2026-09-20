@@ -9,6 +9,7 @@ export module monkey.parser;
 
 export import monkey.ast;
 export import monkey.lexer;
+import monkey.token;
 
 export namespace pyc::monkey {
 

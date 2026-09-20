@@ -9,6 +9,7 @@ export module monkey.compiler;
 export import monkey.code;
 export import monkey.compiler.symbol_table;
 export import monkey.object;
+export import monkey.ast;
 
 export namespace pyc::monkey {
 

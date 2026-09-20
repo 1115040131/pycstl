@@ -11,6 +11,8 @@ module;
 
 module monkey.object;
 
+import monkey.util;
+
 namespace pyc::monkey {
 
 template <std::derived_from<Object> T>

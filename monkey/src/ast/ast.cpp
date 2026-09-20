@@ -13,6 +13,7 @@ module;
 module monkey.ast;
 
 import monkey.token;
+import monkey.util;
 
 namespace pyc::monkey {
 

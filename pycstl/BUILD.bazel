@@ -5,7 +5,7 @@ cc_library(
     name = "pycstl",
     copts = COPTS,
     features = ["cpp_modules"],
-    module_interfaces = glob(["pycstl/*.cppm"]) + ["pycstl.cppm"],
+    module_interfaces = glob(["src/*.cppm"]),
     visibility = ["//visibility:public"],
     deps = ["//common:noncopyable"],
 )
