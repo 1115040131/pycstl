@@ -61,7 +61,12 @@ def parse_args(target_names: list[str]) -> tuple[str, list[str]]:
     mode.add_argument('-o', dest='config', action='store_const', const='--config=opt',
                       help='opt mode (-O2), for benchmarks and releases')
 
-    args, passthrough = parser.parse_known_args()
+    # `--` 之后的参数是给被 run 的二进制用的, argparse 会吞掉这个分隔符, 因此先自行切开
+    argv = sys.argv[1:]
+    split = argv.index('--') if '--' in argv else len(argv)
+    binary_args = argv[split + 1:]
+
+    args, passthrough = parser.parse_known_args(argv[:split])
 
     if args.target == 'help':
         parser.print_help()
@@ -70,8 +75,10 @@ def parse_args(target_names: list[str]) -> tuple[str, list[str]]:
     if args.target not in target_names:
         parser.error(f'unknown target: {args.target}')
 
-    # --config 追加在末尾, 避免占用 build/run/test 等入口的 args[0] (目标名)
-    return args.target, passthrough + ([args.config] if args.config else [])
+    # --config 追加在末尾, 避免占用 build/run/test 等入口的 args[0] (目标名);
+    # 又必须留在 `--` 之前, 否则会被当成二进制参数传给 bazel 的目标
+    bazel_args = passthrough + ([args.config] if args.config else [])
+    return args.target, bazel_args + (['--'] + binary_args if binary_args else [])
 
 
 def run_bazel_build(target: str, check: bool = True, args: list[str] | None = None) -> None:
