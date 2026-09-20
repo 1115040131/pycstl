@@ -5,10 +5,7 @@ cc_test(
     name = "design_pattern_test",
     srcs = glob(["*_test.cpp"]),
     copts = COPTS + ["-Wno-non-virtual-dtor"],
-    features = [
-        "cpp_modules",
-        "-layering_check",
-    ],
+    features = ["cpp_modules"],
     module_interfaces = glob(["*.cppm"]),
     deps = [
         "//common:cin_redirect",
