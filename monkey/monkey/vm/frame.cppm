@@ -1,10 +1,15 @@
-#pragma once
+module;
 
-#include "monkey/code/code.h"
-#include "monkey/object/object.h"
+#include <cstddef>
+#include <memory>
+#include <utility>
 
-namespace pyc {
-namespace monkey {
+export module monkey.vm.frame;
+
+export import monkey.code;
+export import monkey.object;
+
+export namespace pyc::monkey {
 
 struct Frame {
     std::shared_ptr<Closure> closure;
@@ -18,5 +23,4 @@ struct Frame {
     const Instructions& instructions() const { return closure->compiledFunction()->instructions(); }
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

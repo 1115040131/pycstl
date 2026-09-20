@@ -1,6 +1,7 @@
-#pragma once
+module;
 
 #include <map>
+#include <string>
 #include <string_view>
 
 #include <fmt/core.h>
@@ -8,8 +9,9 @@
 
 #include "monkey/macro.h"
 
-namespace pyc {
-namespace monkey {
+export module monkey.token;
+
+export namespace pyc::monkey {
 
 struct Token {
     enum class Type {
@@ -62,7 +64,8 @@ struct Token {
     std::string_view literal;
 };
 
-static const std::map<std::string_view, Token::Type> kKeywords{
+// lexer 在另一个模块里查这张表, 必须是外部链接
+inline const std::map<std::string_view, Token::Type> kKeywords{
     {"fn", Token::Type::kFunction},   {"let", Token::Type::kLet}, {"true", Token::Type::kTrue},
     {"false", Token::Type::kFalse},   {"if", Token::Type::kIf},   {"else", Token::Type::kElse},
     {"return", Token::Type::kReturn},
@@ -105,8 +108,7 @@ inline constexpr std::string_view toString(Token::Type type) {
     }
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey
 
 namespace fmt {
 

@@ -1,6 +1,6 @@
 #include <fmt/base.h>
 
-#include "monkey/repl/repl.h"
+import monkey.repl;
 
 using namespace pyc::monkey;
 

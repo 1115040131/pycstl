@@ -5,6 +5,7 @@ cc_binary(
     name = "monkey_bench",
     srcs = ["fibonacci.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//monkey:monkey_lib",
         "@fmt",

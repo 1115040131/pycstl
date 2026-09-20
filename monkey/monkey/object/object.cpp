@@ -1,7 +1,17 @@
-#include "monkey/object/object.h"
+module;
 
-namespace pyc {
-namespace monkey {
+#include <concepts>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
+
+#include "monkey/macro.h"
+
+module monkey.object;
+
+namespace pyc::monkey {
 
 template <std::derived_from<Object> T>
 static std::string Join(const std::vector<std::shared_ptr<T>>& nodes, std::string dim) {
@@ -95,5 +105,4 @@ std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_pt
     return iter->second.value;  // Return the value associated with the key
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

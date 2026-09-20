@@ -8,7 +8,7 @@ engine=eval, fibonacci(35)=9227465, duration=12.092080939s
 $ ./make monkey_bench -- -engine vm
 engine=vm, fibonacci(35)=9227465, duration=11.851909546s
 
-$ ./make monkey_bench -- -eval vm -builtin
+$ ./make monkey_bench -- -engine eval -builtin
 engine=eval, fibonacci(35)=9227465, duration=0.007922004s
 
 $ ./make monkey_bench -- -engine vm -builtin

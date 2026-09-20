@@ -1,11 +1,20 @@
-#include "monkey/vm/vm.h"
+module;
 
 #include <algorithm>
+#include <memory>
+#include <stdexcept>
+#include <vector>
 
-#include "monkey/object/builtins.h"
+#include <fmt/format.h>
 
-namespace pyc {
-namespace monkey {
+module monkey.vm;
+
+import monkey.compiler;
+import monkey.object;
+import monkey.object.builtins;
+import monkey.vm.frame;
+
+namespace pyc::monkey {
 
 std::shared_ptr<VM> VM::New(std::shared_ptr<Compiler> compiler) {
     auto main_func = std::make_shared<CompiledFunction>(compiler->instructions(), 0, 0);
@@ -494,5 +503,4 @@ std::shared_ptr<Frame> VM::popFrame() {
     return frame;
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

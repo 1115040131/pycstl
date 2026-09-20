@@ -1,14 +1,26 @@
-#pragma once
+module;
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <map>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
-#include "monkey/ast/ast.h"
-#include "monkey/code/code.h"
+#include <fmt/format.h>
+
 #include "monkey/macro.h"
 
-namespace pyc {
-namespace monkey {
+export module monkey.object;
+
+export import monkey.ast;
+export import monkey.code;
+
+export namespace pyc::monkey {
 
 struct HashKey;
 
@@ -140,7 +152,36 @@ private:
     std::shared_ptr<Object> value_;
 };
 
-class Environment;
+class Environment {
+public:
+    static std::shared_ptr<Environment> New() { return std::make_shared<Environment>(); }
+
+    static std::shared_ptr<Environment> NewEnclosed(std::shared_ptr<Environment> outer) {
+        return std::make_shared<Environment>(std::move(outer));
+    }
+
+    Environment() = default;
+    explicit Environment(std::shared_ptr<Environment> outer) : outer_(std::move(outer)) {}
+
+    void set(std::string_view name, std::shared_ptr<Object> value) {
+        store_[std::string(name)] = std::move(value);
+    }
+
+    std::shared_ptr<Object> get(std::string_view name) {
+        auto it = store_.find(std::string(name));
+        if (it != store_.end()) {
+            return it->second;
+        }
+        if (outer_) {
+            return outer_->get(name);
+        }
+        return nullptr;
+    }
+
+private:
+    std::unordered_map<std::string, std::shared_ptr<Object>> store_;
+    std::shared_ptr<Environment> outer_ = nullptr;
+};
 
 class Function : public Object {
 public:
@@ -280,5 +321,4 @@ std::shared_ptr<Object> EvalArrayIndex(std::shared_ptr<Array> array, std::shared
 
 std::shared_ptr<Object> EvalHashIndex(std::shared_ptr<Hash> hash, std::shared_ptr<Object> index);
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

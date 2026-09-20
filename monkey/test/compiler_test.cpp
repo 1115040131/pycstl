@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 
-#define private public
-#include "monkey/compiler/compiler.h"
-#undef private
+import monkey;
 
 #include "monkey/test/test_define.h"
 

@@ -1,9 +1,20 @@
-#include "monkey/ast/ast.h"
+module;
 
+#include <concepts>
+#include <memory>
 #include <sstream>
+#include <string>
+#include <vector>
 
-namespace pyc {
-namespace monkey {
+#include <fmt/format.h>
+
+#include "monkey/macro.h"
+
+module monkey.ast;
+
+import monkey.token;
+
+namespace pyc::monkey {
 
 template <std::derived_from<Node> T>
 static std::string Join(const std::vector<std::shared_ptr<T>>& nodes, std::string dim) {
@@ -110,5 +121,4 @@ std::string Program::toString() const {
     return ss.str();
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

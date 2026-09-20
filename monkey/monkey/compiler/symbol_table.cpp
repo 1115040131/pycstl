@@ -1,7 +1,12 @@
-#include "monkey/compiler/symbol_table.h"
+module;
 
-namespace pyc {
-namespace monkey {
+#include <memory>
+#include <string>
+#include <string_view>
+
+module monkey.compiler.symbol_table;
+
+namespace pyc::monkey {
 
 std::shared_ptr<Symbol> SymbolTable::Define(const std::string& name) {
     auto symbol = std::make_shared<Symbol>(Symbol{name, SymbolScopeType::kGlobal, next_index_++});
@@ -49,5 +54,4 @@ std::shared_ptr<Symbol> SymbolTable::Resolve(const std::string& name) {
     return nullptr;
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

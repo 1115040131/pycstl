@@ -3,10 +3,6 @@
 #include <iostream>
 #include <variant>
 
-#include "monkey/code/code.h"
-#include "monkey/parser/parser.h"
-#include "monkey/token/token.h"
-
 namespace pyc {
 namespace monkey {
 

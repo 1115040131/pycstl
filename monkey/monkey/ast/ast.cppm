@@ -1,14 +1,21 @@
-#pragma once
+module;
 
+#include <map>
 #include <memory>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
-#include "monkey/macro.h"
-#include "monkey/token/token.h"
+#include <fmt/format.h>
 
-namespace pyc {
-namespace monkey {
+#include "monkey/macro.h"
+
+export module monkey.ast;
+
+export import monkey.token;
+
+export namespace pyc::monkey {
 
 class Node {
 public:
@@ -422,5 +429,4 @@ private:
 
 #pragma endregion
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

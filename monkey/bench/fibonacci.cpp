@@ -6,11 +6,7 @@
 #define STRIP_FLAG_HELP 1
 #include <gflags/gflags.h>
 
-#include "monkey/evaluator/evaluator.h"
-#include "monkey/lexer/lexer.h"
-#include "monkey/object/environment.h"
-#include "monkey/parser/parser.h"
-#include "monkey/vm/vm.h"
+import monkey;
 
 using namespace pyc::monkey;
 

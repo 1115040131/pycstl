@@ -1,7 +1,21 @@
-#include "monkey/parser/parser.h"
+module;
 
-namespace pyc {
-namespace monkey {
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include <fmt/format.h>
+
+module monkey.parser;
+
+import monkey.ast;
+import monkey.lexer;
+import monkey.token;
+
+namespace pyc::monkey {
 
 std::unique_ptr<Parser> Parser::New(std::unique_ptr<Lexer> lexer) {
     auto parser = std::make_unique<Parser>();
@@ -327,5 +341,4 @@ std::vector<std::shared_ptr<Expression>> Parser::parseExpressionList(Token::Type
     return list;
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

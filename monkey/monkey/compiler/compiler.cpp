@@ -1,11 +1,19 @@
-#include "monkey/compiler/compiler.h"
+module;
 
 #include <algorithm>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include "monkey/object/builtins.h"
+#include <fmt/format.h>
 
-namespace pyc {
-namespace monkey {
+module monkey.compiler;
+
+import monkey.object;
+import monkey.object.builtins;
+
+namespace pyc::monkey {
 
 std::shared_ptr<Compiler> Compiler::New() {
     auto symbol_table = SymbolTable::New();
@@ -385,5 +393,4 @@ Instructions Compiler::leaveScope() {
     return instructions;
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

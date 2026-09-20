@@ -1,11 +1,16 @@
-#pragma once
+module;
 
-#include "monkey/code/code.h"
-#include "monkey/compiler/symbol_table.h"
-#include "monkey/object/object.h"
+#include <cstddef>
+#include <memory>
+#include <vector>
 
-namespace pyc {
-namespace monkey {
+export module monkey.compiler;
+
+export import monkey.code;
+export import monkey.compiler.symbol_table;
+export import monkey.object;
+
+export namespace pyc::monkey {
 
 struct EmittedInstruction {
     OpcodeType opcode;
@@ -73,5 +78,4 @@ private:
     size_t scope_index_{};
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

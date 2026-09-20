@@ -1,10 +1,15 @@
-#pragma once
+module;
 
-#include "monkey/compiler/compiler.h"
-#include "monkey/vm/frame.h"
+#include <cstddef>
+#include <memory>
+#include <vector>
 
-namespace pyc {
-namespace monkey {
+export module monkey.vm;
+
+export import monkey.compiler;
+export import monkey.vm.frame;
+
+export namespace pyc::monkey {
 
 class VM {
 public:
@@ -85,5 +90,4 @@ private:
     size_t frame_index_{};
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

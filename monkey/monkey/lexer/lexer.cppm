@@ -1,12 +1,14 @@
-#pragma once
+module;
 
+#include <cstddef>
 #include <memory>
 #include <string_view>
 
-#include "monkey/token/token.h"
+export module monkey.lexer;
 
-namespace pyc {
-namespace monkey {
+export import monkey.token;
+
+export namespace pyc::monkey {
 
 class Lexer {
 public:
@@ -30,5 +32,4 @@ private:
     size_t position_{};
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

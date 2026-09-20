@@ -1,9 +1,13 @@
-#pragma once
+module;
 
-#include "monkey/object/object.h"
+#include <memory>
+#include <vector>
 
-namespace pyc {
-namespace monkey {
+export module monkey.evaluator;
+
+export import monkey.object;
+
+export namespace pyc::monkey {
 
 std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environment> env);
 
@@ -55,5 +59,4 @@ std::shared_ptr<Environment> ExtendFunctionEnv(std::shared_ptr<Function> functio
 
 #pragma endregion
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

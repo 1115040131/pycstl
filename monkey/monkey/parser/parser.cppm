@@ -1,13 +1,16 @@
-#pragma once
+module;
 
+#include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "monkey/ast/ast.h"
-#include "monkey/lexer/lexer.h"
+export module monkey.parser;
 
-namespace pyc {
-namespace monkey {
+export import monkey.ast;
+export import monkey.lexer;
+
+export namespace pyc::monkey {
 
 class Parser {
 public:
@@ -96,5 +99,4 @@ private:
     };
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

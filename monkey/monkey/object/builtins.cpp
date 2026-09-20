@@ -1,9 +1,19 @@
-#include "monkey/object/builtins.h"
+module;
 
+#include <memory>
+#include <string>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
-namespace pyc {
-namespace monkey {
+#include <fmt/format.h>
+
+module monkey.object.builtins;
+
+import monkey.object;
+
+namespace pyc::monkey {
 
 #define DEF_BUILTIN(name) \
     inline static std::shared_ptr<Object> Builtin_##name(const std::vector<std::shared_ptr<Object>>& args)
@@ -124,5 +134,4 @@ std::shared_ptr<Builtin> GetBuiltinByName(std::string_view name) {
     return nullptr;
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

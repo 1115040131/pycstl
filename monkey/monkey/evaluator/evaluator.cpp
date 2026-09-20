@@ -1,10 +1,17 @@
-#include "monkey/evaluator/evaluator.h"
+module;
 
-#include "monkey/object/builtins.h"
-#include "monkey/object/environment.h"
+#include <cstddef>
+#include <memory>
+#include <vector>
 
-namespace pyc {
-namespace monkey {
+#include <fmt/format.h>
+
+module monkey.evaluator;
+
+import monkey.object;
+import monkey.object.builtins;
+
+namespace pyc::monkey {
 
 std::shared_ptr<Object> Eval(std::shared_ptr<Node> node, std::shared_ptr<Environment> env) {
     if (!node) {
@@ -340,5 +347,4 @@ std::shared_ptr<Environment> ExtendFunctionEnv(std::shared_ptr<Function> functio
 
 #pragma endregion
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

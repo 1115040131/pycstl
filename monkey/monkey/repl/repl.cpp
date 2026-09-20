@@ -1,18 +1,25 @@
-#include "monkey/repl/repl.h"
+module;
 
 #include <iostream>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <fmt/base.h>
 
-#include "monkey/object/builtins.h"
-// #include "monkey/evaluator/evaluator.h"
-#include "monkey/lexer/lexer.h"
-// #include "monkey/object/environment.h"
-#include "monkey/parser/parser.h"
-#include "monkey/vm/vm.h"
+module monkey.repl;
 
-namespace pyc {
-namespace monkey {
+import monkey.compiler;
+import monkey.compiler.symbol_table;
+import monkey.lexer;
+import monkey.object;
+import monkey.object.builtins;
+import monkey.parser;
+import monkey.vm;
+
+namespace pyc::monkey {
 
 inline constexpr std::string_view kPrompt = ">> ";
 
@@ -99,5 +106,4 @@ void Repl::Start() {
     }
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

@@ -1,17 +1,24 @@
-#include "monkey/code/code.h"
+module;
 
 #include <algorithm>
 #include <array>
 #include <bit>
+#include <concepts>
+#include <cstdint>
 #include <map>
 #include <numeric>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 #include <fmt/format.h>
 
 #include "monkey/macro.h"
 
-namespace pyc {
-namespace monkey {
+module monkey.code;
+
+namespace pyc::monkey {
 
 std::string_view toString(OpcodeType type) {
     switch (type) {
@@ -257,5 +264,4 @@ std::string toString(const Instructions& instructions) {
     return result;
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

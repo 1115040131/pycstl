@@ -1,13 +1,16 @@
-#pragma once
+module;
 
 #include <cstdint>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/base.h>
 
-namespace pyc {
-namespace monkey {
+export module monkey.code;
+
+export namespace pyc::monkey {
 
 // 字节码
 using Opcode = uint8_t;
@@ -71,5 +74,4 @@ public:
     static std::pair<std::vector<size_t>, size_t> ReadOperands(const Instructions& instructions, size_t offset);
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

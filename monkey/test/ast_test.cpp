@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "monkey/ast/ast.h"
-#include "monkey/lexer/lexer.h"
+import monkey;
+
 #include "monkey/test/test_define.h"
 
 namespace pyc {

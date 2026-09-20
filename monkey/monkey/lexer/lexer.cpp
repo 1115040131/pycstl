@@ -1,7 +1,14 @@
-#include "monkey/lexer/lexer.h"
+module;
 
-namespace pyc {
-namespace monkey {
+#include <cctype>
+#include <memory>
+#include <string_view>
+
+module monkey.lexer;
+
+import monkey.token;
+
+namespace pyc::monkey {
 
 std::unique_ptr<Lexer> Lexer::New(std::string_view input) { return std::make_unique<Lexer>(input); }
 
@@ -142,5 +149,4 @@ void Lexer::skipWhitespace() {
     }
 }
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

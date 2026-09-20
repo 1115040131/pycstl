@@ -1,6 +1,8 @@
 
 #include <gtest/gtest.h>
 
+import monkey;
+
 #include "monkey/test/test_define.h"
 
 namespace pyc {

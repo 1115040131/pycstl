@@ -1,12 +1,15 @@
-#pragma once
+module;
 
+#include <cstddef>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
-namespace pyc {
-namespace monkey {
+export module monkey.compiler.symbol_table;
+
+export namespace pyc::monkey {
 
 using SymbolScope = std::string_view;
 
@@ -58,5 +61,4 @@ private:
     std::vector<std::shared_ptr<Symbol>> free_symbols_;
 };
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey

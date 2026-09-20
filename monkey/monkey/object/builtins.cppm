@@ -1,11 +1,15 @@
-#pragma once
+module;
 
+#include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
 
-#include "monkey/object/object.h"
+export module monkey.object.builtins;
 
-namespace pyc {
-namespace monkey {
+export import monkey.object;
+
+export namespace pyc::monkey {
 
 struct BuiltinWithName {
     std::string name;
@@ -16,5 +20,4 @@ const std::vector<BuiltinWithName>& GetBuiltinList();
 
 std::shared_ptr<Builtin> GetBuiltinByName(std::string_view name);
 
-}  // namespace monkey
-}  // namespace pyc
+}  // namespace pyc::monkey
