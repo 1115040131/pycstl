@@ -1,9 +1,13 @@
-#pragma once
+module;
 
-#include "design_pattern/filter_strategy.h"
-#include "design_pattern/inputer.h"
+#include <optional>
 
-namespace pyc {
+export module design_pattern.adapter;
+
+export import design_pattern.filter_strategy;
+export import design_pattern.inputer;
+
+export namespace pyc {
 
 struct StopInputerAdapter : Inputer {
     Inputer* inputer;

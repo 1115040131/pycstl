@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <algorithm>
 #include <limits>
 #include <memory>
 
-namespace pyc {
+export module design_pattern.reducer;
+
+export namespace pyc {
 
 struct ReducerState {
     virtual ~ReducerState() = default;

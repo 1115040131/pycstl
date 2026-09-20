@@ -1,11 +1,17 @@
+#include <algorithm>
+#include <iostream>
 #include <numeric>
+#include <optional>
 #include <sstream>
+#include <string_view>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include "common/cin_redirect.h"
-#include "design_pattern/api.h"
-#include "design_pattern/inputer.h"
+
+import design_pattern.api;
+import design_pattern.inputer;
 
 namespace pyc {
 

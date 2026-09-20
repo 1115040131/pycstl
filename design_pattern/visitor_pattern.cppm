@@ -1,15 +1,19 @@
-#pragma once
-
-#include <memory>
-#include <typeinfo>
-#include <unordered_map>
-#include <vector>
+module;
 
 #include <glm/glm.hpp>
 
-namespace pyc {
+export module design_pattern.visitor_pattern;
 
-struct MessageVisitor;
+export namespace pyc {
+
+struct MoveMessage;
+
+struct JumpMessage;
+
+struct MessageVisitor {
+    virtual void visit(MoveMessage*) {}
+    virtual void visit(JumpMessage*) {}
+};
 
 struct Message {
     virtual void accept(MessageVisitor* visitor) = 0;
@@ -34,11 +38,6 @@ struct JumpMessage : MessageImpl<JumpMessage> {
     double jumpHeight;
 
     // void accept(MessageVisitor* visitor) override { visitor->visit(this); }
-};
-
-struct MessageVisitor {
-    virtual void visit(MoveMessage* msg) {}
-    virtual void visit(JumpMessage* msg) {}
 };
 
 struct GameObject;

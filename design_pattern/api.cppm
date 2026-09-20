@@ -1,9 +1,13 @@
-#pragma once
+module;
 
-#include "design_pattern/inputer.h"
-#include "design_pattern/reducer.h"
+#include <vector>
 
-namespace pyc {
+export module design_pattern.api;
+
+export import design_pattern.inputer;
+export import design_pattern.reducer;
+
+export namespace pyc {
 
 inline int reduce(std::vector<int> v, Reducer* reducer) {
     auto state = reducer->init();

@@ -1,13 +1,15 @@
-#pragma once
+module;
 
 #include <memory>
-#include <typeinfo>
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
 #include <glm/glm.hpp>
 
-namespace pyc {
+export module design_pattern.component_pattern;
+
+export namespace pyc {
 
 struct Message {
     virtual ~Message() = default;
@@ -16,6 +18,8 @@ struct Message {
 struct MoveMessage : Message {
     glm::vec3 velocityChange;
 };
+
+struct GameObject;
 
 struct Component {
     virtual void update(GameObject* go) = 0;
@@ -30,23 +34,23 @@ struct Component {
 
 struct GameObject {
     std::vector<std::unique_ptr<Component>> components;
-    std::unordered_map<std::type_info, std::vector<Component*>> subscribers;  // 事件总线
+    std::unordered_map<std::type_index, std::vector<Component*>> subscribers;  // 事件总线
 
     template <typename EventType>
     void subscribe(Component* component) {
-        subscribers[typeid(EventType)].push_back(component);
+        subscribers[std::type_index(typeid(EventType))].push_back(component);
     }
 
     template <typename EventType>
     void send(EventType* msg) {
-        for (auto&& component : subscribers[typeid(EventType)]) {
+        for (auto&& component : subscribers[std::type_index(typeid(EventType))]) {
             component->handleMessage(msg);
         }
     }
 
     void add(std::unique_ptr<Component> component) {
         components.push_back(std::move(component));
-        component->subscribeMessage(this);
+        components.back()->subscribeMessage(this);
     }
 
     void update() {
@@ -62,7 +66,7 @@ struct Movable : Component {
     glm::vec3 position;
     glm::vec3 velocity;
 
-    void update(GameObject* go) override { position += velocity; }
+    void update(GameObject*) override { position += velocity; }
 
     void subscribeMessage(GameObject* go) override { go->subscribe<MoveMessage>(this); }
 
@@ -84,9 +88,9 @@ struct LivingBeging : Component {
         }
     }
 
-    void subscribeMessage(GameObject* go) override {}
+    void subscribeMessage(GameObject*) override {}
 
-    void handleMessage(Message* msg) override {}
+    void handleMessage(Message*) override {}
 };
 
 struct PlayerController : Component {
@@ -98,19 +102,19 @@ struct PlayerController : Component {
         }
     }
 
-    void subscribeMessage(GameObject* go) override {}
+    void subscribeMessage(GameObject*) override {}
 
-    void handleMessage(Message* msg) override {}
+    void handleMessage(Message*) override {}
 };
 
 struct PlayerAppearence : Component {
-    void update(GameObject* go) override {
+    void update(GameObject*) override {
         // 渲染玩家
     }
 
-    void subscribeMessage(GameObject* go) override {}
+    void subscribeMessage(GameObject*) override {}
 
-    void handleMessage(Message* msg) override {}
+    void handleMessage(Message*) override {}
 };
 
 // 组件作为普通对象, 由 GameObject 构造函数创建

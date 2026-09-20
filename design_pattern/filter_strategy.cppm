@@ -1,6 +1,6 @@
-#pragma once
+export module design_pattern.filter_strategy;
 
-namespace pyc {
+export namespace pyc {
 
 struct FilterStrategy {
     virtual bool shouldPass(int value) = 0;

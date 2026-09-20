@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <memory>
 
-namespace pyc {
+export module design_pattern.factory;
+
+export namespace pyc {
 
 struct Bullet {
     virtual ~Bullet() = default;

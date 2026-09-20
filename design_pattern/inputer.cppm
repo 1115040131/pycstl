@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <iostream>
 #include <optional>
 #include <vector>
 
-namespace pyc {
+export module design_pattern.inputer;
+
+export namespace pyc {
 
 struct Inputer {
     virtual std::optional<int> fetch() = 0;

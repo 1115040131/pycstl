@@ -3,12 +3,13 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 cc_test(
     name = "design_pattern_test",
-    srcs = glob([
-        "*_test.cpp",
-        "*.h",
-    ]),
+    srcs = glob(["*_test.cpp"]),
     copts = COPTS + ["-Wno-non-virtual-dtor"],
-    features = ["-parse_headers"],
+    features = [
+        "cpp_modules",
+        "-layering_check",
+    ],
+    module_interfaces = glob(["*.cppm"]),
     deps = [
         "//common:cin_redirect",
         "@glm",

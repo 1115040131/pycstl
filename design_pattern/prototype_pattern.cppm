@@ -1,10 +1,13 @@
-#pragma once
+module;
 
 #include <memory>
 
-namespace pyc {
+export module design_pattern.prototype_pattern;
+
+export namespace pyc {
 
 struct Ball {
+    virtual ~Ball() = default;
     virtual std::unique_ptr<Ball> clone() = 0;
 };
 
