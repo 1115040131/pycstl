@@ -3,10 +3,10 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "concurrency/test/utils.h"
-#include "concurrency/thread_safe_queue/simple_thread_safe_queue.h"
-#include "concurrency/thread_safe_queue/thread_safe_queue.h"
-#include "concurrency/thread_safe_stack/thread_safe_stack.h"
+import concurrency.test.utils;
+import concurrency.thread_safe_queue.simple_thread_safe_queue;
+import concurrency.thread_safe_queue;
+import concurrency.thread_safe_stack;
 
 namespace pyc {
 namespace concurrency {

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "concurrency/spin_lock.h"
+import concurrency.spin_lock;
 
 namespace pyc {
 namespace concurrency {

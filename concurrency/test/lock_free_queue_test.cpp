@@ -1,8 +1,8 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "concurrency/lock_free_queue/lock_free_queue.h"
-#include "concurrency/test/utils.h"
+import concurrency.lock_free_queue;
+import concurrency.test.utils;
 
 namespace pyc {
 namespace concurrency {
