@@ -6,7 +6,12 @@
 #define STRIP_FLAG_HELP 1
 #include <gflags/gflags.h>
 
-import monkey;
+import monkey.object;
+import monkey.lexer;
+import monkey.parser;
+import monkey.compiler;
+import monkey.evaluator;
+import monkey.vm;
 
 using namespace pyc::monkey;
 

@@ -1,7 +1,7 @@
 #include <fmt/format.h>
 #include <gtest/gtest.h>
 
-import monkey;
+import monkey.parser;
 
 namespace fmt {
 

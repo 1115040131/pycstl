@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-import monkey;
+import monkey.object;
 
 namespace pyc {
 namespace monkey {
