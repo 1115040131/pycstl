@@ -1,15 +1,21 @@
-#pragma once
+module;
 
 #include <coroutine>
+#include <cstddef>
 #include <exception>
 #include <span>
+#include <tuple>
+#include <utility>
 #include <variant>
 
-#include "co_async/awaiter/concepts.h"
-#include "co_async/task.h"
+export module co_async.when_any;
 
-namespace pyc {
-namespace co_async {
+export import co_async.awaiter.concepts;
+export import co_async.awaiter.previous_awaiter;
+export import co_async.task;
+export import co_async.utils.uninitialized;
+
+export namespace pyc::co_async {
 
 struct WhenAnyCounterBlock {
     static constexpr std::size_t kNullIndex = std::size_t(-1);
@@ -75,5 +81,4 @@ auto when_any(Ts&&... ts) {
     return whenAnyImpl(std::index_sequence_for<Ts...>{}, std::forward<Ts>(ts)...);
 }
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

@@ -1,6 +1,9 @@
+#include <coroutine>
+
 #include <gtest/gtest.h>
 
-#include "co_async/task.h"
+import co_async.task;
+
 #include "co_async/utils/debug.h"
 
 namespace pyc {

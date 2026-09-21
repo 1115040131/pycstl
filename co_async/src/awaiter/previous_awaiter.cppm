@@ -1,9 +1,10 @@
-#pragma once
+module;
 
 #include <coroutine>
 
-namespace pyc {
-namespace co_async {
+export module co_async.awaiter.previous_awaiter;
+
+export namespace pyc::co_async {
 
 struct PreviousAwaiter {
     constexpr bool await_ready() const noexcept { return false; }
@@ -20,5 +21,4 @@ struct PreviousAwaiter {
     std::coroutine_handle<> previous_ = nullptr;
 };
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

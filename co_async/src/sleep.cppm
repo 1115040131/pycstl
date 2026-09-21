@@ -1,12 +1,15 @@
-#pragma once
+module;
 
 #include <chrono>
+#include <coroutine>
 
-#include "co_async/awaiter/sleep_awaiter.h"
-#include "co_async/task.h"
+export module co_async.sleep;
 
-namespace pyc {
-namespace co_async {
+import co_async.awaiter.sleep_awaiter;
+export import co_async.task;
+import co_async.timer_loop;
+
+export namespace pyc::co_async {
 
 template <typename T>
 struct TimerTask : public Task<T> {
@@ -25,5 +28,4 @@ inline TimerTask<void> sleep_for(std::chrono::system_clock::duration duration) {
     co_return;
 }
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

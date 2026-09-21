@@ -1,11 +1,13 @@
-#pragma once
+module;
 
+#include <concepts>
 #include <coroutine>
 
-#include "co_async/utils/non_void_helper.h"
+export module co_async.awaiter.concepts;
 
-namespace pyc {
-namespace co_async {
+export import co_async.utils.non_void_helper;
+
+export namespace pyc::co_async {
 
 template <typename A>
 concept Awaiter = requires(A a, std::coroutine_handle<> h) {
@@ -32,5 +34,4 @@ template <typename A>
     requires(!Awaiter<A> && Awaitable<A>)
 struct AwaitableTraits<A> : AwaitableTraits<decltype(std::declval<A>().operator co_await())> {};
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

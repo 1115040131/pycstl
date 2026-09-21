@@ -1,7 +1,6 @@
-#pragma once
+export module co_async.utils.non_void_helper;
 
-namespace pyc {
-namespace co_async {
+export namespace pyc::co_async {
 
 template <typename T = void>
 struct NonVoidHelper {
@@ -15,5 +14,4 @@ struct NonVoidHelper<void> {
     explicit NonVoidHelper() noexcept = default;
 };
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

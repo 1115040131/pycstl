@@ -1,8 +1,11 @@
 #include <chrono>
+#include <coroutine>
 
 #include <gtest/gtest.h>
 
-#include "co_async/sleep.h"
+import co_async.timer_loop;
+import co_async.sleep;
+
 #include "co_async/test/utils.h"
 
 using namespace std::chrono_literals;

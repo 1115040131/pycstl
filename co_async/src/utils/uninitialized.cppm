@@ -1,12 +1,14 @@
-#pragma once
+module;
 
+#include <functional>
 #include <memory>
 #include <utility>
 
-#include "co_async/utils/non_void_helper.h"
+export module co_async.utils.uninitialized;
 
-namespace pyc {
-namespace co_async {
+export import co_async.utils.non_void_helper;
+
+export namespace pyc::co_async {
 
 template <typename T>
 struct Uninitialized {
@@ -46,5 +48,4 @@ struct Uninitialized<T&> : Uninitialized<std::reference_wrapper<T>> {};
 template <typename T>
 struct Uninitialized<T&&> : Uninitialized<T> {};
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

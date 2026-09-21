@@ -1,9 +1,10 @@
-#pragma once
+module;
 
 #include <coroutine>
 
-namespace pyc {
-namespace co_async {
+export module co_async.awaiter.repeat_awaiter;
+
+export namespace pyc::co_async {
 
 struct RepeatAwaiter {
     constexpr bool await_ready() const noexcept { return false; }
@@ -18,5 +19,4 @@ struct RepeatAwaiter {
     constexpr void await_resume() const noexcept {}
 };
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <chrono>
 #include <coroutine>
@@ -19,8 +19,9 @@ struct hash<std::coroutine_handle<>> {
 }  // namespace std
 #endif
 
-namespace pyc {
-namespace co_async {
+export module co_async.timer_loop;
+
+export namespace pyc::co_async {
 
 class TimerLoop : public Singleton<TimerLoop> {
     friend class Singleton<TimerLoop>;
@@ -41,5 +42,4 @@ private:
     std::unordered_map<std::coroutine_handle<>, TimerMap::iterator> search_table_;
 };
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

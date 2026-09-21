@@ -1,14 +1,16 @@
-#pragma once
+module;
 
 #include <coroutine>
 #include <exception>
 
-#include "co_async/awaiter/previous_awaiter.h"
 #include "co_async/utils/debug.h"
-#include "co_async/utils/uninitialized.h"
 
-namespace pyc {
-namespace co_async {
+export module co_async.task;
+
+import co_async.awaiter.previous_awaiter;
+export import co_async.utils.uninitialized;
+
+export namespace pyc::co_async {
 
 template <typename T>
 struct Promise {
@@ -143,5 +145,4 @@ struct ReturnPreviousTask {
     std::coroutine_handle<promise_type> coroutine_;
 };
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async
