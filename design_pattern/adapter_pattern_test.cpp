@@ -1,11 +1,13 @@
 #include <numeric>
 #include <sstream>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include "common/cin_redirect.h"
-#include "design_pattern/adapter.h"
-#include "design_pattern/api.h"
+
+import design_pattern.adapter;
+import design_pattern.api;
 
 namespace pyc {
 

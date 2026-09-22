@@ -1,7 +1,6 @@
-#include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "monkey/compiler/symbol_table.h"
+import monkey.compiler.symbol_table;
 
 namespace pyc {
 namespace monkey {

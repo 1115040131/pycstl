@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "concurrency/parallel_algorithm.h"
+import concurrency.parallel_algorithm;
 
 namespace pyc {
 namespace concurrency {

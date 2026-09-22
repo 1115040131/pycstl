@@ -1,11 +1,13 @@
-#include "co_async/timer_loop.h"
+module;
 
+#include <coroutine>
 #include <thread>
 
 #include "co_async/utils/debug.h"
 
-namespace pyc {
-namespace co_async {
+module co_async.timer_loop;
+
+namespace pyc::co_async {
 
 void TimerLoop::addTimer(std::chrono::system_clock::time_point expire_time, std::coroutine_handle<> task) {
     auto [iter, _] = timer_map_.emplace(expire_time, task);
@@ -34,5 +36,4 @@ void TimerLoop::runAll() {
     }
 }
 
-}  // namespace co_async
-}  // namespace pyc
+}  // namespace pyc::co_async

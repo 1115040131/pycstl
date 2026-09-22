@@ -1,9 +1,11 @@
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "monkey/evaluator/evaluator.h"
-#include "monkey/object/environment.h"
-#include "monkey/parser/parser.h"
-#include "monkey/test/test_define.h"
+import monkey.lexer;
+import monkey.parser;
+import monkey.evaluator;
+
+#include "monkey/test/macro.h"
 
 namespace pyc {
 namespace monkey {

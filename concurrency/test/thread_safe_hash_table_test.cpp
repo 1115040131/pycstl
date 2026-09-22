@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "concurrency/test/utils.h"
-#include "concurrency/thread_safe_hash_table/thread_safe_hash_table.h"
+import concurrency.test.utils;
+import concurrency.thread_safe_hash_table;
 
 namespace pyc {
 namespace concurrency {

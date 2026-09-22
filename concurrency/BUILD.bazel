@@ -4,10 +4,10 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "concurrency",
     srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/concurrency/**/*.h"]),
     copts = COPTS,
+    features = ["cpp_modules"],
     linkopts = ["-latomic"],
-    strip_include_prefix = "include",
+    module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//concurrency:__subpackages__"],
     deps = [
         "//common:allocator_wrapper",

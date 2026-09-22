@@ -1,19 +1,20 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 load("//build_defs:cpp_opts.bzl", "COPTS")
 
-_LIB_SRCS = glob(
-    ["monkey/**/*.cpp"],
-    exclude = ["monkey/monkey.cpp"],
-)
+_LIB_SRCS = glob(["src/**/*.cpp"])
 
-_LIB_HDRS = glob(["monkey/**/*.h"])
+_LIB_HDRS = glob(["include/**/*.h"])
+
+_LIB_MODULE_INTERFACES = glob(["src/**/*.cppm"])
 
 cc_library(
     name = "monkey_lib",
     srcs = _LIB_SRCS,
     hdrs = _LIB_HDRS,
     copts = COPTS,
-    strip_include_prefix = "/monkey",
+    features = ["cpp_modules"],
+    module_interfaces = _LIB_MODULE_INTERFACES,
+    strip_include_prefix = "include",
     visibility = ["//monkey:__subpackages__"],
     deps = ["@fmt"],
 )
@@ -26,15 +27,18 @@ cc_library(
     hdrs = _LIB_HDRS,
     copts = COPTS,
     defines = ["SORTED_HASH"],
-    strip_include_prefix = "/monkey",
+    features = ["cpp_modules"],
+    module_interfaces = _LIB_MODULE_INTERFACES,
+    strip_include_prefix = "include",
     visibility = ["//monkey:__subpackages__"],
     deps = ["@fmt"],
 )
 
 cc_binary(
     name = "monkey",
-    srcs = ["monkey/monkey.cpp"],
+    srcs = ["app/monkey.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         ":monkey_lib",
         "@fmt",

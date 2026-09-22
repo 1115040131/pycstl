@@ -2,11 +2,10 @@
 #include <list>
 #include <vector>
 
-#include <fmt/ranges.h>
 #include <gtest/gtest.h>
 
-#include "concurrency/sorter.h"
-#include "concurrency/thread_pool/thread_pool.h"
+import concurrency.sorter;
+import concurrency.thread_pool;
 
 namespace pyc {
 namespace concurrency {

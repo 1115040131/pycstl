@@ -10,6 +10,8 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["CO_ASYNC_DEBUG"],
     }),
+    features = ["cpp_modules"],
+    module_interfaces = glob(["src/**/*.cppm"]),
     strip_include_prefix = "include",
     visibility = ["//co_async:__subpackages__"],
     deps = ["//common:singleton"] + select({

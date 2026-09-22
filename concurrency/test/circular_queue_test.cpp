@@ -1,11 +1,10 @@
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
-#include "concurrency/circular_queue/circular_queue_light.h"
-#include "concurrency/circular_queue/circular_queue_lock.h"
-#include "concurrency/circular_queue/circular_queue_seq.h"
-#include "concurrency/circular_queue/circular_queue_sync.h"
-#include "concurrency/test/utils.h"
+import concurrency.circular_queue.circular_queue_light;
+import concurrency.circular_queue.circular_queue_lock;
+import concurrency.circular_queue.circular_queue_seq;
+import concurrency.circular_queue.circular_queue_sync;
+import concurrency.test.utils;
 
 namespace pyc {
 namespace concurrency {

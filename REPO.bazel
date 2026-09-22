@@ -10,15 +10,14 @@ layering_check 的豁免(features = ["-layering_check"]) —— 拿不到 module
 
 parse_headers 的豁免(features = ["-parse_headers"]) —— 无法独立成 TU 的头:
 - chat/client/widget: uic 生成的 ui_*.h, include 路径与 Qt module 依赖都由使用者提供。
-- design_pattern/*: 示例头, state_pattern.h 的状态互转天然成环(Idle→Chase→Attack→Idle),
-  拆开的可读性代价大于收益。
 """
 
 repo(
     # layering_check: include 了哪个库的头, 就必须在 deps 里声明
     # parse_headers: 每个 hdrs 单独编成一个 TU, 靠包含顺序才成立的头会构建失败
+    # 20260920： C++20 模块化重构中, 关闭该feature
     features = [
-        "layering_check",
-        "parse_headers",
+        # "layering_check",
+        # "parse_headers",
     ],
 )

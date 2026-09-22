@@ -1,7 +1,12 @@
-#include "concurrency/interruptible_thread.h"
+module;
 
-namespace pyc {
-namespace concurrency {
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+
+module concurrency.interruptible_thread;
+
+namespace pyc::concurrency {
 
 thread_local InterruptFlag this_thread_interrupt_flag;
 
@@ -21,5 +26,4 @@ void InterruptibleWait(std::condition_variable& cv, std::unique_lock<std::mutex>
     InterruptionPoint();
 }
 
-}  // namespace concurrency
-}  // namespace pyc
+}  // namespace pyc::concurrency

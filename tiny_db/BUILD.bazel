@@ -3,17 +3,18 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 cc_library(
     name = "tiny_db_lib",
-    srcs = glob(["tiny_db/*.cpp"]),
-    hdrs = glob(["tiny_db/*.h"]),
+    srcs = glob(["src/*.cpp"]),
     copts = COPTS,
-    strip_include_prefix = "/tiny_db",
+    features = ["cpp_modules"],
+    module_interfaces = glob(["src/*.cppm"]),
     deps = ["@fmt"],
 )
 
 cc_binary(
     name = "tiny_db",
-    srcs = ["tiny_db.cpp"],
+    srcs = ["app/tiny_db.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     visibility = ["//tiny_db:__subpackages__"],
     deps = [
         ":tiny_db_lib",

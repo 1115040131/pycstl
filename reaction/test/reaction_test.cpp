@@ -1,9 +1,15 @@
+#include <chrono>
+#include <iostream>
 #include <numeric>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "reaction/react.h"
+import reaction;
 
 namespace pyc {
 

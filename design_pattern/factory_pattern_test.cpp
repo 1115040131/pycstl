@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "design_pattern/factory.h"
+import design_pattern.factory;
 
 namespace pyc {
 

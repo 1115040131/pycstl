@@ -1,0 +1,178 @@
+module;
+
+#include <atomic>
+#include <cstddef>
+#include <memory>
+#include <optional>
+#include <stdexcept>
+#include <thread>
+#include <utility>
+
+#include "common/allocator_wrapper.h"
+#include "common/noncopyable.h"
+
+export module concurrency.lock_free_stack.hazard_pointer_stack;
+
+export namespace pyc::concurrency {
+
+struct HazardPointer {
+    std::atomic<std::thread::id> id;
+    std::atomic<void*> pointer;
+};
+
+constexpr std::size_t kMaxHazardPointer = 100;
+inline HazardPointer hazard_pointers[kMaxHazardPointer];
+
+class HpOwner : public Noncopyable {
+public:
+    HpOwner() : hp(nullptr) {
+        for (std::size_t i = 0; i < kMaxHazardPointer; i++) {
+            std::thread::id old_id;
+            if (hazard_pointers[i].id.compare_exchange_strong(old_id, std::this_thread::get_id())) {
+                hp = &hazard_pointers[i];
+                break;
+            }
+        }
+
+        if (!hp) {
+            throw std::runtime_error("No hazard pointer available");
+        }
+    }
+
+    ~HpOwner() {
+        hp->pointer.store(nullptr);
+        hp->id.store(std::thread::id());
+    }
+
+    std::atomic<void*>& GetPointer() { return hp->pointer; }
+
+private:
+    HazardPointer* hp;
+};
+
+template <typename T, typename Allocator = std::allocator<T>>
+class HazardPointerStack : public Noncopyable {
+private:
+    struct Node {
+        T data;
+        Node* next;
+
+        Node() = default;
+        Node(const T& _data) : data(_data) {}
+    };
+
+public:
+    HazardPointerStack() = default;
+
+    ~HazardPointerStack() {
+        DeleteNodesWithNoHazards();
+        while (Pop()) {
+        }
+    }
+
+    template <typename... Args>
+    void Emplace(Args&&... args) {
+        Node* new_node = alloc_.Allocate();
+        std::construct_at(&new_node->data, std::forward<Args>(args)...);
+        new_node->next = head_.load();
+        while (!head_.compare_exchange_weak(new_node->next, new_node)) {
+        }
+    }
+
+    void Push(const T& value) { Emplace(value); }
+
+    void Push(T&& value) { Emplace(std::move(value)); }
+
+    std::optional<T> Pop() {
+        // 1. 从风险列表中获取一个节点给当前线程
+        std::atomic<void*>& hp = GetHazardPointerForCurrentThread();
+        Node* old_head = head_.load();
+        do {
+            Node* temp;
+            do {
+                temp = old_head;
+                hp.store(old_head);
+                old_head = head_.load();
+            }  // 2. 如果 old_head 和 temp 不等说明 head 被其他线程更新了，需重试
+            while (old_head != temp);
+            // 3. 将当前 head 更新为 old_head->next, 如不满足则重试。
+            //    old_head 判空必须在这里: 上面的内层循环可能把它刷成 nullptr(其他线程刚
+            //    弹走最后一个节点)，此时 old_head->next 会解引用空指针
+        } while (old_head && !head_.compare_exchange_weak(old_head, old_head->next));
+
+        // 4 一旦更新了 head_ 指针，便将风险指针清零(栈空退出时同样要清，否则会残留悬垂标记)
+        hp.store(nullptr);
+
+        if (old_head) {
+            std::optional<T> result = std::move(old_head->data);
+            // 5 删除旧有的头节点之前，先核查它是否正被风险指针所指涉
+            if (OutstandingHazardPointersFor(old_head)) {
+                // 6 延迟删除
+                ReclaimLater(old_head);
+            } else {
+                // 7 删除头部节点
+                alloc_.Deallocate(old_head);
+            }
+            // 8 删除没有风险的节点
+            DeleteNodesWithNoHazards();
+            return result;
+        }
+        return {};
+    }
+
+private:
+    struct DataToReclaim {
+        Node* data;
+        DataToReclaim* next;
+        DataToReclaim(Node* p) : data(p), next(nullptr) {}
+        ~DataToReclaim() = default;  // 资源由 HazardPointerStack 释放
+    };
+
+    std::atomic<void*>& GetHazardPointerForCurrentThread() {
+        thread_local static HpOwner hazard;
+        return hazard.GetPointer();
+    }
+
+    bool OutstandingHazardPointersFor(void* p) {
+        for (std::size_t i = 0; i < kMaxHazardPointer; i++) {
+            if (hazard_pointers[i].pointer.load() == p) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void ReclaimLater(Node* old_head) {
+        DataToReclaim* reclaim_node = reclaim_alloc_.Allocate();
+        std::construct_at(&reclaim_node->data, old_head);
+        AddToReclaimList(reclaim_node);
+    }
+
+    void AddToReclaimList(DataToReclaim* reclaim_node) {
+        reclaim_node->next = nodes_to_reclaim.load();
+        while (!nodes_to_reclaim.compare_exchange_weak(reclaim_node->next, reclaim_node)) {
+        }
+    }
+
+    void DeleteNodesWithNoHazards() {
+        DataToReclaim* current = nodes_to_reclaim.exchange(nullptr);
+        while (current) {
+            DataToReclaim* const next = current->next;
+            if (!OutstandingHazardPointersFor(current->data)) {
+                alloc_.Deallocate(current->data);
+                reclaim_alloc_.Deallocate(current);
+            } else {
+                AddToReclaimList(current);
+            }
+            current = next;
+        }
+    }
+
+private:
+    std::atomic<Node*> head_{nullptr};
+    std::atomic<DataToReclaim*> nodes_to_reclaim{nullptr};
+    [[no_unique_address]] AllocatorWrapper<Node, Allocator> alloc_;
+    [[no_unique_address]] AllocatorWrapper<DataToReclaim, Allocator> reclaim_alloc_;
+};
+
+}  // namespace pyc::concurrency

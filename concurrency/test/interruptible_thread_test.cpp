@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include "concurrency/interruptible_thread.h"
+import concurrency.interruptible_thread;
 
 namespace pyc {
 namespace concurrency {

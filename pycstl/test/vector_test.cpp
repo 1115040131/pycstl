@@ -1,7 +1,6 @@
 
 #include <vector>
 
-#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 #include "pycstl/test/utils.h"

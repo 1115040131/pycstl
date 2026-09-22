@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
-#define private public
-#include "monkey/compiler/compiler.h"
-#undef private
+import monkey.compiler;
+import monkey.test.utils;
 
-#include "monkey/test/test_define.h"
+#include "monkey/test/macro.h"
 
 namespace pyc {
 namespace monkey {

@@ -1,12 +1,12 @@
+#include <future>
 #include <vector>
 
-#include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "concurrency/parallel_algorithm.h"
-#include "concurrency/thread_pool/simple_thread_pool.h"
-#include "concurrency/thread_pool/steal_thread_pool.h"
-#include "concurrency/thread_pool/thread_pool.h"
+import concurrency.parallel_algorithm;
+import concurrency.thread_pool.simple_thread_pool;
+import concurrency.thread_pool.steal_thread_pool;
+import concurrency.thread_pool;
 
 namespace pyc {
 namespace concurrency {

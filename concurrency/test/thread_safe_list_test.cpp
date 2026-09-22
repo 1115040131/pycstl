@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "concurrency/test/utils.h"
-#include "concurrency/thread_safe_list/double_push_list.h"
-#include "concurrency/thread_safe_list/thread_safe_list.h"
+import concurrency.test.utils;
+import concurrency.thread_safe_list.double_push_list;
+import concurrency.thread_safe_list;
 
 namespace pyc {
 namespace concurrency {
