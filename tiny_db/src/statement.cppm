@@ -1,8 +1,8 @@
-#pragma once
+export module tiny_db.statement;
 
-#include "tiny_db/row.h"
+export import tiny_db.row;
 
-namespace tiny_db {
+export namespace tiny_db {
 
 class Statement {
 public:

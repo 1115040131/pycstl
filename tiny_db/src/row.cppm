@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <cstdint>
 #include <string>
 #include <string_view>
 
-namespace tiny_db {
+export module tiny_db.row;
+
+export namespace tiny_db {
 
 inline constexpr uint32_t kUsernameSize = 32;
 inline constexpr uint32_t kEmailSize = 255;

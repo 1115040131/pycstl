@@ -1,12 +1,15 @@
-#pragma once
+module;
 
+#include <cstdint>
 #include <fstream>
 #include <memory>
 #include <string_view>
 
-#include "tiny_db/defines.h"
+export module tiny_db.table:pager;
 
-namespace tiny_db {
+import tiny_db.defines;
+
+export namespace tiny_db {
 
 struct Pager {
     friend class Table;

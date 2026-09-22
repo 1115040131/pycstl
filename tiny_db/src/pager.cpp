@@ -1,8 +1,16 @@
-#include "tiny_db/pager.h"
+module;
 
+#include <cstdint>
+#include <cstdlib>
 #include <filesystem>
+#include <ios>
+#include <string>
 
 #include <fmt/base.h>
+
+module tiny_db.table;
+
+import tiny_db.defines;
 
 namespace tiny_db {
 

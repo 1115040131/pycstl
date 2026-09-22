@@ -1,9 +1,13 @@
-#include "tiny_db/row.h"
+module;
 
 #include <cstring>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include <fmt/format.h>
+
+module tiny_db.row;
 
 namespace tiny_db {
 

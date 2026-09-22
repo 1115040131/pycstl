@@ -1,8 +1,16 @@
-#include "tiny_db/table.h"
+module;
 
 #include <algorithm>
+#include <cstdint>
+#include <cstdlib>
+#include <memory>
+#include <string_view>
 
 #include <fmt/base.h>
+
+module tiny_db.table;
+
+import tiny_db.defines;
 
 namespace tiny_db {
 

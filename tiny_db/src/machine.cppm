@@ -1,11 +1,14 @@
-#pragma once
+module;
 
 #include <memory>
+#include <string_view>
 
-#include "tiny_db/statement.h"
-#include "tiny_db/table.h"
+export module tiny_db.machine;
 
-namespace tiny_db {
+import tiny_db.statement;
+import tiny_db.table;
+
+export namespace tiny_db {
 
 class Machine {
 public:

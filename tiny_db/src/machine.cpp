@@ -1,10 +1,20 @@
-#include "tiny_db/machine.h"
+module;
 
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <fmt/base.h>
+
+module tiny_db.machine;
+
+import tiny_db.defines;
+import tiny_db.row;
+import tiny_db.statement;
+import tiny_db.table;
 
 namespace tiny_db {
 

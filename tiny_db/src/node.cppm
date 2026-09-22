@@ -1,11 +1,13 @@
-#pragma once
+module;
 
 #include <array>
 #include <cstdint>
 
-#include "tiny_db/defines.h"
+export module tiny_db.node;
 
-namespace tiny_db {
+export import tiny_db.defines;
+
+export namespace tiny_db {
 
 struct Node {
     enum class Type {

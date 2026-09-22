@@ -1,13 +1,17 @@
-#pragma once
+module;
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
 
-#include "tiny_db/node.h"
-#include "tiny_db/pager.h"
-#include "tiny_db/row.h"
+export module tiny_db.table;
 
-namespace tiny_db {
+import :pager;
+
+export import tiny_db.node;
+export import tiny_db.row;
+
+export namespace tiny_db {
 
 class Table {
 public:
