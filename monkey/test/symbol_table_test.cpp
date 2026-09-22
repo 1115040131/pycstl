@@ -1,4 +1,3 @@
-#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 import monkey.compiler.symbol_table;

@@ -1,7 +1,6 @@
 #include <future>
 #include <vector>
 
-#include <fmt/base.h>
 #include <gtest/gtest.h>
 
 import concurrency.parallel_algorithm;

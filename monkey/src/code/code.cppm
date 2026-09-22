@@ -6,8 +6,6 @@ module;
 #include <utility>
 #include <vector>
 
-#include <fmt/base.h>
-
 export module monkey.code;
 
 export namespace pyc::monkey {

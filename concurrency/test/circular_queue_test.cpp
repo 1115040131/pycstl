@@ -1,4 +1,3 @@
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 import concurrency.circular_queue.circular_queue_light;

@@ -1,6 +1,3 @@
-#include <atomic>
-
-#include <fmt/format.h>
 #include <gtest/gtest.h>
 
 import concurrency.test.utils;

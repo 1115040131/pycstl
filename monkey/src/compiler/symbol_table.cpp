@@ -2,7 +2,6 @@ module;
 
 #include <memory>
 #include <string>
-#include <string_view>
 
 module monkey.compiler.symbol_table;
 

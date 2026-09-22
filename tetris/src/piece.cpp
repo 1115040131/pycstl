@@ -1,7 +1,6 @@
 module;
 
 #include <cstddef>
-#include <vector>
 
 module tetris.piece;
 
