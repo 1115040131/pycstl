@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <boost/asio.hpp>
 
 #include "common/noncopyable.h"
 
-namespace network {
+export module network.websocket_server;
+
+export namespace network {
 
 namespace asio = boost::asio;
 using tcp = asio::ip::tcp;

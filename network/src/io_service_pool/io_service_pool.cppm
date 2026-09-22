@@ -1,14 +1,19 @@
-#pragma once
+module;
 
+#include <algorithm>
+#include <cstddef>
 #include <thread>
 #include <vector>
 
 #include <boost/asio.hpp>
 
 #include "common/singleton.h"
-#include "network/base/pool.h"
 
-namespace network {
+export module network.io_service_pool;
+
+export import network.base.pool;
+
+export namespace network {
 
 namespace asio = boost::asio;
 

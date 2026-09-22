@@ -1,6 +1,16 @@
-#include "network/thread_pool/thread_pool_session.h"
+module;
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
+
+#include <boost/asio.hpp>
 #include <fmt/base.h>
+
+module network.thread_pool_session;
+
+import network.msg_node;
 
 namespace network {
 

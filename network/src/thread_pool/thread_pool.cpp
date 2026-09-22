@@ -1,6 +1,13 @@
-#include "network/thread_pool/thread_pool.h"
+module;
 
+#include <cstddef>
+#include <thread>
+#include <vector>
+
+#include <boost/asio.hpp>
 #include <fmt/base.h>
+
+module network.thread_pool;
 
 namespace network {
 

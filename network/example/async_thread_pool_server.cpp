@@ -1,9 +1,13 @@
 #include <atomic>
 #include <condition_variable>
+#include <csignal>
 #include <iostream>
 #include <mutex>
 
-#include "network/thread_pool/thread_pool_server.h"
+#include <boost/asio.hpp>
+
+import network.thread_pool;
+import network.thread_pool_server;
 
 int main() {
     try {

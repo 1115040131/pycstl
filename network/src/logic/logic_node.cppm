@@ -1,11 +1,13 @@
-#pragma once
+module;
 
 #include <memory>
 
-#include "network/base/session.h"
-#include "network/msg_node.h"
+export module network.logic:node;
 
-namespace network {
+export import network.base;
+export import network.msg_node;
+
+export namespace network {
 
 class LogicNode {
     friend class LogicSystem;

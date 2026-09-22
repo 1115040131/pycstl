@@ -1,6 +1,10 @@
+#include <csignal>
 #include <iostream>
 
-#include "network/io_service_pool/io_service_pool_server.h"
+#include <boost/asio.hpp>
+
+import network.io_service_pool;
+import network.io_service_pool_server;
 
 int main() {
     try {

@@ -1,12 +1,15 @@
-#pragma once
+module;
 
 #include <memory>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 
 #include <boost/asio.hpp>
 
-namespace network {
+export module network.base:server;
+
+export namespace network {
 
 namespace asio = boost::asio;
 using asio::ip::tcp;

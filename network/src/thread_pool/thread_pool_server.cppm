@@ -1,9 +1,8 @@
-#pragma once
+export module network.thread_pool_server;
 
-#include "network/base/server.h"
-#include "network/thread_pool/thread_pool.h"
+export import network.base;
 
-namespace network {
+export namespace network {
 
 class ThreadPoolServer : public Server {
 public:

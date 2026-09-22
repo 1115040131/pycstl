@@ -1,8 +1,8 @@
-#pragma once
+export module network.io_service_pool_session;
 
-#include "network/base/session.h"
+export import network.base;
 
-namespace network {
+export namespace network {
 
 class IOServicePoolSession : public Session {
 public:

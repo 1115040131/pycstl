@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <memory>
 #include <mutex>
@@ -8,7 +8,9 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
-namespace network {
+export module network.websocket_connection;
+
+export namespace network {
 
 namespace asio = boost::asio;
 namespace beast = boost::beast;

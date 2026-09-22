@@ -1,6 +1,10 @@
-#include "network/coroutine/coroutine_server.h"
-
+#include <csignal>
 #include <iostream>
+
+#include <boost/asio.hpp>
+
+import network.coroutine_server;
+import network.io_service_pool;
 
 int main() {
     try {

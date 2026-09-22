@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <boost/asio.hpp>
 
-namespace network {
+export module network.base.pool;
+
+export namespace network {
 
 namespace asio = boost::asio;
 

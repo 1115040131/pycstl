@@ -1,9 +1,8 @@
-#pragma once
+export module network.io_service_pool_server;
 
-#include "network/base/server.h"
-#include "network/io_service_pool/io_service_pool.h"
+export import network.base;
 
-namespace network {
+export namespace network {
 
 class IOServicePoolServer : public Server {
 public:

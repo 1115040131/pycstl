@@ -1,18 +1,23 @@
-#pragma once
+module;
+
+#include <string>
 
 #include <fmt/format.h>
 
-#include "network/msg_node.h"
 #include "network/proto/msg.pb.h"
 
-namespace network {
+export module network.utils;
+
+export import network.msg_node;
+
+export namespace network {
 
 const char* ToString(MsgId msg_id);
 
 }  // namespace network
 
 // fmt 格式化
-namespace fmt {
+export namespace fmt {
 
 template <>
 struct formatter<network::MsgId> : formatter<std::string> {

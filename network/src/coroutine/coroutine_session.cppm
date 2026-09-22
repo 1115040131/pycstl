@@ -1,8 +1,14 @@
-#pragma once
+module;
 
-#include "network/base/session.h"
+#include <boost/asio.hpp>
 
-namespace network {
+export module network.coroutine_session;
+
+export import network.base;
+
+export namespace network {
+
+namespace asio = boost::asio;
 
 /// @brief 协程读取, 异步发送
 class CoroutineSession : public Session {

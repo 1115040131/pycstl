@@ -1,6 +1,15 @@
-#include "network/coroutine/coroutine_session.h"
+module;
 
+#include <cstddef>
+#include <exception>
+#include <memory>
+
+#include <boost/asio.hpp>
 #include <fmt/base.h>
+
+module network.coroutine_session;
+
+import network.msg_node;
 
 namespace network {
 

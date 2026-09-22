@@ -1,19 +1,23 @@
-#pragma once
+module;
 
 #include <condition_variable>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 #include <unordered_map>
 
 #include "common/singleton.h"
-#include "network/base/session.h"
-#include "network/logic_node.h"
-#include "network/msg_node.h"
 
-namespace network {
+export module network.logic:system;
+
+import network.base;
+
+export import :node;
+
+export namespace network {
 
 class LogicSystem : public pyc::Singleton<LogicSystem> {
     friend class pyc::Singleton<LogicSystem>;

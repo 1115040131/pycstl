@@ -1,8 +1,14 @@
-#pragma once
+module;
 
-#include "network/base/session.h"
+#include <boost/asio.hpp>
 
-namespace network {
+export module network.thread_pool_session;
+
+export import network.base;
+
+export namespace network {
+
+namespace asio = boost::asio;
 
 class ThreadPoolSession : public Session {
 public:

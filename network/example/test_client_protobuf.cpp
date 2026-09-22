@@ -3,11 +3,12 @@
 #include <thread>
 
 #include <boost/asio.hpp>
-#include <fmt/base.h>
+#include <fmt/format.h>
 
-#include "network/msg_node.h"
 #include "network/proto/msg.pb.h"
-#include "network/utils.h"
+
+import network.msg_node;
+import network.utils;
 
 namespace asio = boost::asio;
 

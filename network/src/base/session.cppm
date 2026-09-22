@@ -1,6 +1,7 @@
-#pragma once
+module;
 
 #include <atomic>
+#include <cstddef>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -8,15 +9,15 @@
 
 #include <boost/asio.hpp>
 
-#include "network/msg_node.h"
+export module network.base:session;
 
-namespace network {
+export import :server;
+export import network.msg_node;
+
+export namespace network {
 
 namespace asio = boost::asio;
-
 using asio::ip::tcp;
-
-class Server;
 
 class Session : public std::enable_shared_from_this<Session> {
 public:

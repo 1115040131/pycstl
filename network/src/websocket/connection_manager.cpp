@@ -1,4 +1,9 @@
-#include "network/websocket/connection_manager.h"
+module;
+
+#include <memory>
+#include <string>
+
+module network.websocket_connection_manager;
 
 namespace network {
 

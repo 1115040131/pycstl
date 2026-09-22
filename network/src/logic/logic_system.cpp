@@ -1,9 +1,18 @@
-#include "network/logic_system.h"
+module;
 
-#include <fmt/base.h>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
-#include "network/utils.h"
+module network.logic;
+
+import network.base;
+import network.msg_node;
+import network.utils;
 
 namespace network {
 

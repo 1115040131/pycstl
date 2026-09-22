@@ -1,4 +1,4 @@
-#include "network/utils.h"
+module network.utils;
 
 namespace network {
 
