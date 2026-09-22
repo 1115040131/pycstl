@@ -1,11 +1,12 @@
-#pragma once
+module;
 
 #include <chrono>
 
 #include "common/singleton.h"
 
-namespace pyc {
-namespace tetris {
+export module tetris.engine;
+
+export namespace pyc::tetris {
 
 class Engine : public Singleton<Engine> {
     friend class Singleton<Engine>;
@@ -21,5 +22,4 @@ private:
     Engine() = default;
 };
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

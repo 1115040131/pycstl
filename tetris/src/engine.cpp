@@ -1,13 +1,15 @@
-#include "tetris/engine.h"
+module;
 
+#include <chrono>
 #include <thread>
 
-#include "tetris/control.h"
-#include "tetris/game.h"
-#include "tetris/window.h"
+module tetris.engine;
 
-namespace pyc {
-namespace tetris {
+import tetris.control;
+import tetris.game;
+import tetris.window;
+
+namespace pyc::tetris {
 
 using namespace std::literals::chrono_literals;
 
@@ -35,5 +37,4 @@ void Engine::Loop() {
 
 void Engine::Exit() { ShowExit(); }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

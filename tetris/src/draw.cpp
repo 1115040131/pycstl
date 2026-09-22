@@ -1,16 +1,20 @@
-#include "tetris/draw.h"
+module;
 
+#include <cstddef>
 #include <limits>
-#include <sstream>
+#include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include <fmt/format.h>
 
-#include "tetris/terminal.h"
-#include "tetris/utils.h"
+module tetris.draw;
 
-namespace pyc {
-namespace tetris {
+import tetris.ansi;
+import tetris.terminal;
+import tetris.utils;
+
+namespace pyc::tetris {
 
 // clang-format off
 /*
@@ -215,5 +219,4 @@ void DrawHold(const Matrix& hold, int top, int left) {
     terminal.Reset();
 }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

@@ -1,4 +1,4 @@
-#include "tetris/control.h"
+module;
 
 #include <termios.h>
 #include <unistd.h>
@@ -6,10 +6,11 @@
 #include <iostream>
 #include <thread>
 
-#include "tetris/game.h"
+module tetris.control;
 
-namespace pyc {
-namespace tetris {
+import tetris.game;
+
+namespace pyc::tetris {
 
 void Control::StartListener() {
     static std::jthread key_event([]() {
@@ -71,5 +72,4 @@ void Control::ProcessCommand() {
     }
 }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

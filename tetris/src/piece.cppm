@@ -1,9 +1,9 @@
-#pragma once
+export module tetris.piece;
 
-#include "tetris/tetromino.h"
+export import tetris.ansi;
+export import tetris.tetromino;
 
-namespace pyc {
-namespace tetris {
+export namespace pyc::tetris {
 
 struct Piece {
     TetrominoSet tetromino_set;
@@ -39,5 +39,4 @@ private:
     bool Rotate(int target_index);
 };
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

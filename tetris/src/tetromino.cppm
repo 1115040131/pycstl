@@ -1,12 +1,15 @@
-#pragma once
+module;
 
 #include <array>
+#include <cstddef>
+#include <utility>
 #include <vector>
 
-#include "tetris/ansi.h"
+export module tetris.tetromino;
 
-namespace pyc {
-namespace tetris {
+export import tetris.ansi;
+
+export namespace pyc::tetris {
 
 namespace v1 {
 
@@ -222,5 +225,4 @@ inline const Offset O{
 
 }  // namespace v3
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

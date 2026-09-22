@@ -1,9 +1,6 @@
-#pragma once
+export module tetris.control;
 
-#include "common/singleton.h"
-
-namespace pyc {
-namespace tetris {
+export namespace pyc::tetris {
 
 class Control {
 public:
@@ -26,5 +23,4 @@ private:
     static constexpr char KeySpace = ' ';
 };
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

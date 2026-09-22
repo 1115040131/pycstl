@@ -1,16 +1,17 @@
-#pragma once
+module;
 
 #include <string>
 #include <string_view>
 
 #include <fmt/format.h>
 
-namespace pyc {
-namespace tetris {
-
 // 定义ANSI转义序列的引导符
 #define CSI "\033["
 #define SGR(params) CSI params "m"
+
+export module tetris.ansi;
+
+export namespace pyc::tetris {
 
 // 常量定义
 inline constexpr std::string_view kClear = CSI "2J";              // 清屏
@@ -93,5 +94,4 @@ inline std::string SetBackgroundColor(ColorId color_id) {
     return fmt::format(CSI "48;5;{}m", static_cast<int>(color_id));
 }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

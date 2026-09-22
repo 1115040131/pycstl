@@ -1,9 +1,11 @@
-#pragma once
+module;
 
+#include <cstddef>
 #include <vector>
 
-namespace pyc {
-namespace tetris {
+export module tetris.play_field;
+
+export namespace pyc::tetris {
 
 inline constexpr std::size_t kPlayFieldRow = 22;
 inline constexpr std::size_t kPlayFieldCol = 10;
@@ -16,5 +18,4 @@ inline constexpr std::size_t kHoldCol = 7;
 
 using Matrix = std::vector<std::vector<int>>;
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

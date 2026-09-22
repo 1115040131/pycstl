@@ -1,9 +1,13 @@
-#include "tetris/piece.h"
+module;
 
-#include "tetris/game.h"
+#include <cstddef>
+#include <vector>
 
-namespace pyc {
-namespace tetris {
+module tetris.piece;
+
+import tetris.game;
+
+namespace pyc::tetris {
 
 bool Piece::Test(int target_x, int target_y, int target_index) const {
     const auto& play_field = Game::GetInstance().GetPlayField();
@@ -55,5 +59,4 @@ bool Piece::Rotate(int target_index) {
     return false;
 }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

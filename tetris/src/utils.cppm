@@ -1,15 +1,13 @@
-#pragma once
+export module tetris.utils;
 
-#include "tetris/piece.h"
-#include "tetris/play_field.h"
+export import tetris.piece;
+export import tetris.play_field;
 
-namespace pyc {
-namespace tetris {
+export namespace pyc::tetris {
 
 inline constexpr int Block2Col(int block_idx) { return 2 * block_idx - 1; }
 
 // 将块合并到 play_field_ 中
 void Merge(Matrix& play_field, const Piece& piece);
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

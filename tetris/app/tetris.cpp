@@ -1,4 +1,4 @@
-#include "tetris/engine.h"
+import tetris.engine;
 
 int main() {
     auto& engine = pyc::tetris::Engine::GetInstance();

@@ -1,12 +1,19 @@
-#include "tetris/window.h"
+module;
 
-#include "tetris/draw.h"
-#include "tetris/game.h"
-#include "tetris/terminal.h"
-#include "tetris/utils.h"
+#include <array>
+#include <string_view>
 
-namespace pyc {
-namespace tetris {
+#include <fmt/format.h>
+
+module tetris.window;
+
+import tetris.ansi;
+import tetris.draw;
+import tetris.game;
+import tetris.terminal;
+import tetris.utils;
+
+namespace pyc::tetris {
 
 void ShowWindows() {
     Terminal::GetInstance().HideCursor().Clear();
@@ -91,5 +98,4 @@ void ShowExit() {
         .Flush();
 }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

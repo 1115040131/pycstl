@@ -1,18 +1,25 @@
-#include "tetris/game.h"
+module;
 
 #include <algorithm>
+#include <array>
 #include <cassert>
+#include <chrono>
+#include <cmath>
+#include <cstddef>
 #include <fstream>
-#include <iostream>
 #include <random>
 #include <ranges>
+#include <utility>
 #include <vector>
 
-#include "tetris/draw.h"
-#include "tetris/utils.h"
+module tetris.game;
 
-namespace pyc {
-namespace tetris {
+import tetris.ansi;
+import tetris.piece;
+import tetris.tetromino;
+import tetris.utils;
+
+namespace pyc::tetris {
 
 using namespace std::literals::chrono_literals;
 
@@ -246,5 +253,4 @@ void Game::Reset() { Init(); }
 
 void Game::Help() { helping_ = !helping_; }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

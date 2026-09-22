@@ -1,7 +1,6 @@
-#pragma once
+export module tetris.window;
 
-namespace pyc {
-namespace tetris {
+export namespace pyc::tetris {
 
 void ShowWindows();
 
@@ -13,5 +12,4 @@ void ShowGame();
 
 void ShowExit();
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

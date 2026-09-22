@@ -1,14 +1,14 @@
-#pragma once
+module;
 
-#include <list>
+#include <cstddef>
 #include <string_view>
 
-#include "tetris/piece.h"
-#include "tetris/play_field.h"
-#include "tetris/tetromino.h"
+export module tetris.draw;
 
-namespace pyc {
-namespace tetris {
+export import tetris.play_field;
+export import tetris.tetromino;
+
+export namespace pyc::tetris {
 
 enum class WindowStyle { kStyle1, kStyle2, kStyle3, kStyle4 };
 
@@ -28,5 +28,4 @@ void DrawPreview(const Matrix& preview, int top, int left);
 
 void DrawHold(const Matrix& hold, int top, int left);
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

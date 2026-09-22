@@ -3,10 +3,10 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 cc_library(
     name = "tetris_lib",
-    srcs = glob(["tetris/*.cpp"]),
-    hdrs = glob(["tetris/*.h"]),
+    srcs = glob(["src/*.cpp"]),
     copts = COPTS,
-    strip_include_prefix = "/tetris",
+    features = ["cpp_modules"],
+    module_interfaces = glob(["src/*.cppm"]),
     deps = [
         "//common:singleton",
         "@fmt",
@@ -15,8 +15,9 @@ cc_library(
 
 cc_binary(
     name = "tetris",
-    srcs = ["tetris.cpp"],
+    srcs = ["app/tetris.cpp"],
     copts = COPTS,
     data = glob(["resource/**"]),
+    features = ["cpp_modules"],
     deps = [":tetris_lib"],
 )

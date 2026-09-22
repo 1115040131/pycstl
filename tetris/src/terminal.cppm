@@ -1,12 +1,15 @@
-#pragma once
+module;
 
 #include <iostream>
+#include <string_view>
 
 #include "common/singleton.h"
-#include "tetris/ansi.h"
 
-namespace pyc {
-namespace tetris {
+export module tetris.terminal;
+
+export import tetris.ansi;
+
+export namespace pyc::tetris {
 
 class Terminal : public Singleton<Terminal> {
     friend class Singleton<Terminal>;
@@ -58,5 +61,4 @@ private:
     Terminal() = default;
 };
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

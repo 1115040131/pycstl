@@ -1,7 +1,6 @@
-#include "tetris/utils.h"
+module tetris.utils;
 
-namespace pyc {
-namespace tetris {
+namespace pyc::tetris {
 
 void Merge(Matrix& play_field, const Piece& piece) {
     int x = piece.x;
@@ -18,5 +17,4 @@ void Merge(Matrix& play_field, const Piece& piece) {
     }
 }
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris

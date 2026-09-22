@@ -1,15 +1,22 @@
-#pragma once
+module;
 
 #include <chrono>
+#include <cstddef>
 #include <list>
 #include <optional>
+#include <vector>
 
 #include "common/singleton.h"
-#include "tetris/piece.h"
-#include "tetris/play_field.h"
 
-namespace pyc {
-namespace tetris {
+export module tetris.game;
+
+export import tetris.play_field;
+
+import tetris.control;
+import tetris.piece;
+import tetris.tetromino;
+
+export namespace pyc::tetris {
 
 using namespace std::chrono_literals;
 
@@ -164,5 +171,4 @@ private:
     Matrix hold_field_;
 };
 
-}  // namespace tetris
-}  // namespace pyc
+}  // namespace pyc::tetris
