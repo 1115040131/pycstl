@@ -11,6 +11,7 @@ cc_test(
         allow_empty = True,
     ),
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//reaction",
         "@fmt",

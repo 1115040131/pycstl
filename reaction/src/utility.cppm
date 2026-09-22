@@ -1,14 +1,18 @@
-#pragma once
+module;
 
 #include <atomic>
 #include <compare>
 #include <cstdint>
+#include <functional>
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
-#include "reaction/concept.h"
+export module reaction:utility;
 
-namespace pyc::reaction {
+import :concepts;
+
+export namespace pyc::reaction {
 
 class UniqueID {
 public:
@@ -54,7 +58,7 @@ struct WeakPtrEqual {
 
 }  // namespace std
 
-namespace pyc::reaction {
+export namespace pyc::reaction {
 
 using NodeSet = std::unordered_set<NodeWeak, std::WeakPtrHash, std::WeakPtrEqual>;
 using NodeMap = std::unordered_map<NodeWeak, size_t, std::WeakPtrHash, std::WeakPtrEqual>;

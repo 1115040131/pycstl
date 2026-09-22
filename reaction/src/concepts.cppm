@@ -1,8 +1,12 @@
-#pragma once
+module;
 
+#include <concepts>
 #include <memory>
+#include <type_traits>
 
-namespace pyc::reaction {
+export module reaction:concepts;
+
+export namespace pyc::reaction {
 
 template <typename T>
 concept IsTrigMode = requires(T t) {

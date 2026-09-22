@@ -1,14 +1,20 @@
-#pragma once
+module;
 
 #include <functional>
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 
 #include "common/singleton.h"
-#include "reaction/concept.h"
-#include "reaction/utility.h"
 
-namespace pyc::reaction {
+export module reaction:observer_node;
+
+import :concepts;
+import :utility;
+
+export namespace pyc::reaction {
 
 inline thread_local NodeSet g_delay_list;
 

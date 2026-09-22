@@ -1,11 +1,16 @@
-#pragma once
+module;
 
 #include <memory>
+#include <stdexcept>
+#include <utility>
 
 #include "common/noncopyable.h"
-#include "reaction/observer_node.h"
 
-namespace pyc::reaction {
+export module reaction:resource;
+
+import :observer_node;
+
+export namespace pyc::reaction {
 
 template <typename T>
 class Resource : Noncopyable, public ObserverNode {

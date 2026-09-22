@@ -1,9 +1,16 @@
-#pragma once
+module;
 
-#include "reaction/resource.h"
-#include "reaction/trigger_mode.h"
+#include <functional>
+#include <type_traits>
+#include <utility>
 
-namespace pyc::reaction {
+export module reaction:expression;
+
+import :concepts;
+import :resource;
+import :trigger_mode;
+
+export namespace pyc::reaction {
 
 struct VarExpr {};
 struct CalcExpr {};

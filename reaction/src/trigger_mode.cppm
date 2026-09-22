@@ -1,8 +1,11 @@
-#pragma once
+module;
 
 #include <functional>
+#include <utility>
 
-namespace pyc::reaction {
+export module reaction:trigger_mode;
+
+export namespace pyc::reaction {
 
 struct AlwaysTrig {
     bool checkTrigger() { return true; }

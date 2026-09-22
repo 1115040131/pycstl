@@ -1,11 +1,21 @@
-#pragma once
+module;
 
 #include <atomic>
+#include <functional>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <utility>
 
-#include "reaction/expression.h"
-#include "reaction/utility.h"
+export module reaction:react;
 
-namespace pyc::reaction {
+import :concepts;
+import :expression;
+import :observer_node;
+import :utility;
+
+export namespace pyc::reaction {
 
 inline thread_local std::function<void(NodePtr)> g_reg_fun;
 
