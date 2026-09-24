@@ -1,15 +1,27 @@
-#include "chat/server/chat_server/chat_grpc_client.h"
+module;
+
+#include <memory>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 #include <fmt/base.h>
 #include <grpcpp/create_channel.h>
 
 #include "chat/common/error_code.h"
-#include "chat/server/chat_server/define.h"
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/defer.h"
 #include "chat/server/proto/chat.grpc.pb.h"
 #include "common/connection_pool.h"
 #include "common/utils.h"
+#include "logger/logger.h"
+
+module chat.server.chat_server.chat_grpc_client;
+
+import chat.server.chat_server.define;
+import chat.server.common.config_mgr;
+import chat.server.common.defer;
 
 namespace pyc {
 namespace chat {
@@ -28,7 +40,7 @@ public:
 ChatGrpcClient::ChatGrpcClient() {
     fmt::println("========== ChatGrpcClient setup ==========");
 
-    GET_SECTION_CONFIG(peer_servers, "PeerServers");
+    auto peer_servers = GetSectionConfigOrDie("PeerServers");
 
     std::unordered_set<std::string> servers;
 
@@ -38,7 +50,7 @@ ChatGrpcClient::ChatGrpcClient() {
 
         while (std::getline(ss, server, ',')) {
             if (servers.count(server) > 0) {
-                PYC_LOG_ERROR("Same peer server {}!", server);
+                LogError("Same peer server {}!", server);
             } else {
                 servers.insert(server);
             }
@@ -46,13 +58,13 @@ ChatGrpcClient::ChatGrpcClient() {
     }
 
     if (servers.empty()) {
-        PYC_LOG_WARN("No peer server found!");
+        LogWarn("No peer server found!");
     }
     for (const auto& server : servers) {
-        GET_CONFIG(host, server, "Host");
-        GET_CONFIG(port, server, "RpcPort");
+        auto host = GetConfigOrDie(server, "Host");
+        auto port = GetConfigOrDie(server, "RpcPort");
         pools_[server] = std::make_unique<ChatConnectionPool>(host, port, 5);
-        PYC_LOG_INFO("Peer Server {} at {}:{} connect", server, host, port);
+        LogInfo("Peer Server {} at {}:{} connect", server, host, port);
     }
 
     fmt::println("==========================================");
@@ -69,7 +81,7 @@ AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_name, con
 
     auto iter = pools_.find(server_name);
     if (iter == pools_.end()) {
-        PYC_LOG_ERROR("Server {} not found", server_name);
+        LogError("Server {} not found", server_name);
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
@@ -77,7 +89,7 @@ AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_name, con
     auto& pool = iter->second;
     auto connection = pool->GetConnection();
     if (!connection) {
-        PYC_LOG_ERROR("Get connection failed");
+        LogError("Get connection failed");
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
@@ -87,7 +99,7 @@ AddFriendRsp ChatGrpcClient::NotifyAddFriend(const std::string& server_name, con
     auto status = connection.value()->NotifyAddFriend(&context, request, &response);
 
     if (!status.ok()) {
-        PYC_LOG_ERROR("Rpc failed: {}", status.error_message());
+        LogError("Rpc failed: {}", status.error_message());
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
     }
 
@@ -99,7 +111,7 @@ AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_name, c
 
     auto iter = pools_.find(server_name);
     if (iter == pools_.end()) {
-        PYC_LOG_ERROR("Server {} not found", server_name);
+        LogError("Server {} not found", server_name);
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
@@ -107,7 +119,7 @@ AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_name, c
     auto& pool = iter->second;
     auto connection = pool->GetConnection();
     if (!connection) {
-        PYC_LOG_ERROR("Get connection failed");
+        LogError("Get connection failed");
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
@@ -117,7 +129,7 @@ AuthFriendRsp ChatGrpcClient::NotifyAuthFriend(const std::string& server_name, c
     auto status = connection.value()->NotifyAuthFriend(&context, request, &response);
 
     if (!status.ok()) {
-        PYC_LOG_ERROR("Rpc failed: {}", status.error_message());
+        LogError("Rpc failed: {}", status.error_message());
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
     }
 
@@ -129,7 +141,7 @@ TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name,
 
     auto iter = pools_.find(server_name);
     if (iter == pools_.end()) {
-        PYC_LOG_ERROR("Server {} not found", server_name);
+        LogError("Server {} not found", server_name);
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
@@ -137,7 +149,7 @@ TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name,
     auto& pool = iter->second;
     auto connection = pool->GetConnection();
     if (!connection) {
-        PYC_LOG_ERROR("Get connection failed");
+        LogError("Get connection failed");
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
         return response;
     }
@@ -147,7 +159,7 @@ TextChatMsgRsp ChatGrpcClient::NotifyTextChatMsg(const std::string& server_name,
     auto status = connection.value()->NotifyTextChatMsg(&context, request, &response);
 
     if (!status.ok()) {
-        PYC_LOG_ERROR("Rpc failed: {}", status.error_message());
+        LogError("Rpc failed: {}", status.error_message());
         response.set_error(static_cast<int>(ErrorCode::kRpcFailed));
     }
 

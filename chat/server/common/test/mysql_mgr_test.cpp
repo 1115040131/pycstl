@@ -2,8 +2,8 @@
 #include <gtest/gtest.h>
 #include <mysqlx/xdevapi.h>
 
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/mysql_mgr.h"
+import chat.server.common.config_mgr;
+import chat.server.common.mysql_mgr;
 
 namespace pyc {
 namespace chat {
@@ -12,11 +12,11 @@ class MysqlMgrTest : public ::testing::Test {
 protected:
     static void SetUpTestSuite() {
         // 测试前清理数据库
-        GET_CONFIG(host, "Mysql", "Host");
-        GET_CONFIG_INT(port, "Mysql", "Port");
-        GET_CONFIG(user, "Mysql", "User");
-        GET_CONFIG(password, "Mysql", "Password");
-        GET_CONFIG(schema, "Mysql", "Schema");
+        auto host = GetConfigOrDie("Mysql", "Host");
+        auto port = GetConfigIntOrDie("Mysql", "Port");
+        auto user = GetConfigOrDie("Mysql", "User");
+        auto password = GetConfigOrDie("Mysql", "Password");
+        auto schema = GetConfigOrDie("Mysql", "Schema");
 
         auto session = mysqlx::Session(host, port, user, password);
         auto db = session.getSchema(schema);
@@ -30,10 +30,10 @@ protected:
 };
 
 TEST_F(MysqlMgrTest, ConnectionTest) {
-    GET_CONFIG(host, "Mysql", "Host");
-    GET_CONFIG_INT(port, "Mysql", "Port");
-    GET_CONFIG(user, "Mysql", "User");
-    GET_CONFIG(password, "Mysql", "Password");
+    auto host = GetConfigOrDie("Mysql", "Host");
+    auto port = GetConfigIntOrDie("Mysql", "Port");
+    auto user = GetConfigOrDie("Mysql", "User");
+    auto password = GetConfigOrDie("Mysql", "Password");
 
     auto session = mysqlx::Session(host, port, user, password);
 

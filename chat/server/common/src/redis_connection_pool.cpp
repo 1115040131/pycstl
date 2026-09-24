@@ -1,4 +1,16 @@
-#include "chat/server/common/redis_connection_pool.h"
+module;
+
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <string_view>
+#include <utility>
+
+#include <hiredis/hiredis.h>
+
+#include "logger/logger.h"
+
+module chat.server.common.redis_connection_pool;
 
 namespace pyc {
 namespace chat {

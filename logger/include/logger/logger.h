@@ -77,6 +77,37 @@ public:
         std::abort();
     }
 
+    template <typename... Args>
+    inline void debug_at(const std::source_location& loc, fmt::format_string<Args...> fmt, Args&&... args) const {
+        log_at<LogLevel::kDebug>(loc, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    inline void info_at(const std::source_location& loc, fmt::format_string<Args...> fmt, Args&&... args) const {
+        log_at<LogLevel::kInfo>(loc, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    inline void warn_at(const std::source_location& loc, fmt::format_string<Args...> fmt, Args&&... args) const {
+        log_at<LogLevel::kWarn>(loc, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    inline void error_at(const std::source_location& loc, fmt::format_string<Args...> fmt, Args&&... args) const {
+        log_at<LogLevel::kError>(loc, fmt, std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    [[noreturn]] inline void fatal_at(const std::source_location& loc, fmt::format_string<Args...> fmt,
+                                      Args&&... args) const {
+        log(LogLevel::kFatal, fmt.get(), fmt::make_format_args(args...), loc,
+            ExtractFunctionName(loc.function_name()));
+        for (const auto& sink : sinks_) {
+            sink->Flush();
+        }
+        std::abort();
+    }
+
 private:
     // Trims a __PRETTY_FUNCTION__-style signature down to the bare function name. Runs in
     // FmtWithLocation's consteval constructor, so no record pays for the scan.
@@ -108,6 +139,15 @@ private:
         }
         log(level, fmt_with_location.fmt.get(), fmt::make_format_args(args...), fmt_with_location.location,
             fmt_with_location.function);
+    }
+
+    // log_if 的运行时位置版本，同样先查级别再格式化。
+    template <LogLevel level, typename... Args>
+    inline void log_at(const std::source_location& loc, fmt::format_string<Args...> fmt, Args&&... args) const {
+        if (level < min_level_) {
+            return;
+        }
+        log(level, fmt.get(), fmt::make_format_args(args...), loc, ExtractFunctionName(loc.function_name()));
     }
 
     void log(LogLevel level, fmt::string_view format_str, fmt::format_args args,

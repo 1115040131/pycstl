@@ -1,6 +1,19 @@
-#include "chat/server/gate_server/http_connection.h"
+module;
 
-#include "chat/server/gate_server/logic_system.h"
+#include <cctype>
+#include <cstddef>
+#include <exception>
+#include <string>
+#include <string_view>
+
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+
+#include "logger/logger.h"
+
+module chat.server.gate_server;
+
+import :logic_system;
 
 namespace pyc {
 namespace chat {
@@ -12,14 +25,14 @@ void HttpConnection::Start() {
                      [self = shared_from_this()](const beast::error_code& ec, std::size_t) {
                          try {
                              if (ec) {
-                                 PYC_LOG_ERROR("{}", ec.message());
+                                 LogError("{}", ec.message());
                                  return;
                              }
 
                              self->HandleRequest();
                              self->CheckDeadline();
                          } catch (const std::exception& e) {
-                             PYC_LOG_ERROR("{}", e.what());
+                             LogError("{}", e.what());
                          }
                      });
 }

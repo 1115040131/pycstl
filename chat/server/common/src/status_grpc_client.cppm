@@ -1,0 +1,32 @@
+module;
+
+#include <memory>
+#include <string>
+
+#include "chat/server/proto/status.pb.h"
+#include "common/singleton.h"
+
+export module chat.server.common.status_grpc_client;
+
+export namespace pyc::chat {
+
+class StatusConnectionPool;
+
+class StatusGrpcClient : public Singleton<StatusGrpcClient> {
+    friend class Singleton<StatusGrpcClient>;
+
+private:
+    StatusGrpcClient();
+
+public:
+    ~StatusGrpcClient();
+
+    GetChatServerRsp GetChatServer(int uid);
+
+    LoginRsp Login(int uid, const std::string& token);
+
+private:
+    std::unique_ptr<StatusConnectionPool> pool_;
+};
+
+}  // namespace pyc::chat

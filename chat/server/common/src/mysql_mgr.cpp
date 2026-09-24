@@ -1,8 +1,14 @@
-#include "chat/server/common/mysql_mgr.h"
+module;
 
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/defer.h"
-#include "chat/server/common/mysql_pool.h"
+#include <mysqlx/xdevapi.h>
+
+#include "logger/logger.h"
+
+module chat.server.common.mysql_mgr;
+
+import chat.server.common.config_mgr;
+import chat.server.common.defer;
+import chat.server.common.mysql_pool;
 
 namespace pyc {
 namespace chat {
@@ -10,11 +16,11 @@ namespace chat {
 static Logger g_logger("MysqlMgr");
 
 MysqlMgr::MysqlMgr() {
-    GET_CONFIG(host, "Mysql", "Host");
-    GET_CONFIG_INT(port, "Mysql", "Port");
-    GET_CONFIG(user, "Mysql", "User");
-    GET_CONFIG(password, "Mysql", "Password");
-    GET_CONFIG(schema, "Mysql", "Schema");
+    auto host = GetConfigOrDie("Mysql", "Host");
+    auto port = GetConfigIntOrDie("Mysql", "Port");
+    auto user = GetConfigOrDie("Mysql", "User");
+    auto password = GetConfigOrDie("Mysql", "Password");
+    auto schema = GetConfigOrDie("Mysql", "Schema");
     pool_ = std::make_unique<MysqlPool>(host, port, user, password, schema, 5);
 }
 
@@ -22,6 +28,8 @@ MysqlMgr::~MysqlMgr() { pool_->Close(); }
 
 template <typename F>
 auto MysqlExecute(std::unique_ptr<MysqlPool>& pool, F&& f) -> decltype(f(std::declval<mysqlx::Session&>())) {
+    using Result = decltype(f(std::declval<mysqlx::Session&>()));
+
     auto connection = pool->GetConnection();
     if (!connection) {
         return std::nullopt;
@@ -31,12 +39,9 @@ auto MysqlExecute(std::unique_ptr<MysqlPool>& pool, F&& f) -> decltype(f(std::de
         pool->ReturnConnection(std::move(*connection));
     });
 
-    try {
-        return f(connection->session_);
-    }
-    MYSQL_CATCH(g_logger)
-
-    return std::nullopt;
+    Result result{};
+    MysqlCatch(g_logger, [&]() { result = f(connection->session_); });
+    return result;
 }
 
 std::optional<int> MysqlMgr::RegUser(std::string_view name, std::string_view email, std::string_view password) {

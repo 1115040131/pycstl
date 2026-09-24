@@ -1,9 +1,16 @@
-#include "chat/server/common/mysql_pool.h"
+module;
+
+#include <chrono>
+#include <thread>
 
 #include <fmt/chrono.h>
+#include <mysqlx/xdevapi.h>
 
-#include "chat/server/common/defer.h"
 #include "logger/logger.h"
+
+module chat.server.common.mysql_pool;
+
+import chat.server.common.defer;
 
 namespace pyc {
 namespace chat {
@@ -15,7 +22,7 @@ static Logger g_logger("MysqlMgr");
 MysqlPool::MysqlPool(const std::string& url, int port, const std::string& user, const std::string& password,
                      const std::string& schema, size_t size)
     : url_(url), port_(port), user_(user), password_(password), schema_(schema) {
-    try {
+    MysqlCatch(g_logger, [&]() {
         // 验证 mysql 版本
         auto session = mysqlx::Session(url_, port_, user_, password_);
         mysqlx::RowResult res = session.sql("show variables like 'version'").execute();
@@ -48,8 +55,7 @@ MysqlPool::MysqlPool(const std::string& url, int port, const std::string& user, 
         });
 
         check_thread_.detach();
-    }
-    MYSQL_CATCH(g_logger)
+    });
 }
 
 SqlConnection MysqlPool::CreateConnection() {

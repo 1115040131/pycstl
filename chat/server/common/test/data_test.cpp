@@ -1,7 +1,8 @@
 #include <fmt/core.h>
 #include <gtest/gtest.h>
+#include <nlohmann/json.hpp>
 
-#include "chat/server/common/data.h"
+import chat.server.common.data;
 
 namespace pyc {
 namespace chat {

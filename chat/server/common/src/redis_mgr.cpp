@@ -1,15 +1,24 @@
-#include "chat/server/common/redis_mgr.h"
+module;
 
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/redis_connection_pool.h"
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+
+#include <hiredis/hiredis.h>
+
+module chat.server.common.redis_mgr;
+
+import chat.server.common.config_mgr;
+import chat.server.common.redis_connection_pool;
 
 namespace pyc {
 namespace chat {
 
 RedisMgr::RedisMgr() {
-    GET_CONFIG(host, "Redis", "Host");
-    GET_CONFIG_INT(port, "Redis", "Port");
-    GET_CONFIG(password, "Redis", "Password");
+    auto host = GetConfigOrDie("Redis", "Host");
+    auto port = GetConfigIntOrDie("Redis", "Port");
+    auto password = GetConfigOrDie("Redis", "Password");
     pool_ = std::make_unique<RedisConnectionPool>(5, host, port, password);
 }
 

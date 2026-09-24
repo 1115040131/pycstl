@@ -1,10 +1,22 @@
-#include "chat/server/chat_server/cserver.h"
+module;
 
-#include "chat/server/chat_server/chat_grpc_client.h"
-#include "chat/server/chat_server/csession.h"
-#include "chat/server/chat_server/user_mgr.h"
-#include "chat/server/common/io_service_pool.h"
-#include "chat/server/common/status_grpc_client.h"
+#include <cstddef>
+#include <exception>
+#include <memory>
+#include <mutex>
+#include <string>
+
+#include <boost/asio.hpp>
+
+#include "logger/logger.h"
+
+module chat.server.chat_server;
+
+import :csession;
+import :user_mgr;
+import chat.server.chat_server.chat_grpc_client;
+import chat.server.common.io_service_pool;
+import chat.server.common.status_grpc_client;
 
 namespace pyc {
 namespace chat {
@@ -17,10 +29,10 @@ CServer::CServer(boost::asio::io_context& io_context, const std::string& name, u
 
     StartAccept();
 
-    PYC_LOG_INFO("{} listening on port {}", name_, port);
+    LogInfo("{} listening on port {}", name_, port);
 }
 
-CServer::~CServer() { PYC_LOG_INFO("{} destruct", name_); }
+CServer::~CServer() { LogInfo("{} destruct", name_); }
 
 void CServer::ClearSession(const std::string& session_id) {
     auto iter = sessions_.find(session_id);
@@ -46,21 +58,21 @@ void CServer::StartAccept() {
 
                 printSessions();  // debug
             } else {
-                PYC_LOG_ERROR("{}", ec.message());
+                LogError("{}", ec.message());
             }
             StartAccept();
         } catch (const std::exception& e) {
-            PYC_LOG_ERROR("{}", e.what());
+            LogError("{}", e.what());
         }
     });
 }
 
 void CServer::printSessions() {
-    PYC_LOG_DEBUG("========== Sessions ==========");
+    LogDebug("========== Sessions ==========");
     for (const auto& [uuid, session] : sessions_) {
-        PYC_LOG_DEBUG("uuid: {}", uuid);
+        LogDebug("uuid: {}", uuid);
     }
-    PYC_LOG_DEBUG("==============================");
+    LogDebug("==============================");
 }
 
 }  // namespace chat

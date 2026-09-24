@@ -5,6 +5,7 @@ cc_test(
     name = "config_mgr_test",
     srcs = ["config_mgr_test.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//chat/server/common:config_mgr",
         "@googletest//:gtest",
@@ -16,6 +17,7 @@ cc_test(
     name = "data_test",
     srcs = ["data_test.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//chat/server/common:data",
         "@fmt",
@@ -28,6 +30,7 @@ cc_test(
     name = "mysql_mgr_test",
     srcs = ["mysql_mgr_test.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//chat/server/common:config_mgr",
         "//chat/server/common:mysql_mgr",
@@ -42,6 +45,7 @@ cc_test(
     name = "redis_mgr_test",
     srcs = ["redis_mgr_test.cpp"],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//chat/server/common:redis_mgr",
         "@googletest//:gtest",

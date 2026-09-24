@@ -1,7 +1,14 @@
-#include "chat/server/gate_server/cserver.h"
+module;
 
-#include "chat/server/common/io_service_pool.h"
-#include "chat/server/gate_server/http_connection.h"
+#include <exception>
+#include <memory>
+
+#include <boost/asio.hpp>
+
+module chat.server.gate_server;
+
+import :http_connection;
+import chat.server.common.io_service_pool;
 
 namespace pyc {
 namespace chat {
@@ -27,7 +34,7 @@ void CServer::Start() {
                                    // 继续监听
                                    self->Start();
                                } catch (const std::exception& e) {
-                                   PYC_LOG_ERROR("{}", e.what());
+                                   LogError("{}", e.what());
                                }
                            });
 }

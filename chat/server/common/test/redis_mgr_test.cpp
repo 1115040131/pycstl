@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "chat/server/common/redis_mgr.h"
+import chat.server.common.redis_mgr;
 
 namespace pyc {
 namespace chat {

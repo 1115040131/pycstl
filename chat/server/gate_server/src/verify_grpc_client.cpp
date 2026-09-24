@@ -1,13 +1,21 @@
-#include "chat/server/gate_server/verify_grpc_client.h"
+module;
+
+#include <cstdint>
+#include <memory>
+#include <string_view>
+#include <utility>
 
 #include <grpcpp/create_channel.h>
 
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/defer.h"
-#include "chat/server/gate_server/define.h"
+#include "chat/common/error_code.h"
 #include "chat/server/proto/verify.grpc.pb.h"
 #include "common/connection_pool.h"
 #include "common/utils.h"
+
+module chat.server.gate_server.verify_grpc_client;
+
+import chat.server.common.config_mgr;
+import chat.server.common.defer;
 
 namespace pyc {
 namespace chat {
@@ -24,8 +32,8 @@ public:
 };
 
 VerifyGrpcClient::VerifyGrpcClient() {
-    GET_CONFIG(host, "VerifyServer", "Host");
-    GET_CONFIG(port, "VerifyServer", "Port");
+    auto host = GetConfigOrDie("VerifyServer", "Host");
+    auto port = GetConfigOrDie("VerifyServer", "Port");
     pool_ = std::make_unique<VerifyConnectionPool>(host, port, 5);
 }
 
