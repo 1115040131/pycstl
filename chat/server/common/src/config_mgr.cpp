@@ -1,4 +1,4 @@
-#include "chat/server/common/config_mgr.h"
+module;
 
 #include <charconv>
 #include <filesystem>
@@ -6,8 +6,14 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "logger/logger.h"
+
+module chat.server.common.config_mgr;
+
 namespace pyc {
 namespace chat {
+
+static Logger _g_config_mgr_logger("ConfigMgr");
 
 ConfigMgr::ConfigMgr() {
     std::filesystem::path config_path = "chat/server/common/config/config.ini";
@@ -75,6 +81,55 @@ std::optional<int> ConfigMgr::GetConfigInt(const std::string& section, const std
 }
 
 std::optional<int> ConfigMgr::GetConfigInt(const std::string& key) const { return GetConfigInt(section_, key); }
+
+void SetSectionOrDie(std::string_view section) {
+    if (!ConfigMgr::GetInstance().SetSection(std::string(section))) {
+        _g_config_mgr_logger.fatal("Config[\"{}\"] not found", section);
+    }
+}
+
+const std::string& CurrentSection() { return ConfigMgr::GetInstance().GetSection(); }
+
+std::string GetConfigOrDie(std::string_view section, std::string_view key) {
+    auto config = ConfigMgr::GetInstance().GetConfig(std::string(section), std::string(key));
+    if (!config) {
+        _g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"] not found", section, key);
+    }
+    return *config;
+}
+
+int GetConfigIntOrDie(std::string_view section, std::string_view key) {
+    auto config = ConfigMgr::GetInstance().GetConfigInt(std::string(section), std::string(key));
+    if (!config) {
+        _g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"] not found or convert fail", section, key);
+    }
+    return *config;
+}
+
+std::string GetSectionConfigOrDie(std::string_view key) {
+    const auto& config_mgr = ConfigMgr::GetInstance();
+    if (config_mgr.GetSection().empty()) {
+        _g_config_mgr_logger.fatal("Section not set");
+    }
+    auto config = config_mgr.GetConfig(std::string(key));
+    if (!config) {
+        _g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"] not found", config_mgr.GetSection(), key);
+    }
+    return *config;
+}
+
+int GetSectionConfigIntOrDie(std::string_view key) {
+    const auto& config_mgr = ConfigMgr::GetInstance();
+    if (config_mgr.GetSection().empty()) {
+        _g_config_mgr_logger.fatal("Section not set");
+    }
+    auto config = config_mgr.GetConfigInt(std::string(key));
+    if (!config) {
+        _g_config_mgr_logger.fatal("Config[\"{}\"][\"{}\"] not found or convert fail", config_mgr.GetSection(),
+                                   key);
+    }
+    return *config;
+}
 
 }  // namespace chat
 }  // namespace pyc

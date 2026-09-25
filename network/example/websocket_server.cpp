@@ -1,4 +1,6 @@
-#include "network/websocket/websocket_server.h"
+#include <boost/asio.hpp>
+
+import network.websocket_server;
 
 int main() {
     boost::asio::io_context io_context;

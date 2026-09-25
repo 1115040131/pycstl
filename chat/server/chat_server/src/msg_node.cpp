@@ -1,8 +1,17 @@
-#include "chat/server/chat_server/msg_node.h"
+module;
 
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <memory>
 #include <utility>
 
 #include <boost/asio.hpp>
+
+#include "chat/common/method.h"
+
+module chat.server.chat_server.msg_node;
 
 namespace pyc {
 namespace chat {

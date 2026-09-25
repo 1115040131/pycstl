@@ -1,15 +1,35 @@
-#include "chat/server/chat_server/logic_system.h"
+module;
+
+#include <algorithm>
+#include <cctype>
+#include <exception>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <string>
+#include <thread>
+#include <unordered_map>
+#include <utility>
 
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include "chat/common/error_code.h"
-#include "chat/server/chat_server/chat_grpc_client.h"
-#include "chat/server/chat_server/user_mgr.h"
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/defer.h"
-#include "chat/server/common/mysql_mgr.h"
-#include "chat/server/common/redis_mgr.h"
+#include "chat/common/method.h"
+#include "chat/server/proto/chat.pb.h"
+#include "logger/logger.h"
+
+module chat.server.chat_server;
+
+import :csession;
+import :logic_node;
+import :user_mgr;
+import chat.server.chat_server.chat_grpc_client;
+import chat.server.common.config_mgr;
+import chat.server.common.defer;
+import chat.server.common.mysql_mgr;
+import chat.server.common.redis_mgr;
 
 namespace pyc {
 namespace chat {
@@ -23,7 +43,7 @@ LogicSystem::~LogicSystem() {
     is_stop_ = true;
     consume_.notify_all();
     work_thread_.join();
-    PYC_LOG_INFO("LogicSystem Exit.");
+    LogInfo("LogicSystem Exit.");
 }
 
 void LogicSystem::PostMsgToQueue(std::unique_ptr<LogicNode> msg) {
@@ -82,7 +102,7 @@ void LogicSystem::DealMsg() {
 void LogicSystem::DealFirstMsg() {
     auto& msg_node = msg_queue_.front();
     auto msg_id = msg_node->recv_node_->GetReqId();
-    PYC_LOG_DEBUG("recv msg id: {}", ToString(msg_id));
+    LogDebug("recv msg id: {}", ToString(msg_id));
     auto iter = callback_map_.find(msg_id);
     if (iter != callback_map_.end()) {
         iter->second(msg_node->session_, std::string(msg_node->recv_node_->Data(), msg_node->recv_node_->Size()));
@@ -98,7 +118,7 @@ std::optional<UserInfo> LogicSystem::GetBaseInfo(int uid) {
     if (info_str) {
         auto j = nlohmann::json::parse(info_str.value(), nullptr, false);
         if (j.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data: {}", info_str.value());
+            LogError("Failed to parse Json data: {}", info_str.value());
             return std::nullopt;
         }
 
@@ -116,7 +136,7 @@ std::optional<UserInfo> LogicSystem::GetBaseInfo(int uid) {
     auto dump = j.dump();
     auto result = RedisMgr::GetInstance().Set(key, dump);
     if (!result) {
-        PYC_LOG_ERROR("Redis set {} {} error", key, dump);
+        LogError("Redis set {} {} error", key, dump);
     }
 
     return user_info.value();
@@ -130,7 +150,7 @@ std::optional<UserInfo> LogicSystem::GetBaseInfo(const std::string& name) {
     if (info_str) {
         auto j = nlohmann::json::parse(info_str.value(), nullptr, false);
         if (j.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data: {}", info_str.value());
+            LogError("Failed to parse Json data: {}", info_str.value());
             return std::nullopt;
         }
 
@@ -148,21 +168,21 @@ std::optional<UserInfo> LogicSystem::GetBaseInfo(const std::string& name) {
     auto dump = j.dump();
     auto result = RedisMgr::GetInstance().Set(key, dump);
     if (!result) {
-        PYC_LOG_ERROR("Redis set {} {} error", key, dump);
+        LogError("Redis set {} {} error", key, dump);
     }
 
     return user_info.value();
 }
 
 void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+    LogDebug("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json root;
     Defer defer([&session, &root]() { session->Send(root.dump(), ReqId::kChatLoginRes); });
 
     if (src_root.is_discarded()) {
-        PYC_LOG_ERROR("Failed to parse Json data");
+        LogError("Failed to parse Json data");
         root["error"] = ErrorCode::kJsonError;
         return;
     }
@@ -214,7 +234,7 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
     }
 
     // 增加登录数量
-    auto server_name = GET_SECTION();
+    auto server_name = CurrentSection();
     RedisMgr::GetInstance().HIncrBy(kLoginCount, server_name, 1);
 
     // session 绑定用户 id
@@ -228,21 +248,21 @@ void LogicSystem::LoginHandler(const std::shared_ptr<CSession>& session, const s
 }
 
 void LogicSystem::SearchInfoHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+    LogDebug("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json src_root = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json root;
     Defer defer([&session, &root]() { session->Send(root.dump(), ReqId::kSearchUserRes); });
 
     if (src_root.is_discarded()) {
-        PYC_LOG_ERROR("Failed to parse Json data");
+        LogError("Failed to parse Json data");
         root["error"] = ErrorCode::kJsonError;
         return;
     }
 
     auto uid_str = src_root.value("uid", "");
     if (uid_str == "") {
-        PYC_LOG_ERROR("uid is empty");
+        LogError("uid is empty");
         root["error"] = ErrorCode::kUidInvalid;
         return;
     }
@@ -260,7 +280,7 @@ void LogicSystem::SearchInfoHandler(const std::shared_ptr<CSession>& session, co
     }
 
     if (!search_info) {
-        PYC_LOG_ERROR("Failed to find user info {}", uid_str);
+        LogError("Failed to find user info {}", uid_str);
         root["error"] = ErrorCode::kUidInvalid;
         return;
     }
@@ -270,14 +290,14 @@ void LogicSystem::SearchInfoHandler(const std::shared_ptr<CSession>& session, co
 }
 
 void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+    LogDebug("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json request = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json response;
     Defer defer([&session, &response]() { session->Send(response.dump(), ReqId::kAddFriendRes); });
 
     if (request.is_discarded()) {
-        PYC_LOG_ERROR("Failed to parse Json data");
+        LogError("Failed to parse Json data");
         response["error"] = ErrorCode::kJsonError;
         return;
     }
@@ -296,7 +316,7 @@ void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, con
 
     // 更新数据库
     if (!(MysqlMgr::GetInstance().AddFriendAppply(uid, to_uid) == true)) {
-        PYC_LOG_ERROR("Failed to update database");
+        LogError("Failed to update database");
         response["error"] = ErrorCode::kNetworkError;
         return;
     }
@@ -307,14 +327,14 @@ void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, con
     // 查询对方服务器地址
     auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
     if (!to_server_name) {
-        PYC_LOG_DEBUG("User {} not online", to_uid);
+        LogDebug("User {} not online", to_uid);
         return;
     }
     // 对方在同一个服务器上
-    if (to_server_name == GET_SECTION()) {
+    if (to_server_name == CurrentSection()) {
         auto session = UserMgr::GetInstance().GetSession(to_uid);
         if (!session) {
-            PYC_LOG_WARN("User {} not online", to_uid);
+            LogWarn("User {} not online", to_uid);
         } else {
             nlohmann::json notify;
             notify["error"] = ErrorCode::kSuccess;
@@ -341,14 +361,14 @@ void LogicSystem::AddFriendHandler(const std::shared_ptr<CSession>& session, con
 }
 
 void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+    LogDebug("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json request = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json response;
     Defer defer([&session, &response]() { session->Send(response.dump(), ReqId::kAuthFriendRes); });
 
     if (request.is_discarded()) {
-        PYC_LOG_ERROR("Failed to parse Json data");
+        LogError("Failed to parse Json data");
         response["error"] = ErrorCode::kJsonError;
         return;
     }
@@ -357,7 +377,7 @@ void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, co
     int to_uid = request.value("to_uid", 0);
     auto back_name = request.value("back_name", "");
 
-    PYC_LOG_INFO("{} to {}", from_uid, to_uid);
+    LogInfo("{} to {}", from_uid, to_uid);
 
     // 查询基本信息
     auto from_base_info = GetBaseInfo(from_uid);
@@ -370,7 +390,7 @@ void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, co
     // 更新数据库
     if (!(MysqlMgr::GetInstance().AuthFriendApply(from_uid, to_uid) == true) ||
         !(MysqlMgr::GetInstance().AddFriend(from_uid, to_uid, back_name) == true)) {
-        PYC_LOG_ERROR("Failed to update database");
+        LogError("Failed to update database");
         response["error"] = ErrorCode::kNetworkError;
         return;
     }
@@ -386,15 +406,15 @@ void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, co
     // 查询对方服务器地址
     auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
     if (!to_server_name) {
-        PYC_LOG_DEBUG("User {} not online", to_uid);
+        LogDebug("User {} not online", to_uid);
         return;
     }
 
     // 对方在同一个服务器上
-    if (to_server_name == GET_SECTION()) {
+    if (to_server_name == CurrentSection()) {
         auto session = UserMgr::GetInstance().GetSession(to_uid);
         if (!session) {
-            PYC_LOG_WARN("User {} not online", to_uid);
+            LogWarn("User {} not online", to_uid);
         } else {
             nlohmann::json notify;
             notify["error"] = ErrorCode::kSuccess;
@@ -419,14 +439,14 @@ void LogicSystem::AuthFriendHandler(const std::shared_ptr<CSession>& session, co
 }
 
 void LogicSystem::TextChatMsgHandler(const std::shared_ptr<CSession>& session, const std::string& msg_data) {
-    PYC_LOG_DEBUG("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
+    LogDebug("session: {}, msg_data: {}", session->GetSessionId(), msg_data);
 
     nlohmann::json request = nlohmann::json::parse(msg_data, nullptr, false);
     nlohmann::json response;
     Defer defer([&session, &response]() { session->Send(response.dump(), ReqId::kTextChatMsgRes); });
 
     if (request.is_discarded()) {
-        PYC_LOG_ERROR("Failed to parse Json data");
+        LogError("Failed to parse Json data");
         response["error"] = ErrorCode::kJsonError;
         return;
     }
@@ -448,15 +468,15 @@ void LogicSystem::TextChatMsgHandler(const std::shared_ptr<CSession>& session, c
     // 查询对方服务器地址
     auto to_server_name = RedisMgr::GetInstance().Get(fmt::format("{}{}", kUserIpPrefix, to_uid));
     if (!to_server_name) {
-        PYC_LOG_DEBUG("User {} not online", to_uid);
+        LogDebug("User {} not online", to_uid);
         return;
     }
 
     // 对方在同一个服务器上
-    if (to_server_name == GET_SECTION()) {
+    if (to_server_name == CurrentSection()) {
         auto session = UserMgr::GetInstance().GetSession(to_uid);
         if (!session) {
-            PYC_LOG_WARN("User {} not online", to_uid);
+            LogWarn("User {} not online", to_uid);
         } else {
             nlohmann::json notify;
             notify["error"] = ErrorCode::kSuccess;

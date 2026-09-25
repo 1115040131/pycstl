@@ -1,0 +1,50 @@
+module;
+
+#include <utility>
+
+#include <boost/asio.hpp>
+
+#include "logger/logger.h"
+
+export module chat.server.chat_server.define;
+
+namespace pyc {
+namespace chat {
+
+inline Logger g_logger("ChatServer");
+
+}  // namespace chat
+}  // namespace pyc
+
+export namespace pyc {
+namespace chat {
+
+using tcp = boost::asio::ip::tcp;
+
+template <typename... Args>
+inline void LogDebug(Logger::FormatString<Args...> fmt, Args&&... args) {
+    g_logger.debug(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void LogInfo(Logger::FormatString<Args...> fmt, Args&&... args) {
+    g_logger.info(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void LogWarn(Logger::FormatString<Args...> fmt, Args&&... args) {
+    g_logger.warn(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+inline void LogError(Logger::FormatString<Args...> fmt, Args&&... args) {
+    g_logger.error(fmt, std::forward<Args>(args)...);
+}
+
+template <typename... Args>
+[[noreturn]] inline void LogFatal(Logger::FormatString<Args...> fmt, Args&&... args) {
+    g_logger.fatal(fmt, std::forward<Args>(args)...);
+}
+
+}  // namespace chat
+}  // namespace pyc

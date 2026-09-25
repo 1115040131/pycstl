@@ -1,6 +1,13 @@
-#include "network/coroutine/coroutine_server.h"
+module;
 
-#include "network/coroutine/coroutine_session.h"
+#include <memory>
+
+#include <boost/asio.hpp>
+
+module network.coroutine_server;
+
+import network.coroutine_session;
+import network.io_service_pool;
 
 namespace network {
 

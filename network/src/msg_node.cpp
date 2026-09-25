@@ -1,8 +1,13 @@
-#include "network/msg_node.h"
+module;
 
+#include <algorithm>
+#include <cstring>
+#include <memory>
 #include <utility>
 
 #include <boost/asio.hpp>
+
+module network.msg_node;
 
 namespace network {
 

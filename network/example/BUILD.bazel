@@ -53,6 +53,7 @@ BINARIES = {
         "//common:timer",
         "//network",
         "@boost.asio",
+        "@fmt",
         "@nlohmann_json//:json",
     ],
 
@@ -61,10 +62,19 @@ BINARIES = {
         "@boost.asio",
         "@fmt",
     ],
-    "async_io_service_pool_server": ["//network"],
-    "async_thread_pool_server": ["//network"],
+    "async_io_service_pool_server": [
+        "//network",
+        "@boost.asio",
+    ],
+    "async_thread_pool_server": [
+        "//network",
+        "@boost.asio",
+    ],
     "simple_coroutine_server": ["@boost.asio"],
-    "coroutine_server": ["//network"],
+    "coroutine_server": [
+        "//network",
+        "@boost.asio",
+    ],
 
     # beast http
     "http_client": [
@@ -77,7 +87,10 @@ BINARIES = {
         "@fmt",
         "@nlohmann_json//:json",
     ],
-    "websocket_server": ["//network"],
+    "websocket_server": [
+        "//network",
+        "@boost.asio",
+    ],
 
     # grpc
     "grpc_server": [
@@ -102,5 +115,6 @@ BINARIES = {
     name = binary,
     srcs = ["%s.cpp" % binary],
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = deps,
 ) for binary, deps in BINARIES.items()]

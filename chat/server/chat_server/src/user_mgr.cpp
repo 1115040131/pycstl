@@ -1,4 +1,11 @@
-#include "chat/server/chat_server/user_mgr.h"
+module;
+
+#include <memory>
+#include <mutex>
+#include <shared_mutex>
+#include <unordered_map>
+
+module chat.server.chat_server;
 
 namespace pyc {
 namespace chat {

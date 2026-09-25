@@ -1,7 +1,11 @@
-#include "chat/server/common/utils.h"
+module;
+
+#include <string>
 
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+
+module chat.server.common.utils;
 
 namespace pyc {
 namespace chat {

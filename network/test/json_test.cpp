@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 
-#include "network/msg_node.h"
+import network.msg_node;
 
 TEST(JsonTest, ParseTest) {
     nlohmann::json root;

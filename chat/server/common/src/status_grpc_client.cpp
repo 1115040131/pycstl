@@ -1,13 +1,16 @@
-#include "chat/server/common/status_grpc_client.h"
+module;
 
 #include <grpcpp/create_channel.h>
 
 #include "chat/common/error_code.h"
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/defer.h"
 #include "chat/server/proto/status.grpc.pb.h"
 #include "common/connection_pool.h"
 #include "common/utils.h"
+
+module chat.server.common.status_grpc_client;
+
+import chat.server.common.config_mgr;
+import chat.server.common.defer;
 
 namespace pyc {
 namespace chat {
@@ -24,8 +27,8 @@ public:
 };
 
 StatusGrpcClient::StatusGrpcClient() {
-    GET_CONFIG(host, "StatusServer", "Host");
-    GET_CONFIG(port, "StatusServer", "Port");
+    auto host = GetConfigOrDie("StatusServer", "Host");
+    auto port = GetConfigOrDie("StatusServer", "Port");
     pool_ = std::make_unique<StatusConnectionPool>(host, port, 5);
 }
 

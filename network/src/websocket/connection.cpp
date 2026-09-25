@@ -1,10 +1,20 @@
-#include "network/websocket/connection.h"
+module;
 
+#include <cstddef>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <utility>
+
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <fmt/base.h>
 
-#include "network/websocket/connection_manager.h"
+module network.websocket_connection;
+
+import network.websocket_connection_manager;
 
 namespace network {
 

@@ -1,8 +1,15 @@
-#include "network/base/server.h"
+module;
 
+#include <memory>
+#include <mutex>
+#include <string>
+
+#include <boost/asio.hpp>
 #include <fmt/base.h>
 
-#include "network/base/session.h"
+module network.base;
+
+import :session;
 
 namespace network {
 

@@ -1,8 +1,23 @@
-#include "chat/server/chat_server/csession.h"
+module;
 
-#include "chat/server/chat_server/cserver.h"
-#include "chat/server/chat_server/logic_system.h"
-#include "chat/server/common/utils.h"
+#include <cstddef>
+#include <exception>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <utility>
+
+#include <boost/asio.hpp>
+
+#include "chat/common/method.h"
+#include "logger/logger.h"
+
+module chat.server.chat_server;
+
+import :cserver;
+import :logic_system;
+import chat.server.common.utils;
 
 namespace pyc {
 namespace chat {
@@ -55,14 +70,14 @@ void CSession::AsyncReadHead(size_t total_len) {
                                                                           size_t bytes_transfered) {
         try {
             if (ec) {
-                PYC_LOG_ERROR("Error code = {}. Message: {}", ec.value(), ec.message());
+                LogError("Error code = {}. Message: {}", ec.value(), ec.message());
                 Close();
 
                 return;
             }
 
             if (bytes_transfered < total_len) {
-                PYC_LOG_ERROR("Read {} not match {}", bytes_transfered, total_len);
+                LogError("Read {} not match {}", bytes_transfered, total_len);
                 Close();
                 return;
             }
@@ -70,7 +85,7 @@ void CSession::AsyncReadHead(size_t total_len) {
             MsgHead msg_head = MsgHead::ParseHead(data_);
             // id 非法
             if (msg_head.id == ReqId::kInvalid) {
-                PYC_LOG_ERROR("Invalid head id: {}, length: {}", static_cast<int>(msg_head.id), msg_head.length);
+                LogError("Invalid head id: {}, length: {}", static_cast<int>(msg_head.id), msg_head.length);
                 Close();
                 return;
             }
@@ -78,7 +93,7 @@ void CSession::AsyncReadHead(size_t total_len) {
             recv_node_ = std::make_unique<RecvNode>(msg_head.length, msg_head.id);
             AsyncReadBody(msg_head.length);
         } catch (const std::exception& e) {
-            PYC_LOG_ERROR("{}", e.what());
+            LogError("{}", e.what());
         }
     });
 }
@@ -88,13 +103,13 @@ void CSession::AsyncReadBody(size_t total_len) {
                                                                           size_t bytes_transfered) {
         try {
             if (ec) {
-                PYC_LOG_ERROR("Error code = {}. Message: {}", ec.value(), ec.message());
+                LogError("Error code = {}. Message: {}", ec.value(), ec.message());
                 Close();
                 return;
             }
 
             if (bytes_transfered < total_len) {
-                PYC_LOG_ERROR("Read {} not match {}", bytes_transfered, total_len);
+                LogError("Read {} not match {}", bytes_transfered, total_len);
                 Close();
                 return;
             }
@@ -106,7 +121,7 @@ void CSession::AsyncReadBody(size_t total_len) {
             // 继续读取
             AsyncReadHead(kHeadLength);
         } catch (const std::exception& e) {
-            PYC_LOG_ERROR("{}", e.what());
+            LogError("{}", e.what());
         }
     });
 }
@@ -115,7 +130,7 @@ void CSession::Send(const char* msg, size_t max_len, ReqId msg_id) {
     std::lock_guard<std::mutex> lock(send_lock_);
     size_t send_queue_size = send_queue_.size();
     if (send_queue_size > kMaxSendQueue) {
-        PYC_LOG_WARN("Send queue size = {} is full", send_queue_size);
+        LogWarn("Send queue size = {} is full", send_queue_size);
         return;
     }
     send_queue_.emplace(std::make_unique<SendNode>(msg, max_len, msg_id));
@@ -134,7 +149,7 @@ void CSession::Send(const std::string& msg, ReqId msg_id) { Send(msg.data(), msg
 void CSession::HandleWrite(const boost::system::error_code& ec) {
     try {
         if (ec) {
-            PYC_LOG_ERROR("Error code = {}. Message: {}", ec.value(), ec.message());
+            LogError("Error code = {}. Message: {}", ec.value(), ec.message());
             Close();
             return;
         }
@@ -148,7 +163,7 @@ void CSession::HandleWrite(const boost::system::error_code& ec) {
                                                                  std::size_t) { self->HandleWrite(ec); });
         }
     } catch (const std::exception& e) {
-        PYC_LOG_ERROR("{}", e.what());
+        LogError("{}", e.what());
     }
 }
 

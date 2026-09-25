@@ -1,8 +1,13 @@
-#include "network/websocket/websocket_server.h"
+module;
 
+#include <memory>
+
+#include <boost/asio.hpp>
 #include <fmt/base.h>
 
-#include "network/websocket/connection.h"
+module network.websocket_server;
+
+import network.websocket_connection;
 
 namespace network {
 

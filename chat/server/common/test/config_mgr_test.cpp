@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "chat/server/common/config_mgr.h"
+import chat.server.common.config_mgr;
 
 namespace pyc {
 namespace chat {
@@ -10,47 +10,47 @@ void DUMMY_CODE(Targs&&... /* unused */) {}
 
 TEST(ConfigMgrTest, GetConfig) {
     {
-        GET_CONFIG(port, "GateServer", "Port");
+        auto port = GetConfigOrDie("GateServer", "Port");
         EXPECT_EQ(port, "8080");
     }
     {
-        GET_CONFIG(host, "VerifyServer", "Host");
-        GET_CONFIG(port, "VerifyServer", "Port");
+        auto host = GetConfigOrDie("VerifyServer", "Host");
+        auto port = GetConfigOrDie("VerifyServer", "Port");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "50051");
     }
     {
-        GET_CONFIG(host, "StatusServer", "Host");
-        GET_CONFIG(port, "StatusServer", "Port");
+        auto host = GetConfigOrDie("StatusServer", "Host");
+        auto port = GetConfigOrDie("StatusServer", "Port");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "50052");
     }
     {
-        GET_CONFIG(name, "ChatServer1", "Name");
-        GET_CONFIG(host, "ChatServer1", "Host");
-        GET_CONFIG(port, "ChatServer1", "Port");
-        GET_CONFIG_INT(rpc_port, "ChatServer1", "RpcPort");
+        auto name = GetConfigOrDie("ChatServer1", "Name");
+        auto host = GetConfigOrDie("ChatServer1", "Host");
+        auto port = GetConfigOrDie("ChatServer1", "Port");
+        auto rpc_port = GetConfigIntOrDie("ChatServer1", "RpcPort");
         EXPECT_EQ(name, "ChatServer1");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "8090");
         EXPECT_EQ(rpc_port, 50055);
     }
     {
-        GET_CONFIG(name, "ChatServer2", "Name");
-        GET_CONFIG(host, "ChatServer2", "Host");
-        GET_CONFIG(port, "ChatServer2", "Port");
-        GET_CONFIG_INT(rpc_port, "ChatServer2", "RpcPort");
+        auto name = GetConfigOrDie("ChatServer2", "Name");
+        auto host = GetConfigOrDie("ChatServer2", "Host");
+        auto port = GetConfigOrDie("ChatServer2", "Port");
+        auto rpc_port = GetConfigIntOrDie("ChatServer2", "RpcPort");
         EXPECT_EQ(name, "ChatServer2");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "8091");
         EXPECT_EQ(rpc_port, 50056);
     }
     {
-        GET_CONFIG(host, "Mysql", "Host");
-        GET_CONFIG_INT(port, "Mysql", "Port");
-        GET_CONFIG(user, "Mysql", "User");
-        GET_CONFIG(password, "Mysql", "Password");
-        GET_CONFIG(schema, "Mysql", "Schema");
+        auto host = GetConfigOrDie("Mysql", "Host");
+        auto port = GetConfigIntOrDie("Mysql", "Port");
+        auto user = GetConfigOrDie("Mysql", "User");
+        auto password = GetConfigOrDie("Mysql", "Password");
+        auto schema = GetConfigOrDie("Mysql", "Schema");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, 33060);
         EXPECT_EQ(user, "root");
@@ -58,83 +58,83 @@ TEST(ConfigMgrTest, GetConfig) {
         EXPECT_EQ(schema, "pyc_chat");
     }
     {
-        GET_CONFIG(host, "Redis", "Host");
-        GET_CONFIG_INT(port, "Redis", "Port");
-        GET_CONFIG(password, "Redis", "Password");
+        auto host = GetConfigOrDie("Redis", "Host");
+        auto port = GetConfigIntOrDie("Redis", "Port");
+        auto password = GetConfigOrDie("Redis", "Password");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, 6379);
         EXPECT_EQ(password, "123456");
     }
     EXPECT_EXIT(
         {
-            GET_CONFIG(not_exist, "GateServer", "NotExist");
+            auto not_exist = GetConfigOrDie("GateServer", "NotExist");
             DUMMY_CODE(not_exist);
         },
         ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
-            GET_CONFIG(not_exist, "NotExist", "NotExist");
+            auto not_exist = GetConfigOrDie("NotExist", "NotExist");
             DUMMY_CODE(not_exist);
         },
         ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
-            GET_CONFIG_INT(not_exist, "NotExist", "NotExist");
+            auto not_exist = GetConfigIntOrDie("NotExist", "NotExist");
             DUMMY_CODE(not_exist);
         },
         ::testing::KilledBySignal(SIGABRT), "");
 }
 
 TEST(ConfigMgrTest, GetSectionConfig) {
-    EXPECT_EXIT({ GET_SECTION_CONFIG(not_exist, "NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");
+    EXPECT_EXIT({ auto not_exist = GetSectionConfigOrDie("NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");
     {
-        SET_SECTION("GateServer");
-        GET_SECTION_CONFIG(port, "Port");
+        SetSectionOrDie("GateServer");
+        auto port = GetSectionConfigOrDie("Port");
         EXPECT_EQ(port, "8080");
     }
     {
-        SET_SECTION("VerifyServer");
-        GET_SECTION_CONFIG(host, "Host");
-        GET_SECTION_CONFIG(port, "Port");
+        SetSectionOrDie("VerifyServer");
+        auto host = GetSectionConfigOrDie("Host");
+        auto port = GetSectionConfigOrDie("Port");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "50051");
     }
     {
-        SET_SECTION("StatusServer");
-        GET_SECTION_CONFIG(host, "Host");
-        GET_SECTION_CONFIG(port, "Port");
+        SetSectionOrDie("StatusServer");
+        auto host = GetSectionConfigOrDie("Host");
+        auto port = GetSectionConfigOrDie("Port");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "50052");
     }
     {
-        SET_SECTION("ChatServer1");
-        GET_SECTION_CONFIG(name, "Name");
-        GET_SECTION_CONFIG(host, "Host");
-        GET_SECTION_CONFIG(port, "Port");
-        GET_SECTION_CONFIG_INT(rpc_port, "RpcPort");
+        SetSectionOrDie("ChatServer1");
+        auto name = GetSectionConfigOrDie("Name");
+        auto host = GetSectionConfigOrDie("Host");
+        auto port = GetSectionConfigOrDie("Port");
+        auto rpc_port = GetSectionConfigIntOrDie("RpcPort");
         EXPECT_EQ(name, "ChatServer1");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "8090");
         EXPECT_EQ(rpc_port, 50055);
     }
     {
-        SET_SECTION("ChatServer2");
-        GET_SECTION_CONFIG(name, "Name");
-        GET_SECTION_CONFIG(host, "Host");
-        GET_SECTION_CONFIG(port, "Port");
-        GET_SECTION_CONFIG_INT(rpc_port, "RpcPort");
+        SetSectionOrDie("ChatServer2");
+        auto name = GetSectionConfigOrDie("Name");
+        auto host = GetSectionConfigOrDie("Host");
+        auto port = GetSectionConfigOrDie("Port");
+        auto rpc_port = GetSectionConfigIntOrDie("RpcPort");
         EXPECT_EQ(name, "ChatServer2");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, "8091");
         EXPECT_EQ(rpc_port, 50056);
     }
     {
-        SET_SECTION("Mysql");
-        GET_SECTION_CONFIG(host, "Host");
-        GET_SECTION_CONFIG_INT(port, "Port");
-        GET_SECTION_CONFIG(user, "User");
-        GET_SECTION_CONFIG(password, "Password");
-        GET_SECTION_CONFIG(schema, "Schema");
+        SetSectionOrDie("Mysql");
+        auto host = GetSectionConfigOrDie("Host");
+        auto port = GetSectionConfigIntOrDie("Port");
+        auto user = GetSectionConfigOrDie("User");
+        auto password = GetSectionConfigOrDie("Password");
+        auto schema = GetSectionConfigOrDie("Schema");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, 33060);
         EXPECT_EQ(user, "root");
@@ -142,31 +142,31 @@ TEST(ConfigMgrTest, GetSectionConfig) {
         EXPECT_EQ(schema, "pyc_chat");
     }
     {
-        SET_SECTION("Redis");
-        GET_SECTION_CONFIG(host, "Host");
-        GET_SECTION_CONFIG_INT(port, "Port");
-        GET_SECTION_CONFIG(password, "Password");
+        SetSectionOrDie("Redis");
+        auto host = GetSectionConfigOrDie("Host");
+        auto port = GetSectionConfigIntOrDie("Port");
+        auto password = GetSectionConfigOrDie("Password");
         EXPECT_EQ(host, "127.0.0.1");
         EXPECT_EQ(port, 6379);
         EXPECT_EQ(password, "123456");
     }
-    EXPECT_EXIT({ SET_SECTION("NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");
-    SET_SECTION("ChatServer1");
+    EXPECT_EXIT({ SetSectionOrDie("NotExist"); }, ::testing::KilledBySignal(SIGABRT), "");
+    SetSectionOrDie("ChatServer1");
     EXPECT_EXIT(
         {
-            GET_SECTION_CONFIG(not_exist, "NotExist");
+            auto not_exist = GetSectionConfigOrDie("NotExist");
             DUMMY_CODE(not_exist);
         },
         ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
-            GET_SECTION_CONFIG_INT(not_exist, "NotExist");
+            auto not_exist = GetSectionConfigIntOrDie("NotExist");
             DUMMY_CODE(not_exist);
         },
         ::testing::KilledBySignal(SIGABRT), "");
     EXPECT_EXIT(
         {
-            GET_SECTION_CONFIG_INT(cannot_convert, "Name");
+            auto cannot_convert = GetSectionConfigIntOrDie("Name");
             DUMMY_CODE(cannot_convert);
         },
         ::testing::KilledBySignal(SIGABRT), "");

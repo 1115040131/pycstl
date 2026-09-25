@@ -1,6 +1,12 @@
-#include "network/thread_pool/thread_pool_server.h"
+module;
 
-#include "network/thread_pool/thread_pool_session.h"
+#include <memory>
+
+#include <boost/asio.hpp>
+
+module network.thread_pool_server;
+
+import network.thread_pool_session;
 
 namespace network {
 

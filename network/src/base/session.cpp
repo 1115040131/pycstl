@@ -1,11 +1,23 @@
-#include "network/base/session.h"
+module;
 
+#include <atomic>
+#include <cstddef>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <string>
+
+#include <boost/asio.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <fmt/format.h>
 
-#include "network/base/server.h"
-#include "network/logic_system.h"
-#include "network/utils.h"
+module network.base;
+
+import :server;
+import network.logic;
+import network.msg_node;
+import network.utils;
 
 namespace network {
 

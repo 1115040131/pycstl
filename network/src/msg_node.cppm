@@ -1,0 +1,76 @@
+module;
+
+#include <cstddef>
+#include <cstring>
+#include <memory>
+
+#include "common/noncopyable.h"
+
+export module network.msg_node;
+
+export namespace network {
+
+using MsgSizeType = unsigned short;
+
+enum class MsgId : MsgSizeType {
+    kMsgHelloWorld = 1001,
+
+    kMaxId,
+};
+
+struct MsgHead {
+    MsgId id;
+    MsgSizeType length;
+
+    /// @brief 从网络数据中解析出 id 和 length
+    static MsgHead ParseHead(const char* data);
+};
+
+inline constexpr std::size_t kHeadLength = sizeof(MsgHead);  // tlv 头部长度
+inline constexpr std::size_t kMaxLength = 2ul * 1024;        // 消息体最大长度 2KB
+inline constexpr std::size_t kMaxRecvQueue = 10000;          // 接收队列最大长度
+inline constexpr std::size_t kMaxSendQueue = 1000;           // 发送队列最大长度
+
+class MsgNode : public pyc::Noncopyable {
+public:
+    MsgNode(MsgSizeType max_len) : total_len_(max_len), data_(new char[total_len_ + 1]) {
+        data_[total_len_] = '\0';
+    }
+
+    std::size_t Remain() const { return total_len_ - cur_len_; }
+
+    std::size_t Size() const { return total_len_; }
+
+    char* Data() { return data_.get(); }
+
+    const char* Data() const { return data_.get(); }
+
+    std::size_t Copy(const char* src, std::size_t len);
+
+    void Clear() {
+        ::memset(data_.get(), 0, total_len_);
+        cur_len_ = 0;
+    }
+
+protected:
+    std::size_t cur_len_ = 0;       // 已经接收/发送的数据长度
+    std::size_t total_len_ = 0;     // 数据总长度
+    std::unique_ptr<char[]> data_;  // 数据缓冲区
+};
+
+class RecvNode : public MsgNode {
+public:
+    RecvNode(MsgSizeType max_len, MsgId msg_id) : MsgNode(max_len), msg_id_(msg_id) {}
+
+    MsgId GetMsgId() const { return msg_id_; }
+
+private:
+    MsgId msg_id_;
+};
+
+class SendNode : public MsgNode {
+public:
+    SendNode(const char* msg, MsgSizeType max_len, MsgId msg_id);
+};
+
+}  // namespace network

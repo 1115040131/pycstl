@@ -1,6 +1,14 @@
-#include "chat/server/common/io_service_pool.h"
+module;
+
+#include <cstddef>
+#include <thread>
+#include <vector>
+
+#include <boost/asio.hpp>
 
 #include "logger/logger.h"
+
+module chat.server.common.io_service_pool;
 
 namespace pyc {
 namespace chat {

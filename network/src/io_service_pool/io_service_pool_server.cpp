@@ -1,6 +1,13 @@
-#include "network/io_service_pool/io_service_pool_server.h"
+module;
 
-#include "network/io_service_pool/io_service_pool_session.h"
+#include <memory>
+
+#include <boost/asio.hpp>
+
+module network.io_service_pool_server;
+
+import network.io_service_pool;
+import network.io_service_pool_session;
 
 namespace network {
 

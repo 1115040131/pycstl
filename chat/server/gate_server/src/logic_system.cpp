@@ -1,19 +1,31 @@
-#include "chat/server/gate_server/logic_system.h"
+module;
 
+#include <exception>
+#include <memory>
+#include <string>
+#include <string_view>
+
+#include <boost/beast.hpp>
 #include <nlohmann/json.hpp>
 
+#include "chat/common/error_code.h"
 #include "chat/common/method.h"
-#include "chat/server/common/mysql_mgr.h"
-#include "chat/server/common/redis_mgr.h"
-#include "chat/server/common/status_grpc_client.h"
-#include "chat/server/gate_server/define.h"
-#include "chat/server/gate_server/verify_grpc_client.h"
+#include "chat/server/proto/verify.pb.h"
+#include "logger/logger.h"
+
+module chat.server.gate_server;
+
+import :http_connection;
+import chat.server.common.mysql_mgr;
+import chat.server.common.redis_mgr;
+import chat.server.common.status_grpc_client;
+import chat.server.gate_server.verify_grpc_client;
 
 namespace pyc {
 namespace chat {
 
 LogicSystem::LogicSystem() {
-    g_logger.info("LogicSystem init start");
+    LogInfo("LogicSystem init start");
 
     RedisMgr::GetInstance();
     MysqlMgr::GetInstance();
@@ -26,13 +38,13 @@ LogicSystem::LogicSystem() {
     });
     RegPost(ToUrl(ReqId::kGetVerifyCode), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
-        PYC_LOG_DEBUG("body: {}", body_str);
+        LogDebug("body: {}", body_str);
         connection->response_.set(http::field::content_type, "text/json");
 
         nlohmann::json src_root = nlohmann::json::parse(body_str, nullptr, false);
         nlohmann::json root;
         if (src_root.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data");
+            LogError("Failed to parse Json data");
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -40,7 +52,7 @@ LogicSystem::LogicSystem() {
 
         auto email_iter = src_root.find("email");
         if (email_iter == src_root.end()) {
-            PYC_LOG_ERROR("Key: email not found");
+            LogError("Key: email not found");
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -49,7 +61,7 @@ LogicSystem::LogicSystem() {
         auto email = email_iter->get<std::string>();
         auto response = VerifyGrpcClient::GetInstance().GetVerifyCode(email);
         if (response.error()) {
-            PYC_LOG_ERROR("grpc GetVerifyCode fail, error is {}", response.error());
+            LogError("grpc GetVerifyCode fail, error is {}", response.error());
             root["error"] = ErrorCode::kRpcFailed;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -61,13 +73,13 @@ LogicSystem::LogicSystem() {
     });
     RegPost(ToUrl(ReqId::kRegUser), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
-        PYC_LOG_DEBUG("body: {}", body_str);
+        LogDebug("body: {}", body_str);
 
         connection->response_.set(http::field::content_type, "text/json");
         nlohmann::json src_root = nlohmann::json::parse(body_str, nullptr, false);
         nlohmann::json root;
         if (src_root.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data");
+            LogError("Failed to parse Json data");
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -81,7 +93,7 @@ LogicSystem::LogicSystem() {
 
         // 确认密码是否一致
         if (password != confirm) {
-            PYC_LOG_WARN("{} not match {}", password, confirm);
+            LogWarn("{} not match {}", password, confirm);
             root["error"] = ErrorCode::kPasswordError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -90,7 +102,7 @@ LogicSystem::LogicSystem() {
         // redis 中 email 对应的验证码是否未超时
         auto redis_verify_code = RedisMgr::GetInstance().Get("code_" + email);
         if (!redis_verify_code) {
-            PYC_LOG_WARN("{} get verify code expired", email);
+            LogWarn("{} get verify code expired", email);
             root["error"] = ErrorCode::kVerifyExpired;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -98,7 +110,7 @@ LogicSystem::LogicSystem() {
 
         // 验证码是否正确
         if (redis_verify_code.value() != verify_code) {
-            PYC_LOG_WARN("{} verify code not match {} {}", email, redis_verify_code.value(), verify_code);
+            LogWarn("{} verify code not match {} {}", email, redis_verify_code.value(), verify_code);
             root["error"] = ErrorCode::kVerifyCodeError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -107,19 +119,19 @@ LogicSystem::LogicSystem() {
         // 查找数据库判断用户是否已经注册
         auto reg_result = MysqlMgr::GetInstance().RegUser(user, email, password);
         if (!reg_result) {
-            PYC_LOG_WARN("RegUser({}, {}, {}) fail", user, email, password);
+            LogWarn("RegUser({}, {}, {}) fail", user, email, password);
             root["error"] = ErrorCode::kNetworkError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
         }
         if (reg_result.value() == 0) {
-            PYC_LOG_WARN("User or email already exist: {} {}", user, email);
+            LogWarn("User or email already exist: {} {}", user, email);
             root["error"] = ErrorCode::kUserExist;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
         }
 
-        PYC_LOG_INFO("RegUser({}, {}, {}) success, uid: {}", user, email, password, reg_result.value());
+        LogInfo("RegUser({}, {}, {}) success, uid: {}", user, email, password, reg_result.value());
         root["error"] = ErrorCode::kSuccess;
         root["user"] = user;
         root["email"] = email;
@@ -131,13 +143,13 @@ LogicSystem::LogicSystem() {
     });
     RegPost(ToUrl(ReqId::kResetPassword), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
-        PYC_LOG_DEBUG("body: {}", body_str);
+        LogDebug("body: {}", body_str);
 
         connection->response_.set(http::field::content_type, "text/json");
         nlohmann::json src_root = nlohmann::json::parse(body_str, nullptr, false);
         nlohmann::json root;
         if (src_root.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data");
+            LogError("Failed to parse Json data");
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -151,7 +163,7 @@ LogicSystem::LogicSystem() {
         // redis 中 email 对应的验证码是否未超时
         auto redis_verify_code = RedisMgr::GetInstance().Get("code_" + email);
         if (!redis_verify_code) {
-            PYC_LOG_WARN("{} get verify code expired", email);
+            LogWarn("{} get verify code expired", email);
             root["error"] = ErrorCode::kVerifyExpired;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -159,7 +171,7 @@ LogicSystem::LogicSystem() {
 
         // 验证码是否正确
         if (redis_verify_code.value() != verify_code) {
-            PYC_LOG_WARN("{} verify code not match {} {}", email, redis_verify_code.value(), verify_code);
+            LogWarn("{} verify code not match {} {}", email, redis_verify_code.value(), verify_code);
             root["error"] = ErrorCode::kVerifyCodeError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -168,13 +180,13 @@ LogicSystem::LogicSystem() {
         // 用户名和邮箱是否匹配
         auto check_email = MysqlMgr::GetInstance().CheckEmail(user, email);
         if (!check_email) {
-            PYC_LOG_WARN("CheckEmail({} {}) fail", user, email);
+            LogWarn("CheckEmail({} {}) fail", user, email);
             root["error"] = ErrorCode::kNetworkError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
         }
         if (!check_email.value()) {
-            PYC_LOG_WARN("CheckEmail({} {}) not match", user, email);
+            LogWarn("CheckEmail({} {}) not match", user, email);
             root["error"] = ErrorCode::kEmailNotMatch;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -183,19 +195,19 @@ LogicSystem::LogicSystem() {
         // 更新密码
         auto update_result = MysqlMgr::GetInstance().UpdatePassword(user, password);
         if (!update_result) {
-            PYC_LOG_WARN("UpdatePassword({} {}) fail", user, password);
+            LogWarn("UpdatePassword({} {}) fail", user, password);
             root["error"] = ErrorCode::kNetworkError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
         }
         if (!update_result.value()) {
-            PYC_LOG_WARN("UpdatePassword({} {}) fail", user, password);
+            LogWarn("UpdatePassword({} {}) fail", user, password);
             root["error"] = ErrorCode::kPasswordUpdateFail;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
         }
 
-        PYC_LOG_INFO("ResetPwd({} {} {}) success", user, email, password);
+        LogInfo("ResetPwd({} {} {}) success", user, email, password);
         root["error"] = ErrorCode::kSuccess;
         root["user"] = user;
         root["email"] = email;
@@ -205,13 +217,13 @@ LogicSystem::LogicSystem() {
     });
     RegPost(ToUrl(ReqId::kLogin), [](const std::shared_ptr<HttpConnection>& connection) {
         auto body_str = beast::buffers_to_string(connection->request_.body().data());
-        PYC_LOG_DEBUG("body: {}", body_str);
+        LogDebug("body: {}", body_str);
 
         connection->response_.set(http::field::content_type, "text/json");
         nlohmann::json src_root = nlohmann::json::parse(body_str, nullptr, false);
         nlohmann::json root;
         if (src_root.is_discarded()) {
-            PYC_LOG_ERROR("Failed to parse Json data");
+            LogError("Failed to parse Json data");
             root["error"] = ErrorCode::kJsonError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -222,7 +234,7 @@ LogicSystem::LogicSystem() {
         // 验证用户名和密码
         auto user_info = MysqlMgr::GetInstance().CheckPassword(email, password);
         if (!user_info) {
-            PYC_LOG_WARN("CheckPassword({} {}) fail", email, password);
+            LogWarn("CheckPassword({} {}) fail", email, password);
             root["error"] = ErrorCode::kPasswordError;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
@@ -231,14 +243,14 @@ LogicSystem::LogicSystem() {
         // 查询找到合适的连接
         auto response = StatusGrpcClient::GetInstance().GetChatServer(user_info->uid);
         if (response.error()) {
-            PYC_LOG_ERROR("grpc GetChatServer fail, error is {}", response.error());
+            LogError("grpc GetChatServer fail, error is {}", response.error());
             root["error"] = ErrorCode::kRpcFailed;
             beast::ostream(connection->response_.body()) << root.dump();
             return;
         }
 
-        PYC_LOG_INFO("Succeed to load userinfo uid: {}, get chat server: host: {}, port: {}, token: {}",
-                     user_info->uid, response.host(), response.port(), response.token());
+        LogInfo("Succeed to load userinfo uid: {}, get chat server: host: {}, port: {}, token: {}", user_info->uid,
+                response.host(), response.port(), response.token());
         root["error"] = ErrorCode::kSuccess;
         root["uid"] = user_info->uid;
         root["user"] = user_info->name;
@@ -248,7 +260,7 @@ LogicSystem::LogicSystem() {
         beast::ostream(connection->response_.body()) << root.dump();
     });
 
-    g_logger.info("LogicSystem init finish");
+    LogInfo("LogicSystem init finish");
 }
 
 void LogicSystem::RegGet(std::string_view url, HttpHandler handler) { get_handlers_.emplace(url, handler); }

@@ -1,22 +1,33 @@
-#include "chat/server/status_server/status_service_impl.h"
+module;
 
 #include <algorithm>
+#include <limits>
+#include <mutex>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include <fmt/format.h>
+#include <grpcpp/grpcpp.h>
 
-#include "chat/server/common/config_mgr.h"
-#include "chat/server/common/redis_mgr.h"
-#include "chat/server/common/utils.h"
-#include "chat/server/status_server/define.h"
+#include "chat/common/error_code.h"
+#include "chat/server/proto/status.grpc.pb.h"
+#include "logger/logger.h"
+
+module chat.server.status_server.status_service_impl;
+
+import chat.server.common.config_mgr;
+import chat.server.common.redis_mgr;
+import chat.server.common.utils;
 
 namespace pyc {
 namespace chat {
 
 StatusServiceImpl::StatusServiceImpl() {
     for (const auto& server_name : std::vector{"ChatServer1", "ChatServer2"}) {
-        GET_CONFIG(name, server_name, "Name");
-        GET_CONFIG(host, server_name, "Host");
-        GET_CONFIG(port, server_name, "Port");
+        auto name = GetConfigOrDie(server_name, "Name");
+        auto host = GetConfigOrDie(server_name, "Host");
+        auto port = GetConfigOrDie(server_name, "Port");
 
         ChatServer server{
             .name = name,
@@ -34,7 +45,7 @@ std::optional<ChatServer> StatusServiceImpl::selectChatServer() {
     for (auto& [_, server] : servers_) {
         auto count_str = RedisMgr::GetInstance().HGet(kLoginCount, server.name);
         if (!count_str) {
-            PYC_LOG_WARN("Get [{}] login count fail", server.name);
+            LogWarn("Get [{}] login count fail", server.name);
             server.connection_count = std::numeric_limits<int>::max();
         } else {
             server.connection_count = std::stoi(*count_str);
@@ -45,10 +56,10 @@ std::optional<ChatServer> StatusServiceImpl::selectChatServer() {
         return lhs.second.connection_count < rhs.second.connection_count;
     });
     if (iter == servers_.end()) {
-        PYC_LOG_INFO("No server can be selected");
+        LogInfo("No server can be selected");
         return std::nullopt;
     }
-    PYC_LOG_INFO("Select {}", iter->second.name);
+    LogInfo("Select {}", iter->second.name);
     return iter->second;
 }
 
