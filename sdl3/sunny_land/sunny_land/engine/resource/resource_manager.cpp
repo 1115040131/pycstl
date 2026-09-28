@@ -1,10 +1,23 @@
-#include "sunny_land/engine/resource/resource_manager.h"
+module;
 
+#include <memory>
+#include <string_view>
+
+#include <SDL3/SDL_render.h>
+#include <SDL3_mixer/SDL_mixer.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/resource/audio_manager.h"
-#include "sunny_land/engine/resource/font_manager.h"
-#include "sunny_land/engine/resource/texture_manager.h"
+#include "common/string_hash.h"
+
+struct SDL_Renderer;
+struct SDL_Texture;
+struct Mix_Chunk;
+struct Mix_Music;
+struct TTF_Font;
+
+module sunny_land.engine.resource;
 
 namespace pyc::sunny_land {
 

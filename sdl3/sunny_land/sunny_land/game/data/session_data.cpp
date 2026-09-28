@@ -1,10 +1,15 @@
-#include "sunny_land/game/data/session_data.h"
+module;
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <string>
+#include <string_view>
 
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+
+module sunny_land.game.data.session_data;
 
 namespace pyc::sunny_land {
 

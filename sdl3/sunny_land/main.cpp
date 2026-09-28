@@ -1,11 +1,15 @@
 #include <filesystem>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/core/game_app.h"
-#include "sunny_land/engine/scene/scene_manager.h"
-#include "sunny_land/game/scene/title_scene.h"
 #include "tools/cpp/runfiles/runfiles.h"
+
+import sunny_land.engine.core.game_app;
+import sunny_land.engine.scene;
+import sunny_land.game.scene;
 
 namespace fs = std::filesystem;
 using bazel::tools::cpp::runfiles::Runfiles;

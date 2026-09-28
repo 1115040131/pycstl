@@ -1,8 +1,12 @@
-#include "sunny_land/engine/component/transform_component.h"
+module;
 
-#include "sunny_land/engine/component/collider_component.h"
-#include "sunny_land/engine/component/sprite_component.h"
-#include "sunny_land/engine/object/game_object.h"
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
+
+module sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

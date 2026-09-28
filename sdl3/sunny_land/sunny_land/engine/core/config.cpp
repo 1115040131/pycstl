@@ -1,9 +1,15 @@
-#include "sunny_land/engine/core/config.h"
+module;
 
 #include <fstream>
+#include <string_view>
 
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <spdlog/spdlog.h>
+
+#include "common/string_hash.h"
+
+module sunny_land.engine.core.config;
 
 namespace pyc::sunny_land {
 
@@ -13,8 +19,6 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Performance, targe
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Audio, music_volume, sound_volume);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail, window, graphics, performance, audio,
                                                 input_mappings);
-
-Config::Config(std::string_view filepath) { loadFromFile(filepath); }
 
 bool Config::loadFromFile(std::string_view filepath) {
     std::ifstream file(filepath.data());

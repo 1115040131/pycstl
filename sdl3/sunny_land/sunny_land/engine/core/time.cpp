@@ -1,7 +1,11 @@
-#include "sunny_land/engine/core/time.h"
+module;
+
+#include <chrono>
 
 #include <SDL3/SDL_timer.h>
 #include <spdlog/spdlog.h>
+
+module sunny_land.engine.core.time;
 
 namespace pyc::sunny_land {
 

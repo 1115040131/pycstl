@@ -1,8 +1,13 @@
-#include "sunny_land/engine/component/health_component.h"
+module;
+
+#include <algorithm>
+#include <chrono>
 
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/object/game_object.h"
+module sunny_land.engine.component.health_component;
+
+import sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

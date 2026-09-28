@@ -1,12 +1,18 @@
-#include "sunny_land/game/component/ai/patrol_behavior.h"
+module;
 
+#include <chrono>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/animation_component.h"
-#include "sunny_land/engine/component/physics_component.h"
-#include "sunny_land/engine/component/sprite_component.h"
-#include "sunny_land/engine/component/transform_component.h"
-#include "sunny_land/game/component/ai_component.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.component.ai.patrol_behavior;
+
+import sunny_land.engine.component.animation_component;
+import sunny_land.engine.core;
+import sunny_land.game.ai;
 
 namespace pyc::sunny_land {
 

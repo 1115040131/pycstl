@@ -1,6 +1,16 @@
-#include "sunny_land/engine/resource/audio_manager.h"
+module;
 
+#include <memory>
+#include <stdexcept>
+#include <string_view>
+#include <unordered_map>
+
+#include <SDL3_mixer/SDL_mixer.h>
 #include <spdlog/spdlog.h>
+
+#include "common/string_hash.h"
+
+module sunny_land.engine.resource;
 
 namespace pyc::sunny_land {
 

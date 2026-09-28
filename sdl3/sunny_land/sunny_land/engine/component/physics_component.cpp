@@ -1,10 +1,11 @@
-#include "sunny_land/engine/component/physics_component.h"
+module;
 
+#include <algorithm>
+
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/transform_component.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/engine/physics/physics_engine.h"
+module sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

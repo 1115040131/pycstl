@@ -1,9 +1,18 @@
-#include "sunny_land/engine/ui/ui_image.h"
+module;
 
+#include <optional>
+#include <string_view>
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/render/renderer.h"
+module sunny_land.engine.ui.ui_image;
+
+import sunny_land.engine.core;
+import sunny_land.engine.render.sprite;
+import sunny_land.engine.ui.ui_element;
 
 namespace pyc::sunny_land {
 

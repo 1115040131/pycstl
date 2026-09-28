@@ -1,6 +1,16 @@
-#include "sunny_land/engine/render/animation.h"
+module;
 
+#include <chrono>
+#include <cmath>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include <SDL3/SDL_rect.h>
 #include <spdlog/spdlog.h>
+
+module sunny_land.engine.render.animation;
 
 namespace pyc::sunny_land {
 

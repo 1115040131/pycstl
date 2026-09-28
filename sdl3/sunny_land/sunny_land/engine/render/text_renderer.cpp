@@ -1,10 +1,20 @@
-#include "sunny_land/engine/render/text_renderer.h"
+module;
+
+#include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include <SDL3_ttf/SDL_ttf.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/render/camera.h"
-#include "sunny_land/engine/resource/resource_manager.h"
+struct SDL_Renderer;
+struct TTF_TextEngine;
+
+module sunny_land.engine.core;
+
+import sunny_land.engine.resource;
+import sunny_land.engine.utils.math;
 
 namespace pyc::sunny_land {
 

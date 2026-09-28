@@ -1,0 +1,26 @@
+module;
+
+#include <memory>
+
+export module sunny_land.game.player:state_factory;
+
+export namespace pyc::sunny_land {
+
+class PlayerComponent;
+class PlayerState;
+
+class ClimbState;
+class DeadState;
+class FallState;
+class HurtState;
+class IdleState;
+class JumpState;
+class WalkState;
+
+class StateFactory final {
+public:
+    template <typename T>
+    static std::unique_ptr<PlayerState> create(PlayerComponent* player_component);
+};
+
+}  // namespace pyc::sunny_land

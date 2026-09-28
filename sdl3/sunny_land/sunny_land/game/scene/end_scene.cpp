@@ -1,16 +1,25 @@
-#include "sunny_land/game/scene/end_scene.h"
+module;
 
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <fmt/format.h>
+#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/core/game_state.h"
-#include "sunny_land/engine/scene/scene_manager.h"
-#include "sunny_land/engine/ui/ui_button.h"
-#include "sunny_land/engine/ui/ui_label.h"
-#include "sunny_land/engine/ui/ui_manager.h"
-#include "sunny_land/game/data/session_data.h"
-#include "sunny_land/game/scene/game_scene.h"
-#include "sunny_land/game/scene/title_scene.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.scene;
+
+import sunny_land.engine.core;
+import sunny_land.engine.core.game_state;
+import sunny_land.engine.scene;
+import sunny_land.engine.ui.ui_button;
+import sunny_land.engine.ui.ui_label;
+import sunny_land.engine.ui.ui_manager;
+import sunny_land.game.data.session_data;
 
 namespace pyc::sunny_land {
 

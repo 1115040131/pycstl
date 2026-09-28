@@ -1,7 +1,18 @@
-#include "sunny_land/engine/resource/texture_manager.h"
+module;
 
+#include <memory>
+#include <stdexcept>
+#include <string_view>
+#include <unordered_map>
+
+#include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
+
+#include "common/string_hash.h"
+
+module sunny_land.engine.resource;
 
 namespace pyc::sunny_land {
 

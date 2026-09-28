@@ -1,11 +1,17 @@
-#include "sunny_land/game/component/state/player_state.h"
+module;
 
+#include <string_view>
+
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/animation_component.h"
-#include "sunny_land/engine/component/audio_component.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/game/component/player_component.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.player;
+
+import sunny_land.engine.component.animation_component;
+import sunny_land.engine.component.audio_component;
+import sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

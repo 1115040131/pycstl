@@ -1,11 +1,16 @@
-#include "sunny_land/engine/component/parallax_component.h"
+module;
 
+#include <string_view>
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/transform_component.h"
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/engine/render/renderer.h"
+module sunny_land.engine.component.parallax_component;
+
+import sunny_land.engine.core;
+import sunny_land.engine.render.sprite;
 
 namespace pyc::sunny_land {
 

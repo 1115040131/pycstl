@@ -1,8 +1,15 @@
-#include "sunny_land/engine/scene/scene_manager.h"
+module;
+
+#include <chrono>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/scene/scene.h"
+module sunny_land.engine.scene;
+
+import sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

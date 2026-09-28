@@ -1,21 +1,34 @@
-#include "sunny_land/engine/core/game_app.h"
+module;
+
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <string_view>
+#include <utility>
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
+#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <spdlog/spdlog.h>
 
-// 引擎组件
-#include "sunny_land/engine/audio/audio_player.h"
-#include "sunny_land/engine/core/config.h"
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/core/game_state.h"
-#include "sunny_land/engine/core/time.h"
-#include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/engine/physics/physics_engine.h"
-#include "sunny_land/engine/render/camera.h"
-#include "sunny_land/engine/render/renderer.h"
-#include "sunny_land/engine/render/text_renderer.h"
-#include "sunny_land/engine/resource/resource_manager.h"
-#include "sunny_land/engine/scene/scene_manager.h"
+#include "common/string_hash.h"
+
+struct SDL_Window;
+struct SDL_Renderer;
+
+module sunny_land.engine.core.game_app;
+
+import sunny_land.engine.audio.audio_player;
+import sunny_land.engine.core;
+import sunny_land.engine.core.config;
+import sunny_land.engine.core.game_state;
+import sunny_land.engine.core.time;
+import sunny_land.engine.input.input_manager;
+import sunny_land.engine.resource;
+import sunny_land.engine.scene;
 
 namespace pyc::sunny_land {
 
@@ -116,7 +129,7 @@ void GameApp::close() {
 #pragma region init
 bool GameApp::initConfig() {
     try {
-        config_ = std::make_unique<Config>("assets/config.json");
+        config_.loadFromFile("assets/config.json");
     } catch (const std::exception& e) {
         spdlog::error("初始化配置失败: {}", e.what());
         return false;
@@ -131,8 +144,8 @@ bool GameApp::initSDL() {
         return false;
     }
 
-    SDL_CreateWindowAndRenderer("SunnyLand", config_->CONFIG(window.width), config_->CONFIG(window.height),
-                                SDL_WINDOW_RESIZABLE, &window_, &sdl_renderer_);
+    SDL_CreateWindowAndRenderer("SunnyLand", config_->window.width, config_->window.height, SDL_WINDOW_RESIZABLE,
+                                &window_, &sdl_renderer_);
     if (!window_ || !sdl_renderer_) {
         spdlog::error("无法创建窗口与渲染器! SDL错误: {}", SDL_GetError());
         return false;
@@ -143,13 +156,13 @@ bool GameApp::initSDL() {
 
     // 设置 VSync (注意: VSync 开启时，驱动程序会尝试将帧率限制到显示器刷新率，有可能会覆盖我们手动设置的
     // target_fps)
-    int vsync_mode = config_->CONFIG(graphics.vsync) ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
+    int vsync_mode = config_->graphics.vsync ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
     SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
-    spdlog::trace("VSync 设置为: {}", config_->CONFIG(graphics.vsync) ? "Enabled" : "Disabled");
+    spdlog::trace("VSync 设置为: {}", config_->graphics.vsync ? "Enabled" : "Disabled");
 
     // 设置逻辑分辨率
-    SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->CONFIG(window.width) / 2,
-                                     config_->CONFIG(window.height) / 2, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->window.width / 2, config_->window.height / 2,
+                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
     spdlog::trace("SDL 初始化成功。");
     return true;
 }
@@ -161,7 +174,7 @@ bool GameApp::initTime() {
         spdlog::error("初始化时间管理失败: {}", e.what());
         return false;
     }
-    time_->setTargetFps(config_->CONFIG(performance.target_fps));
+    time_->setTargetFps(config_->performance.target_fps);
     spdlog::trace("时间管理初始化成功。");
     return true;
 }
@@ -181,8 +194,8 @@ bool GameApp::initAudioPlayer() {
     try {
         audio_player_ = std::make_unique<AudioPlayer>(resource_manager_.get());
         // 设置音量
-        audio_player_->setMusicVolume(config_->CONFIG(audio.music_volume));
-        audio_player_->setSoundVolume(config_->CONFIG(audio.sound_volume));
+        audio_player_->setMusicVolume(config_->audio.music_volume);
+        audio_player_->setSoundVolume(config_->audio.sound_volume);
     } catch (const std::exception& e) {
         spdlog::error("初始化音频播放器失败: {}", e.what());
         return false;
@@ -204,8 +217,7 @@ bool GameApp::initRenderer() {
 
 bool GameApp::initCamera() {
     try {
-        camera_ = std::make_unique<Camera>(
-            glm::vec2(config_->CONFIG(window.width) / 2, config_->CONFIG(window.height) / 2));
+        camera_ = std::make_unique<Camera>(glm::vec2(config_->window.width / 2, config_->window.height / 2));
     } catch (const std::exception& e) {
         spdlog::error("初始化相机失败: {}", e.what());
         return false;
@@ -227,7 +239,7 @@ bool GameApp::initTextRenderer() {
 
 bool GameApp::initInputManager() {
     try {
-        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_.get());
+        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_);
     } catch (const std::exception& e) {
         spdlog::error("初始化输入管理器失败: {}", e.what());
         return false;

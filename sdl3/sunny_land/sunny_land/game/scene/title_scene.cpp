@@ -1,23 +1,37 @@
-#include "sunny_land/game/scene/title_scene.h"
+module;
 
+#include <chrono>
+#include <memory>
+#include <optional>
+#include <string_view>
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
+#include <fmt/format.h>
+#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/audio/audio_player.h"
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/core/game_state.h"
-#include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/engine/render/camera.h"
-#include "sunny_land/engine/resource/resource_manager.h"
-#include "sunny_land/engine/scene/level_loader.h"
-#include "sunny_land/engine/scene/scene_manager.h"
-#include "sunny_land/engine/ui/ui_button.h"
-#include "sunny_land/engine/ui/ui_image.h"
-#include "sunny_land/engine/ui/ui_label.h"
-#include "sunny_land/engine/ui/ui_manager.h"
-#include "sunny_land/engine/ui/ui_panel.h"
-#include "sunny_land/game/data/session_data.h"
-#include "sunny_land/game/scene/game_scene.h"
-#include "sunny_land/game/scene/helps_scene.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.scene;
+
+import sunny_land.engine.audio.audio_player;
+import sunny_land.engine.core;
+import sunny_land.engine.core.game_state;
+import sunny_land.engine.input.input_manager;
+import sunny_land.engine.resource;
+import sunny_land.engine.scene;
+import sunny_land.engine.scene.level_loader;
+import sunny_land.engine.ui.ui_button;
+import sunny_land.engine.ui.ui_image;
+import sunny_land.engine.ui.ui_label;
+import sunny_land.engine.ui.ui_manager;
+import sunny_land.engine.ui.ui_panel;
+import sunny_land.game.data.session_data;
+import sunny_land.game.scene.helps_scene;
 
 namespace pyc::sunny_land {
 

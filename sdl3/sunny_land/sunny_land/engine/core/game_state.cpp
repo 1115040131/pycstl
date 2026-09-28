@@ -1,7 +1,16 @@
-#include "sunny_land/engine/core/game_state.h"
+module;
+
+#include <stdexcept>
+#include <utility>
 
 #include <SDL3/SDL.h>
+#include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
+
+struct SDL_Window;
+struct SDL_Renderer;
+
+module sunny_land.engine.core.game_state;
 
 namespace pyc::sunny_land {
 
