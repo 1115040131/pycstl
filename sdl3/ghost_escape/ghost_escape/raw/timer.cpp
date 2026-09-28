@@ -1,7 +1,16 @@
-#include "ghost_escape/raw/timer.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <chrono>
+#include <memory>
+#include <utility>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.raw.timer;
+
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 Timer* Timer::CreateAndSet(Object* parent, std::chrono::duration<float> interval) {
     auto timer = std::make_unique<Timer>();
@@ -30,5 +39,4 @@ bool Timer::isTimeOut() {
     return false;
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

@@ -1,13 +1,27 @@
-#include "ghost_escape/scene_title.h"
+module;
 
+#include <chrono>
+#include <cmath>
 #include <fstream>
+#include <ios>
+#include <memory>
+#include <string_view>
 
+#include <SDL3/SDL.h>
 #include <fmt/format.h>
+#include <glm/vec2.hpp>
 
-#include "ghost_escape/scene_main.h"
+#include "ghost_escape/core/asset.h"
 
-namespace pyc {
-namespace sdl3 {
+module ghost_escape.scene_title;
+
+import ghost_escape.core;
+import ghost_escape.scene_main;
+import ghost_escape.screen.hud_button;
+import ghost_escape.screen.hud_text;
+import ghost_escape.screen.ui_mouse;
+
+namespace pyc::sdl3 {
 
 void SceneTitle::init() {
     Scene::init();
@@ -122,5 +136,4 @@ void SceneTitle::renderBackground() const {
     game_.drawBoundary(glm::vec2(30), game_.getScreenSize() - glm::vec2(30), 10.0f, boundary_color_);
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

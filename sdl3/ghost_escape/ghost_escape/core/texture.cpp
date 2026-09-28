@@ -1,9 +1,14 @@
-#include "ghost_escape/core/texture.h"
+module;
 
-#include "ghost_escape/core/game.h"
+#include <string>
 
-namespace pyc {
-namespace sdl3 {
+#include <SDL3/SDL.h>
+
+module ghost_escape.core.texture;
+
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 Texture Texture::Create(const std::string& file_path) {
     Texture texture{Game::GetInstance().getAssetStore()->getImage(file_path)};
@@ -11,5 +16,4 @@ Texture Texture::Create(const std::string& file_path) {
     return texture;
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

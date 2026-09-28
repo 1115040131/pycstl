@@ -1,9 +1,16 @@
-#include "ghost_escape/affiliate/collider.h"
+module;
 
-#include "ghost_escape/core/object_world.h"
+#include <memory>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/asset.h"
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 Collider* Collider::CreateAndSet(ObjectWorld* parent, glm::vec2 size, Type type, Anchor anchor) {
     auto collider = std::make_unique<Collider>();
@@ -32,5 +39,4 @@ bool Collider::isColliding(const Collider& other) const {
     return false;
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

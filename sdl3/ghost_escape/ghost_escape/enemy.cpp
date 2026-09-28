@@ -1,7 +1,19 @@
-#include "ghost_escape/enemy.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <chrono>
+#include <memory>
+
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/asset.h"
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.enemy;
+
+import ghost_escape.actor;
+import ghost_escape.affiliate.sprite_anim;
+
+namespace pyc::sdl3 {
 
 std::unique_ptr<Enemy> Enemy::Create(const glm::vec2& position, Actor* target) {
     auto enemy = std::make_unique<Enemy>();
@@ -111,5 +123,4 @@ void Enemy::remove() {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

@@ -1,11 +1,19 @@
-#include "ghost_escape/raw/stats.h"
+module;
 
-#include "ghost_escape/core/actor.h"
+#include <algorithm>
+#include <chrono>
+#include <memory>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include "ghost_escape/core/set_name.h"
 
-Stats* Stats::CreateAndSet(Actor* parent, float max_health, float max_mana, float health_regen, float mana_regon,
+module ghost_escape.raw.stats;
+
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
+
+Stats* Stats::CreateAndSet(Object* parent, float max_health, float max_mana, float health_regen, float mana_regon,
                            float damage) {
     auto stats = std::make_unique<Stats>();
     stats->init();
@@ -55,5 +63,4 @@ void Stats::invincibleUpdate(std::chrono::duration<float> delta) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

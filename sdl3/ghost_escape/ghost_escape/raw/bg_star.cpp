@@ -1,9 +1,21 @@
-#include "ghost_escape/raw/bg_star.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <chrono>
+#include <cmath>
+#include <memory>
+#include <utility>
+#include <vector>
 
-namespace pyc {
-namespace sdl3 {
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.raw.bg_star;
+
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 BgStar* BgStar::CreateAndSet(Object* parent, int num, float far_scale, float mid_scale, float near_scale) {
     auto bg_star = std::make_unique<BgStar>();
@@ -51,5 +63,4 @@ void BgStar::render() {
     game_.drawPoints(near_stars_.stars, -camera_position * near_stars_.scale, near_stars_.color);
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

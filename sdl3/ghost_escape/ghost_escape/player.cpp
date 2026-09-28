@@ -1,9 +1,25 @@
-#include "ghost_escape/player.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <chrono>
 
-namespace pyc {
-namespace sdl3 {
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/asset.h"
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.player;
+
+import ghost_escape.actor;
+import ghost_escape.affiliate.sprite_anim;
+import ghost_escape.core;
+import ghost_escape.raw.timer;
+import ghost_escape.weapon_thunder;
+import ghost_escape.world.effect;
+
+namespace pyc::sdl3 {
+
+using namespace std::chrono_literals;
 
 void Player::init() {
     Actor::init();
@@ -109,5 +125,4 @@ void Player::checkIsDead() {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

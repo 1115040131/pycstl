@@ -1,7 +1,22 @@
-#include "ghost_escape/screen/hud_button.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/asset.h"
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.screen.hud_button;
+
+import ghost_escape.affiliate.sprite;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 HUDButton* HUDButton::CreateAndSet(Object* parent, const glm::vec2 render_position, const std::string& file_normal,
                                    const std::string& file_hover, const std::string& file_press, float scale,
@@ -84,5 +99,4 @@ void HUDButton::checkState() {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

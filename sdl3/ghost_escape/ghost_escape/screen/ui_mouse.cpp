@@ -1,7 +1,22 @@
-#include "ghost_escape/screen/ui_mouse.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.screen.ui_mouse;
+
+import ghost_escape.affiliate.sprite;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
+
+using namespace std::chrono_literals;
 
 UIMouse* UIMouse::CreateAndSet(Object* parent, const std::string& file_path1, const std::string& file_path2,
                                float scale, Anchor anchor) {
@@ -29,5 +44,4 @@ void UIMouse::update(std::chrono::duration<float> delta) {
     setRenderPosition(game_.getMousePosition());
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

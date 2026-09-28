@@ -1,7 +1,20 @@
-#include "ghost_escape/affiliate/text_label.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+
+#include <SDL3_ttf/SDL_ttf.h>
+#include <glm/vec2.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.affiliate.text_label;
+
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 TextLabel* TextLabel::CreateAndSet(ObjectScreen* parent, std::string_view text, const std::string& font_path,
                                    int font_size, Anchor anchor) {
@@ -61,5 +74,4 @@ void TextLabel::updateSize() {
     });
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

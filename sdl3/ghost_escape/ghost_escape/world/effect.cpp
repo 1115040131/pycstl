@@ -1,9 +1,20 @@
-#include "ghost_escape/world/effect.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.world.effect;
+
+import ghost_escape.affiliate.sprite_anim;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 Effect* Effect::CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& position, float scale,
                              std::unique_ptr<ObjectWorld> next) {
@@ -38,5 +49,4 @@ void Effect::checkFinish() {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

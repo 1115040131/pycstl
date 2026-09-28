@@ -1,7 +1,21 @@
-#include "ghost_escape/screen/hud_text.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.screen.hud_text;
+
+import ghost_escape.affiliate.sprite;
+import ghost_escape.affiliate.text_label;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 HUDText* HUDText::CreateAndSet(Object* parent, std::string_view text, const glm::vec2& render_position,
                                const glm::vec2& size, const std::string& font_path, int font_size,
@@ -41,5 +55,4 @@ void HUDText::setBackground(const std::string& file_path) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

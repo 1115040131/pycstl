@@ -1,5 +1,7 @@
-#include "ghost_escape/core/game.h"
-#include "ghost_escape/scene_title.h"
+#include <memory>
+
+import ghost_escape.core;
+import ghost_escape.scene_title;
 
 using namespace pyc::sdl3;
 

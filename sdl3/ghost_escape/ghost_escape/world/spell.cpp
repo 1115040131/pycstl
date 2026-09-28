@@ -1,10 +1,20 @@
-#include "ghost_escape/world/spell.h"
+module;
 
-#include "ghost_escape/core/actor.h"
-#include "ghost_escape/core/scene.h"
+#include <chrono>
+#include <memory>
+#include <string>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.world.spell;
+
+import ghost_escape.actor;
+import ghost_escape.affiliate.sprite_anim;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 std::unique_ptr<Spell> Spell::Create(const std::string& file_path, const glm::vec2& position, float damage,
                                      float scale, Anchor anchor) {
@@ -49,5 +59,4 @@ void Spell::attack() {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

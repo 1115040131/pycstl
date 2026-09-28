@@ -1,18 +1,33 @@
-#include "ghost_escape/core/game.h"
+module;
 
+#include <algorithm>
 #include <chrono>
 #include <fstream>
+#include <memory>
 #include <sstream>
+#include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
+#include <vector>
 
+#include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <fmt/base.h>
+#include <glm/glm.hpp>
 
-#include "ghost_escape/core/scene.h"
+#include "common/singleton.h"
 
-namespace pyc {
-namespace sdl3 {
+module ghost_escape.core;
+
+import ghost_escape.core.asset_store;
+import ghost_escape.core.texture;
+
+namespace pyc::sdl3 {
+
+using namespace std::chrono_literals;
 
 Game::Game() = default;
 
@@ -285,5 +300,4 @@ std::string Game::loadTextFile(std::string_view file_path) {
     return buffer.str();
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

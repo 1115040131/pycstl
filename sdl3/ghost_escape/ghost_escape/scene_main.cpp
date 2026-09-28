@@ -1,21 +1,32 @@
-#include "ghost_escape/scene_main.h"
+module;
 
+#include <chrono>
 #include <fstream>
+#include <ios>
+#include <memory>
+#include <string_view>
+#include <utility>
 
+#include <SDL3/SDL.h>
 #include <fmt/format.h>
+#include <glm/vec2.hpp>
 
-#include "ghost_escape/hud_stats.h"
-#include "ghost_escape/player.h"
-#include "ghost_escape/raw/bg_star.h"
-#include "ghost_escape/raw/timer.h"
-#include "ghost_escape/scene_title.h"
-#include "ghost_escape/screen/hud_button.h"
-#include "ghost_escape/screen/hud_text.h"
-#include "ghost_escape/screen/ui_mouse.h"
-#include "ghost_escape/spawner.h"
+#include "ghost_escape/core/asset.h"
 
-namespace pyc {
-namespace sdl3 {
+module ghost_escape.scene_main;
+
+import ghost_escape.core;
+import ghost_escape.hud_stats;
+import ghost_escape.player;
+import ghost_escape.raw.bg_star;
+import ghost_escape.raw.timer;
+import ghost_escape.scene_title;
+import ghost_escape.screen.hud_button;
+import ghost_escape.screen.hud_text;
+import ghost_escape.screen.ui_mouse;
+import ghost_escape.spawner;
+
+namespace pyc::sdl3 {
 
 void SceneMain::init() {
     Scene::init();
@@ -155,5 +166,4 @@ void SceneMain::renderBackground() const {
     game_.drawBoundary(start, end, 5.F, {1, 1, 1, 1});
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3
