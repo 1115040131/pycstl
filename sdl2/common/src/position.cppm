@@ -1,9 +1,10 @@
-#pragma once
+module;
 
 #include <Eigen/Core>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.common.position;
+
+export namespace pyc::sdl2 {
 
 class Position {
 public:
@@ -15,5 +16,4 @@ protected:
     Eigen::Vector2d position_;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

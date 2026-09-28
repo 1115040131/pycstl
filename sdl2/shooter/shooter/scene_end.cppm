@@ -1,13 +1,16 @@
-#pragma once
+module;
 
+#include <chrono>
 #include <string>
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
-#include "shooter/scene.h"
+export module sdl2.shooter.scene_end;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.shooter.scene;
+
+export namespace pyc::sdl2 {
 
 class SceneEnd : public Scene {
 public:
@@ -33,5 +36,4 @@ private:
     Mix_Music* bgm_{};
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

@@ -1,20 +1,30 @@
-#include "shooter/game.h"
+module;
 
 #include <chrono>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
+#include <memory>
+#include <string>
+#include <string_view>
 #include <thread>
+#include <utility>
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include <fmt/base.h>
 
-#include "shooter/scene_main.h"
-#include "shooter/scene_title.h"
+#include "shooter/asset.h"
 
-namespace pyc {
-namespace sdl2 {
+module sdl2.shooter.scene;
+
+import sdl2.shooter.object;
+import sdl2.shooter.scene_main;
+import sdl2.shooter.scene_title;
+
+namespace pyc::sdl2 {
 
 using namespace std::chrono_literals;
 
@@ -279,5 +289,4 @@ void Game::loadData() {
     file.close();
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

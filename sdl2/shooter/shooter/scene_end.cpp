@@ -1,12 +1,25 @@
-#include "shooter/scene_end.h"
+module;
 
+#include <chrono>
+#include <memory>
+#include <string>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #include <fmt/format.h>
 
-#include "shooter/game.h"
-#include "shooter/scene_main.h"
+#include "shooter/asset.h"
 
-namespace pyc {
-namespace sdl2 {
+module sdl2.shooter.scene_end;
+
+import sdl2.shooter.scene;
+import sdl2.shooter.scene_main;
+
+namespace pyc::sdl2 {
+
+// object 模块里的 using namespace std::chrono_literals 只对直接 import 它的 TU 生效，
+// 本单元没 import object，得自己来一份。
+using namespace std::chrono_literals;
 
 void SceneEnd::init() {
     bgm_ = Mix_LoadMUS(ASSET("music/06_Battle_in_Space_Intro.ogg"));
@@ -119,5 +132,4 @@ void SceneEnd::removeLastUTF8Char(std::string& str) {
     str.pop_back();
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

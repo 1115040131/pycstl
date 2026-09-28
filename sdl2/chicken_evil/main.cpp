@@ -1,4 +1,4 @@
-#include "chicken_evil/engine.h"
+import sdl2.chicken_evil.engine;
 
 int main() {
     pyc::sdl2::Engine engine;

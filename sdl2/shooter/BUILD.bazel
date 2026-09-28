@@ -4,9 +4,10 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "shooter_lib",
     srcs = glob(["shooter/*.cpp"]),
-    hdrs = glob(["shooter/*.h"]),
+    hdrs = ["shooter/asset.h"],
     copts = COPTS,
-    features = ["-layering_check"],
+    features = ["cpp_modules"],
+    module_interfaces = glob(["shooter/*.cppm"]),
     strip_include_prefix = "/sdl2/shooter",
     deps = [
         "//common:singleton",
@@ -23,5 +24,6 @@ cc_binary(
     srcs = ["main.cpp"],
     copts = COPTS,
     data = glob(["assets/**"]),
+    features = ["cpp_modules"],
     deps = [":shooter_lib"],
 )

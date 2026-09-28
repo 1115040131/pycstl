@@ -1,11 +1,15 @@
-#pragma once
+module;
 
+#include <chrono>
+
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
-#include "shooter/scene.h"
+export module sdl2.shooter.scene_title;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.shooter.scene;
+
+export namespace pyc::sdl2 {
 
 class SceneTitle : public Scene {
 public:
@@ -23,5 +27,4 @@ private:
     std::chrono::duration<double> time_{};
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

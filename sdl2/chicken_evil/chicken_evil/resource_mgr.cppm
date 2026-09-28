@@ -1,13 +1,19 @@
-#pragma once
+module;
 
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
 #include "common/singleton.h"
-#include "sdl2/common/atlas.h"
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.chicken_evil.resource_mgr;
+
+export import sdl2.common.atlas;
+
+// Engine 是本模块的友元，需要它的定义所在模块，否则 friend 声明会把 Engine 钉在
+// 本模块上，与 sdl2.chicken_evil.engine 里的定义冲突。
+import sdl2.chicken_evil.engine;
+
+export namespace pyc::sdl2 {
 
 class ResourceMgr : public Singleton<ResourceMgr> {
     friend class Singleton<ResourceMgr>;
@@ -67,5 +73,4 @@ private:
     TTF_Font* font_ = nullptr;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

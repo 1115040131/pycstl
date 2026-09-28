@@ -1,7 +1,15 @@
-#include "sdl2/common/camera.h"
+module;
 
-namespace pyc {
-namespace sdl2 {
+#include <chrono>
+
+#include <Eigen/Core>
+#include <SDL2/SDL.h>
+
+module sdl2.common.camera;
+
+import sdl2.common.timer;
+
+namespace pyc::sdl2 {
 
 Camera::Camera(SDL_Renderer* render) : renderer(render) {
     timer_shake_.set_one_shot(true);
@@ -35,5 +43,4 @@ void Camera::render_texture(SDL_Texture* texture, const SDL_Rect* rect_src, cons
     SDL_RenderCopyExF(renderer, texture, rect_src, &rect_dst_win, angle, center, SDL_RendererFlip::SDL_FLIP_NONE);
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

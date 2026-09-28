@@ -4,10 +4,12 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "common",
     srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    features = ["-layering_check"],
-    strip_include_prefix = "include",
+    features = [
+        "cpp_modules",
+        "-layering_check",
+    ],
+    module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//sdl2:__subpackages__"],
     deps = [
         "//sdl2",

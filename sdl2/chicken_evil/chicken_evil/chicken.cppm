@@ -1,11 +1,14 @@
-#pragma once
+module;
 
-#include "sdl2/common/animation.h"
-#include "sdl2/common/camera.h"
-#include "sdl2/common/position.h"
+#include <chrono>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.chicken_evil.chicken;
+
+export import sdl2.common.animation;
+export import sdl2.common.camera;
+export import sdl2.common.position;
+
+export namespace pyc::sdl2 {
 
 class Chicken : public Position {
 public:
@@ -58,5 +61,4 @@ public:
     ~ChickenSlow() = default;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

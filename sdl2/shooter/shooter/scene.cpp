@@ -1,11 +1,7 @@
-#include "shooter/scene.h"
+module sdl2.shooter.scene;
 
-#include "shooter/game.h"
-
-namespace pyc {
-namespace sdl2 {
+namespace pyc::sdl2 {
 
 Scene::Scene() : game_(Game::GetInstance()) {}
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

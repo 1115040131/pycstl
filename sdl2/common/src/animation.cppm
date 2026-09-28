@@ -1,17 +1,22 @@
-#pragma once
+module;
 
+#include <chrono>
+#include <cstddef>
+#include <functional>
 #include <vector>
 
 #include <Eigen/Core>
 #include <SDL2/SDL.h>
 
-#include "sdl2/common/atlas.h"
-#include "sdl2/common/camera.h"
-#include "sdl2/common/position.h"
-#include "sdl2/common/timer.h"
+export module sdl2.common.animation;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.common.atlas;
+export import sdl2.common.camera;
+export import sdl2.common.position;
+
+import sdl2.common.timer;
+
+export namespace pyc::sdl2 {
 
 class Animation : public Position {
 public:
@@ -59,5 +64,4 @@ private:
     std::function<void()> on_finished_{nullptr};
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

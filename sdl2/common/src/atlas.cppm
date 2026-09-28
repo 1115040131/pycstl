@@ -1,13 +1,15 @@
-#pragma once
+module;
 
+#include <cstddef>
 #include <string_view>
 #include <vector>
 
 #include <SDL2/SDL.h>
 #include <fmt/format.h>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.common.atlas;
+
+export namespace pyc::sdl2 {
 
 class Atlas {
 public:
@@ -34,5 +36,4 @@ private:
     std::vector<SDL_Texture*> textures_;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

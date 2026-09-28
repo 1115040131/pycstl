@@ -1,20 +1,24 @@
-#pragma once
+module;
 
+#include <chrono>
+#include <functional>
 #include <map>
 #include <memory>
+#include <string>
+#include <string_view>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
 #include "common/singleton.h"
-#include "shooter/object.h"
-#include "shooter/scene.h"
 
-#define ASSET_PATH "sdl2/shooter/assets/"
-#define ASSET(filename) (ASSET_PATH filename)
+export module sdl2.shooter.scene:game;
 
-namespace pyc {
-namespace sdl2 {
+import sdl2.shooter.object;
+
+export namespace pyc::sdl2 {
+
+class Scene;
 
 class Game : public Singleton<Game> {
     friend class Singleton<Game>;
@@ -64,7 +68,7 @@ public:
 
 private:
     bool is_running_ = false;
-    std::unique_ptr<Scene> current_scene_ = nullptr;
+    std::unique_ptr<Scene> current_scene_{};
     SDL_Window* window_ = nullptr;
     SDL_Renderer* renderer_ = nullptr;
 
@@ -78,5 +82,4 @@ private:
     std::multimap<int, std::string, std::greater<int>> leader_board_;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

@@ -1,14 +1,15 @@
-#pragma once
+module;
 
 #include <chrono>
 
 #include <Eigen/Core>
 
-#include "sdl2/common/camera.h"
-#include "sdl2/common/position.h"
+export module sdl2.chicken_evil.bullet;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.common.camera;
+export import sdl2.common.position;
+
+export namespace pyc::sdl2 {
 
 class Bullet : public Position {
 public:
@@ -31,5 +32,4 @@ private:
     double speed_ = 800.0;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

@@ -1,11 +1,13 @@
-#pragma once
+module;
 
 #include <chrono>
+#include <type_traits>
 
 #include <SDL2/SDL.h>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.shooter.object;
+
+export namespace pyc::sdl2 {
 
 using namespace std::chrono_literals;
 
@@ -87,5 +89,4 @@ struct Background {
     int speed{30};
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

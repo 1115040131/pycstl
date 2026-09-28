@@ -1,12 +1,15 @@
-#pragma once
+module;
 
 #include <chrono>
 #include <memory>
 
-#include "sdl2/common/camera.h"
+#include <SDL2/SDL.h>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.chicken_evil.engine;
+
+import sdl2.common.camera;
+
+export namespace pyc::sdl2 {
 
 class Engine {
 public:
@@ -26,5 +29,4 @@ private:
     std::unique_ptr<Camera> camera_;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

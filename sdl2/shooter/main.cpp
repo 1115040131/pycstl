@@ -1,4 +1,4 @@
-#include "shooter/game.h"
+import sdl2.shooter.scene;
 
 int main() {
     auto& game = pyc::sdl2::Game::GetInstance();

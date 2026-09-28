@@ -1,10 +1,14 @@
-#include "sdl2/common/atlas.h"
+module;
 
+#include <utility>
+
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <fmt/format.h>
 
-namespace pyc {
-namespace sdl2 {
+module sdl2.common.atlas;
+
+namespace pyc::sdl2 {
 
 Atlas::~Atlas() { clear(); }
 
@@ -34,5 +38,4 @@ SDL_Texture* Atlas::get_texture(size_t index) const {
 
 void Atlas::add_texture(SDL_Texture* texture) { textures_.push_back(texture); }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

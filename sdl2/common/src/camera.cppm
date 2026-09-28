@@ -1,13 +1,17 @@
-#pragma once
+module;
+
+#include <chrono>
 
 #include <Eigen/Core>
 #include <SDL2/SDL.h>
 
-#include "sdl2/common/position.h"
-#include "sdl2/common/timer.h"
+export module sdl2.common.camera;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.common.position;
+
+import sdl2.common.timer;
+
+export namespace pyc::sdl2 {
 
 class Camera : public Position {
 public:
@@ -31,5 +35,4 @@ private:
     SDL_Renderer* renderer{nullptr};
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

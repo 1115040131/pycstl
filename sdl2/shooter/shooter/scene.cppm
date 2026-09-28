@@ -1,11 +1,14 @@
-#pragma once
+module;
 
 #include <chrono>
 
 #include <SDL2/SDL.h>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.shooter.scene;
+
+export import :game;
+
+export namespace pyc::sdl2 {
 
 class Game;
 
@@ -26,5 +29,4 @@ protected:
     Game& game_;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

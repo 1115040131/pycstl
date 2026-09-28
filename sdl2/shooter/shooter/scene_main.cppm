@@ -1,18 +1,21 @@
-#pragma once
+module;
 
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <random>
 #include <vector>
 
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "shooter/object.h"
-#include "shooter/scene.h"
+export module sdl2.shooter.scene_main;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.shooter.scene;
+
+import sdl2.shooter.object;
+
+export namespace pyc::sdl2 {
 
 class SceneMain : public Scene {
 public:
@@ -97,5 +100,4 @@ private:
     std::array<Mix_Chunk*, to_underlying(Sound::kCount)> sounds_;
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

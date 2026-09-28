@@ -1,15 +1,19 @@
-#pragma once
+module;
 
+#include <memory>
 #include <vector>
 
 #include <Eigen/Core>
+#include <SDL2/SDL.h>
 
-#include "chicken_evil/bullet.h"
-#include "chicken_evil/chicken.h"
-#include "sdl2/common/timer.h"
+export module sdl2.chicken_evil.gameplay;
 
-namespace pyc {
-namespace sdl2 {
+export import sdl2.chicken_evil.bullet;
+export import sdl2.chicken_evil.chicken;
+export import sdl2.common.animation;
+export import sdl2.common.timer;
+
+export namespace pyc::sdl2 {
 
 struct Gameplay {
     bool is_quit = false;
@@ -34,5 +38,4 @@ struct Gameplay {
     Animation animation_barrel_fire;  // 炮管开火动画
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

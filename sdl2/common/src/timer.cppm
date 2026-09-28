@@ -1,10 +1,11 @@
-#pragma once
+module;
 
 #include <chrono>
 #include <functional>
 
-namespace pyc {
-namespace sdl2 {
+export module sdl2.common.timer;
+
+export namespace pyc::sdl2 {
 
 class Timer {
 public:
@@ -38,5 +39,4 @@ private:
     std::function<void()> on_timeout_{nullptr};  // 超时回调
 };
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2
