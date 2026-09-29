@@ -6,7 +6,7 @@
 #include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "common/cin_redirect.h"
+import common.cin_redirect;
 
 namespace pyc {
 

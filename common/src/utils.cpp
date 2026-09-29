@@ -1,6 +1,10 @@
-#include "common/utils.h"
+module;
 
 #include <format>
+#include <string>
+#include <string_view>
+
+module common.utils;
 
 namespace pyc {
 

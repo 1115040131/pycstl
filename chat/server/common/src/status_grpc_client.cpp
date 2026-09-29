@@ -4,11 +4,11 @@ module;
 
 #include "chat/common/error_code.h"
 #include "chat/server/proto/status.grpc.pb.h"
-#include "common/connection_pool.h"
-#include "common/utils.h"
 
 module chat.server.common.status_grpc_client;
 
+import common.connection_pool;
+import common.utils;
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
 

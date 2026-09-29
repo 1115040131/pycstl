@@ -7,9 +7,9 @@ module;
 #include <SDL3_mixer/SDL_mixer.h>
 #include <entt/core/fwd.hpp>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.resource:audio_manager;
+
+import common.noncopyable;
 
 export namespace pyc::monster_war {
 

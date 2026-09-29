@@ -15,9 +15,9 @@ module;
 
 #include <hiredis/hiredis.h>
 
-#include "logger/logger.h"
-
 export module chat.server.common.redis_connection_pool;
+
+import logger.logger;
 
 export namespace pyc::chat {
 

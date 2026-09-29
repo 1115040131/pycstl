@@ -11,9 +11,10 @@ module;
 #include <boost/asio.hpp>
 
 #include "chat/common/method.h"
-#include "logger/logger.h"
 
 module chat.server.chat_server;
+
+import logger.logger;
 
 import :cserver;
 import :logic_system;

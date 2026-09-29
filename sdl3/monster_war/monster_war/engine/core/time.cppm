@@ -2,9 +2,9 @@ module;
 
 #include <chrono>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.core.time;
+
+import common.noncopyable;
 
 export namespace pyc::monster_war {
 

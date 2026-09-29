@@ -5,10 +5,9 @@ module;
 #include <string_view>
 #include <vector>
 
-#include "common/singleton.h"
-
 export module chat.server.common.mysql_mgr;
 
+import common.singleton;
 export import chat.server.common.data;
 
 import chat.server.common.mysql_pool;

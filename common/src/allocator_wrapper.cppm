@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <memory>
 
-namespace pyc {
+export module common.allocator_wrapper;
+
+export namespace pyc {
 
 // AllocatorWrapper 封装了与分配器相关的操作
 template <typename T, typename Allocator = std::allocator<T>>

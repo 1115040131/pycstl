@@ -8,10 +8,9 @@ module;
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.game.scene.helps_scene;
 
+import common.string_hash;
 import sunny_land.engine.core;
 import sunny_land.engine.input.input_manager;
 import sunny_land.engine.scene;

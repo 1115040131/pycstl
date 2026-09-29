@@ -1,6 +1,5 @@
 module;
 
-#include <cstddef>
 #include <exception>
 #include <memory>
 #include <mutex>
@@ -8,9 +7,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "logger/logger.h"
-
 module chat.server.chat_server;
+
+import logger.logger;
 
 import :csession;
 import :user_mgr;

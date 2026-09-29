@@ -9,7 +9,6 @@ cc_binary(
         "entt_signal.cpp",
     ],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = [
         "entt_demo.cppm",
         "entt_struct.cppm",
@@ -28,7 +27,6 @@ cc_binary(
     ],
     copts = COPTS,
     data = glob(["assets/**"]),
-    features = ["-layering_check"],
     deps = [
         "//sdl3:sdl3_image",
         "@bazel_tools//tools/cpp/runfiles",

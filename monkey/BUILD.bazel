@@ -12,7 +12,6 @@ cc_library(
     srcs = _LIB_SRCS,
     hdrs = _LIB_HDRS,
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = _LIB_MODULE_INTERFACES,
     strip_include_prefix = "include",
     visibility = ["//monkey:__subpackages__"],
@@ -27,7 +26,6 @@ cc_library(
     hdrs = _LIB_HDRS,
     copts = COPTS,
     defines = ["SORTED_HASH"],
-    features = ["cpp_modules"],
     module_interfaces = _LIB_MODULE_INTERFACES,
     strip_include_prefix = "include",
     visibility = ["//monkey:__subpackages__"],
@@ -38,7 +36,6 @@ cc_binary(
     name = "monkey",
     srcs = ["app/monkey.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     deps = [
         ":monkey_lib",
         "@fmt",

@@ -6,10 +6,9 @@ module;
 
 #include <entt/entity/registry.hpp>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.scene.scene;
 
+import common.noncopyable;
 export import monster_war.engine.core.context;
 export import monster_war.engine.ui.ui_manager;
 

@@ -5,7 +5,8 @@
 
 #include "chat/client/define.h"
 #include "chat/client/user_data.h"
-#include "common/singleton.h"
+
+import common.singleton;
 
 class TcpMgr : public QObject, public pyc::Singleton<TcpMgr> {
     Q_OBJECT

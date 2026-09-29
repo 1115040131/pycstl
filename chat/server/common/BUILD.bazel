@@ -8,14 +8,12 @@ package(default_visibility = ["//chat/server:__subpackages__"])
 cc_library(
     name = "defer",
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/defer.cppm"],
 )
 
 cc_library(
     name = "data",
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/data.cppm"],
     deps = ["@nlohmann_json//:json"],
 )
@@ -24,7 +22,6 @@ cc_library(
     name = "utils",
     srcs = ["src/utils.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/utils.cppm"],
     deps = ["@boost.uuid"],
 )
@@ -36,7 +33,6 @@ cc_library(
     srcs = ["src/config_mgr.cpp"],
     copts = COPTS,
     data = glob(["config/*"]),
-    features = ["cpp_modules"],
     module_interfaces = ["src/config_mgr.cppm"],
     deps = [
         "//common:connection_pool",
@@ -53,7 +49,6 @@ cc_library(
     name = "io_service_pool",
     srcs = ["src/io_service_pool.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/io_service_pool.cppm"],
     deps = [
         "//common:connection_pool",
@@ -70,7 +65,6 @@ cc_library(
     name = "mysql_pool",
     srcs = ["src/mysql_pool.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/mysql_pool.cppm"],
     deps = [
         ":defer",
@@ -87,7 +81,6 @@ cc_library(
     name = "mysql_mgr",
     srcs = ["src/mysql_mgr.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/mysql_mgr.cppm"],
     deps = [
         ":config_mgr",
@@ -107,7 +100,6 @@ cc_library(
     name = "redis_connection_pool",
     srcs = ["src/redis_connection_pool.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/redis_connection_pool.cppm"],
     deps = [
         "//logger",
@@ -119,7 +111,6 @@ cc_library(
     name = "redis_mgr",
     srcs = ["src/redis_mgr.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/redis_mgr.cppm"],
     deps = [
         ":config_mgr",
@@ -136,7 +127,6 @@ cc_library(
     name = "status_grpc_client",
     srcs = ["src/status_grpc_client.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = ["src/status_grpc_client.cppm"],
     deps = [
         ":config_mgr",

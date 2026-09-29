@@ -5,7 +5,6 @@ qt_cc_binary(
     name = "99table",
     srcs = ["main.cpp"],
     copts = COPTS,
-    features = ["-layering_check"],
     deps = [
         "@rules_qt//:qt_widgets",
     ],

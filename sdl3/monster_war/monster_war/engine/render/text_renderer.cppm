@@ -5,13 +5,12 @@ module;
 #include <entt/entity/fwd.hpp>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 struct TTF_TextEngine;
 
 export module monster_war.engine.render.text_renderer;
 
+import common.noncopyable;
 export import monster_war.engine.render.camera;
 export import monster_war.engine.resource;
 export import monster_war.engine.utils.math;

@@ -1,14 +1,15 @@
 module;
 
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 #include <fmt/chrono.h>
 #include <mysqlx/xdevapi.h>
 
-#include "logger/logger.h"
-
 module chat.server.common.mysql_pool;
+
+import logger.logger;
 
 import chat.server.common.defer;
 

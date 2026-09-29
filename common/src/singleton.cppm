@@ -1,8 +1,8 @@
-#pragma once
+export module common.singleton;
 
-#include "common/noncopyable.h"
+import common.noncopyable;
 
-namespace pyc {
+export namespace pyc {
 
 /// @brief 单例模板基类
 /// 用法示例:

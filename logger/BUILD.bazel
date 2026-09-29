@@ -4,10 +4,9 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "logger",
     srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/logger/**/*.h"]),
     copts = COPTS,
     local_defines = ["FMT_USE_LOCAL_TIME=1"],
-    strip_include_prefix = "include",
+    module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//visibility:public"],
     deps = ["@fmt"],
 )

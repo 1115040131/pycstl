@@ -3,50 +3,44 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 cc_library(
     name = "noncopyable",
-    hdrs = ["include/common/noncopyable.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/noncopyable.cppm"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "allocator_wrapper",
-    hdrs = ["include/common/allocator_wrapper.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/allocator_wrapper.cppm"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "connection_pool",
-    hdrs = ["include/common/connection_pool.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/connection_pool.cppm"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "string_hash",
-    hdrs = ["include/common/string_hash.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/string_hash.cppm"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "cin_redirect",
-    hdrs = ["include/common/cin_redirect.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/cin_redirect.cppm"],
     visibility = ["//visibility:public"],
     deps = [":noncopyable"],
 )
 
 cc_library(
     name = "singleton",
-    hdrs = ["include/common/singleton.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/singleton.cppm"],
     visibility = ["//visibility:public"],
     deps = [":noncopyable"],
 )
@@ -54,18 +48,16 @@ cc_library(
 cc_library(
     name = "utils",
     srcs = ["src/utils.cpp"],
-    hdrs = ["include/common/utils.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/utils.cppm"],
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "timer",
     srcs = ["src/timer.cpp"],
-    hdrs = ["include/common/timer.h"],
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = ["src/timer.cppm"],
     visibility = ["//visibility:public"],
     deps = [
         ":utils",
@@ -73,6 +65,7 @@ cc_library(
     ],
 )
 
+# reflect.h 通篇是宏, 宏不能从模块导出, 故保持头文件形态
 cc_library(
     name = "reflect",
     hdrs = ["include/common/reflect.h"],
@@ -81,6 +74,7 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+# json.h 依赖 reflect.h 的模板, 跟着一起留在头文件里
 cc_library(
     name = "json",
     hdrs = ["include/common/json.h"],

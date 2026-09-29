@@ -8,9 +8,9 @@ module;
 #include <SDL3_mixer/SDL_mixer.h>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.engine.resource;
+
+import common.string_hash;
 
 namespace pyc::sunny_land {
 

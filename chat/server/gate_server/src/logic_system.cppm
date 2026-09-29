@@ -6,10 +6,9 @@ module;
 #include <string_view>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module chat.server.gate_server:logic_system;
 
+import common.singleton;
 export import :http_connection;
 
 export namespace pyc {

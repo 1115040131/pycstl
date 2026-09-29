@@ -2,10 +2,9 @@ module;
 
 #include <memory>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.ui:ui_state;
 
+import common.noncopyable;
 export import sunny_land.engine.core;
 
 export namespace pyc::sunny_land {

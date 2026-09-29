@@ -4,13 +4,12 @@ module;
 #include <functional>
 #include <memory>
 
-#include "common/noncopyable.h"
-
 struct SDL_Window;
 struct SDL_Renderer;
 
 export module sunny_land.engine.core.game_app;
 
+import common.noncopyable;
 import sunny_land.engine.audio.audio_player;
 import sunny_land.engine.core;
 import sunny_land.engine.core.config;

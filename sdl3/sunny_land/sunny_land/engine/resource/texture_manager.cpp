@@ -10,9 +10,9 @@ module;
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.engine.resource;
+
+import common.string_hash;
 
 namespace pyc::sunny_land {
 

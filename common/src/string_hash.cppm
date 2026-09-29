@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <string_view>
 
-namespace pyc {
+export module common.string_hash;
+
+export namespace pyc {
 
 // 更简洁的哈希和比较函数实现
 struct StringHash {

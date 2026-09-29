@@ -12,9 +12,10 @@ module;
 
 #include "chat/common/error_code.h"
 #include "chat/server/proto/status.grpc.pb.h"
-#include "logger/logger.h"
 
 module chat.server.status_server.status_service_impl;
+
+import logger.logger;
 
 import chat.server.common.config_mgr;
 import chat.server.common.redis_mgr;

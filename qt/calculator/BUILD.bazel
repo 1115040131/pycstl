@@ -5,7 +5,6 @@ qt_cc_binary(
     name = "calculator",
     srcs = ["main.cpp"],
     copts = COPTS,
-    features = ["-layering_check"],
     deps = [
         "@rules_qt//:qt_widgets",
     ],

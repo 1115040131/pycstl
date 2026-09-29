@@ -5,10 +5,9 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.ui.ui_manager;
 
+import common.noncopyable;
 export import sunny_land.engine.core;
 import sunny_land.engine.ui.ui_element;
 import sunny_land.engine.ui.ui_panel;

@@ -5,10 +5,6 @@ cc_library(
     name = "chicken_evil_lib",
     srcs = glob(["chicken_evil/*.cpp"]),
     copts = COPTS,
-    features = [
-        "cpp_modules",
-        "-layering_check",
-    ],
     module_interfaces = glob(["chicken_evil/*.cppm"]),
     deps = [
         "//common:singleton",
@@ -23,6 +19,5 @@ cc_binary(
     srcs = ["main.cpp"],
     copts = COPTS,
     data = glob(["assets/**"]),
-    features = ["cpp_modules"],
     deps = [":chicken_evil_lib"],
 )

@@ -3,8 +3,7 @@
 
 #include <boost/asio.hpp>
 
-#include "logger/logger.h"
-
+import logger.logger;
 import chat.server.common.config_mgr;
 import chat.server.gate_server;
 import chat.server.gate_server.define;

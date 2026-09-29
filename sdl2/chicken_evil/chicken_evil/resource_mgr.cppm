@@ -3,10 +3,9 @@ module;
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "common/singleton.h"
-
 export module sdl2.chicken_evil.resource_mgr;
 
+import common.singleton;
 export import sdl2.common.atlas;
 
 // Engine 是本模块的友元，需要它的定义所在模块，否则 friend 声明会把 Engine 钉在

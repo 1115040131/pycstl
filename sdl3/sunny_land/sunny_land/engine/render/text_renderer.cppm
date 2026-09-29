@@ -4,13 +4,12 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 struct TTF_TextEngine;
 
 export module sunny_land.engine.core:text_renderer;
 
+import common.noncopyable;
 export import sunny_land.engine.resource;
 export import sunny_land.engine.utils.math;
 

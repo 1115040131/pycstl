@@ -11,9 +11,10 @@ module;
 #include "chat/common/error_code.h"
 #include "chat/common/method.h"
 #include "chat/server/proto/verify.pb.h"
-#include "logger/logger.h"
 
 module chat.server.gate_server;
+
+import logger.logger;
 
 import :http_connection;
 import chat.server.common.mysql_mgr;

@@ -1,9 +1,8 @@
 module;
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.core:context;
 
+import common.noncopyable;
 export import sunny_land.engine.audio.audio_player;
 export import sunny_land.engine.core.game_state;
 export import sunny_land.engine.input.input_manager;

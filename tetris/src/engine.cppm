@@ -1,8 +1,8 @@
 module;
 
-#include "common/singleton.h"
-
 export module tetris.engine;
+
+import common.singleton;
 
 export namespace pyc::tetris {
 

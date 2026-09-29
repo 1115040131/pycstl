@@ -3,9 +3,9 @@ module;
 #include <string>
 #include <string_view>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.game.data.session_data;
+
+import common.noncopyable;
 
 export namespace pyc::sunny_land {
 

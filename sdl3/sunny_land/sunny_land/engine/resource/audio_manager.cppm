@@ -7,10 +7,10 @@ module;
 
 #include <SDL3_mixer/SDL_mixer.h>
 
-#include "common/noncopyable.h"
-#include "common/string_hash.h"
-
 export module sunny_land.engine.resource:audio_manager;
+
+import common.noncopyable;
+import common.string_hash;
 
 export namespace pyc::sunny_land {
 

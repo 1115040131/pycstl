@@ -9,7 +9,6 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["cpp_modules"],
     module_interfaces = glob(["monster_war/engine/**/*.cppm"]),
     deps = [
         "//common:noncopyable",
@@ -36,7 +35,6 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["cpp_modules"],
     module_interfaces = glob(["monster_war/game/**/*.cppm"]),
     deps = [
         ":ziyu_engine",
@@ -59,7 +57,6 @@ cc_binary(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["cpp_modules"],
     deps = [
         ":monster_war_game",
         ":ziyu_engine",

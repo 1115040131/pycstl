@@ -7,10 +7,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "common/singleton.h"
-
 export module network.thread_pool;
 
+import common.singleton;
 export import network.base.pool;
 
 export namespace network {

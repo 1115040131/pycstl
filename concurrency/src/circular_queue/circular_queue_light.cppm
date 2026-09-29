@@ -5,9 +5,9 @@ module;
 #include <memory>
 #include <optional>
 
-#include "common/noncopyable.h"
-
 export module concurrency.circular_queue.circular_queue_light;
+
+import common.noncopyable;
 
 export namespace pyc::concurrency {
 

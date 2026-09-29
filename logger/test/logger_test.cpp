@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <latch>
 #include <memory>
@@ -11,9 +12,11 @@
 #include <thread>
 #include <vector>
 
+#include <fmt/base.h>
 #include <gtest/gtest.h>
 
-#include "logger/logger.h"
+import logger.logger;
+import logger.sink;
 
 namespace pyc {
 

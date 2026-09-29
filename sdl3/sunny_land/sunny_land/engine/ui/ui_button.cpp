@@ -9,10 +9,9 @@ module;
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.engine.ui.ui_button;
 
+import common.string_hash;
 import sunny_land.engine.render.sprite;
 import sunny_land.engine.ui;
 import sunny_land.engine.ui.state;

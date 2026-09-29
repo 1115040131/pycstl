@@ -11,10 +11,9 @@ module;
 
 #include <spdlog/spdlog.h>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.core:game_object;
 
+import common.noncopyable;
 export import :component;
 
 export namespace pyc::sunny_land {

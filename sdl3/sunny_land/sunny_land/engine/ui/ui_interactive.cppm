@@ -7,10 +7,9 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "common/string_hash.h"
-
 export module sunny_land.engine.ui:ui_interactive;
 
+import common.string_hash;
 export import sunny_land.engine.core;
 export import sunny_land.engine.render.sprite;
 export import sunny_land.engine.ui.ui_element;

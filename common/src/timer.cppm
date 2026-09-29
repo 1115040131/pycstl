@@ -1,9 +1,11 @@
-#pragma once
+module;
 
 #include <chrono>
 #include <source_location>
 
-namespace pyc {
+export module common.timer;
+
+export namespace pyc {
 
 class Timer {
 public:

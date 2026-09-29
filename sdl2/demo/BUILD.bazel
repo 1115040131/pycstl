@@ -8,7 +8,6 @@ cc_binary(
     ]),
     copts = COPTS,
     data = glob(["assets/**"]),
-    features = ["-layering_check"],
     deps = [
         "//sdl2",
         "//sdl2:sdl2_image",

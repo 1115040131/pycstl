@@ -11,10 +11,10 @@ module;
 #include <unordered_map>
 
 #include "chat/common/method.h"
-#include "common/singleton.h"
 
 export module chat.server.chat_server:logic_system;
 
+import common.singleton;
 export import :logic_node;
 export import chat.server.common.data;
 import :csession;

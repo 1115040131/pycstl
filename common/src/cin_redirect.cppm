@@ -1,10 +1,12 @@
-#pragma once
+module;
 
 #include <iostream>
 
-#include "common/noncopyable.h"
+export module common.cin_redirect;
 
-namespace pyc {
+import common.noncopyable;
+
+export namespace pyc {
 
 /// @breif: RAII 类用于管理 cin 的缓冲区重定向
 class CinRedirect : public Noncopyable {

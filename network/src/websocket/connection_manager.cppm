@@ -4,10 +4,9 @@ module;
 #include <string>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module network.websocket_connection_manager;
 
+import common.singleton;
 export import network.websocket_connection;
 
 export namespace network {

@@ -9,10 +9,9 @@ module;
 #include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.game.scene;
 
+import common.string_hash;
 import sunny_land.engine.core;
 import sunny_land.engine.core.game_state;
 import sunny_land.engine.scene;

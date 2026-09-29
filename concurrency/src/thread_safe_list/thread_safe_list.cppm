@@ -4,9 +4,9 @@ module;
 #include <mutex>
 #include <utility>
 
-#include "common/noncopyable.h"
-
 export module concurrency.thread_safe_list;
+
+import common.noncopyable;
 
 export namespace pyc::concurrency {
 

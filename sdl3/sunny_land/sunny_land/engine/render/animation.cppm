@@ -7,9 +7,9 @@ module;
 
 #include <SDL3/SDL_rect.h>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.render.animation;
+
+import common.noncopyable;
 
 export namespace pyc::sunny_land {
 

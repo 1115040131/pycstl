@@ -1,7 +1,8 @@
 #include <coroutine>
 #include <exception>
+#include <memory>
 
-#include "logger/logger.h"
+import logger.logger;
 
 inline pyc::Logger logger("Coroutine");
 

@@ -5,12 +5,11 @@ module;
 #include <SDL3/SDL_rect.h>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 
 export module sunny_land.engine.core:renderer;
 
+import common.noncopyable;
 export import sunny_land.engine.render.sprite;
 export import sunny_land.engine.resource;
 export import sunny_land.engine.utils.math;

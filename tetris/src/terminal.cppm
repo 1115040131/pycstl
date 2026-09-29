@@ -3,10 +3,9 @@ module;
 #include <iostream>
 #include <string_view>
 
-#include "common/singleton.h"
-
 export module tetris.terminal;
 
+import common.singleton;
 export import tetris.ansi;
 
 export namespace pyc::tetris {

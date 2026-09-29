@@ -5,8 +5,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 struct SDL_Texture;
 struct Mix_Chunk;
@@ -14,6 +12,8 @@ struct Mix_Music;
 struct TTF_Font;
 
 export module sunny_land.engine.resource:resource_manager;
+
+import common.noncopyable;
 
 export namespace pyc::sunny_land {
 

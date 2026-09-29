@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "common/cin_redirect.h"
+import common.cin_redirect;
 
 import design_pattern.api;
 import design_pattern.inputer;

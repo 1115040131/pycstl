@@ -9,7 +9,6 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["cpp_modules"],
     module_interfaces = glob(["sunny_land/engine/**/*.cppm"]),
     deps = [
         "//common:noncopyable",
@@ -33,7 +32,6 @@ cc_library(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["cpp_modules"],
     module_interfaces = glob(["sunny_land/game/**/*.cppm"]),
     deps = [
         ":ziyu_engine",
@@ -54,7 +52,6 @@ cc_binary(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["cpp_modules"],
     deps = [
         ":sunny_land_game",
         ":ziyu_engine",

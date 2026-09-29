@@ -10,7 +10,7 @@
 #include <fmt/std.h>
 #include <gtest/gtest.h>
 
-#include "common/noncopyable.h"
+import common.noncopyable;
 
 namespace pyc {
 namespace concurrency {

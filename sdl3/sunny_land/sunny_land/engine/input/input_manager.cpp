@@ -12,13 +12,12 @@ module;
 #include <nlohmann/json_fwd.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 struct SDL_Renderer;
 union SDL_Event;
 
 module sunny_land.engine.input.input_manager;
 
+import common.string_hash;
 import sunny_land.engine.core.config;
 
 namespace pyc::sunny_land {

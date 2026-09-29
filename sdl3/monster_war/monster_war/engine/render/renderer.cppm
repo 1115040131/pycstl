@@ -5,12 +5,11 @@ module;
 #include <SDL3/SDL_rect.h>
 #include <glm/vec2.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 
 export module monster_war.engine.render.renderer;
 
+import common.noncopyable;
 export import monster_war.engine.component.sprite_component;
 export import monster_war.engine.render.camera;
 export import monster_war.engine.render.image;

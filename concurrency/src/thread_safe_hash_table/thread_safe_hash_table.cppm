@@ -10,9 +10,9 @@ module;
 #include <utility>
 #include <vector>
 
-#include "common/noncopyable.h"
-
 export module concurrency.thread_safe_hash_table;
+
+import common.noncopyable;
 
 export namespace pyc::concurrency {
 

@@ -6,9 +6,9 @@
 #include <boost/asio.hpp>
 #include <grpcpp/grpcpp.h>
 
-#include "common/utils.h"
-#include "logger/logger.h"
+import common.utils;
 
+import logger.logger;
 import chat.server.chat_server;
 import chat.server.chat_server.chat_service_impl;
 import chat.server.common.config_mgr;

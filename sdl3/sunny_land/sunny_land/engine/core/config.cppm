@@ -7,10 +7,10 @@ module;
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "common/noncopyable.h"
-#include "common/string_hash.h"
-
 export module sunny_land.engine.core.config;
+
+import common.noncopyable;
+import common.string_hash;
 
 export namespace pyc::sunny_land {
 

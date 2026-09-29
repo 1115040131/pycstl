@@ -8,9 +8,9 @@ module;
 
 #include <hiredis/hiredis.h>
 
-#include "logger/logger.h"
-
 module chat.server.common.redis_connection_pool;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <atomic>
 #include <condition_variable>
@@ -6,7 +6,9 @@
 #include <optional>
 #include <queue>
 
-namespace pyc {
+export module common.connection_pool;
+
+export namespace pyc {
 
 template <typename Connection>
 class ConnectionPool {

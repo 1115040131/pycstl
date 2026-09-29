@@ -2,9 +2,9 @@ module;
 
 #include <thread>
 
-#include "common/noncopyable.h"
-
 export module pycstl.joining_thread;
+
+import common.noncopyable;
 
 export namespace pycstl {
 

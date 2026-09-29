@@ -4,10 +4,9 @@ module;
 #include <stdexcept>
 #include <utility>
 
-#include "common/noncopyable.h"
-
 export module reaction:resource;
 
+import common.noncopyable;
 import :observer_node;
 
 export namespace pyc::reaction {

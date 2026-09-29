@@ -6,10 +6,9 @@ module;
 #include <SDL3/SDL_scancode.h>
 #include <glm/glm.hpp>
 
-#include "common/string_hash.h"
-
 module sunny_land.game.player;
 
+import common.string_hash;
 import sunny_land.engine.core;
 import sunny_land.engine.input.input_manager;
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "common/utils.h"
+import common.utils;
 
 namespace pyc {
 
