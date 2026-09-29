@@ -10,11 +10,11 @@ module;
 #include <fmt/format.h>
 #include <grpcpp/grpcpp.h>
 
-#include "chat/common/error_code.h"
 #include "chat/server/proto/status.grpc.pb.h"
 
 module chat.server.status_server.status_service_impl;
 
+import chat.common.error_code;
 import logger.logger;
 
 import chat.server.common.config_mgr;

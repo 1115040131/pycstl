@@ -15,12 +15,12 @@ module;
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
-#include "chat/common/error_code.h"
-#include "chat/common/method.h"
 #include "chat/server/proto/chat.pb.h"
 
 module chat.server.chat_server;
 
+import chat.common.error_code;
+import chat.common.method;
 import logger.logger;
 
 import :csession;

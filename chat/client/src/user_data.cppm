@@ -1,8 +1,13 @@
-#pragma once
+module;
+
+#include <memory>
+#include <vector>
 
 #include <QString>
 
-struct SearchInfo {
+export module chat.client.user_data;
+
+export struct SearchInfo {
     int uid;
     int sex;
     QString name;
@@ -11,7 +16,7 @@ struct SearchInfo {
     QString desc;
 };
 
-struct ApplyInfo {
+export struct ApplyInfo {
     int uid;
     int sex;
     QString name;
@@ -21,7 +26,7 @@ struct ApplyInfo {
     int status = 0;
 };
 
-struct AuthInfo {
+export struct AuthInfo {
     int uid;
     int sex;
     QString name;
@@ -29,14 +34,14 @@ struct AuthInfo {
     QString icon;
 };
 
-struct TextChatData {
+export struct TextChatData {
     QString msg_id;
     QString msg_content;
     int from_uid;
     int to_uid;
 };
 
-struct FriendInfo {
+export struct FriendInfo {
     int uid;
     QString name;
     QString nick;
@@ -48,7 +53,7 @@ struct FriendInfo {
     std::vector<std::shared_ptr<TextChatData>> chat_msgs;
 };
 
-struct UserInfo {
+export struct UserInfo {
     int uid{};
     int sex{};
     QString name{};

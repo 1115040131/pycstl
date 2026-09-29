@@ -2,7 +2,7 @@
 
 #include <QMouseEvent>
 
-#include "chat/client/api.h"
+import chat.client.api;
 
 ClickedLabel::ClickedLabel(QWidget* parent) : QLabel(parent), state_(State::kNormal) {
     setCursor(Qt::PointingHandCursor);

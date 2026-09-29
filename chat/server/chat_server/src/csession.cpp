@@ -10,10 +10,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "chat/common/method.h"
-
 module chat.server.chat_server;
 
+import chat.common.method;
 import logger.logger;
 
 import :cserver;

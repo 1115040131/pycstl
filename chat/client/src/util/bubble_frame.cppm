@@ -1,11 +1,13 @@
-#pragma once
+module;
 
 #include <QFrame>
 #include <QHBoxLayout>
 
-#include "chat/client/define.h"
+export module chat.client.util.bubble_frame;
 
-class BubbleFrame : public QFrame {
+export import chat.client.define;
+
+export class BubbleFrame : public QFrame {
 public:
     explicit BubbleFrame(ChatRole role, QWidget* parent = nullptr);
 

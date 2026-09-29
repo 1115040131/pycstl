@@ -2,7 +2,7 @@
 
 #include <QPixmap>
 
-#include "chat/client/util/bubble_frame.h"
+import chat.client.util.bubble_frame;
 
 class PictureBubble : public BubbleFrame {
     Q_OBJECT

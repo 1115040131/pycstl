@@ -2,7 +2,7 @@
 
 #include <QWidget>
 
-#include "chat/client/user_data.h"
+import chat.client.user_data;
 
 class QScrollArea;
 

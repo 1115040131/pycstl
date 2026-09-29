@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "chat/client/user_data.h"
+import chat.client.user_data;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

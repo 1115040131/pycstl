@@ -8,12 +8,12 @@ module;
 #include <boost/beast.hpp>
 #include <nlohmann/json.hpp>
 
-#include "chat/common/error_code.h"
-#include "chat/common/method.h"
 #include "chat/server/proto/verify.pb.h"
 
 module chat.server.gate_server;
 
+import chat.common.error_code;
+import chat.common.method;
 import logger.logger;
 
 import :http_connection;

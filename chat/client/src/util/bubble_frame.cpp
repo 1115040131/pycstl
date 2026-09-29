@@ -1,6 +1,10 @@
-#include "chat/client/util/bubble_frame.h"
+module;
 
+#include <QFrame>
+#include <QHBoxLayout>
 #include <QPainter>
+
+module chat.client.util.bubble_frame;
 
 inline constexpr int kTriangleWidth = 8;  // 三角宽度
 

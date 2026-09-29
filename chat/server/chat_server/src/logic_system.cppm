@@ -10,10 +10,9 @@ module;
 #include <thread>
 #include <unordered_map>
 
-#include "chat/common/method.h"
-
 export module chat.server.chat_server:logic_system;
 
+export import chat.common.method;
 import common.singleton;
 export import :logic_node;
 export import chat.server.common.data;

@@ -1,8 +1,10 @@
-#pragma once
+module;
 
 #include <cstdint>
 
-enum class ReqId : uint16_t {
+export module chat.common.method;
+
+export enum class ReqId : uint16_t {
     kInvalid = 0,  // 无效请求
 
     kGetVerifyCode = 1001,  // 获取验证码
@@ -29,6 +31,6 @@ enum class ReqId : uint16_t {
     kNotifyTextChatMsgReq = 1019,  // 通知文本聊天消息请求
 };
 
-const char* ToString(ReqId req_id) noexcept;
+export const char* ToString(ReqId req_id) noexcept;
 
-const char* ToUrl(ReqId req_id) noexcept;
+export const char* ToUrl(ReqId req_id) noexcept;

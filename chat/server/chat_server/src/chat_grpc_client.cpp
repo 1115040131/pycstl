@@ -11,11 +11,11 @@ module;
 #include <fmt/base.h>
 #include <grpcpp/create_channel.h>
 
-#include "chat/common/error_code.h"
 #include "chat/server/proto/chat.grpc.pb.h"
 
 module chat.server.chat_server.chat_grpc_client;
 
+import chat.common.error_code;
 import common.connection_pool;
 import common.utils;
 import logger.logger;

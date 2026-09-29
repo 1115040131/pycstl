@@ -9,10 +9,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "chat/common/method.h"
-
 module chat.server.chat_server.msg_node;
 
+import chat.common.method;
 namespace pyc {
 namespace chat {
 

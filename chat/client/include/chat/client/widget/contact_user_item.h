@@ -1,7 +1,8 @@
 #pragma once
 
-#include "chat/client/user_data.h"
 #include "chat/client/util/list_item_base.h"
+
+import chat.client.user_data;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

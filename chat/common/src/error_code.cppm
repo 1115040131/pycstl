@@ -1,6 +1,6 @@
-#pragma once
+export module chat.common.error_code;
 
-enum class ErrorCode {
+export enum class ErrorCode {
     kSuccess = 0,
 
     kJsonError = 1001,     // json 解析失败
@@ -21,4 +21,4 @@ enum class ErrorCode {
     kTokenInvalid = 3002,  // token 无效
 };
 
-const char* ToString(ErrorCode err) noexcept;
+export const char* ToString(ErrorCode err) noexcept;

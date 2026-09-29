@@ -2,7 +2,7 @@
 
 #include <QMouseEvent>
 
-#include "chat/client/api.h"
+import chat.client.api;
 
 ClickedBtn::ClickedBtn(QWidget* parent) : QPushButton(parent) {
     setCursor(Qt::PointingHandCursor);

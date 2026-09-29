@@ -1,6 +1,12 @@
-#include "chat/client/user_mgr.h"
+module;
 
 #include <algorithm>
+#include <memory>
+#include <vector>
+
+#include <QString>
+
+module chat.client.user_mgr;
 
 bool UserMgr::AlreadyApply(int uid) const {
     return std::ranges::find_if(apply_list_, [uid](const std::shared_ptr<ApplyInfo>& apply) {

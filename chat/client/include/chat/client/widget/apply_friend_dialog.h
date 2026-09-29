@@ -6,9 +6,10 @@
 
 #include <QDialog>
 
-#include "chat/client/user_data.h"
 #include "chat/client/util/clicked_label.h"
 #include "chat/client/widget/friend_label.h"
+
+import chat.client.user_data;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

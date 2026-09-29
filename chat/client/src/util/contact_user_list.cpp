@@ -5,9 +5,10 @@
 #include <QWheelEvent>
 
 #include "chat/client/tcp_mgr.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/widget/contact_user_item.h"
 #include "chat/client/widget/group_tip_item.h"
+
+import chat.client.user_mgr;
 
 ContactUserList::ContactUserList(QWidget* parent) : QListWidget(parent) {
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

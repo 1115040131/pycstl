@@ -1,8 +1,9 @@
 #include "chat/client/widget/reset_dialog.h"
 
-#include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
 #include "chat/client/widget/ui_reset_dialog.h"
+
+import chat.client.api;
 
 ResetDialog::ResetDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ResetDialog) {
     ui->setupUi(this);

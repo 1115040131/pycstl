@@ -5,7 +5,7 @@
 #include <QDialog>
 #include <QListWidget>
 
-#include "chat/client/user_data.h"
+import chat.client.user_data;
 
 class CustomizeEdit;
 class LoadingDialog;
