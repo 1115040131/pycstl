@@ -5,7 +5,6 @@ cc_library(
     name = "concurrency",
     srcs = glob(["src/**/*.cpp"]),
     copts = COPTS,
-    features = ["cpp_modules"],
     linkopts = ["-latomic"],
     module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//concurrency:__subpackages__"],

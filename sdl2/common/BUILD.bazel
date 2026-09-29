@@ -5,10 +5,6 @@ cc_library(
     name = "common",
     srcs = glob(["src/**/*.cpp"]),
     copts = COPTS,
-    features = [
-        "cpp_modules",
-        "-layering_check",
-    ],
     module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//sdl2:__subpackages__"],
     deps = [

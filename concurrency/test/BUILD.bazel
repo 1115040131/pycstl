@@ -11,7 +11,6 @@ cc_test(
         allow_empty = True,
     ),
     copts = COPTS + ["-Wno-thread-safety"],
-    features = ["cpp_modules"],
     module_interfaces = glob(["*.cppm"]),
     deps = [
         "//common:noncopyable",

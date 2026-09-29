@@ -8,7 +8,6 @@ cc_test(
         "*.h",
     ]),
     copts = COPTS,
-    features = ["cpp_modules"],
     deps = [
         "//co_async",
         "@googletest//:gtest",

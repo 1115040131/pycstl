@@ -9,7 +9,6 @@ cc_test(
     ]),
     copts = COPTS,
     data = glob(["resource/**"]),
-    features = ["cpp_modules"],
     deps = [
         "//common:cin_redirect",
         "@fmt",

@@ -5,7 +5,6 @@ cc_library(
     name = "gate_server_lib",
     srcs = glob(["src/**/*.cpp"]),
     copts = COPTS,
-    features = ["cpp_modules"],
     module_interfaces = glob(["src/**/*.cppm"]),
     deps = [
         "//chat/common",
@@ -32,7 +31,6 @@ cc_binary(
     name = "gate_server",
     srcs = ["gate_server.cpp"],
     copts = COPTS,
-    features = ["cpp_modules"],
     visibility = ["//chat/server:__subpackages__"],
     deps = [
         ":gate_server_lib",

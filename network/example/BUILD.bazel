@@ -115,6 +115,5 @@ BINARIES = {
     name = binary,
     srcs = ["%s.cpp" % binary],
     copts = COPTS,
-    features = ["cpp_modules"],
     deps = deps,
 ) for binary, deps in BINARIES.items()]

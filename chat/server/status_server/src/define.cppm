@@ -2,7 +2,6 @@ module;
 
 #include <utility>
 
-
 export module chat.server.status_server.define;
 
 import logger.logger;

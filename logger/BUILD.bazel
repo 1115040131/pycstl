@@ -5,7 +5,6 @@ cc_library(
     name = "logger",
     srcs = glob(["src/**/*.cpp"]),
     copts = COPTS,
-    features = ["cpp_modules"],
     local_defines = ["FMT_USE_LOCAL_TIME=1"],
     module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//visibility:public"],
