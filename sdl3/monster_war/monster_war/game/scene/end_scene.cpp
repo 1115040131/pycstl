@@ -1,12 +1,16 @@
-#include "monster_war/game/scene/end_scene.h"
+module;
 
+#include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/audio/audio_player.h"
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/core/game_state.h"
-#include "monster_war/game/scene/title_scene.h"
-#include "monster_war/game/system/debug_ui_system.h"
+module monster_war.game.scene;
+
+import :debug_ui_system;
+import :title_scene;
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.core.context;
+import monster_war.engine.core.game_state;
+import monster_war.engine.scene.scene;
 
 namespace pyc::monster_war {
 

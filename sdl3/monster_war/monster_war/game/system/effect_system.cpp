@@ -1,11 +1,13 @@
-#include "monster_war/game/system/effect_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/factory/entity_factory.h"
+module monster_war.game.system.effect_system;
+
+import monster_war.game.def.events;
+import monster_war.game.factory.entity_factory;
 
 namespace pyc::monster_war {
 

@@ -1,6 +1,13 @@
-#include "sunny_land/engine/core/context.h"
+module;
 
 #include <spdlog/spdlog.h>
+
+module sunny_land.engine.core;
+
+import sunny_land.engine.audio.audio_player;
+import sunny_land.engine.core.game_state;
+import sunny_land.engine.input.input_manager;
+import sunny_land.engine.resource;
 
 namespace pyc::sunny_land {
 
@@ -18,4 +25,4 @@ Context::Context(ResourceManager& resource_manager, Renderer& renderer, Camera& 
     spdlog::trace("上下文已创建并初始化。");
 }
 
-};  // namespace pyc::sunny_land
+}  // namespace pyc::sunny_land

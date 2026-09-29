@@ -1,9 +1,19 @@
-#include "ghost_escape/affiliate/sprite.h"
+module;
 
-#include "ghost_escape/core/object_screen.h"
+#include <memory>
+#include <string>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.affiliate.sprite;
+
+import ghost_escape.core;
+import ghost_escape.core.texture;
+
+namespace pyc::sdl3 {
 
 Sprite* Sprite::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, Anchor anchor) {
     auto sprite = std::make_unique<Sprite>();
@@ -33,5 +43,4 @@ void Sprite::render() {
     game_.renderTexture(texture_, getRenderPosition(), size_, percent_);
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

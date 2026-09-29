@@ -1,22 +1,26 @@
-#include "monster_war/game/ui/units_portrait_ui.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/core/game_state.h"
-#include "monster_war/engine/input/input_manager.h"
-#include "monster_war/engine/ui/ui_button.h"
-#include "monster_war/engine/ui/ui_image.h"
-#include "monster_war/engine/ui/ui_label.h"
-#include "monster_war/engine/ui/ui_manager.h"
-#include "monster_war/engine/ui/ui_panel.h"
-#include "monster_war/game/data/game_stats.h"
-#include "monster_war/game/data/session_data.h"
-#include "monster_war/game/data/ui_config.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/factory/blueprint_manager.h"
+module monster_war.game.ui.units_portrait_ui;
+
+import monster_war.engine.core.context;
+import monster_war.engine.core.game_state;
+import monster_war.engine.input.input_manager;
+import monster_war.engine.ui.ui_button;
+import monster_war.engine.ui.ui_image;
+import monster_war.engine.ui.ui_label;
+import monster_war.engine.ui.ui_manager;
+import monster_war.engine.ui.ui_panel;
+import monster_war.engine.utils.math;
+import monster_war.game.data.game_stats;
+import monster_war.game.data.session_data;
+import monster_war.game.data.ui_config;
+import monster_war.game.def.events;
+import monster_war.game.factory.blueprint_manager;
 
 namespace pyc::monster_war {
 

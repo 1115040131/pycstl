@@ -1,7 +1,21 @@
-#include "ghost_escape/hud_stats.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <chrono>
+#include <memory>
+#include <utility>
+
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/asset.h"
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.hud_stats;
+
+import ghost_escape.actor;
+import ghost_escape.affiliate.sprite;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 HUDStatus* HUDStatus::CreateAndSet(Object* parent, Actor* target, const glm::vec2& render_position) {
     auto hud_stats = std::make_unique<HUDStatus>();
@@ -39,5 +53,4 @@ void HUDStatus::update(std::chrono::duration<float> delta) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

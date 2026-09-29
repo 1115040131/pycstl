@@ -1,9 +1,11 @@
-#include "monster_war/engine/core/config.h"
+module;
 
 #include <fstream>
 
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.core.config;
 
 namespace pyc::monster_war {
 
@@ -14,8 +16,6 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Performance, targe
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail::Audio, music_volume, sound_volume);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigDetail, window, graphics, performance, audio,
                                                 input_mappings);
-
-Config::Config(std::string_view filepath) { loadFromFile(filepath); }
 
 bool Config::loadFromFile(std::string_view filepath) {
     std::ifstream file(filepath.data());

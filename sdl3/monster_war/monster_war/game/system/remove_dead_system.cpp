@@ -1,9 +1,11 @@
-#include "monster_war/game/system/remove_dead_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.remove_dead_system;
+
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

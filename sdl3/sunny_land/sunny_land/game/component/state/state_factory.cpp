@@ -1,12 +1,8 @@
-#include "sunny_land/game/component/state/state_factory.h"
+module;
 
-#include "sunny_land/game/component/state/climb_state.h"
-#include "sunny_land/game/component/state/dead_state.h"
-#include "sunny_land/game/component/state/fall_state.h"
-#include "sunny_land/game/component/state/hurt_state.h"
-#include "sunny_land/game/component/state/idle_state.h"
-#include "sunny_land/game/component/state/jump_state.h"
-#include "sunny_land/game/component/state/walk_state.h"
+#include <memory>
+
+module sunny_land.game.player;
 
 namespace pyc::sunny_land {
 

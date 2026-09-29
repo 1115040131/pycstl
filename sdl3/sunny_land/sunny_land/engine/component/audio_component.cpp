@@ -1,11 +1,18 @@
-#include "sunny_land/engine/component/audio_component.h"
+module;
 
+#include <string>
+#include <string_view>
+#include <unordered_map>
+
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/audio/audio_player.h"
-#include "sunny_land/engine/component/transform_component.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/engine/render/camera.h"
+#include "common/string_hash.h"
+
+module sunny_land.engine.component.audio_component;
+
+import sunny_land.engine.audio.audio_player;
+import sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 
@@ -55,4 +62,4 @@ void AudioComponent::addSound(std::string_view sound_id, std::string_view sound_
     spdlog::debug("AudioComponent::addSound: 添加音效 ID '{}' 路径 '{}'", sound_id, sound_path);
 }
 
-};  // namespace pyc::sunny_land
+}  // namespace pyc::sunny_land

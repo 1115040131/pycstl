@@ -1,8 +1,13 @@
-#include "monster_war/engine/ui/ui_manager.h"
+module;
 
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/ui/ui_panel.h"
+module monster_war.engine.ui.ui_manager;
+
+import monster_war.engine.core.context;
+import monster_war.engine.ui.ui_element;
+import monster_war.engine.ui.ui_panel;
 
 namespace pyc::monster_war {
 

@@ -1,13 +1,22 @@
-#include "sunny_land/engine/scene/scene.h"
+module;
 
+#include <algorithm>
+#include <chrono>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/core/game_state.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/engine/physics/physics_engine.h"
-#include "sunny_land/engine/render/camera.h"
-#include "sunny_land/engine/ui/ui_manager.h"
+module sunny_land.engine.scene;
+
+import sunny_land.engine.core;
+import sunny_land.engine.core.game_state;
+import sunny_land.engine.ui.ui_manager;
 
 namespace pyc::sunny_land {
 

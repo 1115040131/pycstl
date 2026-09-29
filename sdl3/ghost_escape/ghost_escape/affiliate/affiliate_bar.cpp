@@ -1,7 +1,20 @@
-#include "ghost_escape/affiliate/affiliate_bar.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <iterator>
+#include <map>
+#include <memory>
+#include <utility>
+
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.affiliate.affiliate_bar;
+
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 AffiliateBar* AffiliateBar::CreateAndSet(ObjectScreen* parent, const glm::vec2& size, Anchor anchor) {
     auto bar = std::make_unique<AffiliateBar>();
@@ -23,5 +36,4 @@ void AffiliateBar::render() {
     game_.renderHBar(position, size_, percentage_, color->second);
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

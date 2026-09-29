@@ -1,9 +1,17 @@
-#include "ghost_escape/core/scene.h"
+module;
 
 #include <algorithm>
+#include <chrono>
+#include <memory>
+#include <utility>
+#include <vector>
 
-namespace pyc {
-namespace sdl3 {
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+module ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 void Scene::clean() {
     Clean(children_);
@@ -105,5 +113,4 @@ void Scene::removeChild(Object* child_to_remove) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

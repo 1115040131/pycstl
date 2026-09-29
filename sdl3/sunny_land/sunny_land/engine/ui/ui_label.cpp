@@ -1,8 +1,16 @@
-#include "sunny_land/engine/ui/ui_label.h"
+module;
 
+#include <string>
+#include <string_view>
+#include <utility>
+
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/render/text_renderer.h"
+module sunny_land.engine.ui.ui_label;
+
+import sunny_land.engine.core;
+import sunny_land.engine.ui.ui_element;
 
 namespace pyc::sunny_land {
 

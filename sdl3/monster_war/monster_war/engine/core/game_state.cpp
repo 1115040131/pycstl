@@ -1,7 +1,10 @@
-#include "monster_war/engine/core/game_state.h"
+module;
 
 #include <SDL3/SDL.h>
+#include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.core.game_state;
 
 namespace pyc::monster_war {
 

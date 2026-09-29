@@ -1,10 +1,24 @@
-#include "sunny_land/engine/component/animation_component.h"
+module;
 
+#include <chrono>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/sprite_component.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/engine/render/animation.h"
+#include "common/string_hash.h"
+
+module sunny_land.engine.component.animation_component;
+
+import sunny_land.engine.core;
+import sunny_land.engine.render.animation;
 
 namespace pyc::sunny_land {
 

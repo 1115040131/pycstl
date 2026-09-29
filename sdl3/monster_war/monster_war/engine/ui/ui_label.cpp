@@ -1,9 +1,15 @@
-#include "monster_war/engine/ui/ui_label.h"
+module;
 
 #include <entt/core/hashed_string.hpp>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/render/text_renderer.h"
+module monster_war.engine.ui.ui_label;
+
+import monster_war.engine.core.context;
+import monster_war.engine.render.text_renderer;
+import monster_war.engine.ui.ui_element;
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

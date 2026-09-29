@@ -1,13 +1,25 @@
-#include "sunny_land/engine/ui/ui_interactive.h"
+module;
 
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/audio/audio_player.h"
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/render/renderer.h"
-#include "sunny_land/engine/render/sprite.h"
-#include "sunny_land/engine/resource/resource_manager.h"
-#include "sunny_land/engine/ui/state/ui_state.h"
+#include "common/string_hash.h"
+
+module sunny_land.engine.ui;
+
+import sunny_land.engine.audio.audio_player;
+import sunny_land.engine.core;
+import sunny_land.engine.render.sprite;
+import sunny_land.engine.resource;
+import sunny_land.engine.ui.ui_element;
 
 namespace pyc::sunny_land {
 

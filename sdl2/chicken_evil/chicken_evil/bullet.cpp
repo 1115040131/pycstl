@@ -1,9 +1,16 @@
-#include "chicken_evil/bullet.h"
+module;
 
-#include "chicken_evil/resource_mgr.h"
+#include <chrono>
+#include <cmath>
 
-namespace pyc {
-namespace sdl2 {
+#include <SDL2/SDL.h>
+
+module sdl2.chicken_evil.bullet;
+
+import sdl2.chicken_evil.resource_mgr;
+import sdl2.common.camera;
+
+namespace pyc::sdl2 {
 
 Bullet::Bullet(double angle) : angle_(angle) {
     double rad = angle * M_PI / 180;
@@ -23,5 +30,4 @@ void Bullet::on_render(const Camera& camera) const {
     camera.render_texture(ResourceMgr::GetInstance().TextureBullet(), nullptr, &bullet, angle_, nullptr);
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

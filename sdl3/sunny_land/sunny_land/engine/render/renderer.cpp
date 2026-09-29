@@ -1,10 +1,20 @@
-#include "sunny_land/engine/render/renderer.h"
+module;
+
+#include <optional>
+#include <stdexcept>
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/render/camera.h"
-#include "sunny_land/engine/resource/resource_manager.h"
+struct SDL_Renderer;
+
+module sunny_land.engine.core;
+
+import sunny_land.engine.render.sprite;
+import sunny_land.engine.resource;
+import sunny_land.engine.utils.math;
 
 namespace pyc::sunny_land {
 

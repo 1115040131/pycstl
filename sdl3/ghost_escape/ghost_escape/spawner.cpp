@@ -1,11 +1,19 @@
-#include "ghost_escape/spawner.h"
+module;
 
-#include "ghost_escape/core/scene.h"
-#include "ghost_escape/enemy.h"
-#include "ghost_escape/world/effect.h"
+#include <chrono>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/vec2.hpp>
+
+#include "ghost_escape/core/asset.h"
+
+module ghost_escape.spawner;
+
+import ghost_escape.actor;
+import ghost_escape.core;
+import ghost_escape.enemy;
+import ghost_escape.world.effect;
+
+namespace pyc::sdl3 {
 
 void Spawner::update(std::chrono::duration<float> delta) {
     timer_ += delta;
@@ -22,5 +30,4 @@ void Spawner::update(std::chrono::duration<float> delta) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

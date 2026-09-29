@@ -1,18 +1,21 @@
-#include "monster_war/game/system/skill_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <glm/glm.hpp>
 
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/utils/events.h"
-#include "monster_war/game/component/cost_regen_component.h"
-#include "monster_war/game/component/skill_component.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/def/constants.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
-#include "monster_war/game/factory/blueprint_manager.h"
-#include "monster_war/game/factory/entity_factory.h"
+module monster_war.game.system.skill_system;
+
+import monster_war.engine.component.transform_component;
+import monster_war.engine.utils.events;
+import monster_war.game.component.cost_regen_component;
+import monster_war.game.component.skill_component;
+import monster_war.game.component.stats_component;
+import monster_war.game.def.constants;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
+import monster_war.game.factory.blueprint_manager;
+import monster_war.game.factory.entity_factory;
 
 namespace pyc::monster_war {
 

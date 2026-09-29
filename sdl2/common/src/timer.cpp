@@ -1,7 +1,10 @@
-#include "sdl2/common/timer.h"
+module;
 
-namespace pyc {
-namespace sdl2 {
+#include <chrono>
+
+module sdl2.common.timer;
+
+namespace pyc::sdl2 {
 
 void Timer::on_update(std::chrono::duration<double> delta) {
     if (paused_) {
@@ -19,5 +22,4 @@ void Timer::on_update(std::chrono::duration<double> delta) {
     }
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

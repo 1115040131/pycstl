@@ -1,10 +1,15 @@
-#include "monster_war/engine/render/text_renderer.h"
+module;
 
 #include <SDL3_ttf/SDL_ttf.h>
+#include <entt/entt.hpp>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/render/camera.h"
-#include "monster_war/engine/resource/resource_manager.h"
+module monster_war.engine.render.text_renderer;
+
+import monster_war.engine.render.camera;
+import monster_war.engine.resource;
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

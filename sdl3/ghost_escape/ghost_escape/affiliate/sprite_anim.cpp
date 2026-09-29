@@ -1,9 +1,22 @@
-#include "ghost_escape/affiliate/sprite_anim.h"
+module;
 
-#include "ghost_escape/core/object_screen.h"
+#include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/vec2.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.affiliate.sprite_anim;
+
+import ghost_escape.affiliate.sprite;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
+
+using namespace std::chrono_literals;
 
 SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, float fps,
                                      bool is_loop, Anchor anchor) {
@@ -54,5 +67,4 @@ void SpriteAnim::syncFrame(const SpriteAnim& other) {
     texture_.src_rect.x = other.texture_.src_rect.x;
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

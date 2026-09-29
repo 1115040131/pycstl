@@ -1,13 +1,18 @@
-#include "monster_war/game/factory/blueprint_manager.h"
+module;
 
 #include <filesystem>
 #include <fstream>
 
 #include <entt/core/hashed_string.hpp>
+#include <entt/entity/entity.hpp>
+#include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/resource/resource_manager.h"
+module monster_war.game.factory.blueprint_manager;
+
+import monster_war.engine.resource;
+import monster_war.game.data.entity_blueprint;
 
 namespace pyc::monster_war {
 

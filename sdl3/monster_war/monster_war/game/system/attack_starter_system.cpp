@@ -1,15 +1,18 @@
-#include "monster_war/game/system/attack_starter_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <glm/glm.hpp>
 
-#include "monster_war/engine/component/velocity_component.h"
-#include "monster_war/engine/utils/events.h"
-#include "monster_war/game/component/blocked_by_component.h"
-#include "monster_war/game/component/enemy_component.h"
-#include "monster_war/game/component/player_component.h"
-#include "monster_war/game/component/target_component.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.attack_starter_system;
+
+import monster_war.engine.component.velocity_component;
+import monster_war.engine.utils.events;
+import monster_war.game.component.blocked_by_component;
+import monster_war.game.component.enemy_component;
+import monster_war.game.component.player_component;
+import monster_war.game.component.target_component;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

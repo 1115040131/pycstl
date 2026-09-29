@@ -1,9 +1,22 @@
-#include "ghost_escape/weapon_thunder.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <chrono>
+#include <memory>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include <SDL3/SDL.h>
+#include <glm/vec2.hpp>
+
+#include "ghost_escape/core/asset.h"
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.weapon_thunder;
+
+import ghost_escape.core;
+import ghost_escape.raw.weapon;
+import ghost_escape.screen.hud_skill;
+
+namespace pyc::sdl3 {
 
 WeaponThunder* WeaponThunder::CreateAndSet(Actor* parent, std::chrono::duration<float> cool_down,
                                            float mana_cost) {
@@ -43,5 +56,4 @@ bool WeaponThunder::handleEvents(const SDL_Event& event) {
     return false;
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

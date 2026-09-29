@@ -1,7 +1,9 @@
-#include "monster_war/engine/core/time.h"
+module;
 
 #include <SDL3/SDL_timer.h>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.core.time;
 
 namespace pyc::monster_war {
 

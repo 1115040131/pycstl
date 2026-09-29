@@ -1,15 +1,21 @@
-#include "sunny_land/game/component/player_component.h"
+module;
 
+#include <chrono>
+#include <memory>
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/animation_component.h"
-#include "sunny_land/engine/component/audio_component.h"
-#include "sunny_land/engine/component/health_component.h"
-#include "sunny_land/engine/component/physics_component.h"
-#include "sunny_land/engine/component/sprite_component.h"
-#include "sunny_land/engine/component/transform_component.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/game/component/state/state_factory.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.player;
+
+import sunny_land.engine.component.animation_component;
+import sunny_land.engine.component.audio_component;
+import sunny_land.engine.component.health_component;
+import sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

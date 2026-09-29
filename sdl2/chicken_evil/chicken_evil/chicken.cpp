@@ -1,13 +1,17 @@
-#include "chicken_evil/chicken.h"
+module;
 
+#include <chrono>
+#include <ctime>
 #include <random>
 
 #include <SDL2/SDL_mixer.h>
 
-#include "chicken_evil/resource_mgr.h"
+module sdl2.chicken_evil.chicken;
 
-namespace pyc {
-namespace sdl2 {
+import sdl2.chicken_evil.resource_mgr;
+import sdl2.common.animation;
+
+namespace pyc::sdl2 {
 
 using namespace std::chrono_literals;
 
@@ -70,5 +74,4 @@ ChickenSlow::ChickenSlow() : Chicken() {
     speed_ = 30.0;
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

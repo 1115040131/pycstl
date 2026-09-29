@@ -1,17 +1,20 @@
-#include "monster_war/game/system/projectile_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <glm/common.hpp>
 #include <glm/trigonometric.hpp>
+#include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/utils/events.h"
-#include "monster_war/game/component/projectile_component.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
-#include "monster_war/game/factory/entity_factory.h"
+module monster_war.game.system.projectile_system;
+
+import monster_war.engine.component.transform_component;
+import monster_war.engine.utils.events;
+import monster_war.game.component.projectile_component;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
+import monster_war.game.factory.entity_factory;
 
 namespace pyc::monster_war {
 

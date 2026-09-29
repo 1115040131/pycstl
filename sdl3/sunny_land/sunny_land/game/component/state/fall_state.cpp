@@ -1,11 +1,18 @@
-#include "sunny_land/game/component/state/fall_state.h"
+module;
 
-#include "sunny_land/engine/component/physics_component.h"
-#include "sunny_land/engine/component/sprite_component.h"
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/game/component/player_component.h"
-#include "sunny_land/game/component/state/state_factory.h"
+#include <chrono>
+#include <memory>
+
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
+#include <glm/glm.hpp>
+
+#include "common/string_hash.h"
+
+module sunny_land.game.player;
+
+import sunny_land.engine.core;
+import sunny_land.engine.input.input_manager;
 
 namespace pyc::sunny_land {
 

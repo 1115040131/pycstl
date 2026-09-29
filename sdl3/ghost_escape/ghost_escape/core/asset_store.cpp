@@ -1,9 +1,16 @@
-#include "ghost_escape/core/asset_store.h"
+module;
 
+#include <string>
+#include <unordered_map>
+
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_mixer/SDL_mixer.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <fmt/format.h>
 
-namespace pyc {
-namespace sdl3 {
+module ghost_escape.core.asset_store;
+
+namespace pyc::sdl3 {
 
 AssetStore::~AssetStore() {
     for (auto& [_, texture] : textures_) {
@@ -143,5 +150,4 @@ void AssetStore::loadFont(const std::string& file_path, int font_size) {
     fonts_[key] = font;
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

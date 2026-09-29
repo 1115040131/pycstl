@@ -1,24 +1,29 @@
-#include "monster_war/game/system/place_unit_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/audio/audio_player.h"
-#include "monster_war/engine/component/name_component.h"
-#include "monster_war/engine/component/render_component.h"
-#include "monster_war/engine/component/sprite_component.h"
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/input/input_manager.h"
-#include "monster_war/engine/render/camera.h"
-#include "monster_war/game/component/place_occupied_component.h"
-#include "monster_war/game/component/unit_prep_component.h"
-#include "monster_war/game/data/game_stats.h"
-#include "monster_war/game/data/session_data.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
-#include "monster_war/game/factory/entity_factory.h"
+module monster_war.game.system.place_unit_system;
+
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.component.name_component;
+import monster_war.engine.component.render_component;
+import monster_war.engine.component.sprite_component;
+import monster_war.engine.component.transform_component;
+import monster_war.engine.core.context;
+import monster_war.engine.input.input_manager;
+import monster_war.engine.render.camera;
+import monster_war.engine.utils.math;
+import monster_war.game.component.place_occupied_component;
+import monster_war.game.component.unit_prep_component;
+import monster_war.game.data.game_stats;
+import monster_war.game.data.session_data;
+import monster_war.game.def.constants;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
+import monster_war.game.factory.entity_factory;
 
 namespace pyc::monster_war {
 

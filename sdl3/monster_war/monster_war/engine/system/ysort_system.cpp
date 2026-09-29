@@ -1,9 +1,11 @@
-#include "monster_war/engine/system/ysort_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 
-#include "monster_war/engine/component/render_component.h"
-#include "monster_war/engine/component/transform_component.h"
+module monster_war.engine.system.ysort_system;
+
+import monster_war.engine.component.render_component;
+import monster_war.engine.component.transform_component;
 
 namespace pyc::monster_war {
 

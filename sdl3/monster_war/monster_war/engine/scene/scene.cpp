@@ -1,11 +1,13 @@
-#include "monster_war/engine/scene/scene.h"
+module;
 
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/ui/ui_manager.h"
-#include "monster_war/engine/utils/events.h"
+module monster_war.engine.scene.scene;
+
+import monster_war.engine.core.context;
+import monster_war.engine.ui.ui_manager;
+import monster_war.engine.utils.events;
 
 namespace pyc::monster_war {
 

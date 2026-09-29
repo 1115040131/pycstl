@@ -1,9 +1,20 @@
-#include "ghost_escape/raw/weapon.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <algorithm>
+#include <chrono>
+#include <memory>
+#include <utility>
 
-namespace pyc {
-namespace sdl3 {
+#include <fmt/base.h>
+#include <glm/glm.hpp>
+
+module ghost_escape.raw.weapon;
+
+import ghost_escape.actor;
+import ghost_escape.core;
+import ghost_escape.world.spell;
+
+namespace pyc::sdl3 {
 
 void Weapon::update(std::chrono::duration<float> delta) {
     Object::update(delta);
@@ -35,5 +46,4 @@ void Weapon::attack(const glm::vec2& position, std::unique_ptr<Spell> spell) {
     game_.getCurrentScene()->addChild(std::move(spell));
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

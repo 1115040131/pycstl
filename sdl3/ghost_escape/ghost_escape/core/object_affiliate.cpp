@@ -1,9 +1,11 @@
-#include "ghost_escape/core/object_affiliate.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <fmt/base.h>
+#include <glm/glm.hpp>
 
-namespace pyc {
-namespace sdl3 {
+module ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 ObjectScreen* ObjectAffiliate::getParent() const { return static_cast<ObjectScreen*>(parent_); }
 
@@ -55,5 +57,4 @@ glm::vec2 ObjectAffiliate::getPosition() const {
     return game_.getCurrentScene()->screenToWorld(getRenderPosition());
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

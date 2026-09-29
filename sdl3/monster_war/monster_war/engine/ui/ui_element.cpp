@@ -1,6 +1,16 @@
-#include "monster_war/engine/ui/ui_element.h"
+module;
 
 #include <algorithm>
+#include <chrono>
+#include <memory>
+
+#include <entt/entt.hpp>
+#include <glm/glm.hpp>
+
+module monster_war.engine.ui.ui_element;
+
+import monster_war.engine.core.context;
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

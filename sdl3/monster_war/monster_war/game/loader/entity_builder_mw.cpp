@@ -1,10 +1,17 @@
-#include "monster_war/game/loader/entity_builder_mw.h"
+module;
 
+#include <entt/entt.hpp>
+#include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/tilelayer_component.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.loader.entity_builder_mw;
+
+import monster_war.engine.component.tilelayer_component;
+import monster_war.engine.core.context;
+import monster_war.engine.loader;
+import monster_war.game.data.waypoint_node;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

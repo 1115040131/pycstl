@@ -1,37 +1,44 @@
-#include "sunny_land/game/scene/game_scene.h"
+module;
 
+#include <chrono>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
+
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
+#include <fmt/format.h>
+#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/audio/audio_player.h"
-#include "sunny_land/engine/component/animation_component.h"
-#include "sunny_land/engine/component/collider_component.h"
-#include "sunny_land/engine/component/health_component.h"
-#include "sunny_land/engine/component/physics_component.h"
-#include "sunny_land/engine/component/sprite_component.h"
-#include "sunny_land/engine/component/tilelayer_component.h"
-#include "sunny_land/engine/component/transform_component.h"
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/core/game_state.h"
-#include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/engine/physics/physics_engine.h"
-#include "sunny_land/engine/render/animation.h"
-#include "sunny_land/engine/render/camera.h"
-#include "sunny_land/engine/render/text_renderer.h"
-#include "sunny_land/engine/scene/level_loader.h"
-#include "sunny_land/engine/scene/scene_manager.h"
-#include "sunny_land/engine/ui/ui_image.h"
-#include "sunny_land/engine/ui/ui_label.h"
-#include "sunny_land/engine/ui/ui_manager.h"
-#include "sunny_land/engine/ui/ui_panel.h"
-#include "sunny_land/game/component/ai/jump_behavior.h"
-#include "sunny_land/game/component/ai/patrol_behavior.h"
-#include "sunny_land/game/component/ai/updown_behavior.h"
-#include "sunny_land/game/component/ai_component.h"
-#include "sunny_land/game/component/player_component.h"
-#include "sunny_land/game/data/session_data.h"
-#include "sunny_land/game/scene/end_scene.h"
-#include "sunny_land/game/scene/menu_scene.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.scene;
+
+import sunny_land.engine.audio.audio_player;
+import sunny_land.engine.component.animation_component;
+import sunny_land.engine.component.health_component;
+import sunny_land.engine.core;
+import sunny_land.engine.core.game_state;
+import sunny_land.engine.input.input_manager;
+import sunny_land.engine.render.animation;
+import sunny_land.engine.scene;
+import sunny_land.engine.scene.level_loader;
+import sunny_land.engine.ui.ui_image;
+import sunny_land.engine.ui.ui_label;
+import sunny_land.engine.ui.ui_manager;
+import sunny_land.engine.ui.ui_panel;
+import sunny_land.game.ai;
+import sunny_land.game.component.ai.jump_behavior;
+import sunny_land.game.component.ai.patrol_behavior;
+import sunny_land.game.component.ai.updown_behavior;
+import sunny_land.game.data.session_data;
+import sunny_land.game.player;
 
 namespace pyc::sunny_land {
 

@@ -1,9 +1,15 @@
-#include "ghost_escape/core/actor.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <chrono>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/glm.hpp>
+
+module ghost_escape.actor;
+
+import ghost_escape.affiliate.affiliate_bar;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 void Actor::update(std::chrono::duration<float> delta) {
     updateHealthBar();
@@ -34,5 +40,4 @@ void Actor::updateHealthBar() {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

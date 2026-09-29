@@ -1,4 +1,4 @@
-#include "monster_war/game/data/session_data.h"
+module;
 
 #include <filesystem>
 #include <fstream>
@@ -6,6 +6,8 @@
 #include <entt/core/hashed_string.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.game.data.session_data;
 
 namespace pyc::monster_war {
 

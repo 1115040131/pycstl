@@ -1,12 +1,14 @@
-#include "sunny_land/game/component/state/dead_state.h"
+module;
 
+#include <chrono>
+#include <memory>
+
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/component/collider_component.h"
-#include "sunny_land/engine/component/physics_component.h"
-#include "sunny_land/engine/object/game_object.h"
-#include "sunny_land/game/component/player_component.h"
-#include "sunny_land/game/component/state/state_factory.h"
+module sunny_land.game.player;
+
+import sunny_land.engine.core;
 
 namespace pyc::sunny_land {
 

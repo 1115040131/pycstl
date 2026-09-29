@@ -4,10 +4,12 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "chicken_evil_lib",
     srcs = glob(["chicken_evil/*.cpp"]),
-    hdrs = glob(["chicken_evil/*.h"]),
     copts = COPTS,
-    features = ["-layering_check"],
-    strip_include_prefix = "/sdl2/chicken_evil",
+    features = [
+        "cpp_modules",
+        "-layering_check",
+    ],
+    module_interfaces = glob(["chicken_evil/*.cppm"]),
     deps = [
         "//common:singleton",
         "//sdl2/common",
@@ -21,5 +23,6 @@ cc_binary(
     srcs = ["main.cpp"],
     copts = COPTS,
     data = glob(["assets/**"]),
+    features = ["cpp_modules"],
     deps = [":chicken_evil_lib"],
 )

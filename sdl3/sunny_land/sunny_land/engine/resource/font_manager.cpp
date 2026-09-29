@@ -1,6 +1,15 @@
-#include "sunny_land/engine/resource/font_manager.h"
+module;
 
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+
+#include <SDL3_ttf/SDL_ttf.h>
 #include <spdlog/spdlog.h>
+
+module sunny_land.engine.resource;
 
 namespace pyc::sunny_land {
 

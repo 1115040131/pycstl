@@ -1,17 +1,30 @@
-#include "shooter/scene_main.h"
+module;
 
 #include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <memory>
+#include <random>
+#include <utility>
+#include <vector>
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #include <fmt/base.h>
 #include <fmt/format.h>
 
-#include "shooter/game.h"
-#include "shooter/scene_end.h"
-#include "shooter/scene_title.h"
+#include "shooter/asset.h"
 
-namespace pyc {
-namespace sdl2 {
+module sdl2.shooter.scene_main;
+
+import sdl2.shooter.object;
+import sdl2.shooter.scene;
+import sdl2.shooter.scene_end;
+import sdl2.shooter.scene_title;
+
+namespace pyc::sdl2 {
 
 void SceneMain::update(std::chrono::duration<double> delta) {
     if (is_player_alive_) {
@@ -505,5 +518,4 @@ SDL_Rect SceneMain::getRect(const SDL_FPoint& position, int width, int height) {
     };
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

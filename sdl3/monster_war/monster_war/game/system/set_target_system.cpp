@@ -1,16 +1,18 @@
-#include "monster_war/game/system/set_target_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/utils/math.h"
-#include "monster_war/game/component/enemy_component.h"
-#include "monster_war/game/component/player_component.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/component/target_component.h"
-#include "monster_war/game/def/constants.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.set_target_system;
+
+import monster_war.engine.component.transform_component;
+import monster_war.engine.utils.math;
+import monster_war.game.component.enemy_component;
+import monster_war.game.component.player_component;
+import monster_war.game.component.stats_component;
+import monster_war.game.component.target_component;
+import monster_war.game.def.constants;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

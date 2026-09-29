@@ -1,12 +1,23 @@
-#include "sunny_land/game/scene/helps_scene.h"
+module;
 
+#include <memory>
+#include <utility>
+
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_scancode.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/engine/scene/scene_manager.h"
-#include "sunny_land/engine/ui/ui_image.h"
-#include "sunny_land/engine/ui/ui_manager.h"
+#include "common/string_hash.h"
+
+module sunny_land.game.scene.helps_scene;
+
+import sunny_land.engine.core;
+import sunny_land.engine.input.input_manager;
+import sunny_land.engine.scene;
+import sunny_land.engine.ui.ui_image;
+import sunny_land.engine.ui.ui_manager;
+import sunny_land.game.data.session_data;
 
 namespace pyc::sunny_land {
 

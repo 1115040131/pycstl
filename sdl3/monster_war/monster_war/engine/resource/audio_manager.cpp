@@ -1,7 +1,12 @@
-#include "monster_war/engine/resource/audio_manager.h"
+module;
 
+#include <SDL3_mixer/SDL_mixer.h>
 #include <entt/core/hashed_string.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.resource;
+
+import :resource_manager;
 
 namespace pyc::monster_war {
 

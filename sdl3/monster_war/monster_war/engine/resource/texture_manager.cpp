@@ -1,8 +1,13 @@
-#include "monster_war/engine/resource/texture_manager.h"
+module;
 
 #include <SDL3_image/SDL_image.h>
 #include <entt/core/hashed_string.hpp>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.resource;
+
+import :resource_manager;
 
 namespace pyc::monster_war {
 

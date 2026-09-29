@@ -4,14 +4,13 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "ziyu_engine",
     srcs = glob(["sunny_land/engine/**/*.cpp"]),
-    hdrs = glob(["sunny_land/engine/**/*.h"]),
     copts = COPTS,
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["-layering_check"],
-    strip_include_prefix = "/sdl3/sunny_land",
+    features = ["cpp_modules"],
+    module_interfaces = glob(["sunny_land/engine/**/*.cppm"]),
     deps = [
         "//common:noncopyable",
         "//common:string_hash",
@@ -29,14 +28,13 @@ cc_library(
 cc_library(
     name = "sunny_land_game",
     srcs = glob(["sunny_land/game/**/*.cpp"]),
-    hdrs = glob(["sunny_land/game/**/*.h"]),
     copts = COPTS,
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
-    features = ["-layering_check"],
-    strip_include_prefix = "/sdl3/sunny_land",
+    features = ["cpp_modules"],
+    module_interfaces = glob(["sunny_land/game/**/*.cppm"]),
     deps = [
         ":ziyu_engine",
         "//common:noncopyable",
@@ -56,6 +54,7 @@ cc_binary(
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
+    features = ["cpp_modules"],
     deps = [
         ":sunny_land_game",
         ":ziyu_engine",

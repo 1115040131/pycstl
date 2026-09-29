@@ -1,9 +1,21 @@
-#include "ghost_escape/core/object.h"
+module;
 
 #include <algorithm>
+#include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
-namespace pyc {
-namespace sdl3 {
+#include <SDL3/SDL.h>
+
+#ifdef DEBUG_MODE
+#include <fmt/format.h>
+#endif
+
+module ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 void Object::clean() { Clean(children_); }
 
@@ -46,5 +58,4 @@ void Object::removeChild(Object* child_to_remove) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

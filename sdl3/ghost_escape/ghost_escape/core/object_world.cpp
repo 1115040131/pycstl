@@ -1,9 +1,12 @@
-#include "ghost_escape/core/object_world.h"
+module;
 
-#include "ghost_escape/core/scene.h"
+#include <chrono>
 
-namespace pyc {
-namespace sdl3 {
+#include <glm/glm.hpp>
+
+module ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 void ObjectWorld::update(std::chrono::duration<float> delta) {
     ObjectScreen::update(delta);
@@ -20,5 +23,4 @@ void ObjectWorld::setRenderPosition(const glm::vec2& render_position) {
     position_ = game_.getCurrentScene()->screenToWorld(render_position_);
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

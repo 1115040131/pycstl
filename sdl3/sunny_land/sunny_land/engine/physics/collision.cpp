@@ -1,6 +1,10 @@
-#include "sunny_land/engine/physics/collision.h"
+module;
 
-#include "sunny_land/engine/component/collider_component.h"
+#include <glm/glm.hpp>
+
+module sunny_land.engine.core;
+
+import sunny_land.engine.utils.math;
 
 namespace pyc::sunny_land {
 

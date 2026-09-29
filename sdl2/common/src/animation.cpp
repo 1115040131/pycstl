@@ -1,11 +1,17 @@
-#include "sdl2/common/animation.h"
+module;
 
 #include <iostream>
 
+#include <SDL2/SDL.h>
 #include <fmt/ostream.h>
 
-namespace pyc {
-namespace sdl2 {
+module sdl2.common.animation;
+
+import sdl2.common.atlas;
+import sdl2.common.camera;
+import sdl2.common.timer;
+
+namespace pyc::sdl2 {
 
 Animation::Animation() {
     timer_.set_one_shot(false);
@@ -66,5 +72,4 @@ void Animation::on_render(const Camera& camera) const {
     camera.render_texture(frame.texture, &frame.rect_src, &rect_dst, angle_, &center_);
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

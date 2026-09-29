@@ -1,9 +1,22 @@
-#include "sunny_land/engine/audio/audio_player.h"
+module;
+
+#include <algorithm>
+#include <chrono>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 
 #include <SDL3_mixer/SDL_mixer.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/resource/resource_manager.h"
+struct Mix_Chunk;
+struct Mix_Music;
+
+module sunny_land.engine.audio.audio_player;
+
+import sunny_land.engine.resource;
 
 namespace pyc::sunny_land {
 

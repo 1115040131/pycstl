@@ -1,6 +1,17 @@
-#include "sunny_land/engine/ui/ui_element.h"
+module;
 
 #include <algorithm>
+#include <chrono>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include <glm/glm.hpp>
+
+module sunny_land.engine.ui.ui_element;
+
+import sunny_land.engine.core;
+import sunny_land.engine.utils.math;
 
 namespace pyc::sunny_land {
 

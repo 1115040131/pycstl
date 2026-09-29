@@ -1,10 +1,15 @@
-#include "monster_war/engine/system/animation_system.h"
+module;
+
+#include <chrono>
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 
-#include "monster_war/engine/component/animation_component.h"
-#include "monster_war/engine/component/sprite_component.h"
+module monster_war.engine.system.animation_system;
+
+import monster_war.engine.component.animation_component;
+import monster_war.engine.component.sprite_component;
+import monster_war.engine.utils.events;
 
 namespace pyc::monster_war {
 

@@ -1,8 +1,17 @@
-#include "sunny_land/engine/ui/ui_manager.h"
+module;
 
+#include <chrono>
+#include <memory>
+#include <utility>
+
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/ui/ui_panel.h"
+module sunny_land.engine.ui.ui_manager;
+
+import sunny_land.engine.core;
+import sunny_land.engine.ui.ui_element;
+import sunny_land.engine.ui.ui_panel;
 
 namespace pyc::sunny_land {
 

@@ -1,9 +1,16 @@
-#include "monster_war/engine/ui/ui_image.h"
+module;
 
+#include <entt/entt.hpp>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/render/renderer.h"
+module monster_war.engine.ui.ui_image;
+
+import monster_war.engine.core.context;
+import monster_war.engine.render.image;
+import monster_war.engine.render.renderer;
+import monster_war.engine.ui.ui_element;
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

@@ -1,11 +1,15 @@
-#include "monster_war/engine/system/render_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
+#include <glm/vec2.hpp>
 
-#include "monster_war/engine/component/render_component.h"
-#include "monster_war/engine/component/sprite_component.h"
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/render/renderer.h"
+module monster_war.engine.system.render_system;
+
+import monster_war.engine.component.render_component;
+import monster_war.engine.component.sprite_component;
+import monster_war.engine.component.transform_component;
+import monster_war.engine.render.camera;
+import monster_war.engine.render.renderer;
 
 namespace pyc::monster_war {
 

@@ -1,11 +1,18 @@
-#include "sunny_land/engine/ui/state/ui_normal_state.h"
+module;
 
+#include <memory>
+
+#include <SDL3/SDL_scancode.h>
+#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "sunny_land/engine/core/context.h"
-#include "sunny_land/engine/input/input_manager.h"
-#include "sunny_land/engine/ui/state/ui_state_factory.h"
-#include "sunny_land/engine/ui/ui_interactive.h"
+#include "common/string_hash.h"
+
+module sunny_land.engine.ui.state;
+
+import sunny_land.engine.core;
+import sunny_land.engine.input.input_manager;
+import sunny_land.engine.ui;
 
 namespace pyc::sunny_land {
 

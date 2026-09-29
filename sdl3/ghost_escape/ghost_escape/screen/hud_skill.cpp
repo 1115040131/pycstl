@@ -1,7 +1,20 @@
-#include "ghost_escape/screen/hud_skill.h"
+module;
 
-namespace pyc {
-namespace sdl3 {
+#include <memory>
+#include <string>
+#include <utility>
+
+#include <SDL3/SDL.h>
+#include <glm/glm.hpp>
+
+#include "ghost_escape/core/set_name.h"
+
+module ghost_escape.screen.hud_skill;
+
+import ghost_escape.affiliate.sprite;
+import ghost_escape.core;
+
+namespace pyc::sdl3 {
 
 HUDSkill* HUDSkill::CreateAndSet(Object* parent, const std::string& file_path, const glm::vec2& render_position,
                                  float scale, Anchor anchor) {
@@ -32,5 +45,4 @@ void HUDSkill::setPercent(float percent) {
     }
 }
 
-}  // namespace sdl3
-}  // namespace pyc
+}  // namespace pyc::sdl3

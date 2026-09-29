@@ -1,7 +1,12 @@
-#include "monster_war/engine/render/camera.h"
+module;
 
 #include <glm/common.hpp>
+#include <glm/vec2.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.render.camera;
+
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

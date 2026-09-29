@@ -1,24 +1,37 @@
-#include "chicken_evil/engine.h"
+module;
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <memory>
 #include <random>
 #include <ranges>
 #include <thread>
+#include <vector>
 
+#include <Eigen/Core>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include <fmt/base.h>
+#include <fmt/format.h>
 
-#include "chicken_evil/gameplay.h"
-#include "chicken_evil/resource_mgr.h"
+module sdl2.chicken_evil.engine;
+
+import sdl2.chicken_evil.bullet;
+import sdl2.chicken_evil.chicken;
+import sdl2.chicken_evil.gameplay;
+import sdl2.chicken_evil.resource_mgr;
+import sdl2.common.camera;
+import sdl2.common.timer;
 
 #define ASSET_PATH "sdl2/chicken_evil/assets/"
 #define ASSET(filename) (ASSET_PATH filename)
 
-namespace pyc {
-namespace sdl2 {
+namespace pyc::sdl2 {
 
 using namespace std::chrono_literals;
 
@@ -376,5 +389,4 @@ void Engine::on_render(const Camera& camera) {
     }
 }
 
-}  // namespace sdl2
-}  // namespace pyc
+}  // namespace pyc::sdl2

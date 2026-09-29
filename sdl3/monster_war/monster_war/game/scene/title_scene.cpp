@@ -1,23 +1,27 @@
-#include "monster_war/game/scene/title_scene.h"
+module;
 
+#include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/audio/audio_player.h"
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/core/game_state.h"
-#include "monster_war/engine/core/time.h"
-#include "monster_war/engine/loader/level_loader.h"
-#include "monster_war/engine/system/animation_system.h"
-#include "monster_war/engine/system/movement_system.h"
-#include "monster_war/engine/system/render_system.h"
-#include "monster_war/engine/system/ysort_system.h"
-#include "monster_war/engine/ui/ui_manager.h"
-#include "monster_war/game/data/level_config.h"
-#include "monster_war/game/data/session_data.h"
-#include "monster_war/game/data/ui_config.h"
-#include "monster_war/game/factory/blueprint_manager.h"
-#include "monster_war/game/scene/game_scene.h"
-#include "monster_war/game/system/debug_ui_system.h"
+module monster_war.game.scene;
+
+import :debug_ui_system;
+import :game_scene;
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.core.context;
+import monster_war.engine.core.game_state;
+import monster_war.engine.core.time;
+import monster_war.engine.loader;
+import monster_war.engine.scene.scene;
+import monster_war.engine.system.animation_system;
+import monster_war.engine.system.movement_system;
+import monster_war.engine.system.render_system;
+import monster_war.engine.system.ysort_system;
+import monster_war.engine.ui.ui_manager;
+import monster_war.game.data.level_config;
+import monster_war.game.data.session_data;
+import monster_war.game.data.ui_config;
+import monster_war.game.factory.blueprint_manager;
 
 namespace pyc::monster_war {
 
