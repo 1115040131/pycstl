@@ -1,6 +1,8 @@
 module;
 
-#include <entt/entt.hpp>
+#include <string>
+
+#include <entt/core/fwd.hpp>
 
 export module monster_war.example.entt_struct;
 
