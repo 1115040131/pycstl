@@ -9,6 +9,7 @@ module;
 module sunny_land.game.component.ai.updown_behavior;
 
 import common.string_hash;
+
 import sunny_land.engine.component.animation_component;
 import sunny_land.engine.core;
 import sunny_land.game.ai;

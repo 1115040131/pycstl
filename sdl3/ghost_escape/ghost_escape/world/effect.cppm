@@ -9,8 +9,8 @@ module;
 
 export module ghost_escape.world.effect;
 
-export import ghost_escape.core;
 export import ghost_escape.affiliate.sprite_anim;
+export import ghost_escape.core;
 
 export namespace pyc::sdl3 {
 

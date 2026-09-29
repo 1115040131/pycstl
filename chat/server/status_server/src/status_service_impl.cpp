@@ -15,11 +15,11 @@ module;
 module chat.server.status_server.status_service_impl;
 
 import chat.common.error_code;
-import logger.logger;
-
 import chat.server.common.config_mgr;
 import chat.server.common.redis_mgr;
 import chat.server.common.utils;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

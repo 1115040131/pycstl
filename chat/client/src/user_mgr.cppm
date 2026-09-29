@@ -10,6 +10,7 @@ module;
 export module chat.client.user_mgr;
 
 export import chat.client.user_data;
+
 import common.singleton;
 
 export class UserMgr : public pyc::Singleton<UserMgr> {

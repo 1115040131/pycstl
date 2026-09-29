@@ -8,8 +8,8 @@ module;
 export module ghost_escape.scene_title;
 
 export import ghost_escape.core;
-import ghost_escape.screen.hud_text;
 import ghost_escape.screen.hud_button;
+import ghost_escape.screen.hud_text;
 import ghost_escape.screen.ui_mouse;
 
 export namespace pyc::sdl3 {

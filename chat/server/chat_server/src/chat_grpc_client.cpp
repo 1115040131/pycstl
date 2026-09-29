@@ -16,13 +16,14 @@ module;
 module chat.server.chat_server.chat_grpc_client;
 
 import chat.common.error_code;
-import common.connection_pool;
-import common.utils;
-import logger.logger;
-
 import chat.server.chat_server.define;
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
+
+import common.connection_pool;
+import common.utils;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

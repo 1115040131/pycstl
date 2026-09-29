@@ -7,6 +7,7 @@ module;
 export module sunny_land.engine.component.audio_component;
 
 import common.string_hash;
+
 export import sunny_land.engine.audio.audio_player;
 export import sunny_land.engine.core;
 

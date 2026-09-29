@@ -7,7 +7,6 @@ module;
 export module tiny_db.table;
 
 import :pager;
-
 export import tiny_db.node;
 export import tiny_db.row;
 

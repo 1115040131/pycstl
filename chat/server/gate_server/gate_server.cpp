@@ -3,10 +3,11 @@
 
 #include <boost/asio.hpp>
 
-import logger.logger;
 import chat.server.common.config_mgr;
 import chat.server.gate_server;
 import chat.server.gate_server.define;
+
+import logger.logger;
 
 int main() {
     auto port = pyc::chat::GetConfigIntOrDie("GateServer", "Port");

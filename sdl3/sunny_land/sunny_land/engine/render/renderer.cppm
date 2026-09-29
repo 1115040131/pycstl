@@ -10,6 +10,7 @@ struct SDL_Renderer;
 export module sunny_land.engine.core:renderer;
 
 import common.noncopyable;
+
 export import sunny_land.engine.render.sprite;
 export import sunny_land.engine.resource;
 export import sunny_land.engine.utils.math;

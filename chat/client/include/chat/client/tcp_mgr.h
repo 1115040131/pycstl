@@ -5,6 +5,7 @@
 
 import chat.client.define;
 import chat.client.user_data;
+
 import common.singleton;
 
 class TcpMgr : public QObject, public pyc::Singleton<TcpMgr> {

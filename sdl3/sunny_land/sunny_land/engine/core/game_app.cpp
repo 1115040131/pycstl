@@ -20,6 +20,7 @@ struct SDL_Renderer;
 module sunny_land.engine.core.game_app;
 
 import common.string_hash;
+
 import sunny_land.engine.audio.audio_player;
 import sunny_land.engine.core;
 import sunny_land.engine.core.config;

@@ -7,8 +7,8 @@ module;
 
 export module ghost_escape.raw.weapon;
 
-export import ghost_escape.core;
 export import ghost_escape.actor;
+export import ghost_escape.core;
 export import ghost_escape.world.spell;
 
 export namespace pyc::sdl3 {

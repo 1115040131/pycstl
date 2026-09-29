@@ -6,8 +6,8 @@ module;
 
 export module ghost_escape.core:world;
 
-export import :screen;
 import :collider;
+export import :screen;
 
 export namespace pyc::sdl3 {
 

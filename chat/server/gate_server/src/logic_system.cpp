@@ -12,15 +12,15 @@ module;
 
 module chat.server.gate_server;
 
+import :http_connection;
 import chat.common.error_code;
 import chat.common.method;
-import logger.logger;
-
-import :http_connection;
 import chat.server.common.mysql_mgr;
 import chat.server.common.redis_mgr;
 import chat.server.common.status_grpc_client;
 import chat.server.gate_server.verify_grpc_client;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

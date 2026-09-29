@@ -12,9 +12,9 @@ module;
 export module network.logic:system;
 
 import common.singleton;
-import network.base;
 
 export import :node;
+import network.base;
 
 export namespace network {
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-import monkey.vm;
 import monkey.test.utils;
+import monkey.vm;
 
 #include "monkey/test/macro.h"
 

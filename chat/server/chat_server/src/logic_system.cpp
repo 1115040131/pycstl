@@ -2,7 +2,6 @@ module;
 
 #include <algorithm>
 #include <cctype>
-#include <exception>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -19,18 +18,18 @@ module;
 
 module chat.server.chat_server;
 
-import chat.common.error_code;
-import chat.common.method;
-import logger.logger;
-
 import :csession;
 import :logic_node;
 import :user_mgr;
+import chat.common.error_code;
+import chat.common.method;
 import chat.server.chat_server.chat_grpc_client;
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
 import chat.server.common.mysql_mgr;
 import chat.server.common.redis_mgr;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

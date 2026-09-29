@@ -12,11 +12,12 @@ module;
 
 export module chat.server.chat_server:logic_system;
 
-export import chat.common.method;
-import common.singleton;
-export import :logic_node;
-export import chat.server.common.data;
 import :csession;
+export import :logic_node;
+export import chat.common.method;
+export import chat.server.common.data;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {

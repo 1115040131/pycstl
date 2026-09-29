@@ -11,9 +11,9 @@ module;
 
 module chat.server.gate_server;
 
-import logger.logger;
-
 import :logic_system;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

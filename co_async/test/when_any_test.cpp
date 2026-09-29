@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-import co_async.timer_loop;
 import co_async.sleep;
+import co_async.timer_loop;
 import co_async.when_any;
 
 #include "co_async/test/utils.h"

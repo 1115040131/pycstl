@@ -11,6 +11,7 @@ module;
 export module sunny_land.engine.component.animation_component;
 
 import common.string_hash;
+
 export import sunny_land.engine.core;
 export import sunny_land.engine.render.animation;
 

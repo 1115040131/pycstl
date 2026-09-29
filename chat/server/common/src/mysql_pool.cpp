@@ -9,9 +9,9 @@ module;
 
 module chat.server.common.mysql_pool;
 
-import logger.logger;
-
 import chat.server.common.defer;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

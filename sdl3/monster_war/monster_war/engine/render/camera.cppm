@@ -7,6 +7,7 @@ module;
 export module monster_war.engine.render.camera;
 
 import common.noncopyable;
+
 export import monster_war.engine.utils.math;
 
 export namespace pyc::monster_war {

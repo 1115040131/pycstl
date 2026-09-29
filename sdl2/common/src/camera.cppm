@@ -8,7 +8,6 @@ module;
 export module sdl2.common.camera;
 
 export import sdl2.common.position;
-
 import sdl2.common.timer;
 
 export namespace pyc::sdl2 {

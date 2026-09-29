@@ -7,10 +7,10 @@ module;
 
 export module chat.server.common.mysql_mgr;
 
-import common.singleton;
 export import chat.server.common.data;
-
 import chat.server.common.mysql_pool;
+
+import common.singleton;
 
 export namespace pyc::chat {
 

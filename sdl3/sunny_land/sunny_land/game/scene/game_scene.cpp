@@ -19,6 +19,7 @@ module;
 module sunny_land.game.scene;
 
 import common.string_hash;
+
 import sunny_land.engine.audio.audio_player;
 import sunny_land.engine.component.animation_component;
 import sunny_land.engine.component.health_component;

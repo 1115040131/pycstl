@@ -7,7 +7,6 @@ module;
 
 module monster_war.game.factory.entity_factory;
 
-import monster_war.game.factory.blueprint_manager;
 import monster_war.engine.component.animation_component;
 import monster_war.engine.component.audio_component;
 import monster_war.engine.component.render_component;
@@ -25,6 +24,7 @@ import monster_war.game.component.stats_component;
 import monster_war.game.component.unit_prep_component;
 import monster_war.game.data.entity_blueprint;
 import monster_war.game.def.tag;
+import monster_war.game.factory.blueprint_manager;
 
 namespace pyc::monster_war {
 

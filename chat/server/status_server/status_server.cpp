@@ -5,10 +5,11 @@
 #include <boost/asio.hpp>
 #include <grpcpp/grpcpp.h>
 
-import logger.logger;
 import chat.server.common.config_mgr;
 import chat.server.status_server.define;
 import chat.server.status_server.status_service_impl;
+
+import logger.logger;
 
 void RunServer() {
     auto host = pyc::chat::GetConfigOrDie("StatusServer", "Host");

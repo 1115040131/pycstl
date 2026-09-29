@@ -12,10 +12,11 @@ module;
 module chat.server.gate_server.verify_grpc_client;
 
 import chat.common.error_code;
-import common.connection_pool;
-import common.utils;
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
+
+import common.connection_pool;
+import common.utils;
 
 namespace pyc {
 namespace chat {

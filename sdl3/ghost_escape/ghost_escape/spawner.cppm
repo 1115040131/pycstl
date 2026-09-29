@@ -4,8 +4,8 @@ module;
 
 export module ghost_escape.spawner;
 
-export import ghost_escape.core;
 export import ghost_escape.actor;
+export import ghost_escape.core;
 
 export namespace pyc::sdl3 {
 

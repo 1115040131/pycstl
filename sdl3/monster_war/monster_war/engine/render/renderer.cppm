@@ -10,6 +10,7 @@ struct SDL_Renderer;
 export module monster_war.engine.render.renderer;
 
 import common.noncopyable;
+
 export import monster_war.engine.component.sprite_component;
 export import monster_war.engine.render.camera;
 export import monster_war.engine.render.image;

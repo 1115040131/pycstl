@@ -4,6 +4,7 @@ module;
 
 export module monster_war.game.scene:level_clear_scene;
 
+import :debug_ui_system;
 export import monster_war.engine.core.context;
 export import monster_war.engine.scene.scene;
 export import monster_war.game.data.game_stats;
@@ -11,7 +12,6 @@ export import monster_war.game.data.level_config;
 export import monster_war.game.data.session_data;
 export import monster_war.game.data.ui_config;
 export import monster_war.game.factory.blueprint_manager;
-import :debug_ui_system;
 
 export namespace pyc::monster_war {
 

@@ -8,6 +8,7 @@ module;
 export module chat.server.chat_server.msg_node;
 
 export import chat.common.method;
+
 import common.noncopyable;
 
 export namespace pyc {

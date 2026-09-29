@@ -8,6 +8,7 @@ module;
 export module concurrency.lock_free_queue;
 
 import common.noncopyable;
+
 import concurrency.memory_order;
 
 export namespace pyc::concurrency {

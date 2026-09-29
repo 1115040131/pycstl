@@ -8,6 +8,7 @@ module;
 export module concurrency.lock_free_stack.ref_count_stack;
 
 import common.noncopyable;
+
 import concurrency.memory_order;
 
 export namespace pyc::concurrency {

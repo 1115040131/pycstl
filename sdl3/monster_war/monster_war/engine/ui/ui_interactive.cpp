@@ -6,12 +6,12 @@ module;
 
 module monster_war.engine.ui;
 
+import :ui_state;
 import monster_war.engine.audio.audio_player;
 import monster_war.engine.core.context;
 import monster_war.engine.render.image;
 import monster_war.engine.render.renderer;
 import monster_war.engine.resource;
-import :ui_state;
 import monster_war.engine.ui.ui_element;
 
 namespace pyc::monster_war {

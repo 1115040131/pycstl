@@ -6,8 +6,8 @@ module;
 
 export module ghost_escape.actor;
 
-export import ghost_escape.core;
 export import ghost_escape.affiliate.affiliate_bar;
+export import ghost_escape.core;
 export import ghost_escape.raw.stats;
 
 export namespace pyc::sdl3 {

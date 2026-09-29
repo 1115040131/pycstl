@@ -4,8 +4,8 @@ module;
 
 export module monster_war.engine.ui.state.ui_normal_state;
 
-export import monster_war.engine.ui;
 import monster_war.engine.core.context;
+export import monster_war.engine.ui;
 
 export namespace pyc::monster_war {
 

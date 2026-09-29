@@ -5,8 +5,8 @@ cc_test(
     name = "cpp20_stl_all_test",
     srcs = glob(["*_test.cpp"]),
     copts = COPTS,
-    module_interfaces = ["utils.cppm"],
     data = glob(["resource/**"]),
+    module_interfaces = ["utils.cppm"],
     deps = [
         "//common:cin_redirect",
         "@fmt",

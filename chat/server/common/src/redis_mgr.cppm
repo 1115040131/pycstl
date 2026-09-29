@@ -8,8 +8,9 @@ module;
 
 export module chat.server.common.redis_mgr;
 
-import common.singleton;
 import chat.server.common.redis_connection_pool;
+
+import common.singleton;
 
 export namespace pyc::chat {
 

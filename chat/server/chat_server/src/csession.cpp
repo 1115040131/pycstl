@@ -12,12 +12,12 @@ module;
 
 module chat.server.chat_server;
 
-import chat.common.method;
-import logger.logger;
-
 import :cserver;
 import :logic_system;
+import chat.common.method;
 import chat.server.common.utils;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

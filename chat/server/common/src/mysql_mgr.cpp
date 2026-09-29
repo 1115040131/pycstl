@@ -4,11 +4,11 @@ module;
 
 module chat.server.common.mysql_mgr;
 
-import logger.logger;
-
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
 import chat.server.common.mysql_pool;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

@@ -10,6 +10,7 @@ module;
 export module concurrency.thread_pool.simple_thread_pool;
 
 import common.singleton;
+
 import concurrency.thread_safe_queue;
 
 export namespace pyc::concurrency {

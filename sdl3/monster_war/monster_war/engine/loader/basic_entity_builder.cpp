@@ -7,6 +7,7 @@ module;
 
 module monster_war.engine.loader;
 
+import :level_loader;
 import monster_war.engine.component.animation_component;
 import monster_war.engine.component.name_component;
 import monster_war.engine.component.render_component;
@@ -14,7 +15,6 @@ import monster_war.engine.component.sprite_component;
 import monster_war.engine.component.tilelayer_component;
 import monster_war.engine.component.transform_component;
 import monster_war.engine.core.context;
-import :level_loader;
 import monster_war.engine.resource;
 
 namespace pyc::monster_war {

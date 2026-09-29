@@ -9,6 +9,7 @@ module;
 export module sunny_land.engine.scene:scene;
 
 import common.noncopyable;
+
 export import sunny_land.engine.core;
 import sunny_land.engine.ui.ui_manager;
 
