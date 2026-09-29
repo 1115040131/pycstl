@@ -18,9 +18,10 @@ module;
 #include "chat/common/error_code.h"
 #include "chat/common/method.h"
 #include "chat/server/proto/chat.pb.h"
-#include "logger/logger.h"
 
 module chat.server.chat_server;
+
+import logger.logger;
 
 import :csession;
 import :logic_node;

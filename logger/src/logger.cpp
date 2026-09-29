@@ -1,9 +1,11 @@
-#include "logger/logger.h"
+module;
 
 #include <chrono>
 #include <cstdint>
 #include <iterator>
 #include <mutex>
+#include <source_location>
+#include <string>
 #include <string_view>
 
 #include <fmt/chrono.h>
@@ -20,6 +22,10 @@
 #include <functional>
 #include <thread>
 #endif
+
+module logger.logger;
+
+import logger.sink;
 
 namespace pyc {
 

@@ -5,10 +5,11 @@ module;
 
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
-
-#include "logger/logger.h"
+#include <fmt/base.h>
 
 module chat.server.common.config_mgr;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

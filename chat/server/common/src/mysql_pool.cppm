@@ -10,9 +10,10 @@ module;
 #include <mysqlx/xdevapi.h>
 
 #include "common/connection_pool.h"
-#include "logger/logger.h"
 
 export module chat.server.common.mysql_pool;
+
+export import logger.logger;
 
 export namespace pyc::chat {
 

@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cstdio>
 #include <memory>
@@ -6,7 +6,9 @@
 #include <string>
 #include <string_view>
 
-namespace pyc {
+export module logger.sink;
+
+export namespace pyc {
 
 enum class LogLevel { kDebug, kInfo, kWarn, kError, kFatal };
 

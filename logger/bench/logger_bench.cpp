@@ -14,10 +14,13 @@
 #include <benchmark/benchmark.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <memory>
 
-#include "logger/logger.h"
-#include "logger/sink.h"
+#include <fmt/base.h>
+
+import logger.logger;
+import logger.sink;
 
 namespace pyc {
 namespace {

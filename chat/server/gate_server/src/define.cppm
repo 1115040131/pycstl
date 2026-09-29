@@ -5,9 +5,9 @@ module;
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
-#include "logger/logger.h"
-
 export module chat.server.gate_server.define;
+
+export import logger.logger;
 
 namespace pyc {
 namespace chat {

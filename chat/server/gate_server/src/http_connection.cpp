@@ -9,9 +9,9 @@ module;
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
-#include "logger/logger.h"
-
 module chat.server.gate_server;
+
+import logger.logger;
 
 import :logic_system;
 

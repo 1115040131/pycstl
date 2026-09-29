@@ -3,9 +3,9 @@ module;
 #include <coroutine>
 #include <exception>
 
-#include "co_async/utils/debug.h"
-
 export module co_async.task;
+
+#include "co_async/utils/debug.h"
 
 import co_async.awaiter.previous_awaiter;
 export import co_async.utils.uninitialized;

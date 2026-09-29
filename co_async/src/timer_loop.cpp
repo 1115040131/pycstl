@@ -3,9 +3,13 @@ module;
 #include <coroutine>
 #include <thread>
 
-#include "co_async/utils/debug.h"
+#ifdef CO_ASYNC_DEBUG
+#include <fmt/chrono.h>
+#endif
 
 module co_async.timer_loop;
+
+#include "co_async/utils/debug.h"
 
 namespace pyc::co_async {
 

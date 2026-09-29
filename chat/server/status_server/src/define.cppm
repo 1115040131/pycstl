@@ -2,9 +2,10 @@ module;
 
 #include <utility>
 
-#include "logger/logger.h"
 
 export module chat.server.status_server.define;
+
+export import logger.logger;
 
 namespace pyc {
 namespace chat {

@@ -11,6 +11,7 @@ cc_binary(
         allow_empty = True,
     ),
     copts = COPTS,
+    features = ["cpp_modules"],
     deps = [
         "//logger",
         "@google_benchmark//:benchmark",

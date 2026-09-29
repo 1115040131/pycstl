@@ -1,4 +1,4 @@
-#pragma once
+module;
 
 #include <cstdlib>
 #include <initializer_list>
@@ -6,14 +6,17 @@
 #include <source_location>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 #include <fmt/base.h>
 
-#include "logger/sink.h"
+export module logger.logger;
 
-namespace pyc {
+export import logger.sink;
+
+export namespace pyc {
 
 class Logger {
 public:

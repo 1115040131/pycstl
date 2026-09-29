@@ -2,6 +2,7 @@
 #include <coroutine>
 #include <exception>
 #include <map>
+#include <memory>
 #include <span>
 #include <thread>
 #include <unordered_map>
@@ -9,7 +10,7 @@
 
 #include <fmt/chrono.h>
 
-#include "logger/logger.h"
+import logger.logger;
 
 // 检查GCC版本是否小于 13
 #if defined(__GNUC__) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__ < 130000)

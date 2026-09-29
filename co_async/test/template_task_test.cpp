@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-import co_async.task;
-
 #include "co_async/utils/debug.h"
+
+import co_async.task;
 
 namespace pyc {
 namespace co_async {

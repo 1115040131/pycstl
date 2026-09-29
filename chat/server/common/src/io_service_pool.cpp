@@ -6,9 +6,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "logger/logger.h"
-
 module chat.server.common.io_service_pool;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

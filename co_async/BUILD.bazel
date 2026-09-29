@@ -11,14 +11,17 @@ cc_library(
         "//:debug": ["CO_ASYNC_DEBUG"],
     }),
     features = ["cpp_modules"],
-    module_interfaces = glob(["src/**/*.cppm"]),
+    module_interfaces = glob(
+        ["src/**/*.cppm"],
+        exclude = ["src/utils/debug.cppm"],
+    ) + select({
+        "//conditions:default": [],
+        "//:debug": ["src/utils/debug.cppm"],
+    }),
     strip_include_prefix = "include",
     visibility = ["//co_async:__subpackages__"],
     deps = ["//common:singleton"] + select({
         "//conditions:default": [],
-        "//:debug": [
-            "//logger",
-            "@fmt",
-        ],
+        "//:debug": ["//logger"],
     }),
 )

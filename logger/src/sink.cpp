@@ -1,4 +1,8 @@
-#include "logger/sink.h"
+module;
+
+#include <cstdio>
+#include <memory>
+#include <string_view>
 
 #include <fmt/base.h>
 #include <fmt/color.h>
@@ -8,6 +12,8 @@
 #else
 #include <unistd.h>
 #endif
+
+module logger.sink;
 
 namespace pyc {
 

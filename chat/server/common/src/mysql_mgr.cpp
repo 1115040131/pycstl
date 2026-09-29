@@ -2,9 +2,9 @@ module;
 
 #include <mysqlx/xdevapi.h>
 
-#include "logger/logger.h"
-
 module chat.server.common.mysql_mgr;
+
+import logger.logger;
 
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
