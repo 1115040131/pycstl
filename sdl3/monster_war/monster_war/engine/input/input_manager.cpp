@@ -1,18 +1,23 @@
-#include "monster_war/engine/input/input_manager.h"
+module;
+
+#include <variant>
 
 #include <SDL3/SDL.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <glm/glm.hpp>
 #include <imgui/imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/core/config.h"
-#include "monster_war/engine/utils/events.h"
+module monster_war.engine.input.input_manager;
+
+import monster_war.engine.core.config;
+import monster_war.engine.utils.events;
 
 namespace pyc::monster_war {
 
-InputManager::InputManager(SDL_Renderer* sdl_renderer, const Config* config, entt::dispatcher* dispatcher)
+InputManager::InputManager(SDL_Renderer* sdl_renderer, const Config& config, entt::dispatcher* dispatcher)
     : sdl_renderer_(sdl_renderer), dispatcher_(dispatcher) {
     if (!sdl_renderer_) {
         spdlog::error("输入管理器: SDL_Renderer 为空指针");
@@ -136,14 +141,10 @@ void InputManager::processEvent(const SDL_Event& event) {
     }
 }
 
-void InputManager::initializeMappings(const Config* config) {
+void InputManager::initializeMappings(const Config& config) {
     spdlog::trace("初始化输入映射...");
-    if (!config) {
-        spdlog::error("输入管理器: Config 为空指针");
-        throw std::runtime_error("输入管理器: Config 为空指针");
-    }
 
-    auto actions_to_keyname = config->CONFIG(input_mappings);
+    auto actions_to_keyname = config->input_mappings;
     input_to_actions_.clear();
 
     // 如果配置中没有定义鼠标按钮动作(通常不需要配置),则添加默认映射, 用于 UI

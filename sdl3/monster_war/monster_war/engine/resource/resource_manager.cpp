@@ -1,15 +1,24 @@
-#include "monster_war/engine/resource/resource_manager.h"
+module;
 
 #include <filesystem>
 #include <fstream>
 
 #include <entt/core/hashed_string.hpp>
+#include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/resource/audio_manager.h"
-#include "monster_war/engine/resource/font_manager.h"
-#include "monster_war/engine/resource/texture_manager.h"
+struct SDL_Renderer;
+struct SDL_Texture;
+struct Mix_Chunk;
+struct Mix_Music;
+struct TTF_Font;
+
+module monster_war.engine.resource;
+
+import :audio_manager;
+import :font_manager;
+import :texture_manager;
 
 namespace pyc::monster_war {
 

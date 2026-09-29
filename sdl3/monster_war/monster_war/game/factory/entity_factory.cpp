@@ -1,23 +1,30 @@
-#include "monster_war/game/factory/entity_factory.h"
+module;
+
+#include <chrono>
 
 #include <entt/entity/registry.hpp>
+#include <glm/glm.hpp>
 
-#include "monster_war/engine/component/animation_component.h"
-#include "monster_war/engine/component/audio_component.h"
-#include "monster_war/engine/component/render_component.h"
-#include "monster_war/engine/component/sprite_component.h"
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/component/velocity_component.h"
-#include "monster_war/game/component/blocker_component.h"
-#include "monster_war/game/component/class_name_component.h"
-#include "monster_war/game/component/enemy_component.h"
-#include "monster_war/game/component/player_component.h"
-#include "monster_war/game/component/projectile_component.h"
-#include "monster_war/game/component/skill_component.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/component/unit_prep_component.h"
-#include "monster_war/game/def/tag.h"
-#include "monster_war/game/factory/blueprint_manager.h"
+module monster_war.game.factory.entity_factory;
+
+import monster_war.game.factory.blueprint_manager;
+import monster_war.engine.component.animation_component;
+import monster_war.engine.component.audio_component;
+import monster_war.engine.component.render_component;
+import monster_war.engine.component.sprite_component;
+import monster_war.engine.component.transform_component;
+import monster_war.engine.component.velocity_component;
+import monster_war.engine.utils.math;
+import monster_war.game.component.blocker_component;
+import monster_war.game.component.class_name_component;
+import monster_war.game.component.enemy_component;
+import monster_war.game.component.player_component;
+import monster_war.game.component.projectile_component;
+import monster_war.game.component.skill_component;
+import monster_war.game.component.stats_component;
+import monster_war.game.component.unit_prep_component;
+import monster_war.game.data.entity_blueprint;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

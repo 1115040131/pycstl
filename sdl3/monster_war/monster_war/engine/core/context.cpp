@@ -1,6 +1,18 @@
-#include "monster_war/engine/core/context.h"
+module;
 
+#include <entt/entt.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.engine.core.context;
+
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.core.game_state;
+import monster_war.engine.core.time;
+import monster_war.engine.input.input_manager;
+import monster_war.engine.render.camera;
+import monster_war.engine.render.renderer;
+import monster_war.engine.render.text_renderer;
+import monster_war.engine.resource;
 
 namespace pyc::monster_war {
 // clang-format off

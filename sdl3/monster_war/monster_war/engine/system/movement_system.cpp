@@ -1,9 +1,14 @@
-#include "monster_war/engine/system/movement_system.h"
+module;
+
+#include <chrono>
 
 #include <entt/entity/registry.hpp>
+#include <glm/vec2.hpp>
 
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/component/velocity_component.h"
+module monster_war.engine.system.movement_system;
+
+import monster_war.engine.component.transform_component;
+import monster_war.engine.component.velocity_component;
 
 namespace pyc::monster_war {
 

@@ -1,17 +1,20 @@
-#include "monster_war/game/system/followpath_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <glm/geometric.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/component/velocity_component.h"
-#include "monster_war/engine/utils/math.h"
-#include "monster_war/game/component/blocked_by_component.h"
-#include "monster_war/game/component/enemy_component.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.followpath_system;
+
+import monster_war.engine.component.transform_component;
+import monster_war.engine.component.velocity_component;
+import monster_war.engine.utils.math;
+import monster_war.game.component.blocked_by_component;
+import monster_war.game.component.enemy_component;
+import monster_war.game.data.waypoint_node;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

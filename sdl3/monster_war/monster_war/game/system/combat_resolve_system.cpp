@@ -1,20 +1,22 @@
-#include "monster_war/game/system/combat_resolve_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/sprite_component.h"
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/game/component/blocked_by_component.h"
-#include "monster_war/game/component/blocker_component.h"
-#include "monster_war/game/component/class_name_component.h"
-#include "monster_war/game/component/enemy_component.h"
-#include "monster_war/game/component/player_component.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/data/game_stats.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.combat_resolve_system;
+
+import monster_war.engine.component.sprite_component;
+import monster_war.engine.component.transform_component;
+import monster_war.game.component.blocked_by_component;
+import monster_war.game.component.blocker_component;
+import monster_war.game.component.class_name_component;
+import monster_war.game.component.enemy_component;
+import monster_war.game.component.player_component;
+import monster_war.game.component.stats_component;
+import monster_war.game.data.game_stats;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

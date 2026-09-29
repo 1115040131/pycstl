@@ -1,20 +1,28 @@
-#include "monster_war/engine/loader/level_loader.h"
+module;
 
 #include <filesystem>
 #include <fstream>
 
+#include <entt/entt.hpp>
+#include <glm/glm.hpp>
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/component/name_component.h"
-#include "monster_war/engine/component/parallax_component.h"
-#include "monster_war/engine/component/render_component.h"
-#include "monster_war/engine/component/sprite_component.h"
-#include "monster_war/engine/component/tilelayer_component.h"
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/render/renderer.h"
-#include "monster_war/engine/resource/resource_manager.h"
-#include "monster_war/engine/scene/scene.h"
+module monster_war.engine.loader;
+
+import monster_war.engine.component.animation_component;
+import monster_war.engine.component.name_component;
+import monster_war.engine.component.parallax_component;
+import monster_war.engine.component.render_component;
+import monster_war.engine.component.sprite_component;
+import monster_war.engine.component.tilelayer_component;
+import monster_war.engine.component.transform_component;
+import monster_war.engine.core.context;
+import :basic_entity_builder;
+import monster_war.engine.render.renderer;
+import monster_war.engine.resource;
+import monster_war.engine.scene.scene;
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

@@ -7,9 +7,13 @@ cc_binary(
         "entt_base.cpp",
         "entt_example.cpp",
         "entt_signal.cpp",
-        "entt_struct.h",
     ],
     copts = COPTS,
+    features = ["cpp_modules"],
+    module_interfaces = [
+        "entt_demo.cppm",
+        "entt_struct.cppm",
+    ],
     deps = [
         "@entt",
         "@fmt",

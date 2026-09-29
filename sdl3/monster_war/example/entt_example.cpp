@@ -1,9 +1,6 @@
 #include <fmt/base.h>
 
-void entt_base();
-void entt_delegate();
-void entt_signal();
-void entt_dispatcher();
+import monster_war.example.entt_demo;
 
 int main() {
     fmt::println("=== entt_base ===");

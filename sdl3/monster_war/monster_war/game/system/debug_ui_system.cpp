@@ -1,35 +1,40 @@
-#include "monster_war/game/system/debug_ui_system.h"
+module;
 
 #include <SDL3/SDL.h>
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <glm/glm.hpp>
 #include <imgui/imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/audio/audio_player.h"
-#include "monster_war/engine/component/name_component.h"
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/core/game_state.h"
-#include "monster_war/engine/core/time.h"
-#include "monster_war/engine/render/renderer.h"
-#include "monster_war/engine/resource/resource_manager.h"
-#include "monster_war/game/component/blocker_component.h"
-#include "monster_war/game/component/class_name_component.h"
-#include "monster_war/game/component/player_component.h"
-#include "monster_war/game/component/skill_component.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/data/game_stats.h"
-#include "monster_war/game/data/level_data.h"
-#include "monster_war/game/data/session_data.h"
-#include "monster_war/game/data/ui_config.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
-#include "monster_war/game/factory/blueprint_manager.h"
-#include "monster_war/game/scene/end_scene.h"
-#include "monster_war/game/scene/level_clear_scene.h"
-#include "monster_war/game/scene/title_scene.h"
+module monster_war.game.scene;
+
+import :end_scene;
+import :game_scene;
+import :level_clear_scene;
+import :title_scene;
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.component.name_component;
+import monster_war.engine.core.context;
+import monster_war.engine.core.game_state;
+import monster_war.engine.core.time;
+import monster_war.engine.render.image;
+import monster_war.engine.render.renderer;
+import monster_war.engine.resource;
+import monster_war.game.component.blocker_component;
+import monster_war.game.component.class_name_component;
+import monster_war.game.component.player_component;
+import monster_war.game.component.skill_component;
+import monster_war.game.component.stats_component;
+import monster_war.game.data.game_stats;
+import monster_war.game.data.level_data;
+import monster_war.game.data.session_data;
+import monster_war.game.data.ui_config;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
+import monster_war.game.factory.blueprint_manager;
 
 namespace pyc::monster_war {
 

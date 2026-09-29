@@ -1,7 +1,12 @@
+module;
+
+#include <entt/entt.hpp>
 #include <fmt/base.h>
 #include <glm/glm.hpp>
 
-#include "entt_struct.h"
+module monster_war.example.entt_demo;
+
+import monster_war.example.entt_struct;
 
 // 一个符合委托签名的全局函数
 int multiply_by_two(int value) {

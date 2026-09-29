@@ -1,12 +1,15 @@
-#include "monster_war/engine/system/audio_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/audio/audio_player.h"
-#include "monster_war/engine/component/audio_component.h"
-#include "monster_war/engine/core/context.h"
+module monster_war.engine.system.audio_system;
+
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.component.audio_component;
+import monster_war.engine.core.context;
+import monster_war.engine.utils.events;
 
 namespace pyc::monster_war {
 

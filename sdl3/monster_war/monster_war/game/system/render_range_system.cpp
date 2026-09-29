@@ -1,13 +1,15 @@
-#include "monster_war/game/system/render_range_system.h"
+module;
 
 #include <entt/entity/registry.hpp>
 
-#include "monster_war/engine/component/transform_component.h"
-#include "monster_war/engine/render/camera.h"
-#include "monster_war/engine/render/renderer.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/component/unit_prep_component.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.render_range_system;
+
+import monster_war.engine.component.transform_component;
+import monster_war.engine.render.camera;
+import monster_war.engine.render.renderer;
+import monster_war.game.component.stats_component;
+import monster_war.game.component.unit_prep_component;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

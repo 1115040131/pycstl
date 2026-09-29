@@ -1,4 +1,4 @@
-#include "monster_war/engine/core/game_app.h"
+module;
 
 #include <SDL3/SDL.h>
 #include <entt/signal/dispatcher.hpp>
@@ -7,19 +7,22 @@
 #include <imgui_impl_sdlrenderer3.h>
 #include <spdlog/spdlog.h>
 
+module monster_war.engine.core.game_app;
+
+import monster_war.engine.audio.audio_player;
+import monster_war.engine.core.config;
+import monster_war.engine.core.context;
+import monster_war.engine.core.game_state;
+import monster_war.engine.core.time;
+import monster_war.engine.input.input_manager;
+import monster_war.engine.render.camera;
+import monster_war.engine.render.renderer;
+import monster_war.engine.render.text_renderer;
+import monster_war.engine.resource;
+import monster_war.engine.scene.scene_manager;
+import monster_war.engine.utils.events;
+
 // 引擎组件
-#include "monster_war/engine/audio/audio_player.h"
-#include "monster_war/engine/core/config.h"
-#include "monster_war/engine/core/context.h"
-#include "monster_war/engine/core/game_state.h"
-#include "monster_war/engine/core/time.h"
-#include "monster_war/engine/input/input_manager.h"
-#include "monster_war/engine/render/camera.h"
-#include "monster_war/engine/render/renderer.h"
-#include "monster_war/engine/render/text_renderer.h"
-#include "monster_war/engine/resource/resource_manager.h"
-#include "monster_war/engine/scene/scene_manager.h"
-#include "monster_war/engine/utils/events.h"
 
 namespace pyc::monster_war {
 
@@ -157,7 +160,7 @@ bool GameApp::initDispatcher() {
 
 bool GameApp::initConfig() {
     try {
-        config_ = std::make_unique<Config>("assets/config.json");
+        config_.loadFromFile("assets/config.json");
     } catch (const std::exception& e) {
         spdlog::error("初始化配置失败: {}", e.what());
         return false;
@@ -173,8 +176,8 @@ bool GameApp::initSDL() {
     }
 
     // 设置窗口大小
-    int window_width = config_->CONFIG(window.width) * config_->CONFIG(window.window_scale);
-    int window_height = config_->CONFIG(window.height) * config_->CONFIG(window.window_scale);
+    int window_width = config_->window.width * config_->window.window_scale;
+    int window_height = config_->window.height * config_->window.window_scale;
     SDL_CreateWindowAndRenderer("SunnyLand", window_width, window_height, SDL_WINDOW_RESIZABLE, &window_,
                                 &sdl_renderer_);
     if (!window_ || !sdl_renderer_) {
@@ -187,13 +190,13 @@ bool GameApp::initSDL() {
 
     // 设置 VSync (注意: VSync 开启时，驱动程序会尝试将帧率限制到显示器刷新率，有可能会覆盖我们手动设置的
     // target_fps)
-    int vsync_mode = config_->CONFIG(graphics.vsync) ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
+    int vsync_mode = config_->graphics.vsync ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
     SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
-    spdlog::trace("VSync 设置为: {}", config_->CONFIG(graphics.vsync) ? "Enabled" : "Disabled");
+    spdlog::trace("VSync 设置为: {}", config_->graphics.vsync ? "Enabled" : "Disabled");
 
     // 设置逻辑分辨率
-    int logical_width = static_cast<int>(config_->CONFIG(window.width) * config_->CONFIG(window.logical_scale));
-    int logical_height = static_cast<int>(config_->CONFIG(window.height) * config_->CONFIG(window.logical_scale));
+    int logical_width = static_cast<int>(config_->window.width * config_->window.logical_scale);
+    int logical_height = static_cast<int>(config_->window.height * config_->window.logical_scale);
     SDL_SetRenderLogicalPresentation(sdl_renderer_, logical_width, logical_height,
                                      SDL_LOGICAL_PRESENTATION_LETTERBOX);
     spdlog::trace("SDL 初始化成功。");
@@ -217,7 +220,7 @@ bool GameApp::initTime() {
         spdlog::error("初始化时间管理失败: {}", e.what());
         return false;
     }
-    time_->setTargetFps(config_->CONFIG(performance.target_fps));
+    time_->setTargetFps(config_->performance.target_fps);
     spdlog::trace("时间管理初始化成功。");
     return true;
 }
@@ -238,8 +241,8 @@ bool GameApp::initAudioPlayer() {
     try {
         audio_player_ = std::make_unique<AudioPlayer>(resource_manager_.get());
         // 设置音量
-        audio_player_->setMusicVolume(config_->CONFIG(audio.music_volume));
-        audio_player_->setSoundVolume(config_->CONFIG(audio.sound_volume));
+        audio_player_->setMusicVolume(config_->audio.music_volume);
+        audio_player_->setSoundVolume(config_->audio.sound_volume);
     } catch (const std::exception& e) {
         spdlog::error("初始化音频播放器失败: {}", e.what());
         return false;
@@ -283,7 +286,7 @@ bool GameApp::initTextRenderer() {
 
 bool GameApp::initInputManager() {
     try {
-        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_.get(), dispatcher_.get());
+        input_manager_ = std::make_unique<InputManager>(sdl_renderer_, config_, dispatcher_.get());
     } catch (const std::exception& e) {
         spdlog::error("初始化输入管理器失败: {}", e.what());
         return false;

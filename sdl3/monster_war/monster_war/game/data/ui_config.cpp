@@ -1,4 +1,4 @@
-#include "monster_war/game/data/ui_config.h"
+module;
 
 #include <filesystem>
 #include <fstream>
@@ -6,6 +6,11 @@
 #include <entt/core/hashed_string.hpp>
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
+
+module monster_war.game.data.ui_config;
+
+import monster_war.engine.render.image;
+import monster_war.engine.utils.math;
 
 namespace pyc::monster_war {
 

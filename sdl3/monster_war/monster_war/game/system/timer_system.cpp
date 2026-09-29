@@ -1,12 +1,16 @@
-#include "monster_war/game/system/timer_system.h"
+module;
+
+#include <chrono>
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 
-#include "monster_war/game/component/skill_component.h"
-#include "monster_war/game/component/stats_component.h"
-#include "monster_war/game/def/events.h"
-#include "monster_war/game/def/tag.h"
+module monster_war.game.system.timer_system;
+
+import monster_war.game.component.skill_component;
+import monster_war.game.component.stats_component;
+import monster_war.game.def.events;
+import monster_war.game.def.tag;
 
 namespace pyc::monster_war {
 

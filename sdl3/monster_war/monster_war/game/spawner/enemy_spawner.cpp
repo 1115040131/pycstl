@@ -1,12 +1,15 @@
-#include "monster_war/game/spawner/enemy_spawner.h"
+module;
 
 #include <entt/entity/registry.hpp>
 #include <spdlog/spdlog.h>
 
-#include "monster_war/engine/utils/math.h"
-#include "monster_war/game/data/level_config.h"
-#include "monster_war/game/data/waypoint_node.h"
-#include "monster_war/game/factory/entity_factory.h"
+module monster_war.game.spawner.enemy_spawner;
+
+import monster_war.engine.utils.math;
+import monster_war.game.data.level_config;
+import monster_war.game.data.level_data;
+import monster_war.game.data.waypoint_node;
+import monster_war.game.factory.entity_factory;
 
 namespace pyc::monster_war {
 
