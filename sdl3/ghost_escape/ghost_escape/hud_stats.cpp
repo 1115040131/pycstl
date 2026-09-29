@@ -6,9 +6,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/asset.h"
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.hud_stats;
 
 import ghost_escape.actor;
@@ -20,9 +17,7 @@ namespace pyc::sdl3 {
 HUDStatus* HUDStatus::CreateAndSet(Object* parent, Actor* target, const glm::vec2& render_position) {
     auto hud_stats = std::make_unique<HUDStatus>();
     hud_stats->init();
-#ifdef DEBUG_MODE
-    hud_stats->SET_NAME(HUDStatus);
-#endif
+    SetDebugName(hud_stats.get());
     hud_stats->target_ = target;
     hud_stats->setRenderPosition(render_position);
     return static_cast<HUDStatus*>(parent->addChild(std::move(hud_stats)));
@@ -30,17 +25,17 @@ HUDStatus* HUDStatus::CreateAndSet(Object* parent, Actor* target, const glm::vec
 
 void HUDStatus::init() {
     ObjectScreen::init();
-    health_bar_bg_ = Sprite::CreateAndSet(this, ASSET("UI/bar_bg.png"), 3.0f, Anchor::kCenterLeft);
+    health_bar_bg_ = Sprite::CreateAndSet(this, Asset("UI/bar_bg.png"), 3.0f, Anchor::kCenterLeft);
     health_bar_bg_->addOffset(glm::vec2(30, 0));
-    health_bar_ = Sprite::CreateAndSet(this, ASSET("UI/bar_red.png"), 3.0f, Anchor::kCenterLeft);
+    health_bar_ = Sprite::CreateAndSet(this, Asset("UI/bar_red.png"), 3.0f, Anchor::kCenterLeft);
     health_bar_->addOffset(glm::vec2(30, 0));
-    health_icon_ = Sprite::CreateAndSet(this, ASSET("UI/Red Potion.png"), 0.5f, Anchor::kCenterLeft);
+    health_icon_ = Sprite::CreateAndSet(this, Asset("UI/Red Potion.png"), 0.5f, Anchor::kCenterLeft);
 
-    mana_bar_bg_ = Sprite::CreateAndSet(this, ASSET("UI/bar_bg.png"), 3.0f, Anchor::kCenterLeft);
+    mana_bar_bg_ = Sprite::CreateAndSet(this, Asset("UI/bar_bg.png"), 3.0f, Anchor::kCenterLeft);
     mana_bar_bg_->addOffset(glm::vec2(300, 0));
-    mana_bar_ = Sprite::CreateAndSet(this, ASSET("UI/bar_blue.png"), 3.0f, Anchor::kCenterLeft);
+    mana_bar_ = Sprite::CreateAndSet(this, Asset("UI/bar_blue.png"), 3.0f, Anchor::kCenterLeft);
     mana_bar_->addOffset(glm::vec2(300, 0));
-    mana_icon_ = Sprite::CreateAndSet(this, ASSET("UI/Blue Potion.png"), 0.5f, Anchor::kCenterLeft);
+    mana_icon_ = Sprite::CreateAndSet(this, Asset("UI/Blue Potion.png"), 0.5f, Anchor::kCenterLeft);
     mana_icon_->addOffset(glm::vec2(270, 0));
 }
 

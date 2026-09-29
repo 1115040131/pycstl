@@ -1,11 +1,16 @@
-#pragma once
+module;
 
+#include <cstddef>
 #include <memory>
 #include <queue>
+#include <string>
+#include <utility>
 
 #include <boost/asio.hpp>
 
-namespace network {
+export module network.example.async_api;
+
+export namespace network {
 
 namespace asio = boost::asio;
 

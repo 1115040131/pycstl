@@ -3,19 +3,39 @@ module;
 #include <algorithm>
 #include <chrono>
 #include <memory>
-#include <string>
 #include <utility>
 #include <vector>
 
 #include <SDL3/SDL.h>
 
 #ifdef DEBUG_MODE
+#include <cstdlib>
+
+#if defined(__unix__) && __has_include(<cxxabi.h>)
+#include <cxxabi.h>
+#endif
+
 #include <fmt/format.h>
 #endif
 
 module ghost_escape.core;
 
 namespace pyc::sdl3 {
+
+#ifdef DEBUG_MODE
+
+std::string Demangle(const char* name) {
+#if defined(__unix__) && __has_include(<cxxabi.h>)
+    if (char* demangled = abi::__cxa_demangle(name, nullptr, nullptr, nullptr)) {
+        std::string result = demangled;
+        std::free(demangled);
+        return result;
+    }
+#endif
+    return name;
+}
+
+#endif  // DEBUG_MODE
 
 void Object::clean() { Clean(children_); }
 

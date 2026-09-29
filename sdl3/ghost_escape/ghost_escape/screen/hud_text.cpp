@@ -7,8 +7,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.screen.hud_text;
 
 import ghost_escape.affiliate.sprite;
@@ -22,9 +20,7 @@ HUDText* HUDText::CreateAndSet(Object* parent, std::string_view text, const glm:
                                const std::string& file_path, Anchor anchor) {
     auto hud_text = std::make_unique<HUDText>();
     hud_text->init();
-#ifdef DEBUG_MODE
-    hud_text->SET_NAME(HUDText);
-#endif
+    SetDebugName(hud_text.get());
     hud_text->sprite_bg_ = Sprite::CreateAndSet(hud_text.get(), file_path, 1.0f, anchor);
     hud_text->text_label_ = TextLabel::CreateAndSet(hud_text.get(), text, font_path, font_size, anchor);
     hud_text->setRenderPosition(render_position);

@@ -13,7 +13,8 @@ module;
 
 #include <fmt/format.h>
 
-#include "monkey/macro.h"
+#define TYPE(x) \
+    virtual Type type() const override { return Type::x; }
 
 export module monkey.object;
 

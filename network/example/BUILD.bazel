@@ -4,11 +4,9 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 # asio api
 cc_library(
     name = "sync_api",
-    srcs = [
-        "sync_api.cpp",
-        "sync_api.h",
-    ],
+    srcs = ["sync_api.cpp"],
     copts = COPTS,
+    module_interfaces = ["sync_api.cppm"],
     deps = [
         "@boost.asio",
         "@fmt",
@@ -17,18 +15,15 @@ cc_library(
 
 cc_library(
     name = "async_api",
-    srcs = [
-        "async_api.cpp",
-        "async_api.h",
-    ],
+    srcs = ["async_api.cpp"],
     copts = COPTS,
+    module_interfaces = ["async_api.cppm"],
     deps = [
         "@boost.asio",
         "@fmt",
     ],
 )
 
-# layering_check 要求每个 #include 都由直接 deps 提供,所以逐个 example 列自己实际用到的。
 BINARIES = {
     # asio client
     "sync_client": [

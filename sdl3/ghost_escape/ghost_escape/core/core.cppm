@@ -1,6 +1,7 @@
 export module ghost_escape.core;
 
 export import :affiliate;
+export import :asset;
 export import :collider;
 export import :game;
 export import :object;

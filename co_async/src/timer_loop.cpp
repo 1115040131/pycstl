@@ -9,7 +9,7 @@ module;
 
 module co_async.timer_loop;
 
-#include "co_async/utils/debug.h"
+import co_async.utils.debug;
 
 namespace pyc::co_async {
 
@@ -34,7 +34,7 @@ void TimerLoop::runAll() {
             deleteTask(task);
             task.resume();
         } else {
-            CO_ASYNC_LOG_DEBUG("No task Loop waiting for {:%S}s", expire_time - now_time);
+            LogDebug("No task Loop waiting for {:%S}s", expire_time - now_time);
             std::this_thread::sleep_until(expire_time);
         }
     }

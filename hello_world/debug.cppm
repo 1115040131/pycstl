@@ -1,6 +1,4 @@
-#pragma once
-
-#ifndef NDEBUG
+module;
 
 #include <cstdint>
 #include <iomanip>
@@ -18,7 +16,11 @@
 #include <cxxabi.h>
 #endif
 
-struct debug {
+export module hello_world.debug;
+
+#ifndef NDEBUG
+
+export struct debug {
 private:
     std::ostringstream oss;
 
@@ -352,7 +354,7 @@ public:
 
 #else
 
-struct debug {
+export struct debug {
     debug(bool = true, char const* = nullptr) noexcept {}
 
     debug(debug&&) = delete;

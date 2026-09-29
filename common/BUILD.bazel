@@ -64,25 +64,3 @@ cc_library(
         "@fmt",
     ],
 )
-
-# reflect.h 通篇是宏, 宏不能从模块导出, 故保持头文件形态
-cc_library(
-    name = "reflect",
-    hdrs = ["include/common/reflect.h"],
-    copts = COPTS,
-    strip_include_prefix = "include",
-    visibility = ["//visibility:public"],
-)
-
-# json.h 依赖 reflect.h 的模板, 跟着一起留在头文件里
-cc_library(
-    name = "json",
-    hdrs = ["include/common/json.h"],
-    copts = COPTS,
-    strip_include_prefix = "include",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":reflect",
-        "@nlohmann_json//:json",
-    ],
-)

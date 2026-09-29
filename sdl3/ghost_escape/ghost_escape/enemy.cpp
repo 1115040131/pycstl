@@ -5,13 +5,11 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/asset.h"
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.enemy;
 
 import ghost_escape.actor;
 import ghost_escape.affiliate.sprite_anim;
+import ghost_escape.core;
 
 namespace pyc::sdl3 {
 
@@ -26,15 +24,13 @@ std::unique_ptr<Enemy> Enemy::Create(const glm::vec2& position, Actor* target) {
 void Enemy::init() {
     Actor::init();
 
-#ifdef DEBUG_MODE
-    SET_NAME(Enemy);
-#endif
+    SetDebugName(this);
 
     type_ = Object::Type::kEnemy;
 
-    anim_normal_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-Sheet.png"), 2.F);
-    anim_hurt_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghostHurt-Sheet.png"), 2.F);
-    anim_die_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghostDead-Sheet.png"), 2.F, 10.F, false);
+    anim_normal_ = SpriteAnim::CreateAndSet(this, Asset("sprite/ghost-Sheet.png"), 2.F);
+    anim_hurt_ = SpriteAnim::CreateAndSet(this, Asset("sprite/ghostHurt-Sheet.png"), 2.F);
+    anim_die_ = SpriteAnim::CreateAndSet(this, Asset("sprite/ghostDead-Sheet.png"), 2.F, 10.F, false);
     anim_hurt_->setActive(false);
     anim_die_->setActive(false);
     current_anim_ = anim_normal_;

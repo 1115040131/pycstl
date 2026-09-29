@@ -7,8 +7,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.screen.ui_mouse;
 
 import ghost_escape.affiliate.sprite;
@@ -22,9 +20,7 @@ UIMouse* UIMouse::CreateAndSet(Object* parent, const std::string& file_path1, co
                                float scale, Anchor anchor) {
     auto ui_mouse = std::make_unique<UIMouse>();
     ui_mouse->init();
-#ifdef DEBUG_MODE
-    ui_mouse->SET_NAME(UIMouse);
-#endif
+    SetDebugName(ui_mouse.get());
     ui_mouse->sprite1_ = Sprite::CreateAndSet(ui_mouse.get(), file_path1, scale, anchor);
     ui_mouse->sprite2_ = Sprite::CreateAndSet(ui_mouse.get(), file_path2, scale, anchor);
     return static_cast<UIMouse*>(parent->addChild(std::move(ui_mouse)));

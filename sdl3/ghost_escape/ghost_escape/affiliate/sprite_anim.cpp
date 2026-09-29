@@ -7,8 +7,6 @@ module;
 
 #include <glm/vec2.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.affiliate.sprite_anim;
 
 import ghost_escape.affiliate.sprite;
@@ -22,9 +20,7 @@ SpriteAnim* SpriteAnim::CreateAndSet(ObjectScreen* parent, const std::string& fi
                                      bool is_loop, Anchor anchor) {
     auto sprite = std::make_unique<SpriteAnim>();
     sprite->init();
-#ifdef DEBUG_MODE
-    sprite->SET_NAME(SpriteAnim);
-#endif
+    SetDebugName(sprite.get());
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setFps(fps);

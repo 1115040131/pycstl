@@ -1,8 +1,12 @@
+module;
+
 #include <string_view>
 
 #include <fmt/base.h>
 
-namespace pyc {
+export module cpp20_stl.utils;
+
+export namespace pyc {
 
 void printc(const auto& container, std::string_view s = "") {
     if (!s.empty()) {

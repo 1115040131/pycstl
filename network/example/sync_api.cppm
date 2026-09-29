@@ -1,6 +1,6 @@
-#pragma once
+export module network.example.sync_api;
 
-namespace network {
+export namespace network {
 
 /// @brief 创建客户端节点
 int ClientEndPoint();

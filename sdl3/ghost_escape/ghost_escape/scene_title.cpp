@@ -11,8 +11,6 @@ module;
 #include <fmt/format.h>
 #include <glm/vec2.hpp>
 
-#include "ghost_escape/core/asset.h"
-
 module ghost_escape.scene_title;
 
 import ghost_escape.core;
@@ -25,39 +23,39 @@ namespace pyc::sdl3 {
 
 void SceneTitle::init() {
     Scene::init();
-    loadData(ASSET("score.dat"));
+    loadData(Asset("score.dat"));
     SDL_HideCursor();
 
 #ifdef DEBUG_MODE
     name_ = "SceneTitle";
 #endif
 
-    game_.playMusic(ASSET("bgm/Spooky music.mp3"));
+    game_.playMusic(Asset("bgm/Spooky music.mp3"));
 
     HUDText::CreateAndSet(this, "幽灵逃生", game_.getScreenSize() / 2.0f - glm::vec2(0, 100),
                           glm::vec2(game_.getScreenSize().x / 2.0f, game_.getScreenSize().y / 3.0f),
-                          ASSET("font/VonwaonBitmap-16px.ttf"), 64, ASSET("UI/Textfield_01.png"));
+                          Asset("font/VonwaonBitmap-16px.ttf"), 64, Asset("UI/Textfield_01.png"));
     HUDText::CreateAndSet(this, fmt::format("最高分: {}", game_.getHighScore()),
                           game_.getScreenSize() / 2.0f + glm::vec2(0, 100), glm::vec2(200, 50),
-                          ASSET("font/VonwaonBitmap-16px.ttf"), 32, ASSET("UI/Textfield_01.png"));
+                          Asset("font/VonwaonBitmap-16px.ttf"), 32, Asset("UI/Textfield_01.png"));
 
     button_start_ = HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(-200, 200),
-                                            ASSET("UI/A_Start1.png"), ASSET("UI/A_Start2.png"),
-                                            ASSET("UI/A_Start3.png"), 2.0f);
+                                            Asset("UI/A_Start1.png"), Asset("UI/A_Start2.png"),
+                                            Asset("UI/A_Start3.png"), 2.0f);
     button_credits_ =
-        HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(0, 200), ASSET("UI/A_Credits1.png"),
-                                ASSET("UI/A_Credits2.png"), ASSET("UI/A_Credits3.png"), 2.0f);
+        HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(0, 200), Asset("UI/A_Credits1.png"),
+                                Asset("UI/A_Credits2.png"), Asset("UI/A_Credits3.png"), 2.0f);
     button_quit_ =
-        HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(200), ASSET("UI/A_Quit1.png"),
-                                ASSET("UI/A_Quit2.png"), ASSET("UI/A_Quit3.png"), 2.0f);
+        HUDButton::CreateAndSet(this, game_.getScreenSize() / 2.0f + glm::vec2(200), Asset("UI/A_Quit1.png"),
+                                Asset("UI/A_Quit2.png"), Asset("UI/A_Quit3.png"), 2.0f);
 
-    auto text = game_.loadTextFile(ASSET("credits.txt"));
+    auto text = game_.loadTextFile(Asset("credits.txt"));
     credits_text_ = HUDText::CreateAndSet(this, text, game_.getScreenSize() / 2.0f, glm::vec2(500),
-                                          ASSET("font/VonwaonBitmap-16px.ttf"), 16, ASSET("UI/Textfield_01.png"));
+                                          Asset("font/VonwaonBitmap-16px.ttf"), 16, Asset("UI/Textfield_01.png"));
     credits_text_->setSizeByText();
     credits_text_->setActive(false);
 
-    ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/pointer_c_shaded.png"), ASSET("UI/pointer_c_shaded.png"),
+    ui_mouse_ = UIMouse::CreateAndSet(this, Asset("UI/pointer_c_shaded.png"), Asset("UI/pointer_c_shaded.png"),
                                       1.0F, Anchor::kTopLeft);
 }
 

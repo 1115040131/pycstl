@@ -6,7 +6,9 @@ module;
 
 #include <fmt/format.h>
 
-#include "monkey/macro.h"
+#define TO_STRING_CASE1(class_name, x, str) \
+    case class_name::x:                     \
+        return str
 
 export module monkey.token;
 

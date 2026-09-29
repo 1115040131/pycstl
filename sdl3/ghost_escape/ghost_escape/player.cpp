@@ -5,9 +5,6 @@ module;
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/asset.h"
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.player;
 
 import ghost_escape.actor;
@@ -24,20 +21,18 @@ using namespace std::chrono_literals;
 void Player::init() {
     Actor::init();
 
-#ifdef DEBUG_MODE
-    SET_NAME(Player);
-#endif
+    SetDebugName(this);
 
     max_speed_ = 500.F;
-    anim_idle_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-idle.png"), 2.F);
-    anim_move_ = SpriteAnim::CreateAndSet(this, ASSET("sprite/ghost-move.png"), 2.F);
+    anim_idle_ = SpriteAnim::CreateAndSet(this, Asset("sprite/ghost-idle.png"), 2.F);
+    anim_move_ = SpriteAnim::CreateAndSet(this, Asset("sprite/ghost-move.png"), 2.F);
     anim_move_->setActive(false);
 
     collider_ = Collider::CreateAndSet(this, anim_idle_->getSize() / 2.F);
 
     stats_ = Stats::CreateAndSet(this);
 
-    effect_ = Effect::CreateAndSet(game_.getCurrentScene().get(), ASSET("effect/1764.png"), {}, 2.F);
+    effect_ = Effect::CreateAndSet(game_.getCurrentScene().get(), Asset("effect/1764.png"), {}, 2.F);
     effect_->setActive(false);
 
     weapon_thunder_ = WeaponThunder::CreateAndSet(this, 2s, 40.F);
@@ -69,7 +64,7 @@ void Player::takeDamage(double damage) {
         return;
     }
     Actor::takeDamage(damage);
-    game_.playSound(ASSET("sound/hit-flesh-02-266309.mp3"));
+    game_.playSound(Asset("sound/hit-flesh-02-266309.mp3"));
 }
 
 void Player::keyboardControl() {
@@ -121,7 +116,7 @@ void Player::checkIsDead() {
         effect_->setPosition(getPosition());
         effect_->setActive(true);
         setActive(false);
-        game_.playSound(ASSET("sound/female-scream-02-89290.mp3"));
+        game_.playSound(Asset("sound/female-scream-02-89290.mp3"));
     }
 }
 

@@ -14,7 +14,9 @@ module;
 
 #include <fmt/format.h>
 
-#include "monkey/macro.h"
+#define TO_STRING_CASE(class_name, x) \
+    case class_name::x:               \
+        return #x
 
 module monkey.code;
 

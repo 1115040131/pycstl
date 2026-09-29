@@ -2,25 +2,24 @@
 
 #include <gtest/gtest.h>
 
-#include "co_async/utils/debug.h"
-
 import co_async.task;
+import co_async.utils.debug;
 
 namespace pyc {
 namespace co_async {
 
 static Task<void> void_task() {
-    CO_ASYNC_LOG_DEBUG("");
+    LogDebug("");
     co_return;
 }
 
 static Task<std::string> string_task() {
-    CO_ASYNC_LOG_DEBUG("");
+    LogDebug("");
     co_return "aaa";
 }
 
 static Task<double> double_task() {
-    CO_ASYNC_LOG_DEBUG("");
+    LogDebug("");
     co_return 3.14;
 }
 

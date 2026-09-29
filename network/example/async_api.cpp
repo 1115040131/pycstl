@@ -1,6 +1,14 @@
-#include "network/example/async_api.h"
+module;
 
+#include <cstddef>
+#include <memory>
+#include <queue>
+#include <string>
+
+#include <boost/asio.hpp>
 #include <fmt/base.h>
+
+module network.example.async_api;
 
 namespace network {
 

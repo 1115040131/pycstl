@@ -4,14 +4,12 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "ghost_escape_lib",
     srcs = glob(["ghost_escape/**/*.cpp"]),
-    hdrs = glob(["ghost_escape/**/*.h"]),
     copts = COPTS,
     defines = select({
         "//conditions:default": [],
         "//:debug": ["DEBUG_MODE"],
     }),
     module_interfaces = glob(["ghost_escape/**/*.cppm"]),
-    strip_include_prefix = "/sdl3/ghost_escape",
     deps = [
         "//common:singleton",
         "//sdl3",
