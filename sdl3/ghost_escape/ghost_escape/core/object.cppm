@@ -9,9 +9,11 @@ module;
 #include <SDL3/SDL.h>
 
 #ifdef DEBUG_MODE
+#include <atomic>
 #include <string>
+#include <typeinfo>
 
-#include <fmt/base.h>
+#include <fmt/format.h>
 #endif
 
 export module ghost_escape.core:object;
@@ -141,5 +143,32 @@ void Render(std::vector<std::unique_ptr<T>>& children) {
         }
     }
 }
+
+#ifdef DEBUG_MODE
+
+template <typename T>
+int GetCount() {
+    static std::atomic<int> count = 0;
+    return count++;
+}
+
+// 取代原先的 SET_NAME 宏: 类型由实参推导, 名字从 typeid 反查
+std::string Demangle(const char* name);
+
+template <typename T>
+void SetDebugName(T* obj) {
+    std::string name = Demangle(typeid(T).name());
+    if (auto pos = name.rfind("::"); pos != std::string::npos) {
+        name.erase(0, pos + 2);
+    }
+    obj->setName(fmt::format("{} {}", name, GetCount<T>()));
+}
+
+#else
+
+template <typename T>
+void SetDebugName(T*) {}
+
+#endif  // DEBUG_MODE
 
 }  // namespace pyc::sdl3

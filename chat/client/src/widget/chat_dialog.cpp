@@ -6,11 +6,12 @@
 #include <QTimer>
 
 #include "chat/client/tcp_mgr.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/widget/chat_user_widget.h"
 #include "chat/client/widget/contact_user_item.h"
 #include "chat/client/widget/loading_dialog.h"
 #include "chat/client/widget/ui_chat_dialog.h"
+
+import chat.client.user_mgr;
 
 ChatDialog::ChatDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ChatDialog) {
     ui->setupUi(this);

@@ -9,12 +9,11 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "chat/common/method.h"
-
 export module chat.server.chat_server:csession;
 
-export import chat.server.chat_server.define;
 export import :cserver;
+export import chat.common.method;
+export import chat.server.chat_server.define;
 import chat.server.chat_server.msg_node;
 
 export namespace pyc {

@@ -6,9 +6,9 @@ module;
 
 export module ghost_escape.hud_stats;
 
-export import ghost_escape.core;
 export import ghost_escape.actor;
 export import ghost_escape.affiliate.sprite;
+export import ghost_escape.core;
 
 export namespace pyc::sdl3 {
 

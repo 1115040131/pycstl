@@ -12,6 +12,7 @@ module;
 export module chat.server.common.mysql_pool;
 
 import common.connection_pool;
+
 import logger.logger;
 
 export namespace pyc::chat {

@@ -8,8 +8,8 @@ module;
 
 export module monster_war.game.factory.entity_factory;
 
-export import monster_war.game.factory.blueprint_manager;
 export import monster_war.game.data.entity_blueprint;
+export import monster_war.game.factory.blueprint_manager;
 
 export namespace pyc::monster_war {
 

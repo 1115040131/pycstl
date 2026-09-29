@@ -7,8 +7,6 @@ module;
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.screen.hud_skill;
 
 import ghost_escape.affiliate.sprite;
@@ -20,9 +18,7 @@ HUDSkill* HUDSkill::CreateAndSet(Object* parent, const std::string& file_path, c
                                  float scale, Anchor anchor) {
     auto skill = std::make_unique<HUDSkill>();
     skill->init();
-#ifdef DEBUG_MODE
-    skill->SET_NAME(HUDSkill);
-#endif
+    SetDebugName(skill.get());
     skill->icon_ = Sprite::CreateAndSet(skill.get(), file_path, scale, anchor);
     skill->setRenderPosition(render_position);
     return static_cast<HUDSkill*>(parent->addChild(std::move(skill)));

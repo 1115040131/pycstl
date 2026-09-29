@@ -15,6 +15,7 @@ struct TTF_Font;
 export module monster_war.engine.resource:resource_manager;
 
 import common.noncopyable;
+
 export import :audio_manager;
 export import :font_manager;
 export import :texture_manager;

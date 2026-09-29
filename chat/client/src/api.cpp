@@ -1,6 +1,8 @@
-#include "chat/client/api.h"
+module;
 
 #include <QStyle>
+
+module chat.client.api;
 
 void repolish(QWidget* w) {
     w->style()->unpolish(w);

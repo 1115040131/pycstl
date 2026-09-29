@@ -1,16 +1,19 @@
-#pragma once
+module;
 
 #include <list>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include <QString>
 
-#include "chat/client/user_data.h"
+export module chat.client.user_mgr;
+
+export import chat.client.user_data;
 
 import common.singleton;
 
-class UserMgr : public pyc::Singleton<UserMgr> {
+export class UserMgr : public pyc::Singleton<UserMgr> {
     friend class pyc::Singleton<UserMgr>;
 
 public:

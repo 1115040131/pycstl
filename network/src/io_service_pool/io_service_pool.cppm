@@ -10,6 +10,7 @@ module;
 export module network.io_service_pool;
 
 import common.singleton;
+
 export import network.base.pool;
 
 export namespace network {

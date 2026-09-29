@@ -11,9 +11,8 @@ module;
 
 export module sdl2.shooter.scene_main;
 
-export import sdl2.shooter.scene;
-
 import sdl2.shooter.object;
+export import sdl2.shooter.scene;
 
 export namespace pyc::sdl2 {
 

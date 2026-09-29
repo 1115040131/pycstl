@@ -6,10 +6,10 @@ module;
 
 export module monkey.vm;
 
-export import monkey.compiler;
-export import monkey.vm.frame;
-export import monkey.object;
 import monkey.code;
+export import monkey.compiler;
+export import monkey.object;
+export import monkey.vm.frame;
 
 export namespace pyc::monkey {
 

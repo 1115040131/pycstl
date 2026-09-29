@@ -2,12 +2,12 @@ module;
 
 #include <nlohmann/json.hpp>
 
-#include "chat/common/error_code.h"
-#include "chat/common/method.h"
 #include "chat/server/proto/chat.grpc.pb.h"
 
 module chat.server.chat_server.chat_service_impl;
 
+import chat.common.error_code;
+import chat.common.method;
 import chat.server.chat_server;
 
 namespace pyc {

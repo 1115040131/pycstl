@@ -9,13 +9,13 @@ module;
 
 module chat.server.chat_server;
 
-import logger.logger;
-
 import :csession;
 import :user_mgr;
 import chat.server.chat_server.chat_grpc_client;
 import chat.server.common.io_service_pool;
 import chat.server.common.status_grpc_client;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

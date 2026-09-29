@@ -5,9 +5,9 @@ module;
 #include <cstring>
 #include <memory>
 
-#include "chat/common/method.h"
-
 export module chat.server.chat_server.msg_node;
+
+export import chat.common.method;
 
 import common.noncopyable;
 

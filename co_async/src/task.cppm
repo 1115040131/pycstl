@@ -5,9 +5,8 @@ module;
 
 export module co_async.task;
 
-#include "co_async/utils/debug.h"
-
 import co_async.awaiter.previous_awaiter;
+import co_async.utils.debug;
 export import co_async.utils.uninitialized;
 
 export namespace pyc::co_async {
@@ -23,7 +22,7 @@ struct Promise {
     auto final_suspend() noexcept { return PreviousAwaiter(previous_); }
 
     void unhandled_exception() noexcept {
-        CO_ASYNC_LOG_ERROR("unhandled_exception");
+        LogError("unhandled_exception");
         exception_ = std::current_exception();
     }
 
@@ -67,7 +66,7 @@ struct Promise<void> {
     auto final_suspend() noexcept { return PreviousAwaiter(previous_); }
 
     void unhandled_exception() noexcept {
-        CO_ASYNC_LOG_ERROR("unhandled_exception");
+        LogError("unhandled_exception");
         result_ = std::current_exception();
     }
 

@@ -3,10 +3,11 @@
 #include <QRandomGenerator>
 
 #include "chat/client/tcp_mgr.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/widget/apply_friend_item.h"
 #include "chat/client/widget/auth_friend_dialog.h"
 #include "chat/client/widget/ui_apply_friend_page.h"
+
+import chat.client.user_mgr;
 
 ApplyFriendPage::ApplyFriendPage(QWidget* parent) : QDialog(parent), ui(new Ui::ApplyFriendPage) {
     ui->setupUi(this);

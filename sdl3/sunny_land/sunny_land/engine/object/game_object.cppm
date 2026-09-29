@@ -14,6 +14,7 @@ module;
 export module sunny_land.engine.core:game_object;
 
 import common.noncopyable;
+
 export import :component;
 
 export namespace pyc::sunny_land {

@@ -5,8 +5,8 @@ module;
 
 export module monkey.evaluator;
 
-export import monkey.object;
 export import monkey.ast;
+export import monkey.object;
 
 export namespace pyc::monkey {
 

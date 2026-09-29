@@ -10,15 +10,14 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "chat/common/method.h"
-
 module chat.server.chat_server;
-
-import logger.logger;
 
 import :cserver;
 import :logic_system;
+import chat.common.method;
 import chat.server.common.utils;
+
+import logger.logger;
 
 namespace pyc {
 namespace chat {

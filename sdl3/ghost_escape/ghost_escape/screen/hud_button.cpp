@@ -8,9 +8,6 @@ module;
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/asset.h"
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.screen.hud_button;
 
 import ghost_escape.affiliate.sprite;
@@ -23,9 +20,7 @@ HUDButton* HUDButton::CreateAndSet(Object* parent, const glm::vec2 render_positi
                                    Anchor anchor) {
     auto hud_button = std::make_unique<HUDButton>();
     hud_button->init();
-#ifdef DEBUG_MODE
-    hud_button->SET_NAME(HUDButton);
-#endif
+    SetDebugName(hud_button.get());
     hud_button->setRenderPosition(render_position);
     hud_button->sprite_normal_ = Sprite::CreateAndSet(hud_button.get(), file_normal, scale, anchor);
     hud_button->sprite_hover_ = Sprite::CreateAndSet(hud_button.get(), file_hover, scale, anchor);
@@ -40,7 +35,7 @@ bool HUDButton::handleEvents(const SDL_Event& event) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             if (is_hover_) {
                 is_press_ = true;
-                game_.playSound(ASSET("sound/UI_button08.wav"));
+                game_.playSound(Asset("sound/UI_button08.wav"));
                 return true;
             }
         }
@@ -79,7 +74,7 @@ void HUDButton::checkHover() {
     is_hover_ = game_.isMouseInRect(position, position + size);
 
     if (!prev_hover && is_hover_ && !is_press_) {
-        game_.playSound(ASSET("sound/UI_button12.wav"));
+        game_.playSound(Asset("sound/UI_button12.wav"));
     }
 }
 

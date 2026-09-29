@@ -6,10 +6,11 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "chat/client/define.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/util/chat_item_base.h"
 #include "chat/client/util/text_bubble.h"
+
+import chat.client.define;
+import chat.client.user_mgr;
 
 ChatView::ChatView(QWidget* parent) : QWidget(parent) {
     QVBoxLayout* main_layout = new QVBoxLayout();

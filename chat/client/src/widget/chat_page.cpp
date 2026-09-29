@@ -8,11 +8,12 @@
 #include <QUuid>
 
 #include "chat/client/tcp_mgr.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/util/chat_item_base.h"
 #include "chat/client/util/picture_bubble.h"
 #include "chat/client/util/text_bubble.h"
 #include "chat/client/widget/ui_chat_page.h"
+
+import chat.client.user_mgr;
 
 ChatPage::ChatPage(QWidget* parent) : QDialog(parent), ui(new Ui::ChatPage) {
     ui->setupUi(this);

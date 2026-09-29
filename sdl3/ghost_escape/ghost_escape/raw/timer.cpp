@@ -4,8 +4,6 @@ module;
 #include <memory>
 #include <utility>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.raw.timer;
 
 import ghost_escape.core;
@@ -15,9 +13,7 @@ namespace pyc::sdl3 {
 Timer* Timer::CreateAndSet(Object* parent, std::chrono::duration<float> interval) {
     auto timer = std::make_unique<Timer>();
     timer->init();
-#ifdef DEBUG_MODE
-    timer->SET_NAME(Timer);
-#endif
+    SetDebugName(timer.get());
     timer->setActive(false);
     timer->interval_ = interval;
     return static_cast<Timer*>(parent->addChild(std::move(timer)));

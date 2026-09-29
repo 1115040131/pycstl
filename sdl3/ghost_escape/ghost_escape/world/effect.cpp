@@ -7,8 +7,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.world.effect;
 
 import ghost_escape.affiliate.sprite_anim;
@@ -20,9 +18,7 @@ Effect* Effect::CreateAndSet(Object* parent, const std::string& file_path, const
                              std::unique_ptr<ObjectWorld> next) {
     auto effect = std::make_unique<Effect>();
     effect->init();
-#ifdef DEBUG_MODE
-    effect->SET_NAME(Effect);
-#endif
+    SetDebugName(effect.get());
     effect->sprite_ = SpriteAnim::CreateAndSet(effect.get(), file_path, scale, 10.F, false);
     effect->setPosition(position);
     effect->setNext(std::move(next));

@@ -10,6 +10,7 @@ module;
 module sunny_land.engine.component.audio_component;
 
 import common.string_hash;
+
 import sunny_land.engine.audio.audio_player;
 import sunny_land.engine.core;
 

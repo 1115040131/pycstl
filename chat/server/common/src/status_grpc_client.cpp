@@ -2,15 +2,16 @@ module;
 
 #include <grpcpp/create_channel.h>
 
-#include "chat/common/error_code.h"
 #include "chat/server/proto/status.grpc.pb.h"
 
 module chat.server.common.status_grpc_client;
 
-import common.connection_pool;
-import common.utils;
+import chat.common.error_code;
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
+
+import common.connection_pool;
+import common.utils;
 
 namespace pyc {
 namespace chat {

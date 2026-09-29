@@ -7,6 +7,7 @@ module;
 export module sunny_land.game.player:player_state;
 
 import common.noncopyable;
+
 import sunny_land.engine.core;
 
 export namespace pyc::sunny_land {

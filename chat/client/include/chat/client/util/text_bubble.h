@@ -2,7 +2,7 @@
 
 #include <QTextEdit>
 
-#include "chat/client/util/bubble_frame.h"
+import chat.client.util.bubble_frame;
 
 class TextBubble : public BubbleFrame {
     Q_OBJECT

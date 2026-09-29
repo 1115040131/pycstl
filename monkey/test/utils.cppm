@@ -11,9 +11,9 @@ export module monkey.test.utils;
 
 export import monkey.ast;
 export import monkey.code;
-export import monkey.token;
 import monkey.lexer;
 import monkey.parser;
+export import monkey.token;
 
 export namespace pyc::monkey {
 

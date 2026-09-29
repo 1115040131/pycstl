@@ -4,7 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-#include "chat/client/user_mgr.h"
+import chat.client.user_mgr;
 
 TcpMgr::TcpMgr() {
     QObject::connect(&socket_, &QTcpSocket::connected, [this]() {

@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QWidget>
 
-#include "chat/client/define.h"
+import chat.client.define;
 
 /// @brief 气泡聊天框基类
 class ChatItemBase : public QWidget {

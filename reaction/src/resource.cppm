@@ -7,6 +7,7 @@ module;
 export module reaction:resource;
 
 import common.noncopyable;
+
 import :observer_node;
 
 export namespace pyc::reaction {

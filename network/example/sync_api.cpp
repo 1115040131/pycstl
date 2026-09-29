@@ -1,4 +1,4 @@
-#include "network/example/sync_api.h"
+module;
 
 #include <iostream>
 #include <memory>
@@ -7,6 +7,8 @@
 
 #include <boost/asio.hpp>
 #include <fmt/ostream.h>
+
+module network.example.sync_api;
 
 namespace network {
 

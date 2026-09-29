@@ -6,7 +6,7 @@
 #include <QJsonDocument>
 #include <QLabel>
 
-#include "chat/client/define.h"
+import chat.client.define;
 
 class ErrTip : public QLabel {
     Q_OBJECT

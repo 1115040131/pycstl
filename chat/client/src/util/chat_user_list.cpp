@@ -4,7 +4,7 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 
-#include "chat/client/user_mgr.h"
+import chat.client.user_mgr;
 
 ChatUserList::ChatUserList(QWidget* parent) : QListWidget(parent) {
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

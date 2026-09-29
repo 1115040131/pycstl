@@ -6,8 +6,8 @@ module;
 
 export module ghost_escape.screen.hud_skill;
 
-export import ghost_escape.core;
 export import ghost_escape.affiliate.sprite;
+export import ghost_escape.core;
 
 export namespace pyc::sdl3 {
 

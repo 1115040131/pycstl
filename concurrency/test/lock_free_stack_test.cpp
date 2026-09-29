@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-import concurrency.lock_free_stack.hazard_pointer_stack;
 import concurrency.lock_free_stack;
+import concurrency.lock_free_stack.hazard_pointer_stack;
 import concurrency.lock_free_stack.ref_count_stack;
 import concurrency.test.utils;
 

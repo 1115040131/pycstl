@@ -6,6 +6,7 @@ module;
 export module tetris.terminal;
 
 import common.singleton;
+
 export import tetris.ansi;
 
 export namespace pyc::tetris {

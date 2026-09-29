@@ -8,6 +8,7 @@ module;
 export module monster_war.engine.ui.ui_manager;
 
 import common.noncopyable;
+
 export import monster_war.engine.core.context;
 export import monster_war.engine.ui.ui_element;
 export import monster_war.engine.ui.ui_panel;

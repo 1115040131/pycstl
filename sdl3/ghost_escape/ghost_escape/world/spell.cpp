@@ -6,8 +6,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.world.spell;
 
 import ghost_escape.actor;
@@ -20,9 +18,7 @@ std::unique_ptr<Spell> Spell::Create(const std::string& file_path, const glm::ve
                                      float scale, Anchor anchor) {
     auto spell = std::make_unique<Spell>();
     spell->init();
-#ifdef DEBUG_MODE
-    spell->SET_NAME(Spell);
-#endif
+    SetDebugName(spell.get());
     spell->damage_ = damage;
     spell->sprite_anim_ = SpriteAnim::CreateAndSet(spell.get(), file_path, scale, 10.F, false, anchor);
     spell->collider_ =

@@ -6,8 +6,6 @@ module;
 
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.affiliate.sprite;
 
 import ghost_escape.core;
@@ -18,9 +16,7 @@ namespace pyc::sdl3 {
 Sprite* Sprite::CreateAndSet(ObjectScreen* parent, const std::string& file_path, float scale, Anchor anchor) {
     auto sprite = std::make_unique<Sprite>();
     sprite->init();
-#ifdef DEBUG_MODE
-    sprite->SET_NAME(Sprite);
-#endif
+    SetDebugName(sprite.get());
     sprite->setTexture(Texture::Create(file_path));
     sprite->setScale(scale);
     sprite->setOffsetByAnchor(anchor);

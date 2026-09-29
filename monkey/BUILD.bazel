@@ -3,17 +3,13 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 
 _LIB_SRCS = glob(["src/**/*.cpp"])
 
-_LIB_HDRS = glob(["include/**/*.h"])
-
 _LIB_MODULE_INTERFACES = glob(["src/**/*.cppm"])
 
 cc_library(
     name = "monkey_lib",
     srcs = _LIB_SRCS,
-    hdrs = _LIB_HDRS,
     copts = COPTS,
     module_interfaces = _LIB_MODULE_INTERFACES,
-    strip_include_prefix = "include",
     visibility = ["//monkey:__subpackages__"],
     deps = ["@fmt"],
 )
@@ -23,11 +19,9 @@ cc_library(
 cc_library(
     name = "monkey_lib_with_sorted_hash",
     srcs = _LIB_SRCS,
-    hdrs = _LIB_HDRS,
     copts = COPTS,
     defines = ["SORTED_HASH"],
     module_interfaces = _LIB_MODULE_INTERFACES,
-    strip_include_prefix = "include",
     visibility = ["//monkey:__subpackages__"],
     deps = ["@fmt"],
 )

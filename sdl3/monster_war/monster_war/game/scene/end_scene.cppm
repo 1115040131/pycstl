@@ -4,9 +4,9 @@ module;
 
 export module monster_war.game.scene:end_scene;
 
+import :debug_ui_system;
 export import monster_war.engine.core.context;
 export import monster_war.engine.scene.scene;
-import :debug_ui_system;
 
 export namespace pyc::monster_war {
 

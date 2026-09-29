@@ -4,8 +4,7 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "common",
     srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    strip_include_prefix = "include",
+    module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//chat:__subpackages__"],
 )

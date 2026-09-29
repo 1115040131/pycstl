@@ -3,7 +3,7 @@
 #include <QJsonDocument>
 #include <QRegularExpression>
 
-#include "chat/client/api.h"
+import chat.client.api;
 
 ErrTip::ErrTip(QWidget* parent) : QLabel(parent) {
     setProperty("state", "normal");

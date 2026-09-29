@@ -5,8 +5,9 @@
 #include <QScrollBar>
 
 #include "chat/client/tcp_mgr.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/widget/ui_auth_friend_dialog.h"
+
+import chat.client.user_mgr;
 
 inline constexpr int kMinApplyLbaelEditLength = 40;  // 申请好友标签输入框最低长度
 

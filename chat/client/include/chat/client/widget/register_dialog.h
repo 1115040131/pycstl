@@ -8,7 +8,7 @@
 #include <QJsonObject>
 #include <QTimer>
 
-#include "chat/client/define.h"
+import chat.client.define;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

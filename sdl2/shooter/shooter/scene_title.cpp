@@ -7,10 +7,9 @@ module;
 #include <SDL2/SDL_mixer.h>
 #include <fmt/base.h>
 
-#include "shooter/asset.h"
-
 module sdl2.shooter.scene_title;
 
+import sdl2.shooter.asset;
 import sdl2.shooter.scene;
 import sdl2.shooter.scene_main;
 
@@ -21,7 +20,7 @@ namespace pyc::sdl2 {
 using namespace std::chrono_literals;
 
 void SceneTitle::init() {
-    bgm_ = Mix_LoadMUS(ASSET("music/06_Battle_in_Space_Intro.ogg"));
+    bgm_ = Mix_LoadMUS(Asset("music/06_Battle_in_Space_Intro.ogg"));
     if (!bgm_) {
         fmt::println("Mix_LoadMUS: {}", Mix_GetError());
         return;

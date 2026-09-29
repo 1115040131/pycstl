@@ -9,8 +9,14 @@ module;
 
 export module monster_war.game.scene:game_scene;
 
+import :debug_ui_system;
 export import monster_war.engine.core.context;
 export import monster_war.engine.scene.scene;
+import monster_war.engine.system.animation_system;
+import monster_war.engine.system.audio_system;
+import monster_war.engine.system.movement_system;
+import monster_war.engine.system.render_system;
+import monster_war.engine.system.ysort_system;
 export import monster_war.game.data.game_stats;
 export import monster_war.game.data.level_config;
 export import monster_war.game.data.level_data;
@@ -21,13 +27,6 @@ export import monster_war.game.def.events;
 export import monster_war.game.factory.blueprint_manager;
 export import monster_war.game.factory.entity_factory;
 export import monster_war.game.spawner.enemy_spawner;
-export import monster_war.game.ui.units_portrait_ui;
-import :debug_ui_system;
-import monster_war.engine.system.animation_system;
-import monster_war.engine.system.audio_system;
-import monster_war.engine.system.movement_system;
-import monster_war.engine.system.render_system;
-import monster_war.engine.system.ysort_system;
 import monster_war.game.system.animation_event_system;
 import monster_war.game.system.animation_state_system;
 import monster_war.game.system.attack_starter_system;
@@ -46,6 +45,7 @@ import monster_war.game.system.selection_system;
 import monster_war.game.system.set_target_system;
 import monster_war.game.system.skill_system;
 import monster_war.game.system.timer_system;
+export import monster_war.game.ui.units_portrait_ui;
 
 export namespace pyc::monster_war {
 

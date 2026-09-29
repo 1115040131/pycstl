@@ -4,9 +4,9 @@
 #include <gtest/gtest.h>
 
 import concurrency.parallel_algorithm;
+import concurrency.thread_pool;
 import concurrency.thread_pool.simple_thread_pool;
 import concurrency.thread_pool.steal_thread_pool;
-import concurrency.thread_pool;
 
 namespace pyc {
 namespace concurrency {

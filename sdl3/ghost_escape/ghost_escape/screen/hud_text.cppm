@@ -7,9 +7,9 @@ module;
 
 export module ghost_escape.screen.hud_text;
 
-export import ghost_escape.core;
 export import ghost_escape.affiliate.sprite;
 export import ghost_escape.affiliate.text_label;
+export import ghost_escape.core;
 
 export namespace pyc::sdl3 {
 

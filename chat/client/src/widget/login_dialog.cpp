@@ -3,10 +3,11 @@
 #include <QPainter>
 #include <QPainterPath>
 
-#include "chat/client/api.h"
 #include "chat/client/http_mgr.h"
 #include "chat/client/tcp_mgr.h"
 #include "chat/client/widget/ui_login_dialog.h"
+
+import chat.client.api;
 
 LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent), ui(new Ui::LoginDialog) {
     ui->setupUi(this);

@@ -6,13 +6,13 @@ module;
 export module ghost_escape.scene_main;
 
 export import ghost_escape.core;
-import ghost_escape.player;
-import ghost_escape.spawner;
-import ghost_escape.screen.ui_mouse;
 import ghost_escape.hud_stats;
-import ghost_escape.screen.hud_text;
-import ghost_escape.screen.hud_button;
+import ghost_escape.player;
 import ghost_escape.raw.timer;
+import ghost_escape.screen.hud_button;
+import ghost_escape.screen.hud_text;
+import ghost_escape.screen.ui_mouse;
+import ghost_escape.spawner;
 
 export namespace pyc::sdl3 {
 

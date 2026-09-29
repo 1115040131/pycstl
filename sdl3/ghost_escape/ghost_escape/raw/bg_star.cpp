@@ -9,8 +9,6 @@ module;
 #include <SDL3/SDL.h>
 #include <glm/glm.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.raw.bg_star;
 
 import ghost_escape.core;
@@ -20,9 +18,7 @@ namespace pyc::sdl3 {
 BgStar* BgStar::CreateAndSet(Object* parent, int num, float far_scale, float mid_scale, float near_scale) {
     auto bg_star = std::make_unique<BgStar>();
     bg_star->init();
-#ifdef DEBUG_MODE
-    bg_star->SET_NAME(BgStar);
-#endif
+    SetDebugName(bg_star.get());
     bg_star->num_ = num;
     bg_star->far_stars_.scale = far_scale;
     bg_star->mid_stars_.scale = mid_scale;

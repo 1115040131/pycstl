@@ -6,9 +6,9 @@ export module ghost_escape.player;
 
 export import ghost_escape.actor;
 import ghost_escape.affiliate.sprite_anim;
-import ghost_escape.world.effect;
-import ghost_escape.weapon_thunder;
 import ghost_escape.raw.timer;
+import ghost_escape.weapon_thunder;
+import ghost_escape.world.effect;
 
 export namespace pyc::sdl3 {
 

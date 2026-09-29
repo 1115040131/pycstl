@@ -15,10 +15,9 @@ module;
 #include <fmt/base.h>
 #include <fmt/format.h>
 
-#include "shooter/asset.h"
-
 module sdl2.shooter.scene_main;
 
+import sdl2.shooter.asset;
 import sdl2.shooter.object;
 import sdl2.shooter.scene;
 import sdl2.shooter.scene_end;
@@ -70,7 +69,7 @@ void SceneMain::handleEvent(SDL_Event* event) {
 
 void SceneMain::init() {
     // 载入 bgm
-    bgm_ = Mix_LoadMUS(ASSET("music/03_Racing_Through_Asteroids_Loop.ogg"));
+    bgm_ = Mix_LoadMUS(Asset("music/03_Racing_Through_Asteroids_Loop.ogg"));
     if (!bgm_) {
         fmt::println("Mix_LoadMUS: {}", Mix_GetError());
         return;
@@ -78,18 +77,18 @@ void SceneMain::init() {
     Mix_PlayMusic(bgm_, -1);
 
     // 读取音效
-    sounds_[to_underlying(Sound::kPlayerShoot)] = Mix_LoadWAV(ASSET("sound/laser_shoot4.wav"));
-    sounds_[to_underlying(Sound::kEnemyShoot)] = Mix_LoadWAV(ASSET("sound/xs_laser.wav"));
-    sounds_[to_underlying(Sound::kPlayerExplode)] = Mix_LoadWAV(ASSET("sound/explosion1.wav"));
-    sounds_[to_underlying(Sound::kEnemyExplode)] = Mix_LoadWAV(ASSET("sound/explosion3.wav"));
-    sounds_[to_underlying(Sound::kHit)] = Mix_LoadWAV(ASSET("sound/eff11.wav"));
-    sounds_[to_underlying(Sound::kGetItem)] = Mix_LoadWAV(ASSET("sound/eff5.wav"));
+    sounds_[to_underlying(Sound::kPlayerShoot)] = Mix_LoadWAV(Asset("sound/laser_shoot4.wav"));
+    sounds_[to_underlying(Sound::kEnemyShoot)] = Mix_LoadWAV(Asset("sound/xs_laser.wav"));
+    sounds_[to_underlying(Sound::kPlayerExplode)] = Mix_LoadWAV(Asset("sound/explosion1.wav"));
+    sounds_[to_underlying(Sound::kEnemyExplode)] = Mix_LoadWAV(Asset("sound/explosion3.wav"));
+    sounds_[to_underlying(Sound::kHit)] = Mix_LoadWAV(Asset("sound/eff11.wav"));
+    sounds_[to_underlying(Sound::kGetItem)] = Mix_LoadWAV(Asset("sound/eff5.wav"));
 
     // 初始化 UI
-    ui_health_ = IMG_LoadTexture(game_.renderer(), ASSET("image/Health UI Black.png"));
+    ui_health_ = IMG_LoadTexture(game_.renderer(), Asset("image/Health UI Black.png"));
 
     // 载入字体
-    score_font_ = TTF_OpenFont(ASSET("font/VonwaonBitmap-12px.ttf"), 24);
+    score_font_ = TTF_OpenFont(Asset("font/VonwaonBitmap-12px.ttf"), 24);
 
     // 生成随机数
     std::random_device rd;
@@ -97,7 +96,7 @@ void SceneMain::init() {
     dis_ = std::uniform_real_distribution<double>(0, 1);
 
     // 初始化玩家
-    player_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/SpaceShip.png"));
+    player_.texture = IMG_LoadTexture(game_.renderer(), Asset("image/SpaceShip.png"));
     SDL_QueryTexture(player_.texture, nullptr, nullptr, &player_.width, &player_.height);
     player_.width /= 5;
     player_.height /= 5;
@@ -105,34 +104,34 @@ void SceneMain::init() {
     player_.position.y = Game::kWindowHeight - player_.height;
 
     // 初始化敌人原型
-    enemy_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/insect-2.png"));
+    enemy_prototype_.texture = IMG_LoadTexture(game_.renderer(), Asset("image/insect-2.png"));
     SDL_QueryTexture(enemy_prototype_.texture, nullptr, nullptr, &enemy_prototype_.width,
                      &enemy_prototype_.height);
     enemy_prototype_.width /= 4;
     enemy_prototype_.height /= 4;
 
     // 初始化子弹原型
-    player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/laser-1.png"));
+    player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), Asset("image/laser-1.png"));
     SDL_QueryTexture(player_projectile_prototype_.texture, nullptr, nullptr, &player_projectile_prototype_.width,
                      &player_projectile_prototype_.height);
     player_projectile_prototype_.width /= 4;
     player_projectile_prototype_.height /= 4;
 
-    enemy_player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/bullet-1.png"));
+    enemy_player_projectile_prototype_.texture = IMG_LoadTexture(game_.renderer(), Asset("image/bullet-1.png"));
     SDL_QueryTexture(enemy_player_projectile_prototype_.texture, nullptr, nullptr,
                      &enemy_player_projectile_prototype_.width, &enemy_player_projectile_prototype_.height);
     enemy_player_projectile_prototype_.width /= 2;
     enemy_player_projectile_prototype_.height /= 2;
 
     // 初始化爆炸原型
-    explosion_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("effect/explosion.png"));
+    explosion_prototype_.texture = IMG_LoadTexture(game_.renderer(), Asset("effect/explosion.png"));
     SDL_QueryTexture(explosion_prototype_.texture, nullptr, nullptr, &explosion_prototype_.width,
                      &explosion_prototype_.height);
     explosion_prototype_.total_frame = explosion_prototype_.width / explosion_prototype_.height;
     explosion_prototype_.width = explosion_prototype_.height;
 
     // 初始化物品原型
-    item_life_prototype_.texture = IMG_LoadTexture(game_.renderer(), ASSET("image/bonus_life.png"));
+    item_life_prototype_.texture = IMG_LoadTexture(game_.renderer(), Asset("image/bonus_life.png"));
     SDL_QueryTexture(item_life_prototype_.texture, nullptr, nullptr, &item_life_prototype_.width,
                      &item_life_prototype_.height);
     item_life_prototype_.width /= 4;

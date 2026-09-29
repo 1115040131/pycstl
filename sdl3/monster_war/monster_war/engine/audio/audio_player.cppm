@@ -8,6 +8,7 @@ module;
 export module monster_war.engine.audio.audio_player;
 
 import common.noncopyable;
+
 export import monster_war.engine.resource;
 
 export namespace pyc::monster_war {

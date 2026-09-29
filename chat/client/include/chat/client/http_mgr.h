@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QString>
 
-#include "chat/client/define.h"
+import chat.client.define;
 
 import common.singleton;
 

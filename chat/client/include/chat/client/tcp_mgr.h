@@ -3,8 +3,8 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#include "chat/client/define.h"
-#include "chat/client/user_data.h"
+import chat.client.define;
+import chat.client.user_data;
 
 import common.singleton;
 

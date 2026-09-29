@@ -11,8 +11,6 @@ module;
 #include <fmt/format.h>
 #include <glm/vec2.hpp>
 
-#include "ghost_escape/core/asset.h"
-
 module ghost_escape.scene_main;
 
 import ghost_escape.core;
@@ -36,7 +34,7 @@ void SceneMain::init() {
     name_ = "SceneMain";
 #endif
 
-    game_.playMusic(ASSET("bgm/OhMyGhost.ogg"));
+    game_.playMusic(Asset("bgm/OhMyGhost.ogg"));
     game_.setScore(0);
 
     world_size_ = game_.getScreenSize() * 3.0F;
@@ -59,26 +57,26 @@ void SceneMain::init() {
 
     hud_stats_ = HUDStatus::CreateAndSet(this, player_, glm::vec2(30));
     hud_text_score_ = HUDText::CreateAndSet(this, "Score: 0", glm::vec2(game_.getScreenSize().x - 120.f, 30.f),
-                                            glm::vec2(200, 50), ASSET("font/VonwaonBitmap-16px.ttf"), 32,
-                                            ASSET("UI/Textfield_01.png"));
+                                            glm::vec2(200, 50), Asset("font/VonwaonBitmap-16px.ttf"), 32,
+                                            Asset("UI/Textfield_01.png"));
 
     button_pause_ =
-        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(230, 30), ASSET("UI/A_Pause1.png"),
-                                ASSET("UI/A_Pause2.png"), ASSET("UI/A_Pause3.png"));
+        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(230, 30), Asset("UI/A_Pause1.png"),
+                                Asset("UI/A_Pause2.png"), Asset("UI/A_Pause3.png"));
     button_restart_ =
-        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(140, 30), ASSET("UI/A_Restart1.png"),
-                                ASSET("UI/A_Restart2.png"), ASSET("UI/A_Restart3.png"));
+        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(140, 30), Asset("UI/A_Restart1.png"),
+                                Asset("UI/A_Restart2.png"), Asset("UI/A_Restart3.png"));
     button_back_ =
-        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(50, 30), ASSET("UI/A_Back1.png"),
-                                ASSET("UI/A_Back2.png"), ASSET("UI/A_Back3.png"));
-    ui_mouse_ = UIMouse::CreateAndSet(this, ASSET("UI/29.png"), ASSET("UI/30.png"), 2.0F);
+        HUDButton::CreateAndSet(this, game_.getScreenSize() - glm::vec2(50, 30), Asset("UI/A_Back1.png"),
+                                Asset("UI/A_Back2.png"), Asset("UI/A_Back3.png"));
+    ui_mouse_ = UIMouse::CreateAndSet(this, Asset("UI/29.png"), Asset("UI/30.png"), 2.0F);
 
     end_timer_ = Timer::CreateAndSet(this);
 }
 
 void SceneMain::clean() {
     Scene::clean();
-    saveData(ASSET("score.dat"));
+    saveData(Asset("score.dat"));
 }
 
 void SceneMain::update(std::chrono::duration<float> delta) {

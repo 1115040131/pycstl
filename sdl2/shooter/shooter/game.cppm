@@ -13,6 +13,7 @@ module;
 export module sdl2.shooter.scene:game;
 
 import common.singleton;
+
 import sdl2.shooter.object;
 
 export namespace pyc::sdl2 {

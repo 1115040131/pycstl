@@ -6,7 +6,7 @@
 #include <QDialog>
 #include <QJsonObject>
 
-#include "chat/client/define.h"
+import chat.client.define;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

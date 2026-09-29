@@ -6,8 +6,9 @@ module;
 
 export module chat.server.chat_server:user_mgr;
 
-import common.singleton;
 export import :csession;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {

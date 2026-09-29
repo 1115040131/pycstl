@@ -8,8 +8,6 @@ module;
 #include <SDL3_ttf/SDL_ttf.h>
 #include <glm/vec2.hpp>
 
-#include "ghost_escape/core/set_name.h"
-
 module ghost_escape.affiliate.text_label;
 
 import ghost_escape.core;
@@ -20,9 +18,7 @@ TextLabel* TextLabel::CreateAndSet(ObjectScreen* parent, std::string_view text, 
                                    int font_size, Anchor anchor) {
     auto text_label = std::make_unique<TextLabel>();
     text_label->init();
-#ifdef DEBUG_MODE
-    text_label->SET_NAME(TextLabel);
-#endif
+    SetDebugName(text_label.get());
     text_label->setFont(font_path, font_size);
     text_label->setText(text);
     text_label->anchor_ = anchor;

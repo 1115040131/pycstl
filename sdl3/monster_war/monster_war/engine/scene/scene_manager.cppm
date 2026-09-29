@@ -7,6 +7,7 @@ module;
 export module monster_war.engine.scene.scene_manager;
 
 import common.noncopyable;
+
 export import monster_war.engine.core.context;
 export import monster_war.engine.scene.scene;
 export import monster_war.engine.utils.events;

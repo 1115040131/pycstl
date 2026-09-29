@@ -4,10 +4,8 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "shooter_lib",
     srcs = glob(["shooter/*.cpp"]),
-    hdrs = ["shooter/asset.h"],
     copts = COPTS,
     module_interfaces = glob(["shooter/*.cppm"]),
-    strip_include_prefix = "/sdl2/shooter",
     deps = [
         "//common:singleton",
         "//sdl2",

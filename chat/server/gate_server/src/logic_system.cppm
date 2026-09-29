@@ -2,14 +2,14 @@ module;
 
 #include <functional>
 #include <memory>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 
 export module chat.server.gate_server:logic_system;
 
-import common.singleton;
 export import :http_connection;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {

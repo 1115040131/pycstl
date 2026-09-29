@@ -17,6 +17,7 @@ module;
 export module ghost_escape.core:game;
 
 import common.singleton;
+
 export import ghost_escape.core.asset_store;
 export import ghost_escape.core.texture;
 

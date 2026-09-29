@@ -5,7 +5,9 @@ module;
 #include <memory>
 #include <utility>
 
-#include "ghost_escape/core/set_name.h"
+#ifdef DEBUG_MODE
+#include <fmt/base.h>
+#endif
 
 module ghost_escape.raw.stats;
 
@@ -17,9 +19,7 @@ Stats* Stats::CreateAndSet(Object* parent, float max_health, float max_mana, flo
                            float damage) {
     auto stats = std::make_unique<Stats>();
     stats->init();
-#ifdef DEBUG_MODE
-    stats->SET_NAME(Stats);
-#endif
+    SetDebugName(stats.get());
     stats->health_.value = max_health;
     stats->health_.max_value = max_health;
     stats->health_.regen = health_regen;

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 import concurrency.test.utils;
-import concurrency.thread_safe_queue.simple_thread_safe_queue;
 import concurrency.thread_safe_queue;
+import concurrency.thread_safe_queue.simple_thread_safe_queue;
 import concurrency.thread_safe_stack;
 
 namespace pyc {

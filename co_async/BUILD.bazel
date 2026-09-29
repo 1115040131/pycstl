@@ -4,20 +4,12 @@ load("//build_defs:cpp_opts.bzl", "COPTS")
 cc_library(
     name = "co_async",
     srcs = glob(["src/**/*.cpp"]),
-    hdrs = glob(["include/co_async/**/*.h"]),
     copts = COPTS,
     defines = select({
         "//conditions:default": [],
         "//:debug": ["CO_ASYNC_DEBUG"],
     }),
-    module_interfaces = glob(
-        ["src/**/*.cppm"],
-        exclude = ["src/utils/debug.cppm"],
-    ) + select({
-        "//conditions:default": [],
-        "//:debug": ["src/utils/debug.cppm"],
-    }),
-    strip_include_prefix = "include",
+    module_interfaces = glob(["src/**/*.cppm"]),
     visibility = ["//co_async:__subpackages__"],
     deps = ["//common:singleton"] + select({
         "//conditions:default": [],

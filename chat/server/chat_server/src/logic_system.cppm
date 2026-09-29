@@ -10,14 +10,14 @@ module;
 #include <thread>
 #include <unordered_map>
 
-#include "chat/common/method.h"
-
 export module chat.server.chat_server:logic_system;
 
-import common.singleton;
-export import :logic_node;
-export import chat.server.common.data;
 import :csession;
+export import :logic_node;
+export import chat.common.method;
+export import chat.server.common.data;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {

@@ -7,6 +7,7 @@ module;
 export module network.websocket_connection_manager;
 
 import common.singleton;
+
 export import network.websocket_connection;
 
 export namespace network {

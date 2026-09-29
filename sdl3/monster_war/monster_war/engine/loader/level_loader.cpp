@@ -10,6 +10,7 @@ module;
 
 module monster_war.engine.loader;
 
+import :basic_entity_builder;
 import monster_war.engine.component.animation_component;
 import monster_war.engine.component.name_component;
 import monster_war.engine.component.parallax_component;
@@ -18,7 +19,6 @@ import monster_war.engine.component.sprite_component;
 import monster_war.engine.component.tilelayer_component;
 import monster_war.engine.component.transform_component;
 import monster_war.engine.core.context;
-import :basic_entity_builder;
 import monster_war.engine.render.renderer;
 import monster_war.engine.resource;
 import monster_war.engine.scene.scene;

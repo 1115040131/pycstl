@@ -16,10 +16,9 @@ module;
 #include <SDL2/SDL_ttf.h>
 #include <fmt/base.h>
 
-#include "shooter/asset.h"
-
 module sdl2.shooter.scene;
 
+import sdl2.shooter.asset;
 import sdl2.shooter.object;
 import sdl2.shooter.scene_main;
 import sdl2.shooter.scene_title;
@@ -110,7 +109,7 @@ void Game::init() {
     }
 
     // 初始化背景
-    near_stars_.texture = IMG_LoadTexture(renderer_, ASSET("image/Stars-A.png"));
+    near_stars_.texture = IMG_LoadTexture(renderer_, Asset("image/Stars-A.png"));
     if (!near_stars_.texture) {
         fmt::println("IMG_LoadTexture: {}", IMG_GetError());
         return;
@@ -119,7 +118,7 @@ void Game::init() {
     near_stars_.width /= 2;
     near_stars_.height /= 2;
 
-    far_stars_.texture = IMG_LoadTexture(renderer_, ASSET("image/Stars-B.png"));
+    far_stars_.texture = IMG_LoadTexture(renderer_, Asset("image/Stars-B.png"));
     if (!far_stars_.texture) {
         fmt::println("IMG_LoadTexture: {}", IMG_GetError());
         return;
@@ -130,12 +129,12 @@ void Game::init() {
     far_stars_.speed = 20;
 
     // 载入字体
-    title_font_ = TTF_OpenFont(ASSET("font/VonwaonBitmap-16px.ttf"), 64);
+    title_font_ = TTF_OpenFont(Asset("font/VonwaonBitmap-16px.ttf"), 64);
     if (!title_font_) {
         fmt::println("TTF_OpenFont: {}", TTF_GetError());
         return;
     }
-    text_font_ = TTF_OpenFont(ASSET("font/VonwaonBitmap-16px.ttf"), 32);
+    text_font_ = TTF_OpenFont(Asset("font/VonwaonBitmap-16px.ttf"), 32);
     if (!text_font_) {
         fmt::println("TTF_OpenFont: {}", TTF_GetError());
         return;

@@ -2,7 +2,7 @@
 
 #include <QTextEdit>
 
-#include "chat/client/define.h"
+import chat.client.define;
 
 class MessageTextEdit : public QTextEdit {
     Q_OBJECT

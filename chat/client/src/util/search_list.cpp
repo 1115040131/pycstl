@@ -7,12 +7,13 @@
 #include <QWheelEvent>
 
 #include "chat/client/tcp_mgr.h"
-#include "chat/client/user_mgr.h"
 #include "chat/client/util/customize_edit.h"
 #include "chat/client/widget/add_user_item.h"
 #include "chat/client/widget/find_fail_dialog.h"
 #include "chat/client/widget/find_success_dialog.h"
 #include "chat/client/widget/loading_dialog.h"
+
+import chat.client.user_mgr;
 
 SearchList::SearchList(QWidget* parent) : QListWidget(parent) {
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
