@@ -9,9 +9,9 @@ module;
 
 #include <SDL3_ttf/SDL_ttf.h>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.resource:font_manager;
+
+import common.noncopyable;
 
 export namespace pyc::sunny_land {
 

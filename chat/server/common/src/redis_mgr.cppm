@@ -6,10 +6,9 @@ module;
 #include <string>
 #include <string_view>
 
-#include "common/singleton.h"
-
 export module chat.server.common.redis_mgr;
 
+import common.singleton;
 import chat.server.common.redis_connection_pool;
 
 export namespace pyc::chat {

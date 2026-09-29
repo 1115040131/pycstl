@@ -6,10 +6,9 @@ module;
 #include <string>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module reaction:observer_node;
 
+import common.singleton;
 import :concepts;
 import :utility;
 

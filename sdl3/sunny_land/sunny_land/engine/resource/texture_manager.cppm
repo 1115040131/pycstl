@@ -8,10 +8,10 @@ module;
 #include <SDL3/SDL_render.h>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-#include "common/string_hash.h"
-
 export module sunny_land.engine.resource:texture_manager;
+
+import common.noncopyable;
+import common.string_hash;
 
 export namespace pyc::sunny_land {
 

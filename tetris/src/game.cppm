@@ -6,10 +6,9 @@ module;
 #include <optional>
 #include <vector>
 
-#include "common/singleton.h"
-
 export module tetris.game;
 
+import common.singleton;
 export import tetris.play_field;
 
 import tetris.control;

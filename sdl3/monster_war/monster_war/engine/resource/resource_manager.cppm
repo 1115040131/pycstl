@@ -6,8 +6,6 @@ module;
 #include <entt/core/fwd.hpp>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 struct SDL_Texture;
 struct Mix_Chunk;
@@ -16,6 +14,7 @@ struct TTF_Font;
 
 export module monster_war.engine.resource:resource_manager;
 
+import common.noncopyable;
 export import :audio_manager;
 export import :font_manager;
 export import :texture_manager;

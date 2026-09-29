@@ -10,14 +10,13 @@ module;
 #include <SDL3/SDL_scancode.h>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-#include "common/string_hash.h"
-
 struct SDL_Renderer;
 union SDL_Event;
 
 export module sunny_land.engine.input.input_manager;
 
+import common.noncopyable;
+import common.string_hash;
 export import sunny_land.engine.core.config;
 
 export namespace pyc::sunny_land {

@@ -5,10 +5,10 @@ module;
 #include <unordered_map>
 #include <vector>
 
-#include "common/noncopyable.h"
-#include "common/string_hash.h"
-
 export module monster_war.engine.core.config;
+
+import common.noncopyable;
+import common.string_hash;
 
 export namespace pyc::monster_war {
 

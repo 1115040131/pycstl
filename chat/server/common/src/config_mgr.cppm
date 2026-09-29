@@ -5,9 +5,9 @@ module;
 #include <string_view>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module chat.server.common.config_mgr;
+
+import common.singleton;
 
 export namespace pyc::chat {
 

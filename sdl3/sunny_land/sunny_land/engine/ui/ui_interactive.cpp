@@ -11,10 +11,9 @@ module;
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.engine.ui;
 
+import common.string_hash;
 import sunny_land.engine.audio.audio_player;
 import sunny_land.engine.core;
 import sunny_land.engine.render.sprite;

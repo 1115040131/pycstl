@@ -8,9 +8,9 @@ module;
 #include <entt/core/fwd.hpp>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.resource:texture_manager;
+
+import common.noncopyable;
 
 export namespace pyc::monster_war {
 

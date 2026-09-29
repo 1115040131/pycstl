@@ -4,10 +4,9 @@ module;
 #include <memory>
 #include <string_view>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.game.player:player_state;
 
+import common.noncopyable;
 import sunny_land.engine.core;
 
 export namespace pyc::sunny_land {

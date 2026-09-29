@@ -10,9 +10,9 @@ module;
 #include <utility>
 #include <vector>
 
-#include "common/singleton.h"
-
 export module concurrency.thread_pool;
+
+import common.singleton;
 
 export namespace pyc::concurrency {
 

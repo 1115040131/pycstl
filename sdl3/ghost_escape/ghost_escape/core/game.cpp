@@ -18,10 +18,9 @@ module;
 #include <fmt/base.h>
 #include <glm/glm.hpp>
 
-#include "common/singleton.h"
-
 module ghost_escape.core;
 
+import common.singleton;
 import ghost_escape.core.asset_store;
 import ghost_escape.core.texture;
 

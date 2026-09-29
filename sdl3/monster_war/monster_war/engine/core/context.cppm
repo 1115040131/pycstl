@@ -2,10 +2,9 @@ module;
 
 #include <entt/signal/fwd.hpp>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.core.context;
 
+import common.noncopyable;
 export import monster_war.engine.audio.audio_player;
 export import monster_war.engine.core.game_state;
 export import monster_war.engine.core.time;

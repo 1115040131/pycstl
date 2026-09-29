@@ -6,7 +6,8 @@
 #include <QString>
 
 #include "chat/client/define.h"
-#include "common/singleton.h"
+
+import common.singleton;
 
 class HttpMgr : public QObject, public pyc::Singleton<HttpMgr> {
     Q_OBJECT

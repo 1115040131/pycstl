@@ -8,10 +8,9 @@ module;
 #include <glm/vec2.hpp>
 #include <nlohmann/json.hpp>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.loader:level_loader;
 
+import common.noncopyable;
 export import :basic_entity_builder;
 export import monster_war.engine.component.tilelayer_component;
 export import monster_war.engine.scene.scene;

@@ -2,7 +2,7 @@ module;
 
 export module co_async.utils.debug;
 
-export import logger.logger;
+import logger.logger;
 
 export namespace pyc::co_async {
 

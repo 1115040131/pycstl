@@ -7,9 +7,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "common/singleton.h"
-
 export module chat.server.common.io_service_pool;
+
+import common.singleton;
 
 export namespace pyc::chat {
 

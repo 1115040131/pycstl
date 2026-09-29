@@ -5,9 +5,9 @@ module;
 #include <map>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module co_async.timer_loop;
+
+import common.singleton;
 
 export namespace pyc::co_async {
 

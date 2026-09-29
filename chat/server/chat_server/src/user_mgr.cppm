@@ -4,10 +4,9 @@ module;
 #include <shared_mutex>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module chat.server.chat_server:user_mgr;
 
+import common.singleton;
 export import :csession;
 
 export namespace pyc {

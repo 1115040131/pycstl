@@ -5,13 +5,12 @@ module;
 #include <string>
 #include <string_view>
 
-#include "common/noncopyable.h"
-
 struct Mix_Chunk;
 struct Mix_Music;
 
 export module sunny_land.engine.audio.audio_player;
 
+import common.noncopyable;
 export import sunny_land.engine.resource;
 
 export namespace pyc::sunny_land {

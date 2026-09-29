@@ -4,10 +4,9 @@ module;
 #include <string_view>
 #include <unordered_map>
 
-#include "common/string_hash.h"
-
 export module sunny_land.engine.component.audio_component;
 
+import common.string_hash;
 export import sunny_land.engine.audio.audio_player;
 export import sunny_land.engine.core;
 

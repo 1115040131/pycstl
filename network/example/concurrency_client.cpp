@@ -6,7 +6,7 @@
 #include <fmt/base.h>
 #include <nlohmann/json.hpp>
 
-#include "common/timer.h"
+import common.timer;
 
 import network.msg_node;
 import network.utils;

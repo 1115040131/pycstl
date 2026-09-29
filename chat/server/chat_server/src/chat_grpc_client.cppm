@@ -7,9 +7,10 @@ module;
 #include <nlohmann/json.hpp>
 
 #include "chat/server/proto/chat.pb.h"
-#include "common/singleton.h"
 
 export module chat.server.chat_server.chat_grpc_client;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {

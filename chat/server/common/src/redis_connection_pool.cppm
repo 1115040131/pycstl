@@ -17,7 +17,7 @@ module;
 
 export module chat.server.common.redis_connection_pool;
 
-export import logger.logger;
+import logger.logger;
 
 export namespace pyc::chat {
 

@@ -4,10 +4,9 @@ module;
 #include <memory>
 #include <vector>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.scene:scene_manager;
 
+import common.noncopyable;
 export import sunny_land.engine.core;
 
 export namespace pyc::sunny_land {

@@ -2,9 +2,9 @@ module;
 
 #include <chrono>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.core:component;
+
+import common.noncopyable;
 
 export namespace pyc::sunny_land {
 

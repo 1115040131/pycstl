@@ -7,7 +7,8 @@
 #include <QString>
 
 #include "chat/client/user_data.h"
-#include "common/singleton.h"
+
+import common.singleton;
 
 class UserMgr : public pyc::Singleton<UserMgr> {
     friend class pyc::Singleton<UserMgr>;

@@ -1,8 +1,13 @@
-#include "common/timer.h"
+module;
+
+#include <chrono>
+#include <source_location>
 
 #include <fmt/chrono.h>
 
-#include "common/utils.h"
+module common.timer;
+
+import common.utils;
 
 namespace pyc {
 

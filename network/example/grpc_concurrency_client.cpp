@@ -5,8 +5,9 @@
 #include <grpcpp/channel.h>
 #include <grpcpp/create_channel.h>
 
-#include "common/timer.h"
 #include "network/proto/greeter.grpc.pb.h"
+
+import common.timer;
 
 using namespace std::literals::chrono_literals;
 

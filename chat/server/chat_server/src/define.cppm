@@ -6,7 +6,7 @@ module;
 
 export module chat.server.chat_server.define;
 
-export import logger.logger;
+import logger.logger;
 
 namespace pyc {
 namespace chat {

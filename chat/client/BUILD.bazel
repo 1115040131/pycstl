@@ -7,7 +7,7 @@ qt_cc_library(
     srcs = glob(["src/**/*.cpp"]),
     hdrs = glob(["include/**/*.h"]),
     copts = COPTS,
-    features = ["-layering_check"],
+    features = ["cpp_modules", "-layering_check"],
     strip_include_prefix = "include",
     deps = [
         "//chat/client/widget:%s_ui" % widget

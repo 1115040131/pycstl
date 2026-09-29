@@ -4,9 +4,9 @@ module;
 #include <cstring>
 #include <memory>
 
-#include "common/noncopyable.h"
-
 export module network.msg_node;
+
+import common.noncopyable;
 
 export namespace network {
 

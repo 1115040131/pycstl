@@ -2,9 +2,9 @@ module;
 
 #include <boost/asio.hpp>
 
-#include "common/noncopyable.h"
-
 export module network.websocket_server;
+
+import common.noncopyable;
 
 export namespace network {
 

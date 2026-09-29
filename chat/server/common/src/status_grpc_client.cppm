@@ -4,9 +4,10 @@ module;
 #include <string>
 
 #include "chat/server/proto/status.pb.h"
-#include "common/singleton.h"
 
 export module chat.server.common.status_grpc_client;
+
+import common.singleton;
 
 export namespace pyc::chat {
 

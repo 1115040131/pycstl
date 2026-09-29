@@ -4,9 +4,10 @@ module;
 #include <string_view>
 
 #include "chat/server/proto/verify.pb.h"
-#include "common/singleton.h"
 
 export module chat.server.gate_server.verify_grpc_client;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {

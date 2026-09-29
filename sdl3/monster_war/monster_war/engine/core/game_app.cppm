@@ -6,13 +6,12 @@ module;
 
 #include <entt/signal/fwd.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Window;
 struct SDL_Renderer;
 
 export module monster_war.engine.core.game_app;
 
+import common.noncopyable;
 export import monster_war.engine.audio.audio_player;
 export import monster_war.engine.core.config;
 export import monster_war.engine.core.context;

@@ -8,10 +8,9 @@ module;
 #include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 
-#include "common/noncopyable.h"
-
 export module sunny_land.engine.scene.level_loader;
 
+import common.noncopyable;
 import sunny_land.engine.component.animation_component;
 import sunny_land.engine.component.audio_component;
 import sunny_land.engine.core;

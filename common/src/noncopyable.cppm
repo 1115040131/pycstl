@@ -1,6 +1,6 @@
-#pragma once
+export module common.noncopyable;
 
-namespace pyc {
+export namespace pyc {
 
 class Noncopyable {
 public:

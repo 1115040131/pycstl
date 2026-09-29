@@ -9,10 +9,9 @@ module;
 #include <thread>
 #include <unordered_map>
 
-#include "common/singleton.h"
-
 export module network.logic:system;
 
+import common.singleton;
 import network.base;
 
 export import :node;

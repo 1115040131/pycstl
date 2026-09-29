@@ -6,10 +6,9 @@ module;
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
-#include "common/string_hash.h"
-
 module sunny_land.game.component.ai.patrol_behavior;
 
+import common.string_hash;
 import sunny_land.engine.component.animation_component;
 import sunny_land.engine.core;
 import sunny_land.game.ai;

@@ -8,10 +8,9 @@ module;
 #include <utility>
 #include <vector>
 
-#include "common/singleton.h"
-
 export module concurrency.thread_pool.steal_thread_pool;
 
+import common.singleton;
 import concurrency.thread_safe_queue;
 
 export namespace pyc::concurrency {

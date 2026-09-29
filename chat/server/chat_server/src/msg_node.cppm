@@ -6,9 +6,10 @@ module;
 #include <memory>
 
 #include "chat/common/method.h"
-#include "common/noncopyable.h"
 
 export module chat.server.chat_server.msg_node;
+
+import common.noncopyable;
 
 export namespace pyc {
 namespace chat {

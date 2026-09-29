@@ -7,7 +7,7 @@ module;
 
 export module chat.server.gate_server.define;
 
-export import logger.logger;
+import logger.logger;
 
 namespace pyc {
 namespace chat {

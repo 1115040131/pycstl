@@ -10,13 +10,12 @@ module;
 #include <entt/signal/sigh.hpp>
 #include <glm/glm.hpp>
 
-#include "common/noncopyable.h"
-
 struct SDL_Renderer;
 union SDL_Event;
 
 export module monster_war.engine.input.input_manager;
 
+import common.noncopyable;
 export import monster_war.engine.core.config;
 
 export namespace pyc::monster_war {

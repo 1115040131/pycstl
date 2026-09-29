@@ -8,10 +8,10 @@ module;
 #include <thread>
 #include <utility>
 
-#include "common/allocator_wrapper.h"
-#include "common/noncopyable.h"
-
 export module concurrency.lock_free_stack.hazard_pointer_stack;
+
+import common.allocator_wrapper;
+import common.noncopyable;
 
 export namespace pyc::concurrency {
 

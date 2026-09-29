@@ -7,9 +7,9 @@ module;
 #include <SDL3_ttf/SDL_ttf.h>
 #include <entt/core/fwd.hpp>
 
-#include "common/noncopyable.h"
-
 export module monster_war.engine.resource:font_manager;
+
+import common.noncopyable;
 
 export namespace pyc::monster_war {
 
