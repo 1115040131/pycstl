@@ -16,9 +16,9 @@ import network.utils;
 
 namespace network {
 
-void LogicSystem::PostMsgToQueue(std::unique_ptr<LogicNode> msg) {
+void LogicSystem::PostMsgToQueue(const std::shared_ptr<Session>& session, std::unique_ptr<RecvNode> recv_node) {
     std::unique_lock<std::mutex> lock(mutex_);
-    msg_queue_.push(std::move(msg));
+    msg_queue_.push(std::make_unique<LogicNode>(session, std::move(recv_node)));
 
     if (msg_queue_.size() == 1) {
         consume_.notify_one();

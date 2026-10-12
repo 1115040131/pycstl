@@ -10,9 +10,8 @@ module;
 
 #include "chat/server/proto/verify.pb.h"
 
-module chat.server.gate_server;
+module chat.server.gate_server.http;
 
-import :http_connection;
 import chat.common.error_code;
 import chat.common.method;
 import chat.server.common.mysql_mgr;

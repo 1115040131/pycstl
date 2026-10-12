@@ -10,11 +10,10 @@ module;
 
 #include <boost/asio.hpp>
 
-module chat.server.chat_server;
+module chat.server.chat_server.session;
 
-import :cserver;
-import :logic_system;
 import chat.common.method;
+import chat.server.chat_server.logic;
 import chat.server.common.utils;
 
 import logger.logger;
@@ -116,8 +115,7 @@ void CSession::AsyncReadBody(size_t total_len) {
 
             recv_node_->Copy(data_, total_len);
             // 投递数据
-            LogicSystem::GetInstance().PostMsgToQueue(
-                std::make_unique<LogicNode>(shared_from_this(), std::move(recv_node_)));
+            LogicSystem::GetInstance().PostMsgToQueue(shared_from_this(), std::move(recv_node_));
             // 继续读取
             AsyncReadHead(kHeadLength);
         } catch (const std::exception& e) {

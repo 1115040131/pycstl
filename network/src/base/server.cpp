@@ -9,8 +9,6 @@ module;
 
 module network.base;
 
-import :session;
-
 namespace network {
 
 Server::Server(asio::io_context& io_context, unsigned short port_num)

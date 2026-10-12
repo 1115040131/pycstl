@@ -16,14 +16,12 @@ module;
 
 #include "chat/server/proto/chat.pb.h"
 
-module chat.server.chat_server;
+module chat.server.chat_server.logic;
 
-import :csession;
-import :logic_node;
-import :user_mgr;
 import chat.common.error_code;
 import chat.common.method;
 import chat.server.chat_server.chat_grpc_client;
+import chat.server.chat_server.user_mgr;
 import chat.server.common.config_mgr;
 import chat.server.common.defer;
 import chat.server.common.mysql_mgr;
@@ -46,9 +44,9 @@ LogicSystem::~LogicSystem() {
     LogInfo("LogicSystem Exit.");
 }
 
-void LogicSystem::PostMsgToQueue(std::unique_ptr<LogicNode> msg) {
+void LogicSystem::PostMsgToQueue(const std::shared_ptr<CSession>& session, std::unique_ptr<RecvNode> recv_node) {
     std::unique_lock<std::mutex> lock(mutex_);
-    msg_queue_.push(std::move(msg));
+    msg_queue_.push(std::make_unique<LogicNode>(session, std::move(recv_node)));
 
     if (msg_queue_.size() == 1) {
         consume_.notify_one();

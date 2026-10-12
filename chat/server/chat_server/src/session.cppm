@@ -2,6 +2,7 @@ module;
 
 #include <cstddef>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -9,9 +10,8 @@ module;
 
 #include <boost/asio.hpp>
 
-export module chat.server.chat_server:csession;
+export module chat.server.chat_server.session;
 
-export import :cserver;
 export import chat.common.method;
 export import chat.server.chat_server.define;
 import chat.server.chat_server.msg_node;
@@ -19,7 +19,27 @@ import chat.server.chat_server.msg_node;
 export namespace pyc {
 namespace chat {
 
-class CServer;
+class CSession;
+
+class CServer {
+public:
+    CServer(boost::asio::io_context& io_context, const std::string& name, unsigned short port);
+
+    ~CServer();
+
+    void ClearSession(const std::string& session_id);
+
+private:
+    void StartAccept();
+
+    void printSessions();
+
+private:
+    std::string name_;  // 服务器名称
+    tcp::acceptor acceptor_;
+    std::map<std::string, std::shared_ptr<CSession>> sessions_;
+    std::mutex mutex_;
+};
 
 class CSession : public std::enable_shared_from_this<CSession> {
 public:
