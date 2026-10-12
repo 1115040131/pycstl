@@ -2,16 +2,13 @@ module;
 
 #include <cctype>
 #include <cstddef>
-#include <exception>
 #include <string>
 #include <string_view>
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
-module chat.server.gate_server;
-
-import :logic_system;
+module chat.server.gate_server.http;
 
 import logger.logger;
 

@@ -10,11 +10,10 @@ module;
 #include <thread>
 #include <unordered_map>
 
-export module chat.server.chat_server:logic_system;
+export module chat.server.chat_server.logic;
 
-import :csession;
-export import :logic_node;
-export import chat.common.method;
+export import chat.server.chat_server.msg_node;
+export import chat.server.chat_server.session;
 export import chat.server.common.data;
 
 import common.singleton;
@@ -27,13 +26,18 @@ class LogicSystem : public Singleton<LogicSystem> {
 
     using FunCallBack = std::function<void(const std::shared_ptr<CSession>&, const std::string& msg_data)>;
 
+    struct LogicNode {
+        std::shared_ptr<CSession> session_;
+        std::unique_ptr<RecvNode> recv_node_;
+    };
+
 private:
     LogicSystem();
 
 public:
     ~LogicSystem();
 
-    void PostMsgToQueue(std::unique_ptr<LogicNode> msg);
+    void PostMsgToQueue(const std::shared_ptr<CSession>& session, std::unique_ptr<RecvNode> recv_node);
 
     // 根据 uid 获取用户基本信息
     std::optional<UserInfo> GetBaseInfo(int uid);

@@ -5,7 +5,7 @@ module;
 #include <shared_mutex>
 #include <unordered_map>
 
-module chat.server.chat_server;
+module chat.server.chat_server.user_mgr;
 
 namespace pyc {
 namespace chat {

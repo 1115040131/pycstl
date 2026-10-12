@@ -1,16 +1,20 @@
 module;
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
-export module chat.server.gate_server:http_connection;
+export module chat.server.gate_server.http;
 
 export import chat.server.gate_server.define;
+
+import common.singleton;
 
 export namespace pyc {
 namespace chat {
@@ -45,6 +49,30 @@ private:
 
     std::string get_url_;
     std::unordered_map<std::string, std::string> get_params_;
+};
+
+class LogicSystem : public Singleton<LogicSystem> {
+    friend class Singleton<LogicSystem>;
+
+public:
+    using HttpHandler = std::function<void(const std::shared_ptr<HttpConnection>&)>;
+
+    ~LogicSystem() = default;
+
+    void RegGet(std::string_view url, HttpHandler handler);
+
+    bool HandleGet(std::string_view url, const std::shared_ptr<HttpConnection>& connection);
+
+    void RegPost(std::string_view url, HttpHandler handler);
+
+    bool HandlePost(std::string_view url, const std::shared_ptr<HttpConnection>& connection);
+
+private:
+    LogicSystem();
+
+private:
+    std::unordered_map<std::string_view, HttpHandler> get_handlers_;
+    std::unordered_map<std::string_view, HttpHandler> post_handlers_;
 };
 
 }  // namespace chat

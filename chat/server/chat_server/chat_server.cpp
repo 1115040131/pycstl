@@ -6,7 +6,7 @@
 #include <boost/asio.hpp>
 #include <grpcpp/grpcpp.h>
 
-import chat.server.chat_server;
+import chat.server.chat_server.session;
 import chat.server.chat_server.chat_service_impl;
 import chat.server.common.config_mgr;
 import chat.server.common.redis_mgr;

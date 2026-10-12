@@ -4,9 +4,9 @@ module;
 
 #include <boost/asio.hpp>
 
-export module chat.server.gate_server:cserver;
+export module chat.server.gate_server.server;
 
-import chat.server.gate_server.define;
+export import chat.server.gate_server.define;
 
 export namespace pyc {
 namespace chat {

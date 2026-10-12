@@ -7,11 +7,10 @@ module;
 
 #include <boost/asio.hpp>
 
-module chat.server.chat_server;
+module chat.server.chat_server.session;
 
-import :csession;
-import :user_mgr;
 import chat.server.chat_server.chat_grpc_client;
+import chat.server.chat_server.user_mgr;
 import chat.server.common.io_service_pool;
 import chat.server.common.status_grpc_client;
 

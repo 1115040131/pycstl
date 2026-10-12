@@ -5,10 +5,10 @@ module;
 
 #include <boost/asio.hpp>
 
-module chat.server.gate_server;
+module chat.server.gate_server.server;
 
-import :http_connection;
 import chat.server.common.io_service_pool;
+import chat.server.gate_server.http;
 
 namespace pyc {
 namespace chat {

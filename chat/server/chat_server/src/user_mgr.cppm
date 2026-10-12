@@ -4,9 +4,9 @@ module;
 #include <shared_mutex>
 #include <unordered_map>
 
-export module chat.server.chat_server:user_mgr;
+export module chat.server.chat_server.user_mgr;
 
-export import :csession;
+export import chat.server.chat_server.session;
 
 import common.singleton;
 

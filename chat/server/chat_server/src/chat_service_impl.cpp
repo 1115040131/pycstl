@@ -8,7 +8,7 @@ module chat.server.chat_server.chat_service_impl;
 
 import chat.common.error_code;
 import chat.common.method;
-import chat.server.chat_server;
+import chat.server.chat_server.user_mgr;
 
 namespace pyc {
 namespace chat {
