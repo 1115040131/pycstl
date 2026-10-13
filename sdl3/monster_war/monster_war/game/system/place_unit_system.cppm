@@ -4,7 +4,7 @@ module;
 
 #include <entt/entity/entity.hpp>
 #include <entt/signal/fwd.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module monster_war.game.system.place_unit_system;
 

@@ -1,5 +1,3 @@
-module;
-
 export module sunny_land.engine.core:context;
 
 import common.noncopyable;

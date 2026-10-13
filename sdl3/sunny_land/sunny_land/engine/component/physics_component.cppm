@@ -4,7 +4,7 @@ module;
 #include <chrono>
 #include <utility>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module sunny_land.engine.core:physics_component;
 

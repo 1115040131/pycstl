@@ -3,7 +3,7 @@ module;
 #include <unordered_map>
 
 #include <entt/entity/fwd.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 #include <nlohmann/json_fwd.hpp>
 
 export module monster_war.game.factory.entity_factory;

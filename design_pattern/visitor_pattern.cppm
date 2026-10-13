@@ -1,6 +1,6 @@
 module;
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 
 export module design_pattern.visitor_pattern;
 

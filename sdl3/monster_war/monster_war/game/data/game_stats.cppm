@@ -1,5 +1,3 @@
-module;
-
 export module monster_war.game.data.game_stats;
 
 export namespace pyc::monster_war {

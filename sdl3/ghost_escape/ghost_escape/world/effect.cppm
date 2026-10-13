@@ -5,7 +5,7 @@ module;
 #include <string>
 #include <utility>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module ghost_escape.world.effect;
 

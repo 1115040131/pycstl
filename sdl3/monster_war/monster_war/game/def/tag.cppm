@@ -1,5 +1,3 @@
-module;
-
 export module monster_war.game.def.tag;
 
 export namespace pyc::monster_war {

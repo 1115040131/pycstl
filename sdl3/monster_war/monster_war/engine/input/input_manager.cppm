@@ -8,7 +8,7 @@ module;
 
 #include <SDL3/SDL_scancode.h>
 #include <entt/signal/sigh.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 struct SDL_Renderer;
 union SDL_Event;

@@ -5,7 +5,7 @@ module;
 #include <utility>
 #include <vector>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module sunny_land.engine.ui.ui_element;
 

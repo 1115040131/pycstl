@@ -1,5 +1,3 @@
-module;
-
 export module monster_war.engine.utils.alignment;
 
 export namespace pyc::monster_war {

@@ -5,7 +5,7 @@ module;
 #include <utility>
 
 #include <entt/entt.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module monster_war.engine.ui.ui_image;
 

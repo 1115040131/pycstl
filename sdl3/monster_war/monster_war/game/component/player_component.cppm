@@ -1,5 +1,3 @@
-module;
-
 export module monster_war.game.component.player_component;
 
 export namespace pyc::monster_war {

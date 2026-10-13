@@ -5,7 +5,7 @@ module;
 #include <vector>
 
 #include <SDL3/SDL_rect.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module sunny_land.engine.core:tilelayer_component;
 

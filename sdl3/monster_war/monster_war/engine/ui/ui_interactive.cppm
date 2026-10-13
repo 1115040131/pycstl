@@ -2,10 +2,11 @@ module;
 
 #include <chrono>
 #include <string_view>
+#include <unordered_map>
 
 #include <entt/entity/entity.hpp>
 #include <entt/entity/fwd.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module monster_war.engine.ui:ui_interactive;
 

@@ -3,7 +3,7 @@ module;
 #include <optional>
 
 #include <SDL3/SDL_rect.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 struct SDL_Renderer;
 

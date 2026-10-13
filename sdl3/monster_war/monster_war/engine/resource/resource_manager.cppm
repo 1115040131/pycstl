@@ -4,7 +4,7 @@ module;
 #include <string_view>
 
 #include <entt/core/fwd.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 struct SDL_Renderer;
 struct SDL_Texture;

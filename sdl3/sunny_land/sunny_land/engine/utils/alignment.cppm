@@ -1,5 +1,3 @@
-module;
-
 export module sunny_land.engine.utils.alignment;
 
 export namespace pyc::sunny_land {

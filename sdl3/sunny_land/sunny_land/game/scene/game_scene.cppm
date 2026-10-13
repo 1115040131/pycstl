@@ -5,8 +5,7 @@ module;
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module sunny_land.game.scene:game_scene;
 
@@ -47,9 +46,7 @@ private:
     void showEndScene(bool is_win);         ///< @brief 显示结束场景
 
     /// @brief 根据关卡名称获取对应的地图文件路径
-    std::string levelNameToPath(std::string_view level_name) const {
-        return fmt::format("assets/maps/{}.tmj", level_name);
-    }
+    std::string levelNameToPath(std::string_view level_name) const;
 
     /**
      * @brief 创建一个特效对象（一次性）。
