@@ -5,7 +5,7 @@ module;
 #include <unordered_map>
 #include <vector>
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 
 export module design_pattern.component_pattern;
 

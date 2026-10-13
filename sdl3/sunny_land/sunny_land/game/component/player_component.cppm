@@ -3,8 +3,6 @@ module;
 #include <chrono>
 #include <memory>
 
-#include <glm/glm.hpp>
-
 export module sunny_land.game.player:player_component;
 
 export import :player_state;

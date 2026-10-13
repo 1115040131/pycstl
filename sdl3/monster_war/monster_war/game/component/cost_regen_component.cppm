@@ -1,5 +1,3 @@
-module;
-
 export module monster_war.game.component.cost_regen_component;
 
 export namespace pyc::monster_war {

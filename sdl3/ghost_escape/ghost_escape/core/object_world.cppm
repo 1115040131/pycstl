@@ -2,7 +2,7 @@ module;
 
 #include <chrono>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module ghost_escape.core:world;
 

@@ -5,7 +5,7 @@ module;
 #include <string_view>
 #include <unordered_map>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module sunny_land.engine.ui:ui_interactive;
 

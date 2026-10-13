@@ -356,6 +356,10 @@ void GameScene::toNextLevel(GameObject* trigger) {
     scene_manager_.requestReplaceScene(std::move(next_scene));
 }
 
+std::string GameScene::levelNameToPath(std::string_view level_name) const {
+    return fmt::format("assets/maps/{}.tmj", level_name);
+}
+
 void GameScene::showEndScene(bool is_win) {
     spdlog::debug("显示结束场景，游戏 {}", is_win ? "胜利" : "失败");
     game_session_data_->setIsWin(is_win);

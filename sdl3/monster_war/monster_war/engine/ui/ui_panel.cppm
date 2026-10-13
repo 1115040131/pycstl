@@ -2,7 +2,7 @@ module;
 
 #include <optional>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module monster_war.engine.ui.ui_panel;
 

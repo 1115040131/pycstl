@@ -6,7 +6,7 @@ module;
 #include <unordered_map>
 
 #include <SDL3/SDL_render.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module sunny_land.engine.resource:texture_manager;
 

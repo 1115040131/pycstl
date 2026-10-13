@@ -4,7 +4,7 @@ module;
 #include <memory>
 #include <string>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module ghost_escape.world.spell;
 

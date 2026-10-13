@@ -3,8 +3,6 @@ module;
 #include <chrono>
 #include <string>
 
-#include <glm/glm.hpp>
-
 export module ghost_escape.screen.ui_mouse;
 
 export import ghost_escape.affiliate.sprite;

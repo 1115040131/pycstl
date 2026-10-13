@@ -1,5 +1,3 @@
-module;
-
 export module monster_war.engine.ui.state.ui_pressed_state;
 
 export import monster_war.engine.ui;

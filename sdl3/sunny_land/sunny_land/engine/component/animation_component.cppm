@@ -6,8 +6,6 @@ module;
 #include <string_view>
 #include <unordered_map>
 
-#include <glm/glm.hpp>
-
 export module sunny_land.engine.component.animation_component;
 
 import common.string_hash;

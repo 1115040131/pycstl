@@ -5,7 +5,7 @@ module;
 #include <string>
 #include <string_view>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 #include <nlohmann/json.hpp>
 
 export module sunny_land.engine.scene.level_loader;

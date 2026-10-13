@@ -16,6 +16,10 @@ GameObject::GameObject(std::string_view name, std::string_view tag) : name_(name
     spdlog::trace("GameObject created: {} {}", name_, tag_);
 }
 
+void GameObject::logComponentAdded(const char* type_name) const {
+    spdlog::debug("GameObject::addComponent: {} added component {}", name_, type_name);
+}
+
 void GameObject::handleInput(Context& context) {
     for (auto& [_, component] : components_) {
         component->handleInput(context);

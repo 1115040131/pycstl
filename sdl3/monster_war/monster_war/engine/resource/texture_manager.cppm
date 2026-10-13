@@ -6,7 +6,7 @@ module;
 
 #include <SDL3/SDL_render.h>
 #include <entt/core/fwd.hpp>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module monster_war.engine.resource:texture_manager;
 

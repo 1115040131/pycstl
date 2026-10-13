@@ -1,5 +1,3 @@
-module;
-
 export module sunny_land.game.scene.helps_scene;
 
 export import sunny_land.engine.scene;

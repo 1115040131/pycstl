@@ -1,24 +1,17 @@
 """Repo-wide defaults for the main repository (does not apply to external repos).
 
-layering_check 的豁免(features = ["-layering_check"]) —— 拿不到 module map 的场景:
-- qt/*、chat/client*: @rules_qt//:qt_* 是无 hdrs 的转发 cc_library, 生成空 module 又不
-  re-export deps(alias 能穿透, cc_library(deps = ...) 不行), 改造需上游配合;
-  moc/uic 生成的代码同理。
-- sdl2/*、sdl3/*: 经 rules_foreign_cc 的 cmake() 构建, 上游 disable 了 module_maps,
-  而建 module map 的 Starlark API 是 private 的, alias 也救不了, 故只豁免直接
-  include SDL 头的 target(非整包)。
-
-parse_headers 的豁免(features = ["-parse_headers"]) —— 无法独立成 TU 的头:
-- chat/client/widget: uic 生成的 ui_*.h, include 路径与 Qt module 依赖都由使用者提供。
+layering_check 关闭的原因 —— 与 cpp_modules 互斥, 不是豁免能解决的:
+- C++20 起 clang 把 layering_check 用的 module map 当成 C++ 模块处理, 任何 #include 都报
+  "module 'crosstool' is needed but has not been provided"。
+- toolchains_llvm 的规避是加 -fno-cxx-modules, 但只在没开 cpp_modules 时才加; 这里全局
+  开了 cpp_modules, 所以带 #include 的 .cpp 全部编不过(.cppm 的编译动作本来就不带
+  layering 参数, 等于没检查)。
 """
 
 repo(
-    # layering_check: include 了哪个库的头, 就必须在 deps 里声明
-    # parse_headers: 每个 hdrs 单独编成一个 TU, 靠包含顺序才成立的头会构建失败
-    # 20260920： C++20 模块化重构中, 关闭该feature
+    # layering_check: include 了哪个库的头, 就必须在 deps 里声明(与 cpp_modules 互斥, 见上)
     features = [
         # "layering_check",
-        # "parse_headers",
         "cpp_modules",
     ],
 )

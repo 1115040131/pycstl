@@ -11,8 +11,7 @@ module;
 #include <SDL3/SDL.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <fmt/base.h>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 export module ghost_escape.core:game;
 

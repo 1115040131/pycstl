@@ -2,7 +2,7 @@ module;
 
 #include <string_view>
 
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 struct SDL_Renderer;
 struct TTF_TextEngine;

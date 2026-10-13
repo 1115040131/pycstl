@@ -1,5 +1,3 @@
-module;
-
 export module tetris.engine;
 
 import common.singleton;

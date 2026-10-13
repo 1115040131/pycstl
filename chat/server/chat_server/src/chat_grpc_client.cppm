@@ -4,8 +4,6 @@ module;
 #include <string>
 #include <unordered_map>
 
-#include <nlohmann/json.hpp>
-
 #include "chat/server/proto/chat.pb.h"
 
 export module chat.server.chat_server.chat_grpc_client;

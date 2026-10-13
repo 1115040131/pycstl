@@ -9,8 +9,6 @@ module;
 #include <unordered_map>
 #include <utility>
 
-#include <spdlog/spdlog.h>
-
 export module sunny_land.engine.core:game_object;
 
 import common.noncopyable;
@@ -63,7 +61,7 @@ public:
         new_component->setOwner(this);                       // 设置组件的拥有者
         components_[type_index] = std::move(new_component);  // 移动组件
         ptr->init();                                         // 初始化组件 （因此必须用ptr而不能用new_component）
-        spdlog::debug("GameObject::addComponent: {} added component {}", name_, typeid(T).name());
+        logComponentAdded(typeid(T).name());
         return ptr;  // 返回非拥有指针
     }
 
@@ -120,6 +118,8 @@ public:
     void clean();                                                            ///< @brief 清理所有组件
 
 private:
+    void logComponentAdded(const char* type_name) const;  ///< @brief 记录组件添加日志(避免接口依赖spdlog)
+
     std::string name_;                                                            ///< @brief 名称
     std::string tag_;                                                             ///< @brief 标签
     std::unordered_map<std::type_index, std::unique_ptr<Component>> components_;  ///< @brief 组件列表
